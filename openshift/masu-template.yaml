@@ -1,0 +1,297 @@
+kind: Template
+apiVersion: v1
+metadata:
+  name: masu-template
+  annotations:
+    openshift.io/display-name: "Masu"
+    description: "Data ingestion engine for Koku"
+    tags: "python,flask"
+    iconClass: "icon-python"
+    openshift.io/long-description: "This template defines resources needed to run the Masu application, including a build configuration and an application deployment configuration."
+    openshift.io/provider-display-name: "Red Hat, Inc."
+    openshift.io/documentation-url: "https://koku.readthedocs.io/en/latest/"
+labels:
+  app: masu
+  template: masu-template
+objects:
+- kind: ImageStream
+  apiVersion: v1
+  metadata:
+    name: ${NAME}
+    annotations:
+      description: "Keeps track of changes in the application image"
+- kind: Secret
+  apiVersion: v1
+  metadata:
+    labels:
+      app: ${NAME}
+      template: ${NAME}-template
+    annotations:
+      template.openshift.io/expose-secret-key: "{.data['masu-secret-key']}"
+    name: ${NAME}
+  stringData:
+    masu-secret-key: ${MASU_SECRET_KEY}
+- kind: ConfigMap
+  apiVersion: v1
+  metadata:
+    name: ${NAME}
+    labels:
+      name: ${NAME}
+  data:
+    database-engine: ${DATABASE_ENGINE}
+    database-name: ${DATABASE_NAME}
+    database-service-name: POSTGRES_SQL
+    postgres-sql-service-host: ${DATABASE_SERVICE_NAME}.${NAMESPACE}.svc
+    postgres-sql-service-port: "5432"
+    app-config: ${APP_CONFIG}
+    app-home: ${APP_HOME}
+    app-module: ${APP_MODULE}
+- kind: Service
+  apiVersion: v1
+  metadata:
+    annotations:
+      description: Exposes and load balances the application pods
+      service.alpha.openshift.io/dependencies: '[{"name": "${DATABASE_SERVICE_NAME}", "kind": "Service"}]'
+    name: ${NAME}
+  spec:
+    ports:
+    - name: 8080-tcp
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+    selector:
+      name: ${NAME}
+- kind: Route
+  apiVersion: v1
+  metadata:
+    name: ${NAME}
+  spec:
+    host: ${APPLICATION_DOMAIN}
+    to:
+      kind: Service
+      name: ${NAME}
+- kind: BuildConfig
+  apiVersion: v1
+  metadata:
+    annotations:
+      description: Defines how to build the application
+      template.alpha.openshift.io/wait-for-ready: "true"
+    name: ${NAME}
+  spec:
+    output:
+      to:
+        kind: ImageStreamTag
+        name: ${NAME}:latest
+    source:
+      contextDir: ${CONTEXT_DIR}
+      git:
+        ref: ${SOURCE_REPOSITORY_REF}
+        uri: ${SOURCE_REPOSITORY_URL}
+      type: Git
+    strategy:
+      sourceStrategy:
+        env:
+          - name: PIP_INDEX_URL
+            value: ${PIP_INDEX_URL}
+          - name: ENABLE_PIPENV
+            value: "true"
+          - name: APP_CONFIG
+            valueFrom:
+              configMapKeyRef:
+                name: ${NAME}
+                key: app-config
+                optional: false
+          - name: APP_HOME
+            valueFrom:
+              configMapKeyRef:
+                name: ${NAME}
+                key: app-home
+          - name: APP_MODULE
+            valueFrom:
+              configMapKeyRef:
+                name: ${NAME}
+                key: app-module
+        from:
+          kind: ImageStreamTag
+          name: python-36-centos7:latest
+          namespace: ${NAMESPACE}
+    triggers:
+    - type: ConfigChange
+    - imageChange: {}
+      type: ImageChange
+    - github:
+        secret: ${GITHUB_WEBHOOK_SECRET}
+      type: GitHub
+- kind: DeploymentConfig
+  apiVersion: v1
+  metadata:
+    annotations:
+      description: Defines how to deploy the application server
+      template.alpha.openshift.io/wait-for-ready: "true"
+    name: ${NAME}
+  spec:
+    replicas: 1
+    selector:
+      name: ${NAME}
+    strategy:
+      type: Recreate
+    template:
+      metadata:
+        labels:
+          name: ${NAME}
+        name: ${NAME}
+      spec:
+        containers:
+        - name: ${NAME}
+          image: ${NAME}
+          env:
+            - name: DATABASE_USER
+              valueFrom:
+                secretKeyRef:
+                  key: database-user
+                  name: ${DATABASE_SERVICE_NAME}
+                  optional: false
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: database-password
+                  name: ${DATABASE_SERVICE_NAME}
+                  optional: false
+            - name: MASU_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  key: masu-secret-key
+                  name: ${NAME}
+                  optional: false
+            - name: DATABASE_ENGINE
+              valueFrom:
+                configMapKeyRef:
+                  name: ${NAME}
+                  key: database-engine
+                  optional: false
+            - name: DATABASE_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: ${NAME}
+                  key: database-name
+                  optional: false
+            - name: DATABASE_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: ${NAME}
+                  key: postgres-sql-service-host
+                  optional: false
+            - name: DATABASE_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: ${NAME}
+                  key: postgres-sql-service-port
+                  optional: false
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /api/v1/status
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 3
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /api/v1/status
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 3
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+            timeoutSeconds: 3
+          resources:
+            limits:
+              memory: ${MEMORY_LIMIT}
+    triggers:
+    - type: ConfigChange
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+          - ${NAME}
+        from:
+          kind: ImageStreamTag
+          name: ${NAME}:latest
+      type: ImageChange
+parameters:
+- description: The name assigned to all frontend objects defined in this template.
+  displayName: Name
+  name: NAME
+  required: true
+  value: masu
+- description: The OpenShift Namespace where the ImageStream resides.
+  displayName: Namespace
+  name: NAMESPACE
+  required: true
+  value: myproject
+- description: Maximum amount of memory the app container can use.
+  displayName: Memory Limit
+  name: MEMORY_LIMIT
+  required: true
+  value: 512Mi
+- description: The URL of the repository with your application source code.
+  displayName: Git Repository URL
+  name: SOURCE_REPOSITORY_URL
+  required: true
+  value: https://github.com/project-koku/masu.git
+- description: Set this to a branch name, tag or other ref of your repository if you
+    are not using the default branch.
+  displayName: Git Reference
+  name: SOURCE_REPOSITORY_REF
+- description: Set this to the relative path to your project if it is not in the root
+    of your repository.
+  displayName: Context Directory
+  name: CONTEXT_DIR
+- description: The exposed hostname that will route to the app service, if left
+    blank a value will be defaulted.
+  displayName: Application Hostname
+  name: APPLICATION_DOMAIN
+- description: Github trigger secret.  A difficult to guess string encoded as part
+    of the webhook URL.  Not encrypted.
+  displayName: GitHub Webhook Secret
+  from: '[a-zA-Z0-9]{40}'
+  generate: expression
+  name: GITHUB_WEBHOOK_SECRET
+- displayName: Database Service Name
+  name: DATABASE_SERVICE_NAME
+  required: true
+  value: koku-pgsql
+- description: 'Database engine: postgresql, mysql or sqlite (default).'
+  displayName: Database Engine
+  name: DATABASE_ENGINE
+  required: true
+  value: postgresql
+- displayName: Database Name
+  name: DATABASE_NAME
+  required: true
+  value: koku
+- description: Absolute path to Gunicorn configuration file (optional).
+  displayName: Application Configuration File Path
+  name: APP_CONFIG
+  value: /opt/app-root/src/masu/gunicorn.py
+- description: Absolute path to application install location (optional).
+  displayName: Application Home Directory
+  name: APP_HOME
+  value: /opt/app-root/src/masu
+- description: Python module name of the application (optional).
+  displayName: Application Module Name
+  name: APP_MODULE
+  value: masu.__init__:create_app()
+- description: Set this to a long random string.
+  displayName: Application Secret Key
+  from: '[a-zA-Z0-9]{50}'
+  generate: expression
+  name: MASU_SECRET_KEY
+- description: The custom PyPi index URL
+  displayName: Custom PyPi Index URL
+  name: PIP_INDEX_URL

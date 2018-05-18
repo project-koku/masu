@@ -4,6 +4,9 @@ branch = True
 source = masu
 omit =
   *config.py
+  *tests/*
+  */test_*.py
+  masu/gunicorn.py
 
 [report]
 # Regexes for lines to exclude from consideration

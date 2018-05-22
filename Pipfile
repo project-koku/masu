@@ -4,7 +4,6 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 name = "pypi"
 
-
 [packages]
 
 boto3 = "==1.7.25"
@@ -19,8 +18,7 @@ pylint = "==1.9.1"
 coverage = "==4.5.1"
 codecov = "==2.0.15"
 tox = "==3.0.0"
-
+faker = "==0.8.15"
 
 [requires]
-
 python_version = "3.6"

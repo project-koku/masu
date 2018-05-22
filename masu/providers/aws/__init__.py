@@ -15,23 +15,4 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-"""Common Test Case class for Masu tests."""
-
-from unittest import TestCase
-
-from masu import create_app
-
-
-class MasuTestCase(TestCase):
-    """Subclass of TestCase that automatically create an app and client."""
-
-    def setUp(self):
-        """Create test case setup."""
-        self.app = create_app(
-            {
-                'TESTING': True,
-                'SQLALCHEMY_TRACK_MODIFICATIONS': False,
-                'SQLALCHEMY_DATABASE_URI': 'sqlite:///test.db'
-            }
-        )
-        self.client = self.app.test_client()
+"""AWS Provider functions."""

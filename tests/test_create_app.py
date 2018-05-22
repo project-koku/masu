@@ -17,8 +17,6 @@
 
 """Test the app factory for Masu."""
 
-import random
-import string
 from unittest import TestCase
 from unittest.mock import patch
 
@@ -28,10 +26,6 @@ from masu import create_app
 class CreateAppTest(TestCase):
     """Test Cases for create_app app factory."""
 
-    secret_key = ''.join([random.choice(string.hexdigits)
-                          for _ in range(16)])
-
-    @patch.dict('os.environ', {'MASU_SECRET_KEY': secret_key})
     def test_create_app(self):
         """Assert testing is false without passing test config."""
         self.assertFalse(create_app().testing)
@@ -43,7 +37,7 @@ class CreateAppTest(TestCase):
                 {
                     'TESTING': True,
                     'SQLALCHEMY_TRACK_MODIFICATIONS': False,
-                    'SQLALCHEMY_DATABASE_URI': 'sqlite:///:memory:',
+                    'SQLALCHEMY_DATABASE_URI': 'sqlite:///:memory:'
                 }
             ).testing
         )

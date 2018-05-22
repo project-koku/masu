@@ -60,7 +60,7 @@ oc-down:
 oc-clean: oc-down
 	$(PREFIX) rm -rf $(OC_DATA_DIR)
 
-oc-dev-db: oc-create-tags oc-create-db-dev
+oc-dev-db: oc-create-tags oc-create-dev-db
 
 oc-dev-all: oc-create-tags oc-create-dev-db oc-create-masu
 
@@ -90,7 +90,7 @@ oc-rm-dev:
 
 oc-forward-ports:
 	-make oc-stop-forwarding-ports 2>/dev/null
-	oc port-forward $$(oc get pods -o jsonpath='{.items[*].metadata.name}' -l name=masu-pgsql) 15432:5432 >/dev/null 2>&1 &
+	oc port-forward $$(oc get pods -o jsonpath='{.items[*].metadata.name}' -l name=koku-pgsql) 15432:5432 >/dev/null 2>&1 &
 
 oc-stop-forwarding-ports:
 	kill -HUP $$(ps -eo pid,command | grep "oc port-forward" | grep -v grep | awk '{print $$1}')

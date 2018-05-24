@@ -4,9 +4,10 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 name = "pypi"
 
+
 [packages]
 
-boto3 = "==1.7.25"
+boto3 = "==1.7.26"
 flask = "==1.0.2"
 flask-sqlalchemy = "==2.3.2"
 gunicorn = "==19.8.1"
@@ -20,5 +21,7 @@ codecov = "==2.0.15"
 tox = "==3.0.0"
 faker = "==0.8.15"
 
+
 [requires]
+
 python_version = "3.6"

@@ -103,7 +103,7 @@ ENV/
 
 # Editor settings
 .vscode/
-.sw{p,o}
+*.sw?
 
 # Database files
 *.db

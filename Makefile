@@ -16,23 +16,24 @@ endif
 
 help:
 	@echo "Please use \`make <target>' where <target> is one of:"
-	@echo "  clean                    to clean the project directory of any scratch files, bytecode, logs, etc."
-	@echo "  help                     to show this message"
-	@echo "  lint                     to run linting against the project"
-	@echo "  serve                    to run the Flask dev server locally"
-	@echo "  unittest                 to run unittests"
-	@echo "  oc-up                    to initialize an openshift cluster"
-	@echo "  oc-down                  to stop app & openshift cluster"
-	@echo "  oc-clean                 to stop openshift cluster & remove local config data"
-	@echo "  oc-dev-db                to run Postgres in an openshift cluster"
-	@echo "  oc-dev-all               to run app and Postgres in openshift cluster"
-	@echo "  oc-create-tags           to create image stream tags"
-	@echo "  oc-create-dev-db         to create a Postgres DB in an initialized openshift cluster"
-	@echo "  oc-create-masu           to create a the masu app in an initialized openshift cluster"
-	@echo "  oc-rm-dev                to delete Openshift objects without a cluster restart"
-	@echo "  oc-forward-ports         to port forward the DB to localhost"
-	@echo "  oc-stop-forwarding-ports to stop port forwarding the DB to localhost"
-	@echo "  oc-serve 			 	  to run Django server locally against an Openshift DB"
+	@echo "  clean                     clean the project directory of scratch files, bytecode, logs, etc."
+	@echo "  help                      show this message"
+	@echo "  lint                      run linting against the project"
+	@echo "  oc-clean                  stop openshift cluster & remove local config data"
+	@echo "  oc-create-dev-db          create a Postgres DB in an initialized openshift cluster"
+	@echo "  oc-create-masu            create the masu app in an initialized openshift cluster"
+	@echo "  oc-create-rabbitmq        create a RabbitMQ broker in an initialized openshift cluster"
+	@echo "  oc-create-tags            create image stream tags"
+	@echo "  oc-dev-all                run all application services in openshift cluster"
+	@echo "  oc-dev-db                 run Postgres in an openshift cluster"
+	@echo "  oc-down                   stop openshift cluster and all running apps"
+	@echo "  oc-forward-ports          port forward the DB to localhost"
+	@echo "  oc-rm-dev                 delete Openshift objects without a cluster restart"
+	@echo "  oc-serve                  run Django server locally against an Openshift DB"
+	@echo "  oc-stop-forwarding-ports  stop port forwarding the DB to localhost"
+	@echo "  oc-up                     initialize an openshift cluster"
+	@echo "  serve                     run the Flask dev server locally"
+	@echo "  unittest                  run unittests"
 
 clean:
 	git clean -fdx -e .idea/ -e *env/
@@ -62,7 +63,7 @@ oc-clean: oc-down
 
 oc-dev-db: oc-create-tags oc-create-dev-db
 
-oc-dev-all: oc-create-tags oc-create-dev-db oc-create-masu
+oc-dev-all: oc-create-tags oc-create-dev-db oc-create-masu oc-create-rabbitmq
 
 oc-create-tags:
 	oc create istag postgresql:9.6 --from-image=centos/postgresql-96-centos7
@@ -81,6 +82,11 @@ oc-create-dev-db:
 
 oc-create-masu:
 	oc process -f $(TOPDIR)/openshift/masu-template.yaml \
+		-p SOURCE_REPOSITORY_REF=$(shell git rev-parse --abbrev-ref HEAD) \
+	| oc create -f -
+
+oc-create-rabbitmq:
+	oc process -f $(TOPDIR)/openshift/rabbitmq.yaml \
 		-p SOURCE_REPOSITORY_REF=$(shell git rev-parse --abbrev-ref HEAD) \
 	| oc create -f -
 

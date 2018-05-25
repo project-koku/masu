@@ -7,7 +7,7 @@ name = "pypi"
 
 [packages]
 
-boto3 = "==1.7.26"
+boto3 = "==1.7.27"
 flask = "==1.0.2"
 flask-sqlalchemy = "==2.3.2"
 gunicorn = "==19.8.1"

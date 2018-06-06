@@ -91,7 +91,16 @@ oc-create-rabbitmq:
 	| oc create -f -
 
 oc-rm-dev:
-	oc delete imagestreams --all && oc delete dc --all && oc delete svc --all && oc delete bc --all && oc delete routes --all && oc delete statefulsets --all && oc delete configmap/masu secret/masu secret/koku-pgsql pvc/koku-pgsql
+	oc delete is --all && \
+	oc delete dc --all && \
+	oc delete bc --all && \
+	oc delete svc --all && \
+	oc delete pvc --all && \
+	oc delete routes --all && \
+	oc delete statefulsets --all && \
+	oc delete configmap/masu \
+		secret/masu \
+		secret/koku-pgsql \
 
 oc-forward-ports:
 	-make oc-stop-forwarding-ports 2>/dev/null

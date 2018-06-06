@@ -14,25 +14,16 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
-
-"""Common Test Case class for Masu tests."""
-
-from unittest import TestCase
-
-from masu import create_app
+"""Masu Processor Exceptions."""
 
 
-class MasuTestCase(TestCase):
-    """Subclass of TestCase that automatically create an app and client."""
+class MasuProcessingError(Exception):
+    """Masu Processing Error."""
 
-    def setUp(self):
-        """Create test case setup."""
-        self.app = create_app(
-            {
-                'TESTING': True,
-                'SQLALCHEMY_TRACK_MODIFICATIONS': False,
-                'SQLALCHEMY_DATABASE_URI': 'sqlite:///test.db',
-                'CELERY_RESULT_BACKEND': 'db+sqlite:///test.db'
-            }
-        )
-        self.client = self.app.test_client()
+    pass
+
+
+class MasuProviderError(Exception):
+    """Masu Provider Error."""
+
+    pass

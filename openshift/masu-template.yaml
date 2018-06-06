@@ -46,6 +46,7 @@ objects:
     app-config: ${APP_CONFIG}
     app-home: ${APP_HOME}
     app-module: ${APP_MODULE}
+    rabbitmq-host: rabbitmq.${NAMESPACE}.svc
 - kind: Service
   apiVersion: v1
   metadata:
@@ -187,6 +188,12 @@ objects:
                   name: ${NAME}
                   key: postgres-sql-service-port
                   optional: false
+            - name: RABBITMQ_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: ${NAME}
+                  key: rabbitmq-host
+                  optional: false
           livenessProbe:
             failureThreshold: 3
             httpGet:
@@ -210,6 +217,96 @@ objects:
             successThreshold: 1
             failureThreshold: 3
             timeoutSeconds: 3
+          resources:
+            limits:
+              memory: ${MEMORY_LIMIT}
+    triggers:
+    - type: ConfigChange
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+          - ${NAME}
+        from:
+          kind: ImageStreamTag
+          name: ${NAME}:latest
+      type: ImageChange
+- kind: DeploymentConfig
+  apiVersion: v1
+  metadata:
+    annotations:
+      description: Defines how to deploy the celery workers
+      template.alpha.openshift.io/wait-for-ready: "true"
+    name: ${NAME}-worker
+  spec:
+    replicas: 1
+    selector:
+      name: ${NAME}
+    strategy:
+      type: Recreate
+    template:
+      metadata:
+        labels:
+          name: ${NAME}
+        name: ${NAME}
+      spec:
+        containers:
+        - name: ${NAME}
+          image: ${NAME}
+          command:
+            - /bin/bash
+            - -c
+            - >
+              PYTHONPATH=. scl enable rh-python36 --
+              celery -A masu.celery.worker:CELERY worker -B -E
+          env:
+            - name: DATABASE_USER
+              valueFrom:
+                secretKeyRef:
+                  key: database-user
+                  name: ${DATABASE_SERVICE_NAME}
+                  optional: false
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: database-password
+                  name: ${DATABASE_SERVICE_NAME}
+                  optional: false
+            - name: MASU_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  key: masu-secret-key
+                  name: ${NAME}
+                  optional: false
+            - name: DATABASE_ENGINE
+              valueFrom:
+                configMapKeyRef:
+                  name: ${NAME}
+                  key: database-engine
+                  optional: false
+            - name: DATABASE_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: ${NAME}
+                  key: database-name
+                  optional: false
+            - name: DATABASE_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: ${NAME}
+                  key: postgres-sql-service-host
+                  optional: false
+            - name: DATABASE_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: ${NAME}
+                  key: postgres-sql-service-port
+                  optional: false
+            - name: RABBITMQ_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: ${NAME}
+                  key: rabbitmq-host
+                  optional: false
           resources:
             limits:
               memory: ${MEMORY_LIMIT}

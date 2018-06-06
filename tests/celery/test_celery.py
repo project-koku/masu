@@ -14,25 +14,18 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
+"""Test the celery functions."""
 
-"""Common Test Case class for Masu tests."""
+from celery import Celery
 
-from unittest import TestCase
+from masu.celery import create_celery
+from tests import MasuTestCase
 
-from masu import create_app
 
+class CeleryTest(MasuTestCase):
+    """Test Cases for the Celery functions."""
 
-class MasuTestCase(TestCase):
-    """Subclass of TestCase that automatically create an app and client."""
-
-    def setUp(self):
-        """Create test case setup."""
-        self.app = create_app(
-            {
-                'TESTING': True,
-                'SQLALCHEMY_TRACK_MODIFICATIONS': False,
-                'SQLALCHEMY_DATABASE_URI': 'sqlite:///test.db',
-                'CELERY_RESULT_BACKEND': 'db+sqlite:///test.db'
-            }
-        )
-        self.client = self.app.test_client()
+    def test_make_celery(self):
+        """Test that we can get a celery object."""
+        queue = create_celery(self.app)
+        self.assertIsInstance(queue, Celery)

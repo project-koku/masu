@@ -53,6 +53,7 @@ oc-up:
 		--version=$(OC_VERSION) \
 		--host-data-dir=$(OC_DATA_DIR) \
 		--use-existing-config=true
+	oc login -u developer --insecure-skip-tls-verify=true localhost:8443
 	sleep 60
 
 oc-down:
@@ -70,7 +71,6 @@ oc-create-tags:
 	oc create istag python-36-centos7:latest --from-image=centos/python-36-centos7
 
 oc-create-dev-db:
-	oc login -u developer
 	oc process openshift//postgresql-persistent \
 		-p NAMESPACE=myproject \
 		-p POSTGRESQL_USER=kokuadmin \
@@ -91,7 +91,6 @@ oc-create-rabbitmq:
 	| oc create -f -
 
 oc-rm-dev:
-	oc login -u developer
 	oc delete imagestreams --all && oc delete dc --all && oc delete svc --all && oc delete bc --all && oc delete routes --all && oc delete statefulsets --all && oc delete configmap/masu secret/masu secret/koku-pgsql pvc/koku-pgsql
 
 oc-forward-ports:

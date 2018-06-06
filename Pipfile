@@ -11,7 +11,7 @@ boto3 = "==1.7.31"
 flask = "==1.0.2"
 flask-sqlalchemy = "==2.3.2"
 gunicorn = "==19.8.1"
-
+celery = "==4.1.1"
 
 [dev-packages]
 

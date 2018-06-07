@@ -19,6 +19,7 @@ help:
 	@echo "  clean                     clean the project directory of scratch files, bytecode, logs, etc."
 	@echo "  help                      show this message"
 	@echo "  lint                      run linting against the project"
+	@echo "  test-db                   create database schemas and tables"
 	@echo "  oc-clean                  stop openshift cluster & remove local config data"
 	@echo "  oc-create-dev-db          create a Postgres DB in an initialized openshift cluster"
 	@echo "  oc-create-masu            create the masu app in an initialized openshift cluster"
@@ -29,6 +30,7 @@ help:
 	@echo "  oc-down                   stop openshift cluster and all running apps"
 	@echo "  oc-forward-ports          port forward the DB to localhost"
 	@echo "  oc-rm-dev                 delete Openshift objects without a cluster restart"
+	@echo "  oc-test-db                create database schemas and tables"
 	@echo "  oc-serve                  run Django server locally against an Openshift DB"
 	@echo "  oc-stop-forwarding-ports  stop port forwarding the DB to localhost"
 	@echo "  oc-up                     initialize an openshift cluster"
@@ -40,6 +42,8 @@ clean:
 
 lint:
 	tox -elint
+
+test-db: $(TOPDIR)/tests/create_db.sh
 
 unittest:
 	tox -e py36
@@ -111,4 +115,9 @@ oc-stop-forwarding-ports:
 
 oc-serve: oc-forward-ports
 	export FLASK_APP=masu; export FLASK_ENV=development; flask run
+	make oc-stop-forwarding-ports
+
+oc-test-db: oc-forward-ports
+	sleep 1
+	$(TOPDIR)/tests/create_db.sh
 	make oc-stop-forwarding-ports

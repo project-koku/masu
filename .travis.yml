@@ -4,6 +4,25 @@ python:
   - "3.6"
 cache: pip
 
+services:
+  - postgresql
+
+addons:
+  postgresql: '9.6'
+
+env:
+  DATABASE_ENGINE=postgresql
+  DATABASE_NAME=test
+  DATABASE_USER=kokuadmin
+  DATABASE_HOST=localhost
+  DATABASE_PORT=5432
+  DATABASE_PASSWORD=''
+
+before_script:
+  - psql -c "CREATE DATABASE ${DATABASE_NAME};" -U postgres
+  - psql -c "CREATE ROLE ${DATABASE_USER} LOGIN;" -U postgres
+
+
 install:
     - pip install tox codecov
 

@@ -101,6 +101,9 @@ ENV/
 # mypy
 .mypy_cache/
 
+# Local Postgres data
+pg_data
+
 # Editor settings
 .vscode/
 *.sw?

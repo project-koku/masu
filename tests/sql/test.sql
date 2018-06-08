@@ -24,14 +24,14 @@ CREATE SCHEMA testcustomer;
 ALTER SCHEMA testcustomer OWNER TO kokuadmin;
 
 --
--- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: 
+-- Name: plpgsql; Type: EXTENSION; Schema: -; Owner:
 --
 
 CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
 
 
 --
--- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: 
+-- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner:
 --
 
 COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
@@ -1136,6 +1136,7 @@ COPY api_customer (group_ptr_id, date_created, owner_id, uuid, schema_name) FROM
 --
 
 COPY api_provider (id, uuid, name, type, authentication_id, billing_source_id, created_by_id, customer_id) FROM stdin;
+1	6e212746-484a-40cd-bba0-09a19d132d64	Test Provider	AWS	1	1	2	1
 \.
 
 
@@ -1144,6 +1145,7 @@ COPY api_provider (id, uuid, name, type, authentication_id, billing_source_id, c
 --
 
 COPY api_providerauthentication (id, uuid, provider_resource_name) FROM stdin;
+1	7e4ec31b-7ced-4a17-9f7e-f77e9efa8fd6	arn:aws:iam::589173575777:role/CostManagement
 \.
 
 
@@ -1152,6 +1154,7 @@ COPY api_providerauthentication (id, uuid, provider_resource_name) FROM stdin;
 --
 
 COPY api_providerbillingsource (id, uuid, bucket) FROM stdin;
+1	75b17096-319a-45ec-92c1-18dbd5e78f94	test-bucket
 \.
 
 
@@ -2498,4 +2501,3 @@ ALTER TABLE ONLY reporting_awscostentrypricing
 --
 -- PostgreSQL database dump complete
 --
-

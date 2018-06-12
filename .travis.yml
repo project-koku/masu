@@ -18,11 +18,6 @@ env:
   DATABASE_PORT=5432
   DATABASE_PASSWORD=''
 
-before_script:
-  - psql -c "CREATE DATABASE ${DATABASE_NAME};" -U postgres
-  - psql -c "CREATE ROLE ${DATABASE_USER} LOGIN;" -U postgres
-
-
 install:
     - pip install tox codecov
 

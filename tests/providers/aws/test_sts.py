@@ -14,22 +14,26 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
-"""Masu Processor Exceptions."""
 
+import random
+import string
+from unittest import TestCase
 
-class MasuProcessingError(Exception):
-    """Masu Processing Error."""
+import boto3
+from faker import Faker
+from moto import mock_sts
 
-    pass
+from masu.providers.aws.sts import get_assume_role_session
 
+class TestSTS(TestCase):
+    fake = Faker()
 
-class MasuProviderError(Exception):
-    """Masu Provider Error."""
+    @mock_sts
+    def test_get_assume_role_session(self):
+        account = ''.join(random.choices(string.digits, k=12))
+        arn = 'arn:aws:iam::{}:{}/{}'.format(account,
+                                             self.fake.word(),
+                                             self.fake.word())
 
-    pass
-
-
-class MasuConfigurationError(Exception):
-    """Masu Configuration Error."""
-
-    pass
+        session = get_assume_role_session(arn)
+        self.assertIsInstance(session, boto3.Session)

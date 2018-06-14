@@ -41,45 +41,6 @@ SET default_tablespace = '';
 SET default_with_oids = false;
 
 --
--- Name: api_costusagereportstatus; Type: TABLE; Schema: public; Owner: kokuadmin
---
-
-CREATE TABLE public.api_costusagereportstatus (
-    id integer NOT NULL,
-    report_name character varying(128) NOT NULL,
-    cursor_position integer NOT NULL,
-    last_completed_datetime timestamp with time zone,
-    last_started_datetime timestamp with time zone,
-    etag character varying(64),
-    provider_id integer,
-    CONSTRAINT api_costusagereportstatus_cursor_position_check CHECK ((cursor_position >= 0))
-);
-
-
-ALTER TABLE public.api_costusagereportstatus OWNER TO kokuadmin;
-
---
--- Name: api_costusagereportstatus_id_seq; Type: SEQUENCE; Schema: public; Owner: kokuadmin
---
-
-CREATE SEQUENCE public.api_costusagereportstatus_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.api_costusagereportstatus_id_seq OWNER TO kokuadmin;
-
---
--- Name: api_costusagereportstatus_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: kokuadmin
---
-
-ALTER SEQUENCE public.api_costusagereportstatus_id_seq OWNED BY public.api_costusagereportstatus.id;
-
-
---
 -- Name: api_customer; Type: TABLE; Schema: public; Owner: kokuadmin
 --
 
@@ -700,6 +661,45 @@ CREATE TABLE public.django_session (
 ALTER TABLE public.django_session OWNER TO kokuadmin;
 
 --
+-- Name: reporting_common_costusagereportstatus; Type: TABLE; Schema: public; Owner: kokuadmin
+--
+
+CREATE TABLE public.reporting_common_costusagereportstatus (
+    id integer NOT NULL,
+    report_name character varying(128) NOT NULL,
+    cursor_position integer NOT NULL,
+    last_completed_datetime timestamp with time zone,
+    last_started_datetime timestamp with time zone,
+    etag character varying(64),
+    provider_id integer,
+    CONSTRAINT reporting_common_costusagereportstatus_cursor_position_check CHECK ((cursor_position >= 0))
+);
+
+
+ALTER TABLE public.reporting_common_costusagereportstatus OWNER TO kokuadmin;
+
+--
+-- Name: reporting_common_costusagereportstatus_id_seq; Type: SEQUENCE; Schema: public; Owner: kokuadmin
+--
+
+CREATE SEQUENCE public.reporting_common_costusagereportstatus_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.reporting_common_costusagereportstatus_id_seq OWNER TO kokuadmin;
+
+--
+-- Name: reporting_common_costusagereportstatus_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: kokuadmin
+--
+
+ALTER SEQUENCE public.reporting_common_costusagereportstatus_id_seq OWNED BY public.reporting_common_costusagereportstatus.id;
+
+
+--
 -- Name: reporting_common_reportcolumnmap; Type: TABLE; Schema: public; Owner: kokuadmin
 --
 
@@ -733,13 +733,6 @@ ALTER TABLE public.reporting_common_reportcolumnmap_id_seq OWNER TO kokuadmin;
 --
 
 ALTER SEQUENCE public.reporting_common_reportcolumnmap_id_seq OWNED BY public.reporting_common_reportcolumnmap.id;
-
-
---
--- Name: api_costusagereportstatus id; Type: DEFAULT; Schema: public; Owner: kokuadmin
---
-
-ALTER TABLE ONLY public.api_costusagereportstatus ALTER COLUMN id SET DEFAULT nextval('public.api_costusagereportstatus_id_seq'::regclass);
 
 
 --
@@ -855,6 +848,13 @@ ALTER TABLE ONLY public.django_migrations ALTER COLUMN id SET DEFAULT nextval('p
 
 
 --
+-- Name: reporting_common_costusagereportstatus id; Type: DEFAULT; Schema: public; Owner: kokuadmin
+--
+
+ALTER TABLE ONLY public.reporting_common_costusagereportstatus ALTER COLUMN id SET DEFAULT nextval('public.reporting_common_costusagereportstatus_id_seq'::regclass);
+
+
+--
 -- Name: reporting_common_reportcolumnmap id; Type: DEFAULT; Schema: public; Owner: kokuadmin
 --
 
@@ -862,19 +862,11 @@ ALTER TABLE ONLY public.reporting_common_reportcolumnmap ALTER COLUMN id SET DEF
 
 
 --
--- Data for Name: api_costusagereportstatus; Type: TABLE DATA; Schema: public; Owner: kokuadmin
---
-
-COPY public.api_costusagereportstatus (id, report_name, cursor_position, last_completed_datetime, last_started_datetime, etag, provider_id) FROM stdin;
-\.
-
-
---
 -- Data for Name: api_customer; Type: TABLE DATA; Schema: public; Owner: kokuadmin
 --
 
 COPY public.api_customer (group_ptr_id, date_created, owner_id, uuid, schema_name) FROM stdin;
-1	2018-06-14 13:15:56.047742+00	2	62d22bf3-e137-44fc-b4e9-c65e0edff30e	testcustomer
+1	2018-06-14 14:47:19.484+00	2	52ff9e01-e5ed-468a-9b97-e2abd5c81bd2	testcustomer
 \.
 
 
@@ -910,7 +902,7 @@ COPY public.api_providerbillingsource (id, uuid, bucket) FROM stdin;
 --
 
 COPY public.api_resettoken (id, token, expiration_date, used, user_id) FROM stdin;
-1	af5a5d84-8729-446f-90c2-314702b9f84b	2018-06-15 13:15:55.837873+00	f	2
+1	b09d9488-66a7-4046-b862-078376340bab	2018-06-15 14:47:19.276497+00	f	2
 \.
 
 
@@ -919,7 +911,7 @@ COPY public.api_resettoken (id, token, expiration_date, used, user_id) FROM stdi
 --
 
 COPY public.api_status (id, server_id) FROM stdin;
-1	4784c6bf-7a33-4ee6-ba37-ab68c5b38dcd
+1	a615e4f9-156a-41bc-94a3-47638687767f
 \.
 
 
@@ -937,8 +929,8 @@ COPY public.api_tenant (id, schema_name) FROM stdin;
 --
 
 COPY public.api_user (user_ptr_id, uuid) FROM stdin;
-1	5baf3cca-8718-4634-94ed-f40a5caf6632
-2	5118c473-e935-4049-b3d2-0f2c8a29ba63
+1	7c7cc9be-6673-4efd-bf72-35c2823c2479
+2	3cc88472-d4bb-42a3-a35c-7d0e2ed79ea1
 \.
 
 
@@ -947,9 +939,9 @@ COPY public.api_user (user_ptr_id, uuid) FROM stdin;
 --
 
 COPY public.api_userpreference (id, uuid, preference, user_id, description, name) FROM stdin;
-1	119903b4-5ace-4887-b640-a53c0a08a676	{"currency": "USD"}	2	default preference	currency
-2	a3165563-bc78-47b4-90c2-8a36f064c793	{"timezone": "UTC"}	2	default preference	timezone
-3	09c81412-6733-4a9e-896b-e0707f0a441a	{"locale": "en_US.UTF-8"}	2	default preference	locale
+1	349a42d8-cf36-463e-a7ac-c8dbb9b95eb1	{"currency": "USD"}	2	default preference	currency
+2	494ce9c3-776c-4160-8ee1-8f77824bb832	{"timezone": "UTC"}	2	default preference	timezone
+3	ea4d9b90-e0cf-4a9e-943c-94d0f96a1898	{"locale": "en_US.UTF-8"}	2	default preference	locale
 \.
 
 
@@ -1023,30 +1015,30 @@ COPY public.auth_permission (id, name, content_type_id, codename) FROM stdin;
 46	Can add tenant	16	add_tenant
 47	Can change tenant	16	change_tenant
 48	Can delete tenant	16	delete_tenant
-49	Can add cost usage report status	17	add_costusagereportstatus
-50	Can change cost usage report status	17	change_costusagereportstatus
-51	Can delete cost usage report status	17	delete_costusagereportstatus
-52	Can add aws cost entry	18	add_awscostentry
-53	Can change aws cost entry	18	change_awscostentry
-54	Can delete aws cost entry	18	delete_awscostentry
-55	Can add aws cost entry bill	19	add_awscostentrybill
-56	Can change aws cost entry bill	19	change_awscostentrybill
-57	Can delete aws cost entry bill	19	delete_awscostentrybill
-58	Can add aws cost entry line item	20	add_awscostentrylineitem
-59	Can change aws cost entry line item	20	change_awscostentrylineitem
-60	Can delete aws cost entry line item	20	delete_awscostentrylineitem
-61	Can add aws cost entry pricing	21	add_awscostentrypricing
-62	Can change aws cost entry pricing	21	change_awscostentrypricing
-63	Can delete aws cost entry pricing	21	delete_awscostentrypricing
-64	Can add aws cost entry product	22	add_awscostentryproduct
-65	Can change aws cost entry product	22	change_awscostentryproduct
-66	Can delete aws cost entry product	22	delete_awscostentryproduct
-67	Can add aws cost entry reservation	23	add_awscostentryreservation
-68	Can change aws cost entry reservation	23	change_awscostentryreservation
-69	Can delete aws cost entry reservation	23	delete_awscostentryreservation
-70	Can add report column map	24	add_reportcolumnmap
-71	Can change report column map	24	change_reportcolumnmap
-72	Can delete report column map	24	delete_reportcolumnmap
+49	Can add aws cost entry	17	add_awscostentry
+50	Can change aws cost entry	17	change_awscostentry
+51	Can delete aws cost entry	17	delete_awscostentry
+52	Can add aws cost entry bill	18	add_awscostentrybill
+53	Can change aws cost entry bill	18	change_awscostentrybill
+54	Can delete aws cost entry bill	18	delete_awscostentrybill
+55	Can add aws cost entry line item	19	add_awscostentrylineitem
+56	Can change aws cost entry line item	19	change_awscostentrylineitem
+57	Can delete aws cost entry line item	19	delete_awscostentrylineitem
+58	Can add aws cost entry pricing	20	add_awscostentrypricing
+59	Can change aws cost entry pricing	20	change_awscostentrypricing
+60	Can delete aws cost entry pricing	20	delete_awscostentrypricing
+61	Can add aws cost entry product	21	add_awscostentryproduct
+62	Can change aws cost entry product	21	change_awscostentryproduct
+63	Can delete aws cost entry product	21	delete_awscostentryproduct
+64	Can add aws cost entry reservation	22	add_awscostentryreservation
+65	Can change aws cost entry reservation	22	change_awscostentryreservation
+66	Can delete aws cost entry reservation	22	delete_awscostentryreservation
+67	Can add report column map	23	add_reportcolumnmap
+68	Can change report column map	23	change_reportcolumnmap
+69	Can delete report column map	23	delete_reportcolumnmap
+70	Can add cost usage report status	24	add_costusagereportstatus
+71	Can change cost usage report status	24	change_costusagereportstatus
+72	Can delete cost usage report status	24	delete_costusagereportstatus
 \.
 
 
@@ -1055,8 +1047,8 @@ COPY public.auth_permission (id, name, content_type_id, codename) FROM stdin;
 --
 
 COPY public.auth_user (id, password, last_login, is_superuser, username, first_name, last_name, email, is_staff, is_active, date_joined) FROM stdin;
-1	pbkdf2_sha256$100000$K38yrvHSoJGq$CLPPONo1tXWt63IAIsjJ14eB14AfilIrf1FjIUz7Qws=	\N	t	admin			admin@example.com	t	t	2018-06-14 13:15:46.717096+00
-2	pbkdf2_sha256$100000$KZ8Iv2mFWAvR$Tj+pFb2zzFsgCGbYMu/2SxR1LfY109sz4/8oXxcDzmo=	\N	f	test_customer			test@example.com	f	t	2018-06-14 13:15:55.679692+00
+1	pbkdf2_sha256$100000$D6oMWpZxhgqf$vAJpbrWg6IO2HMtvXcJB8SFRQ5Q3A0oSY7A66tKAgnw=	\N	t	admin			admin@example.com	t	t	2018-06-14 14:47:10.066968+00
+2	pbkdf2_sha256$100000$7jUqARXLayO5$SCaqaXpHKmN7ZkhUX1jaIxfAeWIUKh9OgTekbrmgfcI=	\N	f	test_customer			test@example.com	f	t	2018-06-14 14:47:19.02241+00
 \.
 
 
@@ -1082,7 +1074,7 @@ COPY public.auth_user_user_permissions (id, user_id, permission_id) FROM stdin;
 --
 
 COPY public.authtoken_token (key, created, user_id) FROM stdin;
-5aa8e2d31095f9cfd0e2312943186fde480b5d3c	2018-06-14 13:15:55.565704+00	1
+7325bb447e750e840d11ff6fc4e31a54ee9a22eb	2018-06-14 14:47:18.917327+00	1
 \.
 
 
@@ -1115,14 +1107,14 @@ COPY public.django_content_type (id, app_label, model) FROM stdin;
 14	api	providerauthentication
 15	api	providerbillingsource
 16	api	tenant
-17	api	costusagereportstatus
-18	reporting	awscostentry
-19	reporting	awscostentrybill
-20	reporting	awscostentrylineitem
-21	reporting	awscostentrypricing
-22	reporting	awscostentryproduct
-23	reporting	awscostentryreservation
-24	reporting_common	reportcolumnmap
+17	reporting	awscostentry
+18	reporting	awscostentrybill
+19	reporting	awscostentrylineitem
+20	reporting	awscostentrypricing
+21	reporting	awscostentryproduct
+22	reporting	awscostentryreservation
+23	reporting_common	reportcolumnmap
+24	reporting_common	costusagereportstatus
 \.
 
 
@@ -1131,39 +1123,41 @@ COPY public.django_content_type (id, app_label, model) FROM stdin;
 --
 
 COPY public.django_migrations (id, app, name, applied) FROM stdin;
-1	contenttypes	0001_initial	2018-06-14 13:15:45.53973+00
-2	auth	0001_initial	2018-06-14 13:15:45.682915+00
-3	admin	0001_initial	2018-06-14 13:15:45.74612+00
-4	admin	0002_logentry_remove_auto_add	2018-06-14 13:15:45.760674+00
-5	contenttypes	0002_remove_content_type_name	2018-06-14 13:15:45.794458+00
-6	auth	0002_alter_permission_name_max_length	2018-06-14 13:15:45.812755+00
-7	auth	0003_alter_user_email_max_length	2018-06-14 13:15:45.833914+00
-8	auth	0004_alter_user_username_opts	2018-06-14 13:15:45.852504+00
-9	auth	0005_alter_user_last_login_null	2018-06-14 13:15:45.874037+00
-10	auth	0006_require_contenttypes_0002	2018-06-14 13:15:45.884077+00
-11	auth	0007_alter_validators_add_error_messages	2018-06-14 13:15:45.902006+00
-12	auth	0008_alter_user_username_max_length	2018-06-14 13:15:45.926392+00
-13	auth	0009_alter_user_last_name_max_length	2018-06-14 13:15:45.947881+00
-14	api	0001_initial	2018-06-14 13:15:45.968015+00
-15	api	0002_auto_20180509_1400	2018-06-14 13:15:46.036025+00
-16	api	0003_auto_20180509_1849	2018-06-14 13:15:46.13755+00
-17	api	0004_auto_20180510_1824	2018-06-14 13:15:46.211728+00
-18	api	0005_auto_20180511_1445	2018-06-14 13:15:46.235468+00
-19	api	0006_resettoken	2018-06-14 13:15:46.272112+00
-20	api	0007_userpreference	2018-06-14 13:15:46.312722+00
-21	api	0008_provider	2018-06-14 13:15:46.420144+00
-22	api	0009_auto_20180523_0045	2018-06-14 13:15:46.45518+00
-23	api	0010_auto_20180523_1540	2018-06-14 13:15:46.515628+00
-24	api	0011_auto_20180524_1838	2018-06-14 13:15:46.601559+00
-25	api	0012_auto_20180529_1526	2018-06-14 13:15:46.752651+00
-26	api	0013_auto_20180531_1921	2018-06-14 13:15:46.773732+00
-27	api	0014_costusagereportstatus	2018-06-14 13:15:46.847807+00
-28	authtoken	0001_initial	2018-06-14 13:15:46.895442+00
-29	authtoken	0002_auto_20160226_1747	2018-06-14 13:15:46.959664+00
-30	reporting	0001_initial	2018-06-14 13:15:47.058778+00
-31	reporting_common	0001_initial	2018-06-14 13:15:47.084826+00
-32	reporting_common	0002_auto_20180608_1647	2018-06-14 13:15:47.264133+00
-33	sessions	0001_initial	2018-06-14 13:15:47.299532+00
+1	contenttypes	0001_initial	2018-06-14 14:47:08.952056+00
+2	auth	0001_initial	2018-06-14 14:47:09.07862+00
+3	admin	0001_initial	2018-06-14 14:47:09.120613+00
+4	admin	0002_logentry_remove_auto_add	2018-06-14 14:47:09.137945+00
+5	contenttypes	0002_remove_content_type_name	2018-06-14 14:47:09.174662+00
+6	auth	0002_alter_permission_name_max_length	2018-06-14 14:47:09.193396+00
+7	auth	0003_alter_user_email_max_length	2018-06-14 14:47:09.21499+00
+8	auth	0004_alter_user_username_opts	2018-06-14 14:47:09.232955+00
+9	auth	0005_alter_user_last_login_null	2018-06-14 14:47:09.256852+00
+10	auth	0006_require_contenttypes_0002	2018-06-14 14:47:09.264765+00
+11	auth	0007_alter_validators_add_error_messages	2018-06-14 14:47:09.28154+00
+12	auth	0008_alter_user_username_max_length	2018-06-14 14:47:09.304823+00
+13	auth	0009_alter_user_last_name_max_length	2018-06-14 14:47:09.329268+00
+14	api	0001_initial	2018-06-14 14:47:09.345904+00
+15	api	0002_auto_20180509_1400	2018-06-14 14:47:09.411694+00
+16	api	0003_auto_20180509_1849	2018-06-14 14:47:09.50985+00
+17	api	0004_auto_20180510_1824	2018-06-14 14:47:09.584365+00
+18	api	0005_auto_20180511_1445	2018-06-14 14:47:09.611345+00
+19	api	0006_resettoken	2018-06-14 14:47:09.646966+00
+20	api	0007_userpreference	2018-06-14 14:47:09.683386+00
+21	api	0008_provider	2018-06-14 14:47:09.795644+00
+22	api	0009_auto_20180523_0045	2018-06-14 14:47:09.832993+00
+23	api	0010_auto_20180523_1540	2018-06-14 14:47:09.895756+00
+24	api	0011_auto_20180524_1838	2018-06-14 14:47:09.950594+00
+25	api	0012_auto_20180529_1526	2018-06-14 14:47:10.103559+00
+26	api	0013_auto_20180531_1921	2018-06-14 14:47:10.128051+00
+27	api	0014_costusagereportstatus	2018-06-14 14:47:10.169194+00
+28	api	0015_auto_20180614_1343	2018-06-14 14:47:10.207823+00
+29	authtoken	0001_initial	2018-06-14 14:47:10.244138+00
+30	authtoken	0002_auto_20160226_1747	2018-06-14 14:47:10.315942+00
+31	reporting	0001_initial	2018-06-14 14:47:10.37137+00
+32	reporting_common	0001_initial	2018-06-14 14:47:10.406462+00
+33	reporting_common	0002_auto_20180608_1647	2018-06-14 14:47:10.596822+00
+34	reporting_common	0003_costusagereportstatus	2018-06-14 14:47:10.636899+00
+35	sessions	0001_initial	2018-06-14 14:47:10.674419+00
 \.
 
 
@@ -1172,6 +1166,14 @@ COPY public.django_migrations (id, app, name, applied) FROM stdin;
 --
 
 COPY public.django_session (session_key, session_data, expire_date) FROM stdin;
+\.
+
+
+--
+-- Data for Name: reporting_common_costusagereportstatus; Type: TABLE DATA; Schema: public; Owner: kokuadmin
+--
+
+COPY public.reporting_common_costusagereportstatus (id, report_name, cursor_position, last_completed_datetime, last_started_datetime, etag, provider_id) FROM stdin;
 \.
 
 
@@ -1226,13 +1228,6 @@ COPY public.reporting_common_reportcolumnmap (id, provider_type, provider_column
 44	AWS	reservation/unusedQuantity	reporting_awscostentryreservation	unused_quantity
 45	AWS	reservation/unusedRecurringFee	reporting_awscostentryreservation	unused_recurring_fee
 \.
-
-
---
--- Name: api_costusagereportstatus_id_seq; Type: SEQUENCE SET; Schema: public; Owner: kokuadmin
---
-
-SELECT pg_catalog.setval('public.api_costusagereportstatus_id_seq', 1, false);
 
 
 --
@@ -1344,7 +1339,14 @@ SELECT pg_catalog.setval('public.django_content_type_id_seq', 24, true);
 -- Name: django_migrations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: kokuadmin
 --
 
-SELECT pg_catalog.setval('public.django_migrations_id_seq', 33, true);
+SELECT pg_catalog.setval('public.django_migrations_id_seq', 35, true);
+
+
+--
+-- Name: reporting_common_costusagereportstatus_id_seq; Type: SEQUENCE SET; Schema: public; Owner: kokuadmin
+--
+
+SELECT pg_catalog.setval('public.reporting_common_costusagereportstatus_id_seq', 1, false);
 
 
 --
@@ -1352,22 +1354,6 @@ SELECT pg_catalog.setval('public.django_migrations_id_seq', 33, true);
 --
 
 SELECT pg_catalog.setval('public.reporting_common_reportcolumnmap_id_seq', 45, true);
-
-
---
--- Name: api_costusagereportstatus api_costusagereportstatus_pkey; Type: CONSTRAINT; Schema: public; Owner: kokuadmin
---
-
-ALTER TABLE ONLY public.api_costusagereportstatus
-    ADD CONSTRAINT api_costusagereportstatus_pkey PRIMARY KEY (id);
-
-
---
--- Name: api_costusagereportstatus api_costusagereportstatus_report_name_key; Type: CONSTRAINT; Schema: public; Owner: kokuadmin
---
-
-ALTER TABLE ONLY public.api_costusagereportstatus
-    ADD CONSTRAINT api_costusagereportstatus_report_name_key UNIQUE (report_name);
 
 
 --
@@ -1675,6 +1661,22 @@ ALTER TABLE ONLY public.django_session
 
 
 --
+-- Name: reporting_common_costusagereportstatus reporting_common_costusagereportstatus_pkey; Type: CONSTRAINT; Schema: public; Owner: kokuadmin
+--
+
+ALTER TABLE ONLY public.reporting_common_costusagereportstatus
+    ADD CONSTRAINT reporting_common_costusagereportstatus_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: reporting_common_costusagereportstatus reporting_common_costusagereportstatus_report_name_key; Type: CONSTRAINT; Schema: public; Owner: kokuadmin
+--
+
+ALTER TABLE ONLY public.reporting_common_costusagereportstatus
+    ADD CONSTRAINT reporting_common_costusagereportstatus_report_name_key UNIQUE (report_name);
+
+
+--
 -- Name: reporting_common_reportcolumnmap reporting_common_reportcolumnmap_pkey; Type: CONSTRAINT; Schema: public; Owner: kokuadmin
 --
 
@@ -1688,20 +1690,6 @@ ALTER TABLE ONLY public.reporting_common_reportcolumnmap
 
 ALTER TABLE ONLY public.reporting_common_reportcolumnmap
     ADD CONSTRAINT reporting_common_reportcolumnmap_provider_column_name_key UNIQUE (provider_column_name);
-
-
---
--- Name: api_costusagereportstatus_provider_id_169f4584; Type: INDEX; Schema: public; Owner: kokuadmin
---
-
-CREATE INDEX api_costusagereportstatus_provider_id_169f4584 ON public.api_costusagereportstatus USING btree (provider_id);
-
-
---
--- Name: api_costusagereportstatus_report_name_411ebb27_like; Type: INDEX; Schema: public; Owner: kokuadmin
---
-
-CREATE INDEX api_costusagereportstatus_report_name_411ebb27_like ON public.api_costusagereportstatus USING btree (report_name varchar_pattern_ops);
 
 
 --
@@ -1873,18 +1861,24 @@ CREATE INDEX django_session_session_key_c0390e0f_like ON public.django_session U
 
 
 --
+-- Name: reporting_common_costusa_report_name_134674b5_like; Type: INDEX; Schema: public; Owner: kokuadmin
+--
+
+CREATE INDEX reporting_common_costusa_report_name_134674b5_like ON public.reporting_common_costusagereportstatus USING btree (report_name varchar_pattern_ops);
+
+
+--
+-- Name: reporting_common_costusagereportstatus_provider_id_f012c75a; Type: INDEX; Schema: public; Owner: kokuadmin
+--
+
+CREATE INDEX reporting_common_costusagereportstatus_provider_id_f012c75a ON public.reporting_common_costusagereportstatus USING btree (provider_id);
+
+
+--
 -- Name: reporting_common_reportc_provider_column_name_e01eaba3_like; Type: INDEX; Schema: public; Owner: kokuadmin
 --
 
 CREATE INDEX reporting_common_reportc_provider_column_name_e01eaba3_like ON public.reporting_common_reportcolumnmap USING btree (provider_column_name varchar_pattern_ops);
-
-
---
--- Name: api_costusagereportstatus api_costusagereports_provider_id_169f4584_fk_api_provi; Type: FK CONSTRAINT; Schema: public; Owner: kokuadmin
---
-
-ALTER TABLE ONLY public.api_costusagereportstatus
-    ADD CONSTRAINT api_costusagereports_provider_id_169f4584_fk_api_provi FOREIGN KEY (provider_id) REFERENCES public.api_provider(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
@@ -2037,6 +2031,14 @@ ALTER TABLE ONLY public.django_admin_log
 
 ALTER TABLE ONLY public.django_admin_log
     ADD CONSTRAINT django_admin_log_user_id_c564eba6_fk_auth_user_id FOREIGN KEY (user_id) REFERENCES public.auth_user(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: reporting_common_costusagereportstatus reporting_common_cos_provider_id_f012c75a_fk_api_provi; Type: FK CONSTRAINT; Schema: public; Owner: kokuadmin
+--
+
+ALTER TABLE ONLY public.reporting_common_costusagereportstatus
+    ADD CONSTRAINT reporting_common_cos_provider_id_f012c75a_fk_api_provi FOREIGN KEY (provider_id) REFERENCES public.api_provider(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --

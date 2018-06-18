@@ -14,28 +14,28 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
+"""Cost Usage Report Accounts interface to be used by Masu."""
 
-"""Test the AuthDBAccessor utility object."""
-
-from masu.database.auth_db_accessor import AuthDBAccessor
-from tests import MasuTestCase
+from abc import ABC, abstractmethod
 
 
-class AuthDBAccessorTest(MasuTestCase):
-    """Test Cases for the AuthDBAccessor object."""
+# pylint: disable=too-few-public-methods
+class CURAccountsInterface(ABC):
+    """Masu interface definition to access Cost of Usage Report accounts."""
 
-    def setUp(self):
+    @abstractmethod
+    def get_accounts_from_source(self):
+        """
+        Return a list of all CUR accounts setup in Koku.
+
+        Implemented by an account source class.  Must return a list of
+        CostUsageReportAccount objects
+
+        Args:
+            None
+
+        Returns:
+            None
+
+        """
         pass
-
-    def test_initializer(self):
-        """Test Initializer"""
-        auth_id = '1'
-        accessor = AuthDBAccessor(auth_id)
-        self.assertIsNotNone(accessor._session)
-        self.assertTrue(accessor.does_db_entry_exist())
-
-    def test_get_name(self):
-        """Test name getter."""
-        auth_id = '1'
-        accessor = AuthDBAccessor(auth_id)
-        self.assertEqual('Test Customer', accessor.get_name())

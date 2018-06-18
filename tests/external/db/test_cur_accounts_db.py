@@ -15,27 +15,26 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-"""Test the AuthDBAccessor utility object."""
+"""Test the CURAccountsDB utility object."""
 
-from masu.database.auth_db_accessor import AuthDBAccessor
+from masu.external.db.cur_accounts_db import CURAccountsDB
 from tests import MasuTestCase
 
 
-class AuthDBAccessorTest(MasuTestCase):
-    """Test Cases for the AuthDBAccessor object."""
+class CURAccountsDBTest(MasuTestCase):
+    """Test Cases for the CURAccountsDB object."""
 
     def setUp(self):
         pass
 
-    def test_initializer(self):
-        """Test Initializer"""
-        auth_id = '1'
-        accessor = AuthDBAccessor(auth_id)
-        self.assertIsNotNone(accessor._session)
-        self.assertTrue(accessor.does_db_entry_exist())
+    def test_get_accounts_from_source(self):
+        """Test to get all accounts"""
+        accounts = CURAccountsDB().get_accounts_from_source()
+        if len(accounts) != 1:
+            self.fail('unexpected number of accounts')
 
-    def test_get_name(self):
-        """Test name getter."""
-        auth_id = '1'
-        accessor = AuthDBAccessor(auth_id)
-        self.assertEqual('Test Customer', accessor.get_name())
+        account = accounts.pop()
+
+        self.assertEqual(account.get_access_credential(), 'arn:aws:iam::111111111111:role/CostManagement')
+        self.assertEqual(account.get_billing_source(), 'test-bucket')
+        self.assertEqual(account.get_customer(), 'Test Customer')

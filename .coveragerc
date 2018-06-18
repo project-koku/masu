@@ -8,6 +8,7 @@ omit =
   */test_*.py
   masu/gunicorn.py
   masu/celery/worker.py
+  *cur_accounts_interface.py
 
 [report]
 # Regexes for lines to exclude from consideration

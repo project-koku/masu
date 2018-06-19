@@ -105,6 +105,23 @@ To lint the code base ::
 
     tox -e lint
 
+During development it can sometimes be useful to unittest a specific module or test class. Running tox can become burdensome when rapidly iterating on tests. An `.env.test` file in the base of the masu repository can be used to quickly modify database environment variables for testing. An example .env.test file::
+
+    DATABASE_ENGINE=postgresql
+    DATABASE_NAME=test
+    DATABASE_HOST=localhost
+    DATABASE_PORT=15432
+    DATABASE_USER=kokuadmin
+    DATABASE_PASSWORD=''
+
+An example workflow for isolated testing might look like the following ::
+
+    ./tests/create_db.sh
+    source .env.test
+    python -m unittest tests.module.TestClass
+    source .env
+
+
 Contributing
 =============
 
@@ -123,4 +140,3 @@ Please refer to Contributing_.
    :target: https://pyup.io/repos/github/project-koku/masu/
 .. |Python 3| image:: https://pyup.io/repos/github/project-koku/masu/python-3-shield.svg?t=1524249231720
    :target: https://pyup.io/repos/github/project-koku/masu/
-

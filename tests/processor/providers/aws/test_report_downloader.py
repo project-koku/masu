@@ -31,6 +31,7 @@ from dateutil.relativedelta import relativedelta
 from faker import Faker
 from moto import mock_s3
 
+from masu.database.report_stats_db_accessor import ReportStatsDBAccessor
 from masu.processor.exceptions import MasuConfigurationError
 from masu.processor.providers.aws.report_downloader import AWSReportDownloader
 from masu.providers import DATA_DIR
@@ -38,7 +39,7 @@ from tests import MasuTestCase
 from tests.providers.aws import SOME_AWS_REGIONS
 
 FAKE = Faker()
-SCHEMA = FAKE.word()
+CUSTOMER_NAME = FAKE.word()
 REPORT = FAKE.word()
 BUCKET = FAKE.word()
 PREFIX = FAKE.word()
@@ -83,24 +84,19 @@ class AWSReportDownloaderTest(MasuTestCase):
     def setUp(self, fake_session):
         os.makedirs(DATA_DIR, exist_ok=True)
 
-        self.fake_schema_name = SCHEMA
+        self.fake_customer_name = CUSTOMER_NAME
         self.fake_report_name = REPORT
         self.fake_bucket_name = BUCKET
         self.fake_bucket_prefix = PREFIX
         self.selected_region = REGION
 
-        self.mock_customer = Mock(**{
-            'get_schema_name.return_value': self.fake_schema_name})
-
         self.mock_provider = Mock(**{
-            'get_provider_resource_name.return_value': self.fake.word().lower(),
-            'get_report_name.return_value': self.fake_report_name})
+            'get_authentication.return_value': self.fake.word().lower(),
+            'get_billing_source.return_value': self.fake_bucket_name,
+            'get_customer.return_value': self.fake_customer_name})
 
-        self.mock_report_stats = Mock()
-
-        self.report_downloader = AWSReportDownloader(**{'customer': self.mock_customer,
-                                                        'provider': self.mock_provider,
-                                                        'report_stats': self.mock_report_stats})
+        self.report_downloader = AWSReportDownloader(**{'provider': self.mock_provider,
+                                                        'report_name': self.fake_report_name})
 
     def tearDown(self):
         shutil.rmtree(DATA_DIR, ignore_errors=True)
@@ -155,11 +151,11 @@ class AWSReportDownloaderTest(MasuTestCase):
         expected_files = []
         for csv_filename in fake_csv_files:
             expected_csv = '{}/{}/aws/{}'.format(DATA_DIR,
-                                                 self.fake_schema_name,
+                                                 self.fake_customer_name,
                                                  csv_filename)
             expected_files.append(expected_csv)
         expected_manifest = '{}/{}/aws/{}-Manifest.json'.format(DATA_DIR,
-                                                                self.fake_schema_name,
+                                                                self.fake_customer_name,
                                                                 self.fake_report_name)
         expected_files.append(expected_manifest)
         self.assertEqual(sorted(out), sorted(expected_files))
@@ -214,9 +210,23 @@ class AWSReportDownloaderTest(MasuTestCase):
         # actual test
         out = self.report_downloader.download_current_report()
         expected_csv = '{}/{}/aws/{}'.format(DATA_DIR,
-                                             self.fake_schema_name,
+                                             self.fake_customer_name,
                                              selected_csv)
         self.assertEqual(out, [expected_csv])
+
+        # Verify etag is stored
+        for cur_file in out:
+            file_name = cur_file.split('/')[-1]
+            stats_recorder = ReportStatsDBAccessor(file_name)
+            self.assertIsNotNone(stats_recorder.get_etag())
+
+            # Cleanup
+            stats_recorder.remove()
+            stats_recorder.commit()
+
+            stats_recorder2 = ReportStatsDBAccessor(file_name)
+            self.assertIsNone(stats_recorder2.get_etag())
+
 
     @mock_s3
     def test_download_file(self):
@@ -225,8 +235,8 @@ class AWSReportDownloaderTest(MasuTestCase):
         conn.create_bucket(Bucket=self.fake_bucket_name)
         conn.Object(self.fake_bucket_name, fake_object).put(Body='test')
 
-        out = self.report_downloader.download_file(fake_object)
-        self.assertEqual(out, DATA_DIR+'/'+self.fake_schema_name+'/aws/'+fake_object)
+        out, _ = self.report_downloader.download_file(fake_object)
+        self.assertEqual(out, DATA_DIR+'/'+self.fake_customer_name+'/aws/'+fake_object)
 
     @mock_s3
     def test_download_report(self):
@@ -270,5 +280,18 @@ class AWSReportDownloaderTest(MasuTestCase):
 
         # actual test
         out = self.report_downloader.download_report(fake_report_date)
-        expected_path = DATA_DIR+'/'+self.fake_schema_name+'/aws/mocked-report-file.csv'
+        expected_path = DATA_DIR+'/'+self.fake_customer_name+'/aws/mocked-report-file.csv'
         self.assertEqual(out, [expected_path])
+
+        # Attempt to download again
+        out = self.report_downloader.download_report(fake_report_date)
+        expected_path = DATA_DIR+'/'+self.fake_customer_name+'/aws/mocked-report-file.csv'
+        self.assertEqual(out, [expected_path])
+
+    @mock_s3
+    @patch('masu.processor.providers.aws.report_downloader.get_assume_role_session',
+           return_value=FakeSession)
+    def test_missing_report_name(self, fake_session):
+        """Test downloading a report with an invalid report name."""
+        with self.assertRaises(MasuConfigurationError):
+            _ = AWSReportDownloader(self.mock_provider, 'wrongreport')

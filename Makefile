@@ -43,7 +43,8 @@ clean:
 lint:
 	tox -elint
 
-test-db: $(TOPDIR)/tests/create_db.sh
+test-db:
+	$(TOPDIR)/tests/create_db.sh
 
 unittest:
 	tox -e py36

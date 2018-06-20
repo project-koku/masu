@@ -33,10 +33,10 @@ from moto import mock_s3
 
 from masu.database.report_stats_db_accessor import ReportStatsDBAccessor
 from masu.processor.exceptions import MasuConfigurationError
-from masu.processor.providers.aws.report_downloader import AWSReportDownloader
+from masu.external.downloader.aws.aws_report_downloader import AWSReportDownloader
 from masu.providers import DATA_DIR
 from tests import MasuTestCase
-from tests.providers.aws import SOME_AWS_REGIONS
+from tests.external.downloader.aws import SOME_AWS_REGIONS
 
 FAKE = Faker()
 CUSTOMER_NAME = FAKE.word()
@@ -73,13 +73,24 @@ class FakeSession():
         with mock_s3():
             return boto3.client(service)
 
+class FakeSessionNoReport():
+    """
+    Fake Boto Session object with no reports in the S3 bucket.
+
+    This is here because Moto doesn't mock out the 'cur' endpoint yet. As soon
+    as Moto supports 'cur', this can be removed.
+    """
+
+    @staticmethod
+    def client(service):
+        pass
 
 class AWSReportDownloaderTest(MasuTestCase):
     """Test Cases for the AWS S3 functions."""
 
     fake = Faker()
 
-    @patch('masu.processor.providers.aws.report_downloader.get_assume_role_session',
+    @patch('masu.external.downloader.aws.aws_utils.get_assume_role_session',
            return_value=FakeSession)
     def setUp(self, fake_session):
         os.makedirs(DATA_DIR, exist_ok=True)
@@ -90,12 +101,9 @@ class AWSReportDownloaderTest(MasuTestCase):
         self.fake_bucket_prefix = PREFIX
         self.selected_region = REGION
 
-        self.mock_provider = Mock(**{
-            'get_authentication.return_value': self.fake.word().lower(),
-            'get_billing_source.return_value': self.fake_bucket_name,
-            'get_customer.return_value': self.fake_customer_name})
-
-        self.report_downloader = AWSReportDownloader(**{'provider': self.mock_provider,
+        self.report_downloader = AWSReportDownloader(**{'customer_name': self.fake_customer_name,
+                                                        'auth_credential': self.fake.word().lower(),
+                                                        'cur_source': self.fake_bucket_name,
                                                         'report_name': self.fake_report_name})
 
     def tearDown(self):
@@ -289,9 +297,68 @@ class AWSReportDownloaderTest(MasuTestCase):
         self.assertEqual(out, [expected_path])
 
     @mock_s3
-    @patch('masu.processor.providers.aws.report_downloader.get_assume_role_session',
+    @patch('masu.external.downloader.aws.aws_utils.get_assume_role_session',
            return_value=FakeSession)
     def test_missing_report_name(self, fake_session):
         """Test downloading a report with an invalid report name."""
         with self.assertRaises(MasuConfigurationError):
-            _ = AWSReportDownloader(self.mock_provider, 'wrongreport')
+            _ = AWSReportDownloader(self.fake_customer_name,
+                                    'creds',
+                                    's3_bucket',
+                                    'wrongreport')
+
+
+    @mock_s3
+    @patch('masu.external.downloader.aws.aws_utils.get_assume_role_session',
+           return_value=FakeSession)
+    def test_download_default_report(self, fake_session):
+        fake_report_date = self.fake.date_time().replace(day=1)
+        fake_report_end_date = fake_report_date + relativedelta(months=+1)
+        report_range = '{}-{}'.format(fake_report_date.strftime('%Y%m%d'),
+                                      fake_report_end_date.strftime('%Y%m%d'))
+
+        # mocked report file definition
+        fake_report_file = '{}/{}/{}/{}/{}.csv'.format(
+            self.fake_bucket_prefix,
+            self.fake_report_name,
+            report_range,
+            uuid.uuid4(),
+            'mocked-report-file')
+
+        # mocked Manifest definition
+        fake_object = '{}/{}/{}/{}-Manifest.json'.format(
+            self.fake_bucket_prefix,
+            self.fake_report_name,
+            report_range,
+            self.fake_report_name)
+        fake_object_body = {'reportKeys':[fake_report_file]}
+
+        # Moto setup
+        conn = boto3.resource('s3', region_name=self.selected_region)
+        conn.create_bucket(Bucket=self.fake_bucket_name)
+
+        # push mocked manifest into Moto env
+        conn.Object(self.fake_bucket_name,
+                    fake_object).put(Body=json.dumps(fake_object_body))
+        key = conn.Object(self.fake_bucket_name, fake_object).get()
+        self.assertEqual(fake_object_body, json.load(key['Body']))
+
+        # push mocked csv into Moto env
+        fake_csv_body = ','.join(self.fake.words(random.randint(5, 10)))
+        conn.Object(self.fake_bucket_name,
+                    fake_report_file).put(Body=fake_csv_body)
+        key = conn.Object(self.fake_bucket_name, fake_report_file).get()
+        self.assertEqual(fake_csv_body, str(key['Body'].read(), 'utf-8'))
+
+        # actual test
+        downloader = AWSReportDownloader(self.fake_customer_name, 'auth', self.fake_bucket_name)
+        self.assertEqual(downloader.report_name, self.fake_report_name)
+
+    @mock_s3
+    @patch('masu.external.downloader.aws.aws_utils.get_assume_role_session',
+           return_value=FakeSessionNoReport)
+    @patch('masu.external.downloader.aws.aws_utils.get_cur_report_definitions',
+           return_value=[])
+    def test_download_default_report_no_report_found(self, fake_session, fake_report_list):
+        with self.assertRaises(MasuConfigurationError):
+            _ = AWSReportDownloader(self.fake_customer_name, 'auth', self.fake_bucket_name)

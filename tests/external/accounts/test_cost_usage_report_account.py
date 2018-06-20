@@ -17,7 +17,7 @@
 
 """Test the CostUsageReportAccount object."""
 
-from masu.external.cost_usage_report_account import CostUsageReportAccount
+from masu.external.accounts.cost_usage_report_account import CostUsageReportAccount
 from tests import MasuTestCase
 
 
@@ -28,10 +28,12 @@ class CostUsageReportAccountTest(MasuTestCase):
         self.auth_string = 'my_authenticaiton_string'
         self.billing_source = 'my_billing_source'
         self.customer_name = 'the_customer_name'
+        self.provider = 'test_provider'
 
         args = {'authentication': self.auth_string,
                 'billing_source': self.billing_source,
-                'customer_name': self.customer_name}
+                'customer_name': self.customer_name,
+                'provider': self.provider}
         self.account = CostUsageReportAccount(**args)
 
     def test_get_access_credentials(self):
@@ -45,3 +47,7 @@ class CostUsageReportAccountTest(MasuTestCase):
     def test_get_customer_name(self):
         """Test to get_customer_name"""
         self.assertEqual(self.account.get_customer(), self.customer_name)
+
+    def test_get_provider(self):
+        """Test to get_provider"""
+        self.assertEqual(self.account.get_provider(), self.provider)

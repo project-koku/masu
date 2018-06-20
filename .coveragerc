@@ -9,6 +9,7 @@ omit =
   masu/gunicorn.py
   masu/celery/worker.py
   *cur_accounts_interface.py
+  *downloader_interface.py
 
 [report]
 # Regexes for lines to exclude from consideration

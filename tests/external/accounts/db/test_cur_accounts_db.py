@@ -17,6 +17,7 @@
 
 """Test the CURAccountsDB utility object."""
 
+from masu.external import AMAZON_WEB_SERVICES
 from masu.external.accounts.db.cur_accounts_db import CURAccountsDB
 from tests import MasuTestCase
 
@@ -38,4 +39,5 @@ class CURAccountsDBTest(MasuTestCase):
         self.assertEqual(account.get_access_credential(), 'arn:aws:iam::111111111111:role/CostManagement')
         self.assertEqual(account.get_billing_source(), 'test-bucket')
         self.assertEqual(account.get_customer(), 'Test Customer')
-        self.assertEqual(account.get_provider(), 'Test Provider')
+        self.assertEqual(account.get_provider_type(), AMAZON_WEB_SERVICES)
+

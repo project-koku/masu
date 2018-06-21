@@ -19,6 +19,7 @@
 
 from unittest.mock import patch
 
+from masu.external import AMAZON_WEB_SERVICES
 from masu.external.downloader.aws.aws_report_downloader import AWSReportDownloader
 from masu.external.report_downloader import ReportDownloader, ReportDownloaderError
 from tests import MasuTestCase
@@ -40,7 +41,7 @@ class ReportDownloaderTest(MasuTestCase):
                                       access_credential='mycred',
                                       report_source='hereiam',
                                       report_name='bestreport',
-                                      provider_type='aws')
+                                      provider_type=AMAZON_WEB_SERVICES)
         self.assertIsNotNone(downloader._downloader)
 
     def test_invalid_provider_type(self):

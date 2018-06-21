@@ -33,7 +33,7 @@ class CostUsageReportAccountTest(MasuTestCase):
         args = {'authentication': self.auth_string,
                 'billing_source': self.billing_source,
                 'customer_name': self.customer_name,
-                'provider': self.provider}
+                'provider_type': self.provider}
         self.account = CostUsageReportAccount(**args)
 
     def test_get_access_credentials(self):
@@ -48,6 +48,6 @@ class CostUsageReportAccountTest(MasuTestCase):
         """Test to get_customer_name"""
         self.assertEqual(self.account.get_customer(), self.customer_name)
 
-    def test_get_provider(self):
+    def test_get_provider_type(self):
         """Test to get_provider"""
-        self.assertEqual(self.account.get_provider(), self.provider)
+        self.assertEqual(self.account.get_provider_type(), self.provider)

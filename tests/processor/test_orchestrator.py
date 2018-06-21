@@ -19,6 +19,7 @@
 
 from unittest.mock import patch
 
+from masu.external import AMAZON_WEB_SERVICES
 from masu.processor.orchestrator import Orchestrator
 
 from tests import MasuTestCase
@@ -46,7 +47,7 @@ class OrchestratorTest(MasuTestCase):
         self.assertEqual(account.get_access_credential(), 'arn:aws:iam::111111111111:role/CostManagement')
         self.assertEqual(account.get_billing_source(), 'test-bucket')
         self.assertEqual(account.get_customer(), 'Test Customer')
-        self.assertEqual(account.get_provider(), 'Test Provider')
+        self.assertEqual(account.get_provider_type(), AMAZON_WEB_SERVICES)
 
 
     @patch('masu.external.report_downloader.ReportDownloader._set_downloader', return_value=FakeDownloader)

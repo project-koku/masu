@@ -28,7 +28,7 @@ class DownloadAPIViewTest(MasuTestCase):
     file_list = ['/var/tmp/masu/region/aws/catch-clearly.csv',
                  '/var/tmp/masu/base/aws/professor-hour-industry-television.csv']
 
-    @patch('masu.processor.orchestrator.Orchestrator.download_curs', return_value=file_list)
+    @patch('masu.processor.orchestrator.Orchestrator.prepare_curs', return_value=file_list)
     def test_download(self, file_list):
         """Test the download endpoint."""
         response = self.client.get('/api/v1/download/')

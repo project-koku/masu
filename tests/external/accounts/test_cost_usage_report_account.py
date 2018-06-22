@@ -29,11 +29,13 @@ class CostUsageReportAccountTest(MasuTestCase):
         self.billing_source = 'my_billing_source'
         self.customer_name = 'the_customer_name'
         self.provider = 'test_provider'
+        self.schema_name = 'testschema'
 
         args = {'authentication': self.auth_string,
                 'billing_source': self.billing_source,
                 'customer_name': self.customer_name,
-                'provider_type': self.provider}
+                'provider_type': self.provider,
+                'schema_name': self.schema_name}
         self.account = CostUsageReportAccount(**args)
 
     def test_get_access_credentials(self):
@@ -51,3 +53,7 @@ class CostUsageReportAccountTest(MasuTestCase):
     def test_get_provider_type(self):
         """Test to get_provider"""
         self.assertEqual(self.account.get_provider_type(), self.provider)
+
+    def test_get_schema_name(self):
+        """Test to get_schema_name"""
+        self.assertEqual(self.account.get_schema_name(), self.schema_name)

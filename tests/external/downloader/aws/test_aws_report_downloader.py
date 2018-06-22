@@ -217,13 +217,18 @@ class AWSReportDownloaderTest(MasuTestCase):
 
         # actual test
         out = self.report_downloader.download_current_report()
+        files_list = []
+        for cur_dict in out:
+            files_list.append(cur_dict['file'])
+            self.assertIsNotNone(cur_dict['compression'])
         expected_csv = '{}/{}/aws/{}'.format(DATA_DIR,
                                              self.fake_customer_name,
                                              selected_csv)
-        self.assertEqual(out, [expected_csv])
+        self.assertEqual(files_list, [expected_csv])
 
         # Verify etag is stored
-        for cur_file in out:
+        for cur_dict in out:
+            cur_file = cur_dict['file']
             file_name = cur_file.split('/')[-1]
             stats_recorder = ReportStatsDBAccessor(file_name)
             self.assertIsNotNone(stats_recorder.get_etag())
@@ -288,13 +293,23 @@ class AWSReportDownloaderTest(MasuTestCase):
 
         # actual test
         out = self.report_downloader.download_report(fake_report_date)
+        files_list = []
+        for cur_dict in out:
+            files_list.append(cur_dict['file'])
+            self.assertIsNotNone(cur_dict['compression'])
+
         expected_path = DATA_DIR+'/'+self.fake_customer_name+'/aws/mocked-report-file.csv'
-        self.assertEqual(out, [expected_path])
+        self.assertEqual(files_list, [expected_path])
 
         # Attempt to download again
         out = self.report_downloader.download_report(fake_report_date)
+        files_list = []
+        for cur_dict in out:
+            files_list.append(cur_dict['file'])
+            self.assertIsNotNone(cur_dict['compression'])
+
         expected_path = DATA_DIR+'/'+self.fake_customer_name+'/aws/mocked-report-file.csv'
-        self.assertEqual(out, [expected_path])
+        self.assertEqual(files_list, [expected_path])
 
     @mock_s3
     @patch('masu.external.downloader.aws.aws_utils.get_assume_role_session',

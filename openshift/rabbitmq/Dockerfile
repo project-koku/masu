@@ -1,4 +1,4 @@
-FROM rhel:7.4
+FROM centos:latest
 
 ARG ERLANG_VERSION=20.3.4
 ARG RABBITMQ_AUTOCLUSTER_VERSION=0.10.0
@@ -8,12 +8,15 @@ LABEL io.k8s.description="Lightweight open source message broker" \
     io.k8s.display-name="RabbitMQ" \
     io.openshift.expose-services="4369:epmd, 5671:amqp, 5672:amqp, 25672:http" \
     io.openshift.tags="rabbitmq"
-    
+
 ENV GPG_KEY="0A9AF2115F4687BD29803A206B73A36E6026DFCA" \
     HOME=/var/lib/rabbitmq \
     RABBITMQ_HOME=/opt/rabbitmq \
     RABBITMQ_LOGS=- \
     RABBITMQ_SASL_LOGS=-
+
+RUN yum update -y && \
+    yum clean all
 
 RUN set -xe && \
     curl -LO https://github.com/rabbitmq/erlang-rpm/releases/download/v${ERLANG_VERSION}/erlang-${ERLANG_VERSION}-1.el7.centos.x86_64.rpm && \

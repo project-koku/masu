@@ -172,23 +172,24 @@ objects:
     - annotations: null
       from:
         kind: DockerImage
-        name: registry.access.redhat.com/rhel7/rhel:7.3
-      importPolicy: {}
-      name: "7.3"
-      referencePolicy:
-        type: Source
-    - annotations: null
-      from:
-        kind: DockerImage
-        name: registry.access.redhat.com/rhel7/rhel:7.4
-      importPolicy: {}
-      name: "7.4"
-      referencePolicy:
-        type: Source
-    - annotations: null
-      from:
-        kind: DockerImage
         name: registry.access.redhat.com/rhel7/rhel:latest
+      importPolicy: {}
+      name: latest
+      referencePolicy:
+        type: Source
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    name: centos
+  spec:
+    dockerImageRepository: registry.centos.org/centos/centos
+    lookupPolicy:
+      local: false
+    tags:
+    - annotations: null
+      from:
+        kind: DockerImage
+        name: registry.centos.org/centos/centos:latest
       importPolicy: {}
       name: latest
       referencePolicy:
@@ -216,7 +217,7 @@ parameters:
 - description: Image stream tag for the image you'd like to use to build the application
   name: FROM_IMAGE
   required: true
-  value: rhel:7.4
+  value: centos:latest
 - description: RabbitMQ Autocluster version to use
   name: RABBITMQ_AUTOCLUSTER_VERSION
   required: true

@@ -20,6 +20,7 @@
 from unittest.mock import patch
 
 from masu.external import AMAZON_WEB_SERVICES
+from masu.external.report_downloader import ReportDownloaderError
 from masu.processor.orchestrator import Orchestrator
 from masu.processor.cur_process_request import CURProcessRequest
 
@@ -91,3 +92,11 @@ class OrchestratorTest(MasuTestCase):
         orchestrator = Orchestrator()
 
         orchestrator.process_curs()
+
+    @patch('masu.external.report_downloader.ReportDownloader._set_downloader', side_effect=ReportDownloaderError)
+    def test_prepare_curs_download_exception(self, mock_downloader):
+        """Test downloading cost usage reports."""
+        orchestrator = Orchestrator()
+        reports = orchestrator.prepare_curs()
+
+        self.assertEqual(len(reports), 0)

@@ -32,8 +32,7 @@ from faker import Faker
 from moto import mock_s3
 
 from masu.database.report_stats_db_accessor import ReportStatsDBAccessor
-from masu.processor.exceptions import MasuConfigurationError
-from masu.external.downloader.aws.aws_report_downloader import AWSReportDownloader
+from masu.external.downloader.aws.aws_report_downloader import AWSReportDownloader, AWSReportDownloaderError
 from masu.providers import DATA_DIR
 from tests import MasuTestCase
 from tests.external.downloader.aws import SOME_AWS_REGIONS
@@ -316,7 +315,7 @@ class AWSReportDownloaderTest(MasuTestCase):
            return_value=FakeSession)
     def test_missing_report_name(self, fake_session):
         """Test downloading a report with an invalid report name."""
-        with self.assertRaises(MasuConfigurationError):
+        with self.assertRaises(AWSReportDownloaderError):
             _ = AWSReportDownloader(self.fake_customer_name,
                                     'creds',
                                     's3_bucket',
@@ -375,5 +374,5 @@ class AWSReportDownloaderTest(MasuTestCase):
     @patch('masu.external.downloader.aws.aws_utils.get_cur_report_definitions',
            return_value=[])
     def test_download_default_report_no_report_found(self, fake_session, fake_report_list):
-        with self.assertRaises(MasuConfigurationError):
+        with self.assertRaises(AWSReportDownloaderError):
             _ = AWSReportDownloader(self.fake_customer_name, 'auth', self.fake_bucket_name)

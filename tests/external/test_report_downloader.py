@@ -20,7 +20,7 @@
 from unittest.mock import patch
 
 from masu.external import AMAZON_WEB_SERVICES
-from masu.external.downloader.aws.aws_report_downloader import AWSReportDownloader
+from masu.external.downloader.aws.aws_report_downloader import AWSReportDownloader, AWSReportDownloaderError
 from masu.external.report_downloader import ReportDownloader, ReportDownloaderError
 from tests import MasuTestCase
 
@@ -43,6 +43,16 @@ class ReportDownloaderTest(MasuTestCase):
                                       report_name='bestreport',
                                       provider_type=AMAZON_WEB_SERVICES)
         self.assertIsNotNone(downloader._downloader)
+
+    @patch('masu.external.report_downloader.ReportDownloader._set_downloader', side_effect=AWSReportDownloaderError)
+    def test_initializer_downloader_exception(self, fake_downloader):
+        """Test to initializer where _set_downloader throws exception"""
+        with self.assertRaises(ReportDownloaderError):
+            _ = ReportDownloader(customer_name='customer name',
+                                 access_credential='mycred',
+                                 report_source='hereiam',
+                                 report_name='bestreport',
+                                 provider_type=AMAZON_WEB_SERVICES)
 
     def test_invalid_provider_type(self):
         """Test that error is thrown with invalid account source."""

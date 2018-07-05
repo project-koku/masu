@@ -28,7 +28,7 @@ class DownloadAPIViewTest(MasuTestCase):
     file_list = ['/var/tmp/masu/region/aws/catch-clearly.csv',
                  '/var/tmp/masu/base/aws/professor-hour-industry-television.csv']
 
-    @patch('masu.processor.orchestrator.Orchestrator.prepare_curs', return_value=file_list)
+    @patch('masu.processor.orchestrator.Orchestrator.prepare', return_value=file_list)
     def test_download(self, file_list):
         """Test the download endpoint."""
         response = self.client.get('/api/v1/download/')
@@ -37,4 +37,4 @@ class DownloadAPIViewTest(MasuTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
 
-        self.assertIn('files', body)
+        self.assertIn('message', body)

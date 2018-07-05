@@ -17,19 +17,31 @@
 
 """Test the Orchestrator object."""
 
+import random
+
+import faker
+from celery.result import AsyncResult
 from unittest.mock import patch
 
 from masu.external import AMAZON_WEB_SERVICES
+from masu.exceptions import MasuProviderError
 from masu.external.report_downloader import ReportDownloaderError
 from masu.processor.orchestrator import Orchestrator
-from masu.processor.cur_process_request import CURProcessRequest
-
 from tests import MasuTestCase
 
 class FakeDownloader():
-    def download_current_report():
-        return [{'file': '/var/tmp/masu/region/aws/catch-clearly.csv', 'compression': 'GZIP'},
-                {'file': '/var/tmp/masu/base/aws/professor-hour-industry-television.csv', 'compression': 'GZIP'}]
+    fake = faker.Faker()
+
+    def download_current_report(self):
+        path = '/var/tmp/masu'
+        fake_files = []
+        for _ in range(1,random.randint(5,50)):
+            fake_files.append({'file': '{}/{}/aws/{}-{}.csv'.format(path,
+                                                                    self.fake.word(),
+                                                                    self.fake.word(),
+                                                                    self.fake.word()),
+                               'compression': random.choice(['GZIP', 'PLAIN'])})
+        return fake_files
 
 
 class OrchestratorTest(MasuTestCase):
@@ -51,52 +63,20 @@ class OrchestratorTest(MasuTestCase):
         self.assertEqual(account.get_customer(), 'Test Customer')
         self.assertEqual(account.get_provider_type(), AMAZON_WEB_SERVICES)
 
-
     @patch('masu.external.report_downloader.ReportDownloader._set_downloader', return_value=FakeDownloader)
-    def test_prepare_curs(self, mock_downloader):
+    @patch('masu.processor.orchestrator.get_report_files.delay', return_value=True)
+    def test_prepare(self, mock_downloader, mock_task):
         """Test downloading cost usage reports."""
         orchestrator = Orchestrator()
 
-        reports = orchestrator.prepare_curs()
-
-        self.assertEqual(len(reports), 2)
+        reports = orchestrator.prepare()
+        self.assertTrue(reports)
 
     @patch('masu.external.report_downloader.ReportDownloader._set_downloader', return_value=FakeDownloader)
     @patch('masu.external.accounts_accessor.AccountsAccessor.get_accounts', return_value=[])
-    def test_prepare_curs_no_accounts(self, mock_downloader, mock_accounts_accessor):
+    def test_prepare_no_accounts(self, mock_downloader, mock_accounts_accessor):
         """Test downloading cost usage reports."""
         orchestrator = Orchestrator()
-        reports = orchestrator.prepare_curs()
+        reports = orchestrator.prepare()
 
-        self.assertEqual(len(reports), 0)
-
-    @patch('masu.processor.tasks.process.process_report_file', return_value=None)
-    def test_process_curs(self, mock_task):
-        """Test downloading cost usage reports."""
-        requests = []
-        request1 = CURProcessRequest().report_path = '/test/path/file.csv'
-        requests.append(request1)
-        print((request1))
-        request2 = CURProcessRequest().report_path = '/test/path/file2.csv'
-        requests.append(request2)
-        print((request2))
-
-        orchestrator = Orchestrator()
-        orchestrator._processing_requests = requests
-        orchestrator.process_curs()
-
-    @patch('masu.processor.tasks.process.process_report_file', return_value=None)
-    @patch('masu.external.accounts_accessor.AccountsAccessor.get_accounts', return_value=[])
-    def test_process_curs_not_accounts(self, mock_task, mock_accounts_accessor):
-        """Test downloading cost usage reports with no pending requests."""
-        orchestrator = Orchestrator()
-
-        orchestrator.process_curs()
-
-    @patch('masu.external.report_downloader.ReportDownloader._set_downloader', side_effect=ReportDownloaderError)
-    def test_prepare_curs_download_exception(self, mock_downloader):
-        """Test downloading cost usage reports."""
-        orchestrator = Orchestrator()
-        reports = orchestrator.prepare_curs()
-
-        self.assertEqual(len(reports), 0)
+        self.assertEqual(reports, [])

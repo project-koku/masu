@@ -32,7 +32,7 @@ class MasuTestCase(TestCase):
                 'TESTING': True,
                 'SQLALCHEMY_TRACK_MODIFICATIONS': False,
                 'SQLALCHEMY_DATABASE_URI': 'sqlite:///test.db',
-                'CELERY_RESULT_BACKEND': 'db+sqlite:///test.db'
+                #'CELERY_RESULT_BACKEND': 'db+sqlite:///test.db'
             }
         )
         self.client = self.app.test_client()

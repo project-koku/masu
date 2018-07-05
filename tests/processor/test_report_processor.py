@@ -31,8 +31,8 @@ from masu.config import Config
 from masu.database import AWS_CUR_TABLE_MAP
 from masu.database.report_db_accessor import ReportDBAccessor
 from masu.database.reporting_common_db_accessor import ReportingCommonDBAccessor
+from masu.exceptions import MasuProcessingError
 from masu.external import GZIP_COMPRESSED, UNCOMPRESSED
-from masu.processor.exceptions import MasuProcessingError
 from masu.processor.report_processor import ProcessedReport, ReportProcessor
 from tests import MasuTestCase
 

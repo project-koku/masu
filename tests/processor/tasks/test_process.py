@@ -19,8 +19,7 @@
 
 from unittest.mock import patch
 
-from masu.processor.cur_process_request import CURProcessRequest
-from masu.processor.tasks.process import process_report_file
+from masu.processor.tasks.process import _process_report_file
 
 from tests import MasuTestCase
 
@@ -28,16 +27,11 @@ from tests import MasuTestCase
 class ProcessReportFileTests(MasuTestCase):
     """Test Cases for the Orchestrator object."""
 
-    def setUp(self):
-        pass
-
     @patch('masu.processor.report_processor.ReportProcessor')
     @patch('masu.processor.report_processor.ReportProcessor.process', return_value=2)
     def test_process_file(self, fake_processor, fake_process):
         """Test task"""
-        request = CURProcessRequest()
-        request.report_path = '/test/path/file1.csv'
-        request.compression = 'gzip'
-        request.schema_name = 'testcustomer'
-
-        process_report_file(request)
+        request = {'report_path': '/test/path/file1.csv',
+                   'compression': 'gzip',
+                   'schema_name': 'testcustomer'}
+        _process_report_file(**request)

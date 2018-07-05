@@ -31,12 +31,14 @@ from dateutil.relativedelta import relativedelta
 from faker import Faker
 from moto import mock_s3
 
+from masu.config import Config
 from masu.database.report_stats_db_accessor import ReportStatsDBAccessor
-from masu.external.downloader.aws.aws_report_downloader import AWSReportDownloader, AWSReportDownloaderError
-from masu.providers import DATA_DIR
+from masu.exceptions import MasuProviderError
+from masu.external.downloader.aws.aws_report_downloader import AWSReportDownloader
 from tests import MasuTestCase
-from tests.external.downloader.aws import SOME_AWS_REGIONS
+from tests.external.downloader.aws import SOME_AWS_REGIONS, fake_arn
 
+DATA_DIR = Config.TMP_DIR
 FAKE = Faker()
 CUSTOMER_NAME = FAKE.word()
 REPORT = FAKE.word()
@@ -82,14 +84,22 @@ class FakeSessionNoReport():
 
     @staticmethod
     def client(service):
-        pass
+        fake_report = {'ReportDefinitions': []}
+
+        # only mock the 'cur' boto client.
+        if 'cur' in service:
+            return Mock(**{'describe_report_definitions.return_value': fake_report})
+
+        # pass-through requests for the 's3' boto client.
+        with mock_s3():
+            return boto3.client(service)
 
 class AWSReportDownloaderTest(MasuTestCase):
     """Test Cases for the AWS S3 functions."""
 
     fake = Faker()
 
-    @patch('masu.external.downloader.aws.aws_utils.get_assume_role_session',
+    @patch('masu.external.downloader.aws.utils.get_assume_role_session',
            return_value=FakeSession)
     def setUp(self, fake_session):
         os.makedirs(DATA_DIR, exist_ok=True)
@@ -100,9 +110,11 @@ class AWSReportDownloaderTest(MasuTestCase):
         self.fake_bucket_prefix = PREFIX
         self.selected_region = REGION
 
+        auth_credential = fake_arn(service='iam', generate_account_id=True)
+
         self.report_downloader = AWSReportDownloader(**{'customer_name': self.fake_customer_name,
-                                                        'auth_credential': self.fake.word().lower(),
-                                                        'cur_source': self.fake_bucket_name,
+                                                        'auth_credential': auth_credential,
+                                                        'bucket': self.fake_bucket_name,
                                                         'report_name': self.fake_report_name})
 
     def tearDown(self):
@@ -311,19 +323,21 @@ class AWSReportDownloaderTest(MasuTestCase):
         self.assertEqual(files_list, [expected_path])
 
     @mock_s3
-    @patch('masu.external.downloader.aws.aws_utils.get_assume_role_session',
+    @patch('masu.external.downloader.aws.utils.get_assume_role_session',
            return_value=FakeSession)
     def test_missing_report_name(self, fake_session):
         """Test downloading a report with an invalid report name."""
-        with self.assertRaises(AWSReportDownloaderError):
-            _ = AWSReportDownloader(self.fake_customer_name,
-                                    'creds',
-                                    's3_bucket',
-                                    'wrongreport')
+        auth_credential = fake_arn(service='iam', generate_account_id=True)
+
+        with self.assertRaises(MasuProviderError):
+            AWSReportDownloader(self.fake_customer_name,
+                                auth_credential,
+                                's3_bucket',
+                                'wrongreport')
 
 
     @mock_s3
-    @patch('masu.external.downloader.aws.aws_utils.get_assume_role_session',
+    @patch('masu.external.downloader.aws.utils.get_assume_role_session',
            return_value=FakeSession)
     def test_download_default_report(self, fake_session):
         fake_report_date = self.fake.date_time().replace(day=1)
@@ -365,14 +379,21 @@ class AWSReportDownloaderTest(MasuTestCase):
         self.assertEqual(fake_csv_body, str(key['Body'].read(), 'utf-8'))
 
         # actual test
-        downloader = AWSReportDownloader(self.fake_customer_name, 'auth', self.fake_bucket_name)
+        auth_credential = fake_arn(service='iam', generate_account_id=True)
+        downloader = AWSReportDownloader(self.fake_customer_name,
+                                         auth_credential,
+                                         self.fake_bucket_name)
         self.assertEqual(downloader.report_name, self.fake_report_name)
 
     @mock_s3
-    @patch('masu.external.downloader.aws.aws_utils.get_assume_role_session',
+    @patch('masu.external.downloader.aws.utils.get_assume_role_session',
            return_value=FakeSessionNoReport)
-    @patch('masu.external.downloader.aws.aws_utils.get_cur_report_definitions',
+    @patch('masu.external.downloader.aws.utils.get_cur_report_definitions',
            return_value=[])
     def test_download_default_report_no_report_found(self, fake_session, fake_report_list):
-        with self.assertRaises(AWSReportDownloaderError):
-            _ = AWSReportDownloader(self.fake_customer_name, 'auth', self.fake_bucket_name)
+        auth_credential = fake_arn(service='iam', generate_account_id=True)
+
+        with self.assertRaises(MasuProviderError):
+            AWSReportDownloader(self.fake_customer_name,
+                                auth_credential,
+                                self.fake_bucket_name)

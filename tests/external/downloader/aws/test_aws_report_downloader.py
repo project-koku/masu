@@ -27,6 +27,7 @@ from datetime import datetime
 from unittest.mock import ANY, Mock, patch, PropertyMock
 
 import boto3
+from botocore.exceptions import ClientError
 from dateutil.relativedelta import relativedelta
 from faker import Faker
 from moto import mock_s3
@@ -34,9 +35,11 @@ from moto import mock_s3
 from masu.config import Config
 from masu.database.report_stats_db_accessor import ReportStatsDBAccessor
 from masu.exceptions import MasuProviderError
-from masu.external.downloader.aws.aws_report_downloader import AWSReportDownloader
+from masu.external.downloader.aws.aws_report_downloader import (AWSReportDownloader,
+                                                                AWSReportDownloaderError)
+from masu.external import AWS_REGIONS
 from tests import MasuTestCase
-from tests.external.downloader.aws import SOME_AWS_REGIONS, fake_arn
+from tests.external.downloader.aws import fake_arn
 
 DATA_DIR = Config.TMP_DIR
 FAKE = Faker()
@@ -44,7 +47,7 @@ CUSTOMER_NAME = FAKE.word()
 REPORT = FAKE.word()
 BUCKET = FAKE.word()
 PREFIX = FAKE.word()
-REGION = random.choice(SOME_AWS_REGIONS)
+REGION = random.choice(AWS_REGIONS)
 
 class FakeSession():
     """
@@ -261,6 +264,27 @@ class AWSReportDownloaderTest(MasuTestCase):
 
         out, _ = self.report_downloader.download_file(fake_object)
         self.assertEqual(out, DATA_DIR+'/'+self.fake_customer_name+'/aws/'+fake_object)
+
+    @mock_s3
+    def test_download_file_missing_key(self):
+        fake_object = self.fake.word().lower()
+        conn = boto3.resource('s3', region_name=self.selected_region)
+        conn.create_bucket(Bucket=self.fake_bucket_name)
+        conn.Object(self.fake_bucket_name, fake_object).put(Body='test')
+
+        missing_key = 'missing' + fake_object
+        with self.assertRaises(AWSReportDownloaderError) as error:
+            _, _ = self.report_downloader.download_file(missing_key)
+        expected_err = 'Unable to find {} in S3 Bucket: {}'.format(missing_key, self.fake_bucket_name)
+        self.assertEqual(expected_err, str(error.exception))
+
+    @mock_s3
+    def test_download_file_other_error(self):
+        fake_object = self.fake.word().lower()
+        # No S3 bucket created
+        with self.assertRaises(AWSReportDownloaderError) as error:
+            _, _ = self.report_downloader.download_file(fake_object)
+        self.assertTrue('NoSuchBucket' in str(error.exception))
 
     @mock_s3
     def test_download_report(self):

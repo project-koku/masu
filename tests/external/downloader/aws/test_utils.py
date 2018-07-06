@@ -28,15 +28,15 @@ from faker import Faker
 from moto import mock_sts
 
 from masu.external.downloader.aws import utils
-from tests.external.downloader.aws import (SOME_AWS_REGIONS,
-                                           fake_arn,
+from tests.external.downloader.aws import (fake_arn,
                                            fake_aws_account_id)
+from masu.external import AWS_REGIONS
 from tests.external.downloader.aws.test_aws_report_downloader import FakeSession
 
 NAME = Faker().word()
 BUCKET = Faker().word()
 PREFIX = Faker().word()
-REGION = random.choice(SOME_AWS_REGIONS)
+REGION = random.choice(AWS_REGIONS)
 FORMAT = random.choice(['text', 'csv'])
 COMPRESSION = random.choice(['ZIP', 'GZIP'])
 REPORT_DEFS = [{'ReportName': NAME,

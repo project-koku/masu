@@ -23,8 +23,10 @@ import faker
 from celery.result import AsyncResult
 from unittest.mock import patch
 
+
 from masu.external import AMAZON_WEB_SERVICES
-from masu.exceptions import MasuProviderError
+from masu.external.accounts_accessor import AccountsAccessor
+from masu.external.accounts.cost_usage_report_account import CostUsageReportAccount
 from masu.external.report_downloader import ReportDownloaderError
 from masu.processor.orchestrator import Orchestrator
 from tests import MasuTestCase
@@ -48,7 +50,23 @@ class OrchestratorTest(MasuTestCase):
     """Test Cases for the Orchestrator object."""
 
     def setUp(self):
-        pass
+        self.mock_accounts = [
+        CostUsageReportAccount('cred1',
+                               'billingsource1',
+                               'customer1',
+                               'AWS',
+                               'customer1schema'),
+        CostUsageReportAccount('cred2',
+                               'billingsource2',
+                               'customer2',
+                               'AWS',
+                               'customer2schema'),
+        CostUsageReportAccount('cred3',
+                               'billingsource3',
+                               'customer3',
+                               'AWS',
+                               'customer3schema')
+        ]
 
     def test_initializer(self):
         """Test to init"""
@@ -80,3 +98,17 @@ class OrchestratorTest(MasuTestCase):
         reports = orchestrator.prepare()
 
         self.assertEqual(reports, [])
+
+    @patch('masu.processor.tasks.process.process_report_file', return_value=None)
+    def test_init_with_forced_billing_source(self, mock_task):
+        """Test initializing orchestrator with forced billing source."""
+
+        with patch.object(AccountsAccessor, 'get_accounts', return_value=self.mock_accounts):
+            orchestrator_all = Orchestrator()
+            self.assertEqual(set(orchestrator_all._accounts), set(self.mock_accounts))
+
+        with patch.object(AccountsAccessor, 'get_accounts', return_value=self.mock_accounts):
+            orchestrator_individual = Orchestrator('billingsource2')
+            self.assertEqual(len(orchestrator_individual._accounts), 1)
+            found_account = orchestrator_individual._accounts[0]
+            self.assertEqual(found_account.get_billing_source(), 'billingsource2')

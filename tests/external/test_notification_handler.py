@@ -79,7 +79,7 @@ class NotificationHandlerTest(MasuTestCase):
         body = json.dumps(body_dict)
 
         with self.assertRaises(NotificationHandlerError) as error:
-            _ = NotificationHandler(headers, body)
+            NotificationHandler(headers, body)
         self.assertTrue('Unexpected message type' in str(error.exception))
 
     def test_initializer_unsupported_provider(self):
@@ -97,7 +97,7 @@ class NotificationHandlerTest(MasuTestCase):
         body = json.dumps(body_dict)
 
         with self.assertRaises(NotificationHandlerError) as error:
-            _ = NotificationHandler(headers, body)
+            NotificationHandler(headers, body)
         self.assertTrue('Unsupported cloud provider.' in str(error.exception))
 
     def test_billing_source_exception(self):
@@ -127,4 +127,4 @@ class NotificationHandlerTest(MasuTestCase):
         handler = NotificationHandler(headers, body)
         with self.assertRaises(NotificationHandlerError):
             handler = NotificationHandler(headers, body)
-            _ = handler.billing_source()
+            handler.billing_source()

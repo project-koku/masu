@@ -274,7 +274,7 @@ class AWSReportDownloaderTest(MasuTestCase):
 
         missing_key = 'missing' + fake_object
         with self.assertRaises(AWSReportDownloaderError) as error:
-            _, _ = self.report_downloader.download_file(missing_key)
+            self.report_downloader.download_file(missing_key)
         expected_err = 'Unable to find {} in S3 Bucket: {}'.format(missing_key, self.fake_bucket_name)
         self.assertEqual(expected_err, str(error.exception))
 
@@ -283,7 +283,7 @@ class AWSReportDownloaderTest(MasuTestCase):
         fake_object = self.fake.word().lower()
         # No S3 bucket created
         with self.assertRaises(AWSReportDownloaderError) as error:
-            _, _ = self.report_downloader.download_file(fake_object)
+            self.report_downloader.download_file(fake_object)
         self.assertTrue('NoSuchBucket' in str(error.exception))
 
     @mock_s3

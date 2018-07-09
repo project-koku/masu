@@ -56,7 +56,7 @@ class AWSNotificationHandlerTest(MasuTestCase):
                      "SigningCertURL" : "https://sns.us-east-1.amazonaws.com/SimpleNotificationService-eaea6120e66ea12e88dcd8bcbddca752.pem"}
         body = json.dumps(body_dict)
         try:
-            _ = AWSNotificationHandler(headers, body, validation=False)
+            AWSNotificationHandler(headers, body, validation=False)
         except Exception:
             self.fail('Unexpected exception')
 
@@ -89,7 +89,7 @@ class AWSNotificationHandlerTest(MasuTestCase):
                      "SigningCertURL" : "https://sns.us-east-1.amazonaws.com/SimpleNotificationService-eaea6120e66ea12e88dcd8bcbddca752.pem"}
         body = json.dumps(body_dict)
         with self.assertRaises(AWSNotificationHandlerError):
-            _ = AWSNotificationHandler(headers, body, validation=False)
+            AWSNotificationHandler(headers, body, validation=False)
 
     def test_get_billing_source_non_top_level_manifest(self):
         headers = [('X-Amz-Sns-Message-Type', 'Notification'),
@@ -115,7 +115,7 @@ class AWSNotificationHandlerTest(MasuTestCase):
         body = json.dumps(body_dict)
         handler = AWSNotificationHandler(headers, body)
         with self.assertRaises(NotificationInterfaceFilter):
-            _ = handler.get_billing_source()
+            handler.get_billing_source()
 
     def test_get_billing_source_top_level_manifest(self):
         headers = [('X-Amz-Sns-Message-Type', 'Notification'),
@@ -167,7 +167,7 @@ class AWSNotificationHandlerTest(MasuTestCase):
         body = json.dumps(body_dict)
         handler = AWSNotificationHandler(headers, body)
         with self.assertRaises(NotificationInterfaceFilter):
-            _ = handler.get_billing_source()
+            handler.get_billing_source()
 
     def test_get_billing_source_empty_body(self):
         headers = [('X-Amz-Sns-Message-Type', 'Notification')]
@@ -180,7 +180,7 @@ class AWSNotificationHandlerTest(MasuTestCase):
         headers = [('X-Amz-Sns-Message-Type', 'RandomType')]
         body = u''
         with self.assertRaises(AWSNotificationHandlerError):
-            _ = AWSNotificationHandler(headers, body)
+            AWSNotificationHandler(headers, body)
 
     def test_get_billing_source_unexpected_message_format(self):
         headers = [('X-Amz-Sns-Message-Type', 'Notification'),
@@ -208,7 +208,7 @@ class AWSNotificationHandlerTest(MasuTestCase):
         handler = AWSNotificationHandler(headers, body)
         with self.assertRaises(AWSNotificationHandlerError):
             handler = AWSNotificationHandler(headers, body, validation=False)
-            _ = handler.get_billing_source()
+            handler.get_billing_source()
 
     def test_missing_message_type(self):
         headers = [('X-Amz-Sns-Topic-Arn', 'arn:aws:sns:us-east-1:589173575009:CostUsageNotificationDemo'),
@@ -233,7 +233,7 @@ class AWSNotificationHandlerTest(MasuTestCase):
                      "SigningCertURL" : "https://sns.us-east-1.amazonaws.com/SimpleNotificationService-eaea6120e66ea12e88dcd8bcbddca752.pem"}
         body = json.dumps(body_dict)
         with self.assertRaises(AWSNotificationHandlerError):
-            _ = AWSNotificationHandler(headers, body, validation=False)
+            AWSNotificationHandler(headers, body, validation=False)
 
     def test_get_region_invalid_arn(self):
         # Removed a ':' in Topic ARN
@@ -259,7 +259,7 @@ class AWSNotificationHandlerTest(MasuTestCase):
                      "SigningCertURL" : "https://sns.us-east-1.amazonaws.com/SimpleNotificationService-eaea6120e66ea12e88dcd8bcbddca752.pem"}
         body = json.dumps(body_dict)
         with self.assertRaises(AWSNotificationHandlerError) as error:
-            _ = AWSNotificationHandler(headers, body, validation=False)
+            AWSNotificationHandler(headers, body, validation=False)
         self.assertTrue('Unexpected region name' in str(error.exception))
 
     def test_get_region_invalid_arn_2(self):
@@ -286,7 +286,7 @@ class AWSNotificationHandlerTest(MasuTestCase):
                      "SigningCertURL" : "https://sns.us-east-1.amazonaws.com/SimpleNotificationService-eaea6120e66ea12e88dcd8bcbddca752.pem"}
         body = json.dumps(body_dict)
         with self.assertRaises(AWSNotificationHandlerError) as error:
-            _ = AWSNotificationHandler(headers, body, validation=False)
+            AWSNotificationHandler(headers, body, validation=False)
         self.assertTrue('Unexpected Subscription ARN format' in str(error.exception))
 
     @mock_sns
@@ -313,7 +313,7 @@ class AWSNotificationHandlerTest(MasuTestCase):
                      "SigningCertURL" : "https://sns.us-east-1.amazonaws.com/SimpleNotificationService-eaea6120e66ea12e88dcd8bcbddca752.pem"}
         body = json.dumps(body_dict)
         with self.assertRaises(AWSNotificationHandlerError) as error:
-            _ = AWSNotificationHandler(headers, body, validation=False)
+            AWSNotificationHandler(headers, body, validation=False)
         self.assertTrue('Unexpected region name.' in str(error.exception))
 
     @mock_sns
@@ -340,5 +340,5 @@ class AWSNotificationHandlerTest(MasuTestCase):
                      "SigningCertURL" : "https://sns.us-east-1.amazonaws.com/SimpleNotificationService-eaea6120e66ea12e88dcd8bcbddca752.pem"}
         body = json.dumps(body_dict)
         with self.assertRaises(AWSNotificationHandlerError) as error:
-            _ = AWSNotificationHandler(headers, body, validation=False)
+            AWSNotificationHandler(headers, body, validation=False)
         self.assertTrue('Missing Subscription ARN' in str(error.exception))

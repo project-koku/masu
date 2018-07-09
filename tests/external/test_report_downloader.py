@@ -48,7 +48,7 @@ class ReportDownloaderTest(MasuTestCase):
     def test_initializer_downloader_exception(self, fake_downloader):
         """Test to initializer where _set_downloader throws exception"""
         with self.assertRaises(ReportDownloaderError):
-            _ = ReportDownloader(customer_name='customer name',
+            ReportDownloader(customer_name='customer name',
                                  access_credential='mycred',
                                  report_source='hereiam',
                                  report_name='bestreport',
@@ -58,7 +58,7 @@ class ReportDownloaderTest(MasuTestCase):
         """Test that error is thrown with invalid account source."""
 
         with self.assertRaises(ReportDownloaderError):
-            _ = ReportDownloader(customer_name='customer name',
+            ReportDownloader(customer_name='customer name',
                                  access_credential='mycred',
                                  report_source='hereiam',
                                  report_name='bestreport',
@@ -86,4 +86,4 @@ class ReportDownloaderTest(MasuTestCase):
                                       provider_type=AMAZON_WEB_SERVICES)
         with patch.object(AWSReportDownloader, 'download_current_report', side_effect=Exception('some error')):
             with self.assertRaises(ReportDownloaderError):
-                _ = downloader.get_current_report()
+                downloader.get_current_report()

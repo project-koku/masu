@@ -21,11 +21,12 @@ import random
 import string
 
 import faker
-from unittest.mock import patch, Mock
+from unittest.mock import call, patch, Mock
 
 from masu.external.report_downloader import ReportDownloaderError
 from masu.processor._tasks.download import _get_report_files
 from masu.processor._tasks.process import _process_report_file
+from masu.processor.tasks import get_report_files, process_report_file
 
 from tests import MasuTestCase
 from tests.external.downloader.aws import fake_arn
@@ -78,62 +79,91 @@ class GetReportFileTests(MasuTestCase):
 
         self.assertEqual(report, [])
 
-    @patch('masu.processor._tasks.download._get_report_files',
-           return_value=['file1', 'file2'])
+class ProcessReportFileTests(MasuTestCase):
+    """Test Cases for the Orchestrator object."""
+
+    @patch('masu.processor._tasks.process.ReportProcessor')
+    @patch('masu.processor._tasks.process.ReportStatsDBAccessor')
+    def test_process_file(self, mock_accessor, mock_processor):
+        """Test the process_report_file functionality."""
+        request = {'report_path': '/test/path/file1.csv',
+                   'compression': 'gzip',
+                   'schema_name': 'testcustomer'}
+
+        mock_proc = mock_processor()
+        mock_acc = mock_accessor()
+
+        _process_report_file(**request)
+
+        mock_proc.process.assert_called()
+        mock_acc.log_last_started_datetime.assert_called()
+        mock_acc.log_last_completed_datetime.assert_called()
+        mock_acc.set_cursor_position.assert_called()
+        mock_acc.commit.assert_called()
+
+
+class TestProcessorTasks(MasuTestCase):
+    """Test cases for Processor Celery tasks."""
+
+    fake = faker.Faker()
+
+    @patch('masu.processor.tasks._get_report_files')
     @patch('masu.processor.tasks.process_report_file')
-    def test_second_task_called(self, mock_process_files, mock_get_files):
+    def test_get_report_files_second_task_called(self,
+                                                 mock_process_files,
+                                                 mock_get_files):
+        """Test that the chained task is called."""
+        report_dicts = [{'file': 'file1', 'compression': 'GZIP'},
+                        {'file': 'file2', 'compression': 'PLAIN'}]
+
         mock_process_files.delay = Mock()
+        mock_get_files.return_value = report_dicts
 
         account = fake_arn(service='iam', generate_account_id=True)
-
-        reports = _get_report_files(customer_name=self.fake.word(),
-                                    access_credential=account,
-                                    provider_type='AWS',
-                                    report_name=self.fake.word(),
-                                    report_source=self.fake.word())
-
         schema_name = self.fake.word()
-        for report_dict in reports:
-            request = {'schema_name': schema_name,
-                       'report_path': report_dict.get('file'),
-                       'compression': report_dict.get('compression')}
-            process_report_file.delay(**request)
+        get_report_files(customer_name=self.fake.word(),
+                         access_credential=account,
+                         provider_type='AWS',
+                         report_name=self.fake.word(),
+                         schema_name=schema_name,
+                         report_source=self.fake.word())
 
-            mock_process_files.assert_called_with(
-                schema_name,
-                report_dict.get('file'),
-                report_dict.get('compression')
-            )
+        expected_calls = [
+            call(schema_name, report['file'], report['compression'])
+            for report in report_dicts
+        ]
+
+        mock_process_files.delay.has_calls(expected_calls, any_order=True)
 
     @patch('masu.processor._tasks.download._get_report_files',
            return_value=[])
     @patch('masu.processor.tasks.process_report_file')
-    def test_second_task_not_called(self, mock_process_files, mock_get_files):
+    def test_get_report_files_second_task_not_called(self,
+                                                     mock_process_files,
+                                                     mock_get_files):
+        """Test that the chained task is not called."""
         mock_process_files.delay = Mock()
 
         account = fake_arn(service='iam', generate_account_id=True)
+        schema_name = self.fake.word()
+        get_report_files(customer_name=self.fake.word(),
+                         access_credential=account,
+                         provider_type='AWS',
+                         report_name=self.fake.word(),
+                         schema_name=schema_name,
+                         report_source=self.fake.word())
+        mock_process_files.delay.assert_not_called()
 
-        reports = _get_report_files(customer_name=self.fake.word(),
-                                   access_credential=account,
-                                   provider_type='AWS',
-                                   report_name=self.fake.word(),
-                                   report_source=self.fake.word())
-        for report_dict in reports:
-            request = {'schema_name': schema_name,
-                       'report_path': report_dict.get('file'),
-                       'compression': report_dict.get('compression')}
-            process_report_file.delay(**request)
+    @patch('masu.processor.tasks._process_report_file')
+    def test_process_report_file(self, mock_process_files):
+        """Test process report file functionality."""
+        schema_name = self.fake.word()
+        report_path = 'path/to/file'
+        compression = 'GZIP'
+        process_report_file(schema_name, report_path, compression)
 
-        mock_process_files.assert_not_called()
-
-class ProcessReportFileTests(MasuTestCase):
-    """Test Cases for the Orchestrator object."""
-
-    @patch('masu.processor.report_processor.ReportProcessor')
-    @patch('masu.processor.report_processor.ReportProcessor.process', return_value=2)
-    def test_process_file(self, fake_processor, fake_process):
-        """Test task"""
-        request = {'report_path': '/test/path/file1.csv',
-                   'compression': 'gzip',
-                   'schema_name': 'testcustomer'}
-        _process_report_file(**request)
+        mock_process_files.assert_called_with(
+            schema_name,
+            report_path,
+            compression
+        )

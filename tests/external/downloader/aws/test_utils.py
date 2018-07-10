@@ -33,10 +33,13 @@ from tests.external.downloader.aws import (fake_arn,
 from masu.external import AWS_REGIONS
 from tests.external.downloader.aws.test_aws_report_downloader import FakeSession
 
+# the cn endpoints aren't supported by moto, so filter them out
+AWS_REGIONS = list(filter(lambda reg: not reg.startswith('cn-'), AWS_REGIONS))
+REGION = random.choice(AWS_REGIONS)
+
 NAME = Faker().word()
 BUCKET = Faker().word()
 PREFIX = Faker().word()
-REGION = random.choice(AWS_REGIONS)
 FORMAT = random.choice(['text', 'csv'])
 COMPRESSION = random.choice(['ZIP', 'GZIP'])
 REPORT_DEFS = [{'ReportName': NAME,

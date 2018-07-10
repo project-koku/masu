@@ -47,6 +47,9 @@ CUSTOMER_NAME = FAKE.word()
 REPORT = FAKE.word()
 BUCKET = FAKE.word()
 PREFIX = FAKE.word()
+
+# the cn endpoints aren't supported by moto, so filter them out
+AWS_REGIONS = list(filter(lambda reg: not reg.startswith('cn-'), AWS_REGIONS))
 REGION = random.choice(AWS_REGIONS)
 
 class FakeSession():

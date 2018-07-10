@@ -51,6 +51,7 @@ objects:
     rabbitmq-host: rabbitmq.${NAMESPACE}.svc
     log-level: ${LOG_LEVEL}
     worker-queues: ${WORKER_QUEUES}
+    schedule-check-interval: "60"
 - kind: Service
   apiVersion: v1
   metadata:
@@ -345,6 +346,12 @@ objects:
                 configMapKeyRef:
                   name: ${NAME}
                   key: worker-queues
+                  optional: false
+            - name: SCHEDULE_CHECK_INTERVAL
+              valueFrom:
+                configMapKeyRef:
+                  name: ${NAME}
+                  key: schedule-check-interval
                   optional: false
             - name: AWS_ACCESS_KEY_ID
               valueFrom:

@@ -22,7 +22,9 @@ from unittest.mock import patch
 from masu.external import AMAZON_WEB_SERVICES
 from masu.external.downloader.aws.aws_report_downloader import AWSReportDownloader, AWSReportDownloaderError
 from masu.external.report_downloader import ReportDownloader, ReportDownloaderError
+
 from tests import MasuTestCase
+from tests.external.downloader.aws import fake_arn
 
 class FakeDownloader():
     pass
@@ -34,11 +36,15 @@ class ReportDownloaderTest(MasuTestCase):
     file_list = ['/var/tmp/masu/region/aws/catch-clearly.csv',
                  '/var/tmp/masu/base/aws/professor-hour-industry-television.csv']
 
+    def setUp(self):
+        super().setUp()
+        self.fake_creds = fake_arn(service='iam', generate_account_id=True)
+
     @patch('masu.external.downloader.aws.aws_report_downloader.AWSReportDownloader.__init__', return_value=None)
     def test_initializer(self, fake_downloader):
         """Test to initializer"""
         downloader = ReportDownloader(customer_name='customer name',
-                                      access_credential='mycred',
+                                      access_credential=self.fake_creds,
                                       report_source='hereiam',
                                       report_name='bestreport',
                                       provider_type=AMAZON_WEB_SERVICES)
@@ -49,26 +55,26 @@ class ReportDownloaderTest(MasuTestCase):
         """Test to initializer where _set_downloader throws exception"""
         with self.assertRaises(ReportDownloaderError):
             ReportDownloader(customer_name='customer name',
-                                 access_credential='mycred',
-                                 report_source='hereiam',
-                                 report_name='bestreport',
-                                 provider_type=AMAZON_WEB_SERVICES)
+                             access_credential=self.fake_creds,
+                             report_source='hereiam',
+                             report_name='bestreport',
+                             provider_type=AMAZON_WEB_SERVICES)
 
     def test_invalid_provider_type(self):
         """Test that error is thrown with invalid account source."""
 
         with self.assertRaises(ReportDownloaderError):
             ReportDownloader(customer_name='customer name',
-                                 access_credential='mycred',
-                                 report_source='hereiam',
-                                 report_name='bestreport',
-                                 provider_type='unknown')
+                             access_credential=self.fake_creds,
+                             report_source='hereiam',
+                             report_name='bestreport',
+                             provider_type='unknown')
 
     @patch('masu.external.downloader.aws.aws_report_downloader.AWSReportDownloader.__init__', return_value=None)
     def test_get_current_report(self, fake_downloader):
         """Test get_current_report function."""
         downloader = ReportDownloader(customer_name='customer name',
-                                      access_credential='mycred',
+                                      access_credential=self.fake_creds,
                                       report_source='hereiam',
                                       report_name='bestreport',
                                       provider_type=AMAZON_WEB_SERVICES)
@@ -80,7 +86,7 @@ class ReportDownloaderTest(MasuTestCase):
     def test_get_current_report_error(self, fake_downloader):
         """Test get_current_report function with error."""
         downloader = ReportDownloader(customer_name='customer name',
-                                      access_credential='mycred',
+                                      access_credential=self.fake_creds,
                                       report_source='hereiam',
                                       report_name='bestreport',
                                       provider_type=AMAZON_WEB_SERVICES)

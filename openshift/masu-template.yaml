@@ -222,6 +222,18 @@ objects:
                   name: ${NAME}
                   key: rabbitmq-host
                   optional: false
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  key: aws-access-key-id
+                  name: ${NAME}
+                  optional: false
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  key: aws-secret-access-key
+                  name: ${NAME}
+                  optional: false
           livenessProbe:
             failureThreshold: 3
             httpGet:

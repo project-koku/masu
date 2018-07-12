@@ -97,7 +97,7 @@ class OrchestratorTest(MasuTestCase):
         orchestrator = Orchestrator()
         reports = orchestrator.prepare()
 
-        self.assertEqual(reports, [])
+        self.assertEqual(reports, None)
 
     @patch('masu.processor.tasks.process_report_file', return_value=None)
     def test_init_with_forced_billing_source(self, mock_task):

@@ -18,17 +18,15 @@
 """Test the download endpoint view."""
 
 from unittest.mock import patch
-
+from celery.result import AsyncResult
 from tests import MasuTestCase
 
 
 class DownloadAPIViewTest(MasuTestCase):
     """Test Cases for the Download API."""
 
-    file_list = ['/var/tmp/masu/region/aws/catch-clearly.csv',
-                 '/var/tmp/masu/base/aws/professor-hour-industry-television.csv']
-
-    @patch('masu.processor.orchestrator.Orchestrator.prepare', return_value=file_list)
+    @patch('masu.processor.orchestrator.Orchestrator.prepare',
+           return_value=AsyncResult('dc350f15-ffc7-4fcb-92d7-2a9f1275568e'))
     def test_download(self, file_list):
         """Test the download endpoint."""
         response = self.client.get('/api/v1/download/')
@@ -37,4 +35,4 @@ class DownloadAPIViewTest(MasuTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
 
-        self.assertIn('message', body)
+        self.assertIn('Download Request Task ID', body)

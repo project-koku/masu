@@ -36,8 +36,8 @@ class CURAccountsDBTest(MasuTestCase):
 
         account = accounts.pop()
 
-        self.assertEqual(account.get_access_credential(), 'arn:aws:iam::111111111111:role/CostManagement')
-        self.assertEqual(account.get_billing_source(), 'test-bucket')
-        self.assertEqual(account.get_customer(), 'Test Customer')
-        self.assertEqual(account.get_provider_type(), AMAZON_WEB_SERVICES)
+        self.assertEqual(account.get('authentication'), 'arn:aws:iam::111111111111:role/CostManagement')
+        self.assertEqual(account.get('billing_source'), 'test-bucket')
+        self.assertEqual(account.get('customer_name'), 'Test Customer')
+        self.assertEqual(account.get('provider_type'), AMAZON_WEB_SERVICES)
 

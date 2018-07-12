@@ -26,10 +26,10 @@ from unittest.mock import patch
 
 from masu.external import AMAZON_WEB_SERVICES
 from masu.external.accounts_accessor import AccountsAccessor
-from masu.external.accounts.cost_usage_report_account import CostUsageReportAccount
 from masu.external.report_downloader import ReportDownloaderError
 from masu.processor.orchestrator import Orchestrator
 from tests import MasuTestCase
+from tests.external.downloader.aws import fake_arn
 
 class FakeDownloader():
     fake = faker.Faker()
@@ -48,25 +48,18 @@ class FakeDownloader():
 
 class OrchestratorTest(MasuTestCase):
     """Test Cases for the Orchestrator object."""
+    fake = faker.Faker()
 
     def setUp(self):
-        self.mock_accounts = [
-        CostUsageReportAccount('cred1',
-                               'billingsource1',
-                               'customer1',
-                               'AWS',
-                               'customer1schema'),
-        CostUsageReportAccount('cred2',
-                               'billingsource2',
-                               'customer2',
-                               'AWS',
-                               'customer2schema'),
-        CostUsageReportAccount('cred3',
-                               'billingsource3',
-                               'customer3',
-                               'AWS',
-                               'customer3schema')
-        ]
+        self.mock_accounts = []
+        self.num_accounts = range(1, random.randint(1,20))
+        for _ in self.num_accounts:
+            self.mock_accounts.append({
+                'authentication': fake_arn(service='iam', generate_account_id=True),
+                'billing_source': self.fake.word(),
+                'customer_name': self.fake.word(),
+                'provider_type': 'AWS',
+                'schema_name': self.fake.word()})
 
     def test_initializer(self):
         """Test to init"""
@@ -76,10 +69,10 @@ class OrchestratorTest(MasuTestCase):
             self.fail("Unexpected number of test accounts")
 
         account = orchestrator._accounts.pop()
-        self.assertEqual(account.get_access_credential(), 'arn:aws:iam::111111111111:role/CostManagement')
-        self.assertEqual(account.get_billing_source(), 'test-bucket')
-        self.assertEqual(account.get_customer(), 'Test Customer')
-        self.assertEqual(account.get_provider_type(), AMAZON_WEB_SERVICES)
+        self.assertEqual(account.get('authentication'), 'arn:aws:iam::111111111111:role/CostManagement')
+        self.assertEqual(account.get('billing_source'), 'test-bucket')
+        self.assertEqual(account.get('customer_name'), 'Test Customer')
+        self.assertEqual(account.get('provider_type'), AMAZON_WEB_SERVICES)
 
     @patch('masu.external.report_downloader.ReportDownloader._set_downloader', return_value=FakeDownloader)
     @patch('masu.processor.orchestrator.get_report_files.delay', return_value=True)
@@ -97,18 +90,26 @@ class OrchestratorTest(MasuTestCase):
         orchestrator = Orchestrator()
         reports = orchestrator.prepare()
 
-        self.assertEqual(reports, None)
+        self.assertIsNone(reports)
 
+    @patch.object(AccountsAccessor, 'get_accounts')
     @patch('masu.processor.tasks.process_report_file', return_value=None)
-    def test_init_with_forced_billing_source(self, mock_task):
+    def test_init_all_accounts(self, mock_task, mock_accessor):
         """Test initializing orchestrator with forced billing source."""
+        mock_accessor.return_value = self.mock_accounts
+        orchestrator_all = Orchestrator()
+        self.assertEqual(orchestrator_all._accounts, self.mock_accounts)
 
-        with patch.object(AccountsAccessor, 'get_accounts', return_value=self.mock_accounts):
-            orchestrator_all = Orchestrator()
-            self.assertEqual(set(orchestrator_all._accounts), set(self.mock_accounts))
+    @patch.object(AccountsAccessor, 'get_accounts')
+    @patch('masu.processor.tasks.process_report_file', return_value=None)
+    def test_init_with_billing_source(self, mock_task, mock_accessor):
+        """Test initializing orchestrator with forced billing source."""
+        mock_accessor.return_value = self.mock_accounts
 
-        with patch.object(AccountsAccessor, 'get_accounts', return_value=self.mock_accounts):
-            orchestrator_individual = Orchestrator('billingsource2')
-            self.assertEqual(len(orchestrator_individual._accounts), 1)
-            found_account = orchestrator_individual._accounts[0]
-            self.assertEqual(found_account.get_billing_source(), 'billingsource2')
+        fake_source = random.choice(self.mock_accounts)
+
+        individual = Orchestrator(fake_source.get('billing_source'))
+        self.assertEqual(len(individual._accounts), 1)
+        found_account = individual._accounts[0]
+        self.assertEqual(found_account.get('billing_source'),
+                         fake_source.get('billing_source'))

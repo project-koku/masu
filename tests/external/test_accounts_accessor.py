@@ -18,7 +18,6 @@
 """Test the CostUsageReportAccount object."""
 
 from masu.external.accounts_accessor import AccountsAccessor, AccountsAccessorError
-from masu.external.accounts.cost_usage_report_account import CostUsageReportAccount
 from tests import MasuTestCase
 
 
@@ -32,14 +31,14 @@ class AccountsAccessorTest(MasuTestCase):
         if len(account_objects) != 1:
             self.fail('unexpected number of accounts')
 
-        self.assertIsInstance(account_objects.pop(), CostUsageReportAccount)
+        self.assertIsInstance(account_objects.pop(), dict)
 
         for account in account_objects:
-            self.assertEqual(account.get_access_credential(), 'arn:aws:iam::111111111111:role/CostManagement')
-            self.assertEqual(account.get_billing_source(), 'test-bucket')
-            self.assertEqual(account.get_customer(), 'Test Customer')
-            self.assertEqual(account.get_provider_type(), 'Test Provider')
-            self.assertEqual(account.get_schema_name(), 'testcustomer')
+            self.assertEqual(account.get('access_credential'), 'arn:aws:iam::111111111111:role/CostManagement')
+            self.assertEqual(account.get('billing_source'), 'test-bucket')
+            self.assertEqual(account.get('customer_name'), 'Test Customer')
+            self.assertEqual(account.get('provider_type'), 'Test Provider')
+            self.assertEqual(account.get('schema_name'), 'testcustomer')
 
     def test_invalid_source_specification(self):
         """Test that error is thrown with invalid account source."""

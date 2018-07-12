@@ -380,6 +380,13 @@ objects:
           resources:
             limits:
               memory: ${MEMORY_LIMIT}
+          volumeMounts:
+          - mountPath: /var/tmp/masu/
+            name: ${NAME}-data
+        volumes:
+        - name: ${NAME}-data
+          persistentVolumeClaim:
+            claimName: ${NAME}
     triggers:
     - type: ConfigChange
     - imageChangeParams:
@@ -480,6 +487,19 @@ objects:
           kind: ImageStreamTag
           name: ${NAME}:latest
       type: ImageChange
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    labels:
+      app: ${NAME}
+      template: ${NAME}-template
+    name: ${NAME}
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: ${VOLUME_CAPACITY}
 parameters:
 - description: The name assigned to all frontend objects defined in this template.
   displayName: Name
@@ -566,3 +586,8 @@ parameters:
 - displayName: AWS Secret Access Key
   from: ${AWS_SECRET_ACCESS_KEY}
   name: AWS_SECRET_ACCESS_KEY
+- displayName: Volume Capacity
+  description: Volume space available for shared files, e.g. 512Mi, 2Gi
+  name: VOLUME_CAPACITY
+  required: true
+  value: 1Gi

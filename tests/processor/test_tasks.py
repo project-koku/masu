@@ -57,10 +57,11 @@ class GetReportFileTests(MasuTestCase):
         """Test task"""
         account = fake_arn(service='iam', generate_account_id=True)
         report = _get_report_files(customer_name=self.fake.word(),
-                                   access_credential=account,
+                                   authentication=account,
                                    provider_type='AWS',
                                    report_name=self.fake.word(),
-                                   report_source=self.fake.word())
+                                   billing_source=self.fake.word(),
+                                   provider_id=random.randint(1,65535))
 
         self.assertIsInstance(report, list)
         self.assertGreater(len(report), 0)
@@ -72,10 +73,11 @@ class GetReportFileTests(MasuTestCase):
         account = fake_arn(service='iam', generate_account_id=True)
 
         report = _get_report_files(customer_name=self.fake.word(),
-                                   access_credential=account,
+                                   authentication=account,
                                    provider_type='AWS',
                                    report_name=self.fake.word(),
-                                   report_source=self.fake.word())
+                                   billing_source=self.fake.word(),
+                                   provider_id=random.randint(1,65535))
 
         self.assertEqual(report, [])
 
@@ -122,11 +124,12 @@ class TestProcessorTasks(MasuTestCase):
         account = fake_arn(service='iam', generate_account_id=True)
         schema_name = self.fake.word()
         get_report_files(customer_name=self.fake.word(),
-                         access_credential=account,
+                         authentication=account,
                          provider_type='AWS',
                          report_name=self.fake.word(),
                          schema_name=schema_name,
-                         report_source=self.fake.word())
+                         billing_source=self.fake.word(),
+                         provider_id=random.randint(1,65535))
 
         expected_calls = [
             call(schema_name, report['file'], report['compression'])
@@ -147,11 +150,12 @@ class TestProcessorTasks(MasuTestCase):
         account = fake_arn(service='iam', generate_account_id=True)
         schema_name = self.fake.word()
         get_report_files(customer_name=self.fake.word(),
-                         access_credential=account,
+                         authentication=account,
                          provider_type='AWS',
                          report_name=self.fake.word(),
                          schema_name=schema_name,
-                         report_source=self.fake.word())
+                         billing_source=self.fake.word(),
+                         provider_id=random.randint(1,65535))
         mock_process_files.delay.assert_not_called()
 
     @patch('masu.processor.tasks._process_report_file')

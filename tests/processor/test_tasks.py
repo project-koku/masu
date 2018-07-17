@@ -19,10 +19,12 @@
 
 import random
 import string
+from datetime import datetime, timedelta
 
 import faker
 from unittest.mock import call, patch, Mock
 
+from masu.database.report_stats_db_accessor import ReportStatsDBAccessor
 from masu.external.report_downloader import ReportDownloaderError
 from masu.processor._tasks.download import _get_report_files
 from masu.processor._tasks.process import _process_report_file
@@ -30,7 +32,6 @@ from masu.processor.tasks import get_report_files, process_report_file
 
 from tests import MasuTestCase
 from tests.external.downloader.aws import fake_arn
-
 
 class FakeDownloader(Mock):
     def download_current_report():
@@ -60,8 +61,7 @@ class GetReportFileTests(MasuTestCase):
                                    authentication=account,
                                    provider_type='AWS',
                                    report_name=self.fake.word(),
-                                   billing_source=self.fake.word(),
-                                   provider_id=random.randint(1,65535))
+                                   billing_source=self.fake.word())
 
         self.assertIsInstance(report, list)
         self.assertGreater(len(report), 0)
@@ -76,8 +76,7 @@ class GetReportFileTests(MasuTestCase):
                                    authentication=account,
                                    provider_type='AWS',
                                    report_name=self.fake.word(),
-                                   billing_source=self.fake.word(),
-                                   provider_id=random.randint(1,65535))
+                                   billing_source=self.fake.word())
 
         self.assertEqual(report, [])
 
@@ -109,31 +108,42 @@ class TestProcessorTasks(MasuTestCase):
 
     fake = faker.Faker()
 
+    def setUp(self):
+        super().setUp()
+
+        self.fake_reports = []
+        for _ in range(1, random.randint(5,20)):
+            self.fake_reports.append({'file': self.fake.word(),
+                                      'compression': random.choice(['GZIP', 'PLAIN'])})
+
+        fake_account = fake_arn(service='iam', generate_account_id=True)
+
+        self.fake_get_report_args = {'customer_name': self.fake.word(),
+                                     'authentication': fake_account,
+                                     'provider_type': 'AWS',
+                                     'report_name': self.fake.word(),
+                                     'schema_name': self.fake.word(),
+                                     'billing_source': self.fake.word()}
+
+        self.today = datetime.today()
+        self.yesterday = datetime.today() - timedelta(days=1)
+
     @patch('masu.processor.tasks._get_report_files')
     @patch('masu.processor.tasks.process_report_file')
     def test_get_report_files_second_task_called(self,
                                                  mock_process_files,
                                                  mock_get_files):
         """Test that the chained task is called."""
-        report_dicts = [{'file': 'file1', 'compression': 'GZIP'},
-                        {'file': 'file2', 'compression': 'PLAIN'}]
-
         mock_process_files.delay = Mock()
-        mock_get_files.return_value = report_dicts
+        mock_get_files.return_value = self.fake_reports
 
-        account = fake_arn(service='iam', generate_account_id=True)
-        schema_name = self.fake.word()
-        get_report_files(customer_name=self.fake.word(),
-                         authentication=account,
-                         provider_type='AWS',
-                         report_name=self.fake.word(),
-                         schema_name=schema_name,
-                         billing_source=self.fake.word(),
-                         provider_id=random.randint(1,65535))
+        get_report_files(**self.fake_get_report_args)
 
         expected_calls = [
-            call(schema_name, report['file'], report['compression'])
-            for report in report_dicts
+            call(self.fake_get_report_args.get('schema_name'),
+                 report['file'],
+                 report['compression'])
+            for report in self.fake_reports
         ]
 
         mock_process_files.delay.has_calls(expected_calls, any_order=True)
@@ -146,17 +156,112 @@ class TestProcessorTasks(MasuTestCase):
                                                      mock_get_files):
         """Test that the chained task is not called."""
         mock_process_files.delay = Mock()
-
-        account = fake_arn(service='iam', generate_account_id=True)
-        schema_name = self.fake.word()
-        get_report_files(customer_name=self.fake.word(),
-                         authentication=account,
-                         provider_type='AWS',
-                         report_name=self.fake.word(),
-                         schema_name=schema_name,
-                         billing_source=self.fake.word(),
-                         provider_id=random.randint(1,65535))
+        get_report_files(**self.fake_get_report_args)
         mock_process_files.delay.assert_not_called()
+
+    @patch('masu.processor.tasks.ReportStatsDBAccessor.get_last_completed_datetime')
+    @patch('masu.processor.tasks.ReportStatsDBAccessor.get_last_started_datetime')
+    @patch('masu.processor.tasks._get_report_files')
+    @patch('masu.processor.tasks.process_report_file')
+    def test_get_report_files_timestamps_aligned(self,
+                                                 mock_process_files,
+                                                 mock_get_files,
+                                                 mock_started,
+                                                 mock_completed):
+        """
+        Test that the chained task is called when start timestamp is before
+        end timestamp.
+        """
+        mock_process_files.delay = Mock()
+        mock_get_files.return_value = self.fake_reports
+
+        mock_started.return_value = self.yesterday
+        mock_completed.return_value = self.today
+
+        get_report_files(**self.fake_get_report_args)
+        mock_process_files.delay.assert_called()
+
+    @patch('masu.processor.tasks.ReportStatsDBAccessor.get_last_completed_datetime')
+    @patch('masu.processor.tasks.ReportStatsDBAccessor.get_last_started_datetime')
+    @patch('masu.processor.tasks._get_report_files')
+    @patch('masu.processor.tasks.process_report_file')
+    def test_get_report_files_timestamps_misaligned(self,
+                                                    mock_process_files,
+                                                    mock_get_files,
+                                                    mock_started,
+                                                    mock_completed):
+        """
+        Test that the chained task is called when start timestamp is before
+        end timestamp.
+        """
+        mock_process_files.delay = Mock()
+        mock_get_files.return_value = self.fake_reports
+
+        mock_started.return_value = self.today
+        mock_completed.return_value = self.yesterday
+
+        get_report_files(**self.fake_get_report_args)
+        mock_process_files.delay.assert_not_called()
+
+    @patch('masu.processor.tasks.ReportStatsDBAccessor.get_last_completed_datetime')
+    @patch('masu.processor.tasks.ReportStatsDBAccessor.get_last_started_datetime')
+    @patch('masu.processor.tasks._get_report_files')
+    @patch('masu.processor.tasks.process_report_file')
+    def test_get_report_files_timestamps_empty_start(self,
+                                               mock_process_files,
+                                               mock_get_files,
+                                               mock_started,
+                                               mock_completed):
+        """
+        Test that the chained task is called when no start time is set.
+        """
+        mock_process_files.delay = Mock()
+        mock_get_files.return_value = self.fake_reports
+
+        mock_started.return_value = None
+        mock_completed.return_value = self.today
+        get_report_files(**self.fake_get_report_args)
+        mock_process_files.delay.assert_called()
+
+    @patch('masu.processor.tasks.ReportStatsDBAccessor.get_last_completed_datetime')
+    @patch('masu.processor.tasks.ReportStatsDBAccessor.get_last_started_datetime')
+    @patch('masu.processor.tasks._get_report_files')
+    @patch('masu.processor.tasks.process_report_file')
+    def test_get_report_files_timestamps_empty_end(self,
+                                               mock_process_files,
+                                               mock_get_files,
+                                               mock_started,
+                                               mock_completed):
+        """
+        Test that the chained task is called when no end time is set.
+        """
+        mock_process_files.delay = Mock()
+        mock_get_files.return_value = self.fake_reports
+
+        mock_started.return_value = self.today
+        mock_completed.return_value = None
+        get_report_files(**self.fake_get_report_args)
+        mock_process_files.delay.assert_called()
+
+    @patch('masu.processor.tasks.ReportStatsDBAccessor.get_last_completed_datetime')
+    @patch('masu.processor.tasks.ReportStatsDBAccessor.get_last_started_datetime')
+    @patch('masu.processor.tasks._get_report_files')
+    @patch('masu.processor.tasks.process_report_file')
+    def test_get_report_files_timestamps_empty_both(self,
+                                               mock_process_files,
+                                               mock_get_files,
+                                               mock_started,
+                                               mock_completed):
+        """
+        Test that the chained task is called when no timestamps are set.
+        """
+        mock_process_files.delay = Mock()
+        mock_get_files.return_value = self.fake_reports
+
+        mock_started.return_value = None
+        mock_completed.return_value = None
+        get_report_files(**self.fake_get_report_args)
+        mock_process_files.delay.assert_called()
 
     @patch('masu.processor.tasks._process_report_file')
     def test_process_report_file(self, mock_process_files):

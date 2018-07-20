@@ -72,7 +72,6 @@ class OrchestratorTest(MasuTestCase):
         self.assertEqual(account.get('billing_source'), 'test-bucket')
         self.assertEqual(account.get('customer_name'), 'Test Customer')
         self.assertEqual(account.get('provider_type'), AMAZON_WEB_SERVICES)
-        self.assertEqual(account.get('provider_id'), 1)
 
     @patch('masu.external.report_downloader.ReportDownloader._set_downloader', return_value=FakeDownloader)
     @patch('masu.processor.orchestrator.get_report_files.delay', return_value=True)

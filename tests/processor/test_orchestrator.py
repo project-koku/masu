@@ -25,7 +25,7 @@ from unittest.mock import patch
 
 
 from masu.external import AMAZON_WEB_SERVICES
-from masu.external.accounts_accessor import AccountsAccessor
+from masu.external.accounts_accessor import (AccountsAccessor, AccountsAccessorError)
 from masu.external.report_downloader import ReportDownloaderError
 from masu.processor.orchestrator import Orchestrator
 from tests import MasuTestCase
@@ -112,3 +112,13 @@ class OrchestratorTest(MasuTestCase):
         found_account = individual._accounts[0]
         self.assertEqual(found_account.get('billing_source'),
                          fake_source.get('billing_source'))
+
+    @patch.object(AccountsAccessor, 'get_accounts')
+    @patch('masu.processor.tasks.process_report_file', return_value=None)
+    def test_init_all_accounts_error(self, mock_task, mock_accessor):
+        """Test initializing orchestrator accounts error."""
+        mock_accessor.side_effect = AccountsAccessorError('Sample timeout error')
+        try:
+            Orchestrator()
+        except Exception:
+            self.fail('unexpected error')

@@ -17,7 +17,10 @@
 
 """Test the CostUsageReportAccount object."""
 
+from unittest.mock import patch
+from masu.exceptions import CURAccountsInterfaceError
 from masu.external.accounts_accessor import AccountsAccessor, AccountsAccessorError
+from masu.external.accounts.network.cur_accounts_network import CURAccountsNetwork
 from tests import MasuTestCase
 
 
@@ -45,3 +48,9 @@ class AccountsAccessorTest(MasuTestCase):
 
         with self.assertRaises(AccountsAccessorError):
             AccountsAccessor('bad')
+
+    def test_get_accounts_exception(self):
+        """Test to get accounts with an exception."""
+        with patch.object(CURAccountsNetwork, 'get_accounts_from_source', side_effect=CURAccountsInterfaceError('test')):
+            with self.assertRaises(AccountsAccessorError):
+                AccountsAccessor('network').get_accounts()

@@ -91,7 +91,7 @@ class ReportProcessorTest(MasuTestCase):
 
         for table_name in self.report_tables:
             self.accessor._cursor.execute(f'DELETE FROM {table_name}')
-        self.accessor._conn.commit()
+        self.accessor._pg2_conn.commit()
 
         self.processor.processed_report.remove_processed_rows()
 
@@ -158,6 +158,7 @@ class ReportProcessorTest(MasuTestCase):
                 self.assertTrue(count > counts[table_name])
 
         self.assertTrue(processor.report_db._conn.closed)
+        self.assertTrue(processor.report_db._pg2_conn.closed)
 
     def test_process_gzip(self):
         """Test the processing of a gzip compressed file."""
@@ -196,6 +197,7 @@ class ReportProcessorTest(MasuTestCase):
                 self.assertTrue(count > counts[table_name])
 
         self.assertTrue(processor.report_db._conn.closed)
+        self.assertTrue(processor.report_db._pg2_conn.closed)
 
     def test_process_non_zero_cursor(self):
         """Test that cursor position is calculated properly."""

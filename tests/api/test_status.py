@@ -21,7 +21,7 @@ from collections import namedtuple
 from unittest.mock import ANY, Mock, patch, PropertyMock
 
 from masu.api import API_VERSION
-from masu.api.status import StatusView
+from masu.api.status import ApplicationStatus
 from tests import MasuTestCase
 
 
@@ -52,7 +52,7 @@ class StatusAPITest(MasuTestCase):
         """Test the commit method via environment."""
         expected = 'buildnum'
         mock_os.get.return_value = expected
-        result = StatusView().commit
+        result = ApplicationStatus().commit
         self.assertEqual(result, expected)
 
     @patch('masu.api.status.subprocess.run')
@@ -64,7 +64,7 @@ class StatusAPITest(MasuTestCase):
         run.stdout = b'buildnum'
         mock_subprocess.return_value = run
         mock_os.get.return_value = None
-        result = StatusView().commit
+        result = ApplicationStatus().commit
         self.assertEqual(result, expected)
 
     @patch('masu.api.status.platform.uname')
@@ -73,7 +73,7 @@ class StatusAPITest(MasuTestCase):
         platform_record = namedtuple('Platform', ['os', 'version'])
         a_plat = platform_record('Red Hat', '7.4')
         mock_platform.return_value = a_plat
-        result = StatusView().platform_info
+        result = ApplicationStatus().platform_info
         self.assertEqual(result['os'], 'Red Hat')
         self.assertEqual(result['version'], '7.4')
 
@@ -82,7 +82,7 @@ class StatusAPITest(MasuTestCase):
         """Test the python_version method."""
         expected = 'Python 3.6'
         mock_sys_ver.replace.return_value = expected
-        result = StatusView().python_version
+        result = ApplicationStatus().python_version
         self.assertEqual(result, expected)
 
     @patch('masu.api.status.sys.modules')
@@ -94,21 +94,21 @@ class StatusAPITest(MasuTestCase):
         mod2 = Mock(__version__='version2')
         mock_modules.items.return_value = (('module1', mod1),
                                            ('module2', mod2))
-        result = StatusView().modules
+        result = ApplicationStatus().modules
         self.assertEqual(result, expected)
 
     @patch('masu.api.status.logger.info')
     def test_startup_with_modules(self, mock_logger):
         """Test the startup method with a module list."""
-        StatusView().startup()
+        ApplicationStatus().startup()
         mock_logger.assert_called_with(ANY, ANY)
 
-    @patch('masu.api.status.StatusView.modules', new_callable=PropertyMock)
+    @patch('masu.api.status.ApplicationStatus.modules', new_callable=PropertyMock)
     def test_startup_without_modules(self, mock_mods):
         """Test the startup method without a module list."""
         mock_mods.return_value = {}
         expected = 'INFO:masu.api.status:Modules: None'
 
         with self.assertLogs('masu.api.status', level='INFO') as logger:
-            StatusView().startup()
+            ApplicationStatus().startup()
             self.assertIn(expected, logger.output)

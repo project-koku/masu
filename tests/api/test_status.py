@@ -18,6 +18,7 @@
 """Test the status endpoint view."""
 
 from collections import namedtuple
+from datetime import datetime
 from unittest.mock import ANY, Mock, patch, PropertyMock
 
 from masu.api import API_VERSION
@@ -46,6 +47,8 @@ class StatusAPITest(MasuTestCase):
         self.assertIsNotNone(body['platform_info'])
         self.assertIsNotNone(body['modules'])
         self.assertEqual(body['api_version'], API_VERSION)
+        self.assertIsNotNone(body['current_datetime'])
+        self.assertIsNotNone(body['debug'])
 
     @patch('masu.api.status.os.environ')
     def test_commit_with_env(self, mock_os):
@@ -112,3 +115,21 @@ class StatusAPITest(MasuTestCase):
         with self.assertLogs('masu.api.status', level='INFO') as logger:
             ApplicationStatus().startup()
             self.assertIn(expected, logger.output)
+
+    @patch('masu.external.date_accessor.DateAccessor.today')
+    def test_get_datetime(self, mock_date):
+        """Test the startup method for datetime."""
+        mock_date_string = '2018-07-25 10:41:59.993536'
+        mock_date_obj = datetime.strptime(mock_date_string, '%Y-%m-%d %H:%M:%S.%f')
+        mock_date.return_value = mock_date_obj
+        expected = 'INFO:masu.api.status:Current Date: {}'.format(mock_date.return_value)
+        with self.assertLogs('masu.api.status', level='INFO') as logger:
+            ApplicationStatus().startup()
+            self.assertIn(str(expected), logger.output)
+
+    def test_get_debug(self):
+        """Test the startup method for debug state."""
+        expected = 'INFO:masu.api.status:DEBUG enabled: {}'.format(str(False))
+        with self.assertLogs('masu.api.status', level='INFO') as logger:
+            ApplicationStatus().startup()
+            self.assertIn(str(expected), logger.output)

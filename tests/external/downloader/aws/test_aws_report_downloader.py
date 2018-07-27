@@ -37,6 +37,7 @@ from masu.database.report_stats_db_accessor import ReportStatsDBAccessor
 from masu.exceptions import MasuProviderError
 from masu.external.downloader.aws.aws_report_downloader import (AWSReportDownloader,
                                                                 AWSReportDownloaderError)
+from masu.external.downloader.aws import utils
 from masu.external import AWS_REGIONS
 from tests import MasuTestCase
 from tests.external.downloader.aws import fake_arn
@@ -139,6 +140,7 @@ class AWSReportDownloaderTest(MasuTestCase):
 
         # push mocked csvs into Moto env
         fake_csv_files = []
+        fake_csv_files_with_key = {}
         for x in range(0, random.randint(2, 10)):
             csv_filename = '{}.csv'.format('-'.join(self.fake.words(random.randint(2, 5))))
             fake_csv_files.append(csv_filename)
@@ -150,7 +152,7 @@ class AWSReportDownloaderTest(MasuTestCase):
                 report_range,
                 uuid.uuid4(),
                 csv_filename)
-
+            fake_csv_files_with_key[csv_filename] = fake_report_file
             fake_csv_body = ','.join(self.fake.words(random.randint(5, 10)))
             conn.Object(self.fake_bucket_name,
                         fake_report_file).put(Body=fake_csv_body)
@@ -175,8 +177,11 @@ class AWSReportDownloaderTest(MasuTestCase):
         out = self.report_downloader.download_bucket()
         expected_files = []
         for csv_filename in fake_csv_files:
-            expected_csv = '{}/{}/aws/{}'.format(DATA_DIR,
+            report_key = fake_csv_files_with_key.get(csv_filename)
+            expected_assembly_id = utils.get_assembly_id_from_cur_key(report_key)
+            expected_csv = '{}/{}/aws/{}-{}'.format(DATA_DIR,
                                                  self.fake_customer_name,
+                                                 expected_assembly_id,
                                                  csv_filename)
             expected_files.append(expected_csv)
         expected_manifest = '{}/{}/aws/{}-Manifest.json'.format(DATA_DIR,
@@ -238,8 +243,12 @@ class AWSReportDownloaderTest(MasuTestCase):
         for cur_dict in out:
             files_list.append(cur_dict['file'])
             self.assertIsNotNone(cur_dict['compression'])
-        expected_csv = '{}/{}/aws/{}'.format(DATA_DIR,
+
+        report_key = fake_object_body.get('reportKeys').pop()
+        expected_assembly_id = utils.get_assembly_id_from_cur_key(report_key)
+        expected_csv = '{}/{}/aws/{}-{}'.format(DATA_DIR,
                                              self.fake_customer_name,
+                                             expected_assembly_id,
                                              selected_csv)
         self.assertEqual(files_list, [expected_csv])
 
@@ -336,7 +345,15 @@ class AWSReportDownloaderTest(MasuTestCase):
             files_list.append(cur_dict['file'])
             self.assertIsNotNone(cur_dict['compression'])
 
-        expected_path = DATA_DIR+'/'+self.fake_customer_name+'/aws/mocked-report-file.csv'
+        report_key = fake_object_body.get('reportKeys').pop()
+        expected_assembly_id = utils.get_assembly_id_from_cur_key(report_key)
+
+        expected_path_base = '{}/{}/{}/{}-{}'
+        expected_path = expected_path_base.format(DATA_DIR,
+                                                  self.fake_customer_name,
+                                                  'aws',
+                                                  expected_assembly_id,
+                                                  'mocked-report-file.csv')
         self.assertEqual(files_list, [expected_path])
 
         # Attempt to download again
@@ -346,7 +363,6 @@ class AWSReportDownloaderTest(MasuTestCase):
             files_list.append(cur_dict['file'])
             self.assertIsNotNone(cur_dict['compression'])
 
-        expected_path = DATA_DIR+'/'+self.fake_customer_name+'/aws/mocked-report-file.csv'
         self.assertEqual(files_list, [expected_path])
 
     @mock_s3

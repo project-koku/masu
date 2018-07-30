@@ -31,7 +31,7 @@ help:
 	@echo "  oc-forward-ports          port forward the DB to localhost"
 	@echo "  oc-rm-dev                 delete Openshift objects without a cluster restart"
 	@echo "  oc-test-db                create database schemas and tables"
-	@echo "  oc-serve                  run Django server locally against an Openshift DB"
+	@echo "  oc-serve                  run Flask server locally against an Openshift DB"
 	@echo "  oc-stop-forwarding-ports  stop port forwarding the DB to localhost"
 	@echo "  oc-up                     initialize an openshift cluster"
 	@echo "  serve                     run the Flask dev server locally"
@@ -50,7 +50,10 @@ unittest:
 	tox -e py36
 
 serve:
-	export FLASK_APP=masu; export FLASK_ENV=development; flask run
+	FLASK_APP=masu \
+	FLASK_ENV=development \
+	MASU_SECRET_KEY='t@@ m4nY 53Cr3tZ' \
+	flask run
 
 oc-up:
 	oc cluster up \
@@ -115,9 +118,7 @@ oc-forward-ports:
 oc-stop-forwarding-ports:
 	kill -HUP $$(ps -eo pid,command | grep "oc port-forward" | grep -v grep | awk '{print $$1}')
 
-oc-serve: oc-forward-ports
-	export FLASK_APP=masu; export FLASK_ENV=development; flask run
-	make oc-stop-forwarding-ports
+oc-serve: oc-forward-ports serve
 
 oc-test-db: oc-forward-ports
 	sleep 1

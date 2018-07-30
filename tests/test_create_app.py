@@ -17,20 +17,27 @@
 
 """Test the app factory for Masu."""
 
-from unittest import TestCase
-from unittest.mock import patch
+import errno
+import logging
 
+from unittest import TestCase
+from unittest.mock import patch, PropertyMock
+
+from flask import Flask
 from masu import create_app
 
 
+@patch('masu.api.status.celery_app', autospec=True)
 class CreateAppTest(TestCase):
     """Test Cases for create_app app factory."""
 
-    def test_create_app(self):
+    @patch('masu.api.status.ApplicationStatus.celery_status',
+           new_callable=PropertyMock)
+    def test_create_app(self, mock_status, mock_celery):
         """Assert testing is false without passing test config."""
         self.assertFalse(create_app().testing)
 
-    def test_create_test_app(self):
+    def test_create_test_app(self, mock_celery):
         """Assert that testing is true with test config."""
         self.assertTrue(
             create_app(
@@ -41,3 +48,25 @@ class CreateAppTest(TestCase):
                 }
             ).testing
         )
+
+    @patch('masu.os.makedirs')
+    def test_create_app_dirs_exist(self, mock_mkdir, mock_celery):
+        """Test handling of os exception."""
+        err = OSError('test error', errno.EEXIST)
+        mock_mkdir.side_effect = err
+
+        app = create_app(test_config=dict())
+        self.assertIsInstance(app, Flask)
+
+    @patch('masu.os.makedirs')
+    def test_create_app_oserror(self, mock_mkdir, mock_celery):
+        """Test handling of os exception."""
+        logging.disable(logging.NOTSET)
+
+        err = OSError('test error')
+        mock_mkdir.side_effect = err
+
+        expected = 'WARNING:masu:test error'
+        with self.assertLogs('masu', level='WARNING') as logger:
+            app = create_app(test_config=dict())
+            self.assertIn(expected, logger.output)

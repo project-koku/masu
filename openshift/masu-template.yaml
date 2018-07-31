@@ -165,6 +165,9 @@ objects:
     replicas: 1
     selector:
       name: ${NAME}
+    resources:
+      limits:
+        memory: ${MEMORY_LIMIT}
     strategy:
       type: Recreate
     template:
@@ -284,6 +287,10 @@ objects:
     replicas: 1
     selector:
       name: ${NAME}
+    resources:
+      limits:
+        cpu: ${CPU_LIMIT}
+        memory: ${MEMORY_LIMIT}
     strategy:
       type: Recreate
     template:
@@ -411,6 +418,9 @@ objects:
     replicas: 1
     selector:
       name: ${NAME}
+    resources:
+      limits:
+        memory: ${MEMORY_LIMIT}
     strategy:
       type: Recreate
     template:
@@ -541,7 +551,12 @@ parameters:
   displayName: Memory Limit
   name: MEMORY_LIMIT
   required: true
-  value: 512Mi
+  value: 1Gi
+- description: Maximum amount of CPU the app container can use.
+  displayName: CPU Limit
+  name: CPU_LIMIT
+  required: true
+  value: '1'
 - description: The URL of the repository with your application source code.
   displayName: Git Repository URL
   name: SOURCE_REPOSITORY_URL

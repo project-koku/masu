@@ -183,25 +183,21 @@ class StatusAPITest(MasuTestCase):
     def test_celery_status_timeout(self, mock_celery):
         """test celery status handles timeout."""
         mock_celery.events.Receiver.return_value.capture.side_effect = socket.timeout
+        expected_log = 'INFO:masu.api.status:Timeout connecting to message broker.'
 
-        expected = {'ERROR': 'connection timeout'}
-        expected_log = 'WARNING:masu.api.status:Timeout connecting to message broker.'
-
-        with self.assertLogs('masu.api.status', level='WARNING') as logger:
+        with self.assertLogs('masu.api.status', level='INFO') as logger:
             status = ApplicationStatus().celery_status
-            self.assertEqual(status, expected)
+            self.assertEqual(status, dict())
             self.assertIn(expected_log, logger.output)
 
     def test_celery_status_reset(self, mock_celery):
         """test celery status handles ConnectionResetError."""
         mock_celery.events.Receiver.return_value.capture.side_effect = ConnectionResetError
+        expected_log = 'INFO:masu.api.status:Connection reset by message broker.'
 
-        expected = {'ERROR': 'connection reset'}
-        expected_log = 'WARNING:masu.api.status:Connection reset by message broker.'
-
-        with self.assertLogs('masu.api.status', level='WARNING') as logger:
+        with self.assertLogs('masu.api.status', level='INFO') as logger:
             status = ApplicationStatus().celery_status
-            self.assertEqual(status, expected)
+            self.assertEqual(status, dict())
             self.assertIn(expected_log, logger.output)
 
     def test_announce_worker_status(self, mock_celery):

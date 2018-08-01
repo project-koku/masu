@@ -18,6 +18,7 @@
 """Test the Orchestrator object."""
 
 import random
+import logging
 
 import faker
 from celery.result import AsyncResult
@@ -27,6 +28,7 @@ from unittest.mock import patch
 from masu.external import AMAZON_WEB_SERVICES
 from masu.external.accounts_accessor import (AccountsAccessor, AccountsAccessorError)
 from masu.external.report_downloader import ReportDownloaderError
+from masu.processor.expired_data_remover import ExpiredDataRemover
 from masu.processor.orchestrator import Orchestrator
 from tests import MasuTestCase
 from tests.external.downloader.aws import fake_arn
@@ -122,3 +124,36 @@ class OrchestratorTest(MasuTestCase):
             Orchestrator()
         except Exception:
             self.fail('unexpected error')
+
+    @patch.object(ExpiredDataRemover, 'remove')
+    @patch('masu.processor.orchestrator.remove_expired_data.delay', return_value=True)
+    def test_remove_expired_report_data(self, mock_task, mock_remover):
+        """Test removing expired report data."""
+        expected_results = [{'account_payer_id': '999999999',
+                             'billing_period_start': '2018-06-24 15:47:33.052509'}]
+        mock_remover.return_value = expected_results
+
+        expected = 'INFO:masu.processor.orchestrator:Expired data removal queued - customer: Test Customer, Task ID: {}'
+        logging.disable(logging.NOTSET) # We are currently disabling all logging below CRITICAL in masu/__init__.py
+        with self.assertLogs('masu.processor.orchestrator', level='INFO') as logger:
+            orchestrator = Orchestrator()
+            results = orchestrator.remove_expired_report_data()
+            self.assertTrue(results)
+            self.assertEqual(len(results), 1)
+            async_id = results.pop().get('async_id')
+            self.assertIn(expected.format(async_id), logger.output)
+
+    @patch.object(AccountsAccessor, 'get_accounts')
+    @patch.object(ExpiredDataRemover, 'remove')
+    @patch('masu.processor.orchestrator.remove_expired_data.delay', return_value=True)
+    def test_remove_expired_report_data_no_accounts(self, mock_task, mock_remover, mock_accessor):
+        """Test removing expired report data with no accounts."""
+        expected_results = [{'account_payer_id': '999999999',
+                             'billing_period_start': '2018-06-24 15:47:33.052509'}]
+        mock_remover.return_value = expected_results
+        mock_accessor.return_value = []
+
+        orchestrator = Orchestrator()
+        results = orchestrator.remove_expired_report_data()
+
+        self.assertEqual(results, [])

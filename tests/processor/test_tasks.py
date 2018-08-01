@@ -19,6 +19,7 @@
 
 import random
 import string
+import logging
 from datetime import datetime, timedelta
 
 import faker
@@ -26,9 +27,10 @@ from unittest.mock import call, patch, Mock
 
 from masu.database.report_stats_db_accessor import ReportStatsDBAccessor
 from masu.external.report_downloader import ReportDownloaderError
+from masu.processor.expired_data_remover import ExpiredDataRemover
 from masu.processor._tasks.download import _get_report_files
 from masu.processor._tasks.process import _process_report_file
-from masu.processor.tasks import get_report_files, process_report_file
+from masu.processor.tasks import get_report_files, process_report_file, remove_expired_data
 
 from tests import MasuTestCase
 from tests.external.downloader.aws import fake_arn
@@ -276,3 +278,20 @@ class TestProcessorTasks(MasuTestCase):
             report_path,
             compression
         )
+
+class TestRemoveExpiredDataTasks(MasuTestCase):
+    """Test cases for Processor Celery tasks."""
+
+    @patch.object(ExpiredDataRemover, 'remove')
+    def test_remove_expired_data(self, fake_remover):
+        """Test task"""
+        expected_results = [{'account_payer_id': '999999999',
+                             'billing_period_start': '2018-06-24 15:47:33.052509'}]
+        fake_remover.return_value = expected_results
+
+        expected = 'INFO:masu.processor._tasks.remove_expired:Expired Data: {}'
+
+        logging.disable(logging.NOTSET) # We are currently disabling all logging below CRITICAL in masu/__init__.py
+        with self.assertLogs('masu.processor._tasks.remove_expired') as logger:
+            remove_expired_data(schema_name='testcustomer', simulate=True)
+            self.assertIn(expected.format(str(expected_results)), logger.output)

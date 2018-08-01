@@ -620,7 +620,7 @@ parameters:
 - description: Comma-separated list of Celery worker queues
   displayName: Celery worker queues
   name: WORKER_QUEUES
-  value: 'celery,download,process'
+  value: 'celery,download,process,remove_expired'
 - displayName: AWS Access Key ID
   from: ${AWS_ACCESS_KEY_ID}
   name: AWS_ACCESS_KEY_ID

@@ -17,11 +17,13 @@
 
 """Test the status endpoint view."""
 
+import re
 import os
 import logging
 import socket
 from subprocess import CompletedProcess, PIPE
 
+import psycopg2
 from collections import namedtuple
 from datetime import datetime
 from unittest.mock import ANY, Mock, patch, PropertyMock
@@ -49,22 +51,26 @@ class StatusAPITest(MasuTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
 
+        self.assertIn('api_version', body)
         self.assertIn('celery_status', body)
         self.assertIn('commit', body)
-        self.assertIn('python_version', body)
-        self.assertIn('platform_info', body)
+        self.assertIn('current_datetime', body)
+        self.assertIn('database_status', body)
+        self.assertIn('debug', body)
         self.assertIn('modules', body)
-        self.assertIn('api_version', body)
-
-        self.assertIsNotNone(body['celery_status'])
-        self.assertIsNotNone(body['commit'])
-        self.assertIsNotNone(body['python_version'])
-        self.assertIsNotNone(body['platform_info'])
-        self.assertIsNotNone(body['modules'])
+        self.assertIn('platform_info', body)
+        self.assertIn('python_version', body)
 
         self.assertEqual(body['api_version'], API_VERSION)
+        self.assertIsNotNone(body['celery_status'])
+        self.assertIsNotNone(body['commit'])
         self.assertIsNotNone(body['current_datetime'])
+        self.assertIsNotNone(body['database_status'])
         self.assertIsNotNone(body['debug'])
+        self.assertIsNotNone(body['modules'])
+        self.assertIsNotNone(body['platform_info'])
+        self.assertIsNotNone(body['python_version'])
+
 
     @patch.dict(os.environ, {'OPENSHIFT_BUILD_COMMIT': 'fake_commit_hash'})
     def test_commit_with_env(self, mock_celery):
@@ -210,6 +216,25 @@ class StatusAPITest(MasuTestCase):
         status._announce_worker_event(fake_event)
 
         self.assertEqual(status._events, expected)
+
+    def test_database_status(self, mock_celery):
+        """test that fetching database status works."""
+        expected = re.compile(r'INFO:masu.api.status:Database: \[{.*postgres.*}\]')
+        with self.assertLogs('masu.api.status', level='INFO') as logger:
+            ApplicationStatus().startup()
+            results = None
+            for line in logger.output:
+                if not results:
+                    results = expected.search(line)
+            self.assertIsNotNone(results)
+
+    @patch('masu.api.status.psycopg2.connect', side_effect=psycopg2.InterfaceError)
+    def test_database_status_fail(self, mock_psql, mock_celery):
+        """test that fetching database handles errors."""
+        expected = 'WARNING:masu.api.status:Unable to connect to DB: '
+        with self.assertLogs('masu.api.status', level='INFO') as logger:
+            ApplicationStatus().startup()
+            self.assertIn(expected, logger.output)
 
     def test_liveness(self, mock_celery):
         """Test the liveness response."""

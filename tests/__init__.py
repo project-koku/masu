@@ -32,6 +32,7 @@ class MasuTestCase(TestCase):
                 'TESTING': True,
                 'SQLALCHEMY_TRACK_MODIFICATIONS': False,
                 'SQLALCHEMY_DATABASE_URI': 'sqlite:///test.db',
+                'REMOVE_EXPIRED_REPORT_DATA_ON_DAY': '1'
                 #'CELERY_RESULT_BACKEND': 'db+sqlite:///test.db'
             }
         )

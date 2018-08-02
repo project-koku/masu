@@ -52,6 +52,7 @@ objects:
     log-level: ${LOG_LEVEL}
     worker-queues: ${WORKER_QUEUES}
     schedule-check-interval: "60"
+    remove-expired-data-on-day: "1"
 - kind: Service
   apiVersion: v1
   metadata:
@@ -388,6 +389,12 @@ objects:
                 secretKeyRef:
                   key: aws-secret-access-key
                   name: ${NAME}
+                  optional: false
+            - name: REMOVE_EXPIRED_REPORT_DATA_ON_DAY
+              valueFrom:
+                configMapKeyRef:
+                  name: ${NAME}
+                  key: remove-expired-data-on-day
                   optional: false
           resources:
             limits:

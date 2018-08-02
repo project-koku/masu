@@ -44,7 +44,8 @@ class CreateAppTest(TestCase):
                 {
                     'TESTING': True,
                     'SQLALCHEMY_TRACK_MODIFICATIONS': False,
-                    'SQLALCHEMY_DATABASE_URI': 'sqlite:///:memory:'
+                    'SQLALCHEMY_DATABASE_URI': 'sqlite:///:memory:',
+                    'REMOVE_EXPIRED_REPORT_DATA_ON_DAY': '1'
                 }
             ).testing
         )

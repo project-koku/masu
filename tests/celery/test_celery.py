@@ -41,7 +41,8 @@ class CeleryTest(MasuTestCase):
                 'TESTING': True,
                 'SQLALCHEMY_TRACK_MODIFICATIONS': False,
                 'SQLALCHEMY_DATABASE_URI': 'sqlite:///test.db',
-                'SCHEDULE_REPORT_CHECKS': True
+                'SCHEDULE_REPORT_CHECKS': True,
+                'REMOVE_EXPIRED_REPORT_DATA_ON_DAY': '1'
             }
         )
 

@@ -1,6 +1,6 @@
+from datetime import datetime
 from unittest.mock import Mock, patch
-
-from masu.celery.tasks import check_report_updates
+from masu.celery.tasks import check_report_updates, remove_expired_data
 from tests import MasuTestCase
 
 class TestCeleryTasks(MasuTestCase):
@@ -14,3 +14,32 @@ class TestCeleryTasks(MasuTestCase):
 
         mock_orchestrator.assert_called()
         mock_orch.prepare.assert_called()
+
+    @patch('masu.celery.tasks.Orchestrator')
+    @patch('masu.external.date_accessor.DateAccessor.today')
+    def test_remove_expired_data_midnight(self, mock_date, mock_orchestrator):
+        """Test that the scheduled task calls the orchestrator."""
+        mock_orch = mock_orchestrator()
+
+        mock_date_string = '2018-07-25 00:00:30.993536'
+        mock_date_obj = datetime.strptime(mock_date_string, '%Y-%m-%d %H:%M:%S.%f')
+        mock_date.return_value = mock_date_obj
+
+        remove_expired_data()
+
+        mock_orchestrator.assert_called()
+        mock_orch.remove_expired_report_data.assert_called()
+
+    @patch('masu.celery.tasks.Orchestrator')
+    @patch('masu.external.date_accessor.DateAccessor.today')
+    def test_remove_expired_data_not_midnight(self, mock_date, mock_orchestrator):
+        """Test that the scheduled task calls the orchestrator."""
+        mock_orch = mock_orchestrator()
+
+        mock_date_string = '2018-07-25 01:00:30.993536'
+        mock_date_obj = datetime.strptime(mock_date_string, '%Y-%m-%d %H:%M:%S.%f')
+        mock_date.return_value = mock_date_obj
+
+        remove_expired_data()
+
+        mock_orch.remove_expired_report_data.assert_not_called()

@@ -19,6 +19,7 @@
 
 from unittest.mock import patch
 from datetime import datetime
+import pytz
 
 from masu.external.date_accessor import DateAccessor
 from masu.processor.expired_data_remover import ExpiredDataRemover
@@ -37,22 +38,22 @@ class ExpiredDataRemoverTest(MasuTestCase):
     def test_calculate_expiration_date(self):
         """Test that the expiration date is correctly calculated."""
         date_matrix = [{'current_date':    datetime(year=2018, month=7, day=1), 
-                        'expected_expire': datetime(year=2018, month=4, day=1),
+                        'expected_expire': datetime(year=2018, month=4, day=1, tzinfo=pytz.UTC),
                         'months_to_keep': None},
                        {'current_date':    datetime(year=2018, month=7, day=31), 
-                        'expected_expire': datetime(year=2018, month=4, day=1),
+                        'expected_expire': datetime(year=2018, month=4, day=1, tzinfo=pytz.UTC),
                         'months_to_keep': None},
                        {'current_date':    datetime(year=2018, month=3, day=20), 
-                        'expected_expire': datetime(year=2017, month=12, day=1),
+                        'expected_expire': datetime(year=2017, month=12, day=1, tzinfo=pytz.UTC),
                         'months_to_keep': None},
                        {'current_date':    datetime(year=2018, month=7, day=1), 
-                        'expected_expire': datetime(year=2017, month=7, day=1),
+                        'expected_expire': datetime(year=2017, month=7, day=1, tzinfo=pytz.UTC),
                         'months_to_keep': 12},
                        {'current_date':    datetime(year=2018, month=7, day=31), 
-                        'expected_expire': datetime(year=2017, month=7, day=1),
+                        'expected_expire': datetime(year=2017, month=7, day=1, tzinfo=pytz.UTC),
                         'months_to_keep': 12},
                        {'current_date':    datetime(year=2018, month=3, day=20), 
-                        'expected_expire': datetime(year=2016, month=3, day=1),
+                        'expected_expire': datetime(year=2016, month=3, day=1, tzinfo=pytz.UTC),
                         'months_to_keep': 24},]
         for test_case in date_matrix:
             with patch.object(DateAccessor, 'today', return_value=test_case.get('current_date')):

@@ -4,7 +4,7 @@ TOPDIR  = $(shell pwd)
 PYDIR	= masu
 
 OC_SOURCE	= registry.access.redhat.com/openshift3/ose
-OC_VERSION	= v3.7
+OC_VERSION	= v3.9
 OC_DATA_DIR	= ${HOME}/.oc/openshift.local.data
 
 OS := $(shell uname)

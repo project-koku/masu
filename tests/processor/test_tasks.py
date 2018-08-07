@@ -101,7 +101,6 @@ class ProcessReportFileTests(MasuTestCase):
         mock_proc.process.assert_called()
         mock_acc.log_last_started_datetime.assert_called()
         mock_acc.log_last_completed_datetime.assert_called()
-        mock_acc.set_cursor_position.assert_called()
         mock_acc.commit.assert_called()
 
 

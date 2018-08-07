@@ -17,6 +17,10 @@
 
 """Test the common util functions."""
 
+import json
+from datetime import datetime
+from decimal import Decimal
+
 import masu.util.common as common_utils
 
 from tests import MasuTestCase
@@ -42,3 +46,47 @@ class CommonUtilTests(MasuTestCase):
         uuids = common_utils.extract_uuids_from_string(cur_key)
         self.assertEqual(len(uuids), 1)
         self.assertEqual(uuids.pop(), assembly_id)
+
+    def test_stringify_json_data_list(self):
+        """Test that each element of JSON is returned as a string."""
+        data = [
+            {
+                'datetime': datetime.utcnow(),
+                'float': 1.2,
+                'int': 1,
+                'str': 'string'
+            },
+            {'Decimal': Decimal('1.2')}
+        ]
+
+        with self.assertRaises(TypeError):
+            json.dumps(data)
+
+        result = common_utils.stringify_json_data(data)
+
+        self.assertIsInstance(result[0]['datetime'], str)
+        self.assertIsInstance(result[0]['float'], str)
+        self.assertIsInstance(result[0]['int'], str)
+        self.assertIsInstance(result[0]['str'], str)
+        self.assertIsInstance(result[1]['Decimal'], str)
+
+    def test_stringify_json_data_dict(self):
+        """Test that the dict block is covered."""
+        data = {
+            'datetime': datetime.utcnow(),
+            'float': 1.2,
+            'int': 1,
+            'str': 'string',
+            'Decimal': Decimal('1.2')
+        }
+
+        with self.assertRaises(TypeError):
+            json.dumps(data)
+
+        result = common_utils.stringify_json_data(data)
+
+        self.assertIsInstance(result['datetime'], str)
+        self.assertIsInstance(result['float'], str)
+        self.assertIsInstance(result['int'], str)
+        self.assertIsInstance(result['str'], str)
+        self.assertIsInstance(result['Decimal'], str)

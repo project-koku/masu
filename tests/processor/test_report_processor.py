@@ -20,6 +20,7 @@ from collections import defaultdict
 import csv
 import copy
 import datetime
+from decimal import Decimal
 import gzip
 from itertools import islice
 import json
@@ -34,6 +35,7 @@ from masu.database.reporting_common_db_accessor import ReportingCommonDBAccessor
 from masu.exceptions import MasuProcessingError
 from masu.external import GZIP_COMPRESSED, UNCOMPRESSED
 from masu.processor.report_processor import ProcessedReport, ReportProcessor
+import masu.util.common as common_util
 from tests import MasuTestCase
 
 
@@ -95,13 +97,13 @@ class ReportProcessorTest(MasuTestCase):
 
         self.processor.processed_report.remove_processed_rows()
 
+        self.processor.line_item_columns = None
 
     def test_initializer(self):
         """Test initializer."""
         self.assertIsNotNone(self.processor._schema_name)
         self.assertIsNotNone(self.processor._report_path)
         self.assertIsNotNone(self.processor._report_name)
-        self.assertIsNotNone(self.processor._cursor_pos)
         self.assertIsNotNone(self.processor._compression)
         self.assertEqual(
             self.processor._datetime_format,
@@ -136,17 +138,7 @@ class ReportProcessorTest(MasuTestCase):
             count = report_db.session.query(table).count()
             counts[table_name] = count
 
-        lines = 0
-        with open(self.test_report, 'r') as f:
-            # Bump the header
-            f.readline()
-            for line in f:
-                lines += 1
-        old_cursor = processor._cursor_pos
-        expected = old_cursor + lines
-        new_cursor = processor.process()
-
-        self.assertEqual(new_cursor, expected)
+        processor.process()
 
         for table_name in self.report_tables:
             table = getattr(report_schema, table_name)
@@ -175,17 +167,7 @@ class ReportProcessorTest(MasuTestCase):
             count = report_db.session.query(table).count()
             counts[table_name] = count
 
-        lines = 0
-        with gzip.open(self.test_report_gzip, 'rt') as f:
-            # Bump the header
-            f.readline()
-            for line in f:
-                lines += 1
-        old_cursor = processor._cursor_pos
-        expected = old_cursor + lines
-        new_cursor = processor.process()
-
-        self.assertEqual(new_cursor, expected)
+        processor.process()
 
         for table_name in self.report_tables:
             table = getattr(report_schema, table_name)
@@ -199,29 +181,37 @@ class ReportProcessorTest(MasuTestCase):
         self.assertTrue(processor.report_db._conn.closed)
         self.assertTrue(processor.report_db._pg2_conn.closed)
 
-    def test_process_non_zero_cursor(self):
-        """Test that cursor position is calculated properly."""
+    def test_process_duplicates(self):
+        """Test that row duplicates are not inserted into the DB."""
         counts = {}
-        cursor_pos = random.randint(1,100)
         processor = ReportProcessor(
             schema_name='testcustomer',
             report_path=self.test_report,
-            compression=UNCOMPRESSED,
-            cursor_pos=cursor_pos
+            compression=UNCOMPRESSED
         )
 
-        lines = 0
-        with open(self.test_report, 'r') as f:
-            # Bump the header
-            f.readline()
-            for row in islice(f, cursor_pos, None):
-                lines += 1
-        old_cursor = processor._cursor_pos
-        expected = old_cursor + lines
-        new_cursor = processor.process()
+        # Process for the first time
+        processor.process()
+        report_db = processor.report_db
+        report_schema = report_db.report_schema
 
-        self.assertEqual(new_cursor, expected)
+        for table_name in self.report_tables:
+            table = getattr(report_schema, table_name)
+            count = report_db.session.query(table).count()
+            counts[table_name] = count
 
+        processor = ReportProcessor(
+            schema_name='testcustomer',
+            report_path=self.test_report,
+            compression=UNCOMPRESSED
+        )
+        # Process for the second time
+        processor.process()
+
+        for table_name in self.report_tables:
+            table = getattr(report_schema, table_name)
+            count = report_db.session.query(table).count()
+            self.assertTrue(count == counts[table_name])
 
     def test_get_file_opener_default(self):
         """Test that the default file opener is returned."""
@@ -426,6 +416,11 @@ class ReportProcessorTest(MasuTestCase):
         if self.processor.processed_report.line_items:
             line_item = self.processor.processed_report.line_items[-1]
 
+        data = copy.deepcopy(line_item)
+        data.pop('hash')
+        data_str = self.processor._create_line_item_hash_string(data)
+        hash_str = self.processor.hasher.hash_string_to_hex(data_str)
+
         self.assertIsNotNone(line_item)
         self.assertIn('tags', line_item)
         self.assertEqual(line_item.get('cost_entry_id'), cost_entry_id)
@@ -436,6 +431,9 @@ class ReportProcessorTest(MasuTestCase):
             line_item.get('cost_entry_reservation_id'),
             reservation_id
         )
+        self.assertEqual(line_item.get('hash'), hash_str)
+
+        self.assertIsNotNone(self.processor.line_item_columns)
 
     def test_create_cost_entry_product(self):
         """Test that a cost entry product id is returned."""
@@ -494,9 +492,18 @@ class ReportProcessorTest(MasuTestCase):
     def test_create_cost_entry_pricing_already_processed(self):
         """Test that an already processed pricing id is returned."""
         expected_id = random.randint(1,9)
+        # Get the correct decimal precision to compare to stored
+        # values in the database
+        cost = Decimal(self.row.get('pricing/publicOnDemandCost')).quantize(
+            Decimal(self.processor._decimal_precision)
+        )
+        rate = Decimal(self.row.get('pricing/publicOnDemandRate')).quantize(
+            Decimal(self.processor._decimal_precision)
+        )
+
         key = '{cost}-{rate}-{term}-{unit}'.format(
-            cost=self.row['pricing/publicOnDemandCost'],
-            rate=self.row['pricing/publicOnDemandRate'],
+            cost=cost,
+            rate=rate,
             term=self.row['pricing/term'],
             unit=self.row['pricing/unit']
         )
@@ -509,9 +516,18 @@ class ReportProcessorTest(MasuTestCase):
     def test_create_cost_entry_pricing_existing(self):
         """Test that a previously existing pricing id is returned."""
         expected_id = random.randint(1,9)
+        # Get the correct decimal precision to compare to stored
+        # values in the database
+        cost = Decimal(self.row.get('pricing/publicOnDemandCost')).quantize(
+            Decimal(self.processor._decimal_precision)
+        )
+        rate = Decimal(self.row.get('pricing/publicOnDemandRate')).quantize(
+            Decimal(self.processor._decimal_precision)
+        )
+
         key = '{cost}-{rate}-{term}-{unit}'.format(
-            cost=self.row['pricing/publicOnDemandCost'],
-            rate=self.row['pricing/publicOnDemandRate'],
+            cost=cost,
+            rate=rate,
             term=self.row['pricing/term'],
             unit=self.row['pricing/unit']
         )
@@ -562,3 +578,45 @@ class ReportProcessorTest(MasuTestCase):
         product_id = self.processor._create_cost_entry_reservation(self.row)
 
         self.assertEqual(product_id, expected_id)
+
+    def test_get_line_item_hash_columns(self):
+        """Test that the correct list of columns is returned."""
+        table_name = AWS_CUR_TABLE_MAP['line_item']
+        columns = self.processor.column_map[table_name].values()
+        expected = [column for column in columns if column != 'invoice_id']
+
+        result = self.processor._get_line_item_hash_columns()
+
+        self.assertEqual(result, expected)
+
+    def test_create_line_item_hash_string(self):
+        """Test that a hash string is properly formatted."""
+        bill_id = self.processor._create_cost_entry_bill(self.row)
+        cost_entry_id = self.processor._create_cost_entry(self.row, bill_id)
+        product_id = self.processor._create_cost_entry_product(self.row)
+        pricing_id = self.processor._create_cost_entry_pricing(self.row)
+        reservation_id = self.processor._create_cost_entry_reservation(self.row)
+
+        self.accessor.commit()
+
+        self.processor._create_cost_entry_line_item(
+            self.row,
+            cost_entry_id,
+            bill_id,
+            product_id,
+            pricing_id,
+            reservation_id
+        )
+
+        line_item = None
+        if self.processor.processed_report.line_items:
+            line_item = self.processor.processed_report.line_items[-1]
+
+        line_item = common_util.stringify_json_data(copy.deepcopy(line_item))
+        line_item.pop('hash')
+        data = [line_item.get(column) for column in self.processor.hash_columns]
+        expected = ':'.join(data)
+
+        result = self.processor._create_line_item_hash_string(line_item)
+
+        self.assertEqual(result, expected)

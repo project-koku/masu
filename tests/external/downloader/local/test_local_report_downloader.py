@@ -26,7 +26,10 @@ from tarfile import TarFile
 
 from faker import Faker
 
+from datetime import datetime
+from unittest.mock import patch
 from masu.config import Config
+from masu.external.date_accessor import DateAccessor
 from masu.external.downloader.local.local_report_downloader import LocalReportDownloader
 from masu.external import AWS_REGIONS
 from tests import MasuTestCase
@@ -71,7 +74,9 @@ class LocalReportDownloaderTest(MasuTestCase):
 
     def test_download_bucket(self):
         """Test to verify that basic report downloading works."""
-        self.report_downloader.download_current_report()
+        test_report_date = datetime(year=2018, month=8, day=7)
+        with patch.object(DateAccessor, 'today', return_value=test_report_date):
+            self.report_downloader.download_current_report()
         expected_path = '{}/{}/{}'.format(DATA_DIR, self.fake_customer_name, 'local')
         self.assertTrue(os.path.isdir(expected_path))
  

@@ -179,13 +179,15 @@ class AWSReportDownloaderTest(MasuTestCase):
         for csv_filename in fake_csv_files:
             report_key = fake_csv_files_with_key.get(csv_filename)
             expected_assembly_id = utils.get_assembly_id_from_cur_key(report_key)
-            expected_csv = '{}/{}/aws/{}-{}'.format(DATA_DIR,
+            expected_csv = '{}/{}/aws/{}/{}-{}'.format(DATA_DIR,
                                                  self.fake_customer_name,
+                                                 self.fake_bucket_name,
                                                  expected_assembly_id,
                                                  csv_filename)
             expected_files.append(expected_csv)
-        expected_manifest = '{}/{}/aws/{}-Manifest.json'.format(DATA_DIR,
+        expected_manifest = '{}/{}/aws/{}/{}-Manifest.json'.format(DATA_DIR,
                                                                 self.fake_customer_name,
+                                                                self.fake_bucket_name,
                                                                 self.fake_report_name)
         expected_files.append(expected_manifest)
         self.assertEqual(sorted(out), sorted(expected_files))
@@ -246,8 +248,9 @@ class AWSReportDownloaderTest(MasuTestCase):
 
         report_key = fake_object_body.get('reportKeys').pop()
         expected_assembly_id = utils.get_assembly_id_from_cur_key(report_key)
-        expected_csv = '{}/{}/aws/{}-{}'.format(DATA_DIR,
+        expected_csv = '{}/{}/aws/{}/{}-{}'.format(DATA_DIR,
                                              self.fake_customer_name,
+                                             self.fake_bucket_name,
                                              expected_assembly_id,
                                              selected_csv)
         self.assertEqual(files_list, [expected_csv])
@@ -275,7 +278,7 @@ class AWSReportDownloaderTest(MasuTestCase):
         conn.Object(self.fake_bucket_name, fake_object).put(Body='test')
 
         out, _ = self.report_downloader.download_file(fake_object)
-        self.assertEqual(out, DATA_DIR+'/'+self.fake_customer_name+'/aws/'+fake_object)
+        self.assertEqual(out, DATA_DIR+'/'+self.fake_customer_name+'/aws/'+self.fake_bucket_name+'/'+fake_object)
 
     @mock_s3
     def test_download_file_missing_key(self):
@@ -348,10 +351,11 @@ class AWSReportDownloaderTest(MasuTestCase):
         report_key = fake_object_body.get('reportKeys').pop()
         expected_assembly_id = utils.get_assembly_id_from_cur_key(report_key)
 
-        expected_path_base = '{}/{}/{}/{}-{}'
+        expected_path_base = '{}/{}/{}/{}/{}-{}'
         expected_path = expected_path_base.format(DATA_DIR,
                                                   self.fake_customer_name,
                                                   'aws',
+                                                  self.fake_bucket_name,
                                                   expected_assembly_id,
                                                   'mocked-report-file.csv')
         self.assertEqual(files_list, [expected_path])

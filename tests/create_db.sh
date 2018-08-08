@@ -1,4 +1,5 @@
 #!/bin/sh
+TOX_DB=$1
 CWD=$(pwd)
 DB_ADMIN=postgres
 USER_IN_FILE=$(grep -n "OWNER TO" "$CWD/tests/sql/test.sql" | head -n 1 | cut -d ' ' -f6 | cut -d ';' -f 1)
@@ -14,6 +15,14 @@ if ! [ -x "$(command -v psql)" ]; then
   exit 1
 fi
 
+if [ -n "$TOX_DB" ]; then
+  echo "Overriding database name with ${TOX_DB}"
+  DATABASE_NAME=${TOX_DB}
+fi
+
+echo "Creating ${DATABASE_NAME}"
+
+psql postgres -p ${DATABASE_PORT} -h ${DATABASE_HOST} -U $DB_ADMIN -c "DROP DATABASE IF EXISTS ${DATABASE_NAME};"
 psql postgres -p ${DATABASE_PORT} -h ${DATABASE_HOST} -U $DB_ADMIN -c "CREATE DATABASE ${DATABASE_NAME};"
 psql postgres -p ${DATABASE_PORT} -h ${DATABASE_HOST} -U $DB_ADMIN -c "CREATE ROLE ${DATABASE_USER} LOGIN;"
 
@@ -31,7 +40,3 @@ psql ${DATABASE_NAME} -p ${DATABASE_PORT} -h ${DATABASE_HOST} -U $DB_ADMIN -c "A
 psql ${DATABASE_NAME} -p ${DATABASE_PORT} -h ${DATABASE_HOST} -U $DB_ADMIN -c "ALTER SCHEMA public OWNER TO ${DATABASE_USER};"
 
 echo "Database ${DATABASE_NAME} has been refreshed."
-
-if [ -f $NORMAL_ENV ]; then
-  source $NORMAL_ENV
-fi

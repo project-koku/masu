@@ -206,6 +206,16 @@ class StatusAPITest(MasuTestCase):
             self.assertEqual(status, dict())
             self.assertIn(expected_log, logger.output)
 
+    def test_celery_status_oserror(self, mock_celery):
+        """test celery status handles OSError."""
+        mock_celery.events.Receiver.return_value.capture.side_effect = OSError
+        expected_log = r'INFO:masu.api.status: '
+
+        with self.assertLogs('masu.api.status', level='INFO') as logger:
+            status = ApplicationStatus().celery_status
+            self.assertEqual(status, dict())
+            self.assertRegex(expected_log, ''.join(logger.output))
+
     def test_announce_worker_status(self, mock_celery):
         """Test the event announcement helper function."""
         args = {'foo': 'bar', 'hostname': 'fake.host.name', 'timestamp': '12345'}

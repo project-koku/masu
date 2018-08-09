@@ -243,6 +243,12 @@ objects:
                   key: aws-secret-access-key
                   name: ${NAME}
                   optional: false
+            - name: LOG_LEVEL
+              valueFrom:
+                configMapKeyRef:
+                  name: ${NAME}
+                  key: log-level
+                  optional: false
           livenessProbe:
             failureThreshold: 3
             httpGet:
@@ -261,7 +267,7 @@ objects:
               path: /api/v1/status/
               port: 8080
               scheme: HTTP
-            initialDelaySeconds: 90
+            initialDelaySeconds: 30
             periodSeconds: 60
             successThreshold: 1
             failureThreshold: 3

@@ -316,13 +316,20 @@ class AWSReportDownloaderTest(MasuTestCase):
             uuid.uuid4(),
             'mocked-report-file')
 
+        fake_report_file2 = '{}/{}/{}/{}/{}.csv'.format(
+            self.fake_bucket_prefix,
+            self.fake_report_name,
+            report_range,
+            uuid.uuid4(),
+            'mocked-report-file2')
+
         # mocked Manifest definition
         fake_object = '{}/{}/{}/{}-Manifest.json'.format(
             self.fake_bucket_prefix,
             self.fake_report_name,
             report_range,
             self.fake_report_name)
-        fake_object_body = {'reportKeys':[fake_report_file]}
+        fake_object_body = {'reportKeys':[fake_report_file, fake_report_file2]}
 
         # Moto setup
         conn = boto3.resource('s3', region_name=self.selected_region)
@@ -338,36 +345,33 @@ class AWSReportDownloaderTest(MasuTestCase):
         fake_csv_body = ','.join(self.fake.words(random.randint(5, 10)))
         conn.Object(self.fake_bucket_name,
                     fake_report_file).put(Body=fake_csv_body)
+        conn.Object(self.fake_bucket_name,
+                    fake_report_file2).put(Body=fake_csv_body)
         key = conn.Object(self.fake_bucket_name, fake_report_file).get()
         self.assertEqual(fake_csv_body, str(key['Body'].read(), 'utf-8'))
 
-        # actual test
-        out = self.report_downloader.download_report(fake_report_date)
-        files_list = []
-        for cur_dict in out:
-            files_list.append(cur_dict['file'])
-            self.assertIsNotNone(cur_dict['compression'])
+        # actual test. Run twice
+        for _ in range(2):
+            out = self.report_downloader.download_report(fake_report_date)
+            files_list = []
+            for cur_dict in out:
+                files_list.append(cur_dict['file'])
+                self.assertIsNotNone(cur_dict['compression'])
 
-        report_key = fake_object_body.get('reportKeys').pop()
-        expected_assembly_id = utils.get_assembly_id_from_cur_key(report_key)
+            expected_paths = []
+            for report_key in fake_object_body.get('reportKeys'):
+                expected_assembly_id = utils.get_assembly_id_from_cur_key(report_key)
 
-        expected_path_base = '{}/{}/{}/{}/{}-{}'
-        expected_path = expected_path_base.format(DATA_DIR,
-                                                  self.fake_customer_name,
-                                                  'aws',
-                                                  self.fake_bucket_name,
-                                                  expected_assembly_id,
-                                                  'mocked-report-file.csv')
-        self.assertEqual(files_list, [expected_path])
-
-        # Attempt to download again
-        out = self.report_downloader.download_report(fake_report_date)
-        files_list = []
-        for cur_dict in out:
-            files_list.append(cur_dict['file'])
-            self.assertIsNotNone(cur_dict['compression'])
-
-        self.assertEqual(files_list, [expected_path])
+                expected_path_base = '{}/{}/{}/{}/{}-{}'
+                file_name = os.path.basename(report_key)
+                expected_path = expected_path_base.format(DATA_DIR,
+                                                        self.fake_customer_name,
+                                                        'aws',
+                                                        self.fake_bucket_name,
+                                                        expected_assembly_id,
+                                                        file_name)
+                expected_paths.append(expected_path)
+            self.assertEqual(files_list, expected_paths)
 
     @mock_s3
     @patch('masu.external.downloader.aws.utils.get_assume_role_session',

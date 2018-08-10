@@ -87,3 +87,71 @@ class LocalReportDownloaderTest(MasuTestCase):
                                                      'bucket': self.fake_bucket_name,
                                                      'report_name': 'awesome-report'})
         self.assertEqual(report_downloader.report_name, 'awesome-report')
+
+    def test_extract_names_no_prefix(self):
+        """Test to extract the report and prefix names from a bucket with no prefix."""
+        report_downloader = LocalReportDownloader(**{'customer_name': self.fake_customer_name,
+                                                     'auth_credential': self.fake_auth_credential,
+                                                     'bucket': self.fake_bucket_name})
+        self.assertEqual(report_downloader.report_name, self.fake_report_name)
+        self.assertIsNone(report_downloader.report_prefix)
+
+    def test_download_bucket_with_prefix(self):
+        """Test to verify that basic report downloading works."""
+        fake_bucket = tempfile.mkdtemp()
+        mytar = TarFile.open('./tests/data/test_local_bucket_prefix.tar.gz')
+        mytar.extractall(fake_bucket)
+        test_report_date = datetime(year=2018, month=8, day=7)
+        with patch.object(DateAccessor, 'today', return_value=test_report_date):
+            report_downloader = LocalReportDownloader(**{'customer_name': self.fake_customer_name,
+                                                        'auth_credential': self.fake_auth_credential,
+                                                        'bucket': fake_bucket})
+            # Names from test report .gz file
+            self.assertEqual(report_downloader.report_name, 'my-report')
+            self.assertEqual(report_downloader.report_prefix, 'my-prefix')
+            report_downloader.download_current_report()
+        expected_path = '{}/{}/{}'.format(DATA_DIR, self.fake_customer_name, 'local')
+        self.assertTrue(os.path.isdir(expected_path))
+
+        shutil.rmtree(fake_bucket)
+
+    def test_extract_names_with_prefix(self):
+        """Test to extract the report and prefix names from a bucket with prefix."""
+        bucket = tempfile.mkdtemp()
+        report_name = 'report-name'
+        prefix_name = 'prefix-name'
+        full_path = '{}/{}/{}/20180801-20180901/'.format(bucket, prefix_name, report_name)
+        os.makedirs(full_path)
+        report_downloader = LocalReportDownloader(**{'customer_name': self.fake_customer_name,
+                                                     'auth_credential': self.fake_auth_credential,
+                                                     'bucket': bucket})
+        self.assertEqual(report_downloader.report_name, report_name)
+        self.assertEqual(report_downloader.report_prefix, prefix_name)
+        shutil.rmtree(full_path)
+
+    def test_extract_names_with_bad_path(self):
+        """Test to extract the report and prefix names from a bad path."""
+        bucket = tempfile.mkdtemp()
+        report_name = 'report-name'
+        prefix_name = 'prefix-name'
+        full_path = '{}/{}/{}/20180801-aaaaaaa/'.format(bucket, prefix_name, report_name)
+        os.makedirs(full_path)
+
+        report_downloader = LocalReportDownloader(**{'customer_name': self.fake_customer_name,
+                                                     'auth_credential': self.fake_auth_credential,
+                                                     'bucket': bucket})
+        self.assertIsNone(report_downloader.report_name)
+        self.assertIsNone(report_downloader.report_prefix)
+
+        shutil.rmtree(full_path)
+
+    def test_extract_names_with_incomplete_path(self):
+        """Test to extract the report and prefix from a path where a CUR hasn't been generated yet."""
+        bucket = tempfile.mkdtemp()
+        report_downloader = LocalReportDownloader(**{'customer_name': self.fake_customer_name,
+                                                     'auth_credential': self.fake_auth_credential,
+                                                     'bucket': bucket})
+        self.assertIsNone(report_downloader.report_name)
+        self.assertIsNone(report_downloader.report_prefix)
+
+        shutil.rmtree(bucket)

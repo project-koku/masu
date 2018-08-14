@@ -663,6 +663,40 @@ CREATE TABLE public.django_session (
 ALTER TABLE public.django_session OWNER TO kokuadmin;
 
 --
+-- Name: region_mapping; Type: TABLE; Schema: public; Owner: kokuadmin
+--
+
+CREATE TABLE public.region_mapping (
+    id integer NOT NULL,
+    region character varying(32) NOT NULL,
+    region_name character varying(64) NOT NULL
+);
+
+
+ALTER TABLE public.region_mapping OWNER TO kokuadmin;
+
+--
+-- Name: region_mapping_id_seq; Type: SEQUENCE; Schema: public; Owner: kokuadmin
+--
+
+CREATE SEQUENCE public.region_mapping_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.region_mapping_id_seq OWNER TO kokuadmin;
+
+--
+-- Name: region_mapping_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: kokuadmin
+--
+
+ALTER SEQUENCE public.region_mapping_id_seq OWNED BY public.region_mapping.id;
+
+
+--
 -- Name: reporting_common_costusagereportstatus; Type: TABLE; Schema: public; Owner: kokuadmin
 --
 
@@ -1172,6 +1206,13 @@ ALTER TABLE ONLY public.django_migrations ALTER COLUMN id SET DEFAULT nextval('p
 
 
 --
+-- Name: region_mapping id; Type: DEFAULT; Schema: public; Owner: kokuadmin
+--
+
+ALTER TABLE ONLY public.region_mapping ALTER COLUMN id SET DEFAULT nextval('public.region_mapping_id_seq'::regclass);
+
+
+--
 -- Name: reporting_common_costusagereportstatus id; Type: DEFAULT; Schema: public; Owner: kokuadmin
 --
 
@@ -1246,7 +1287,7 @@ ALTER TABLE ONLY testcustomer.reporting_awscostentryreservation ALTER COLUMN id 
 --
 
 COPY public.api_customer (group_ptr_id, date_created, owner_id, uuid, schema_name) FROM stdin;
-1	2018-08-03 20:12:49.412187+00	2	4120c70c-2c58-4ee8-9ccb-6ea721188597	testcustomer
+1	2018-08-13 15:53:48.677053+00	2	4ca1b0c8-8973-44f2-a630-66bab00f2eef	testcustomer
 \.
 
 
@@ -1282,7 +1323,7 @@ COPY public.api_providerbillingsource (id, uuid, bucket) FROM stdin;
 --
 
 COPY public.api_resettoken (id, token, expiration_date, used, user_id) FROM stdin;
-1	666df682-09df-4e5c-a1bb-0c9649f8d09f	2018-08-04 20:12:49.286619+00	f	2
+1	cb66674c-d485-434e-9aeb-85809978658c	2018-08-14 15:53:48.429627+00	f	2
 \.
 
 
@@ -1291,7 +1332,7 @@ COPY public.api_resettoken (id, token, expiration_date, used, user_id) FROM stdi
 --
 
 COPY public.api_status (id, server_id) FROM stdin;
-1	acc95eb8-61ae-4c67-9f2e-51d0124d3dcb
+1	a6c7b6e8-a0e5-48c0-bef9-8d621404d8b4
 \.
 
 
@@ -1310,8 +1351,8 @@ COPY public.api_tenant (id, schema_name) FROM stdin;
 --
 
 COPY public.api_user (user_ptr_id, uuid) FROM stdin;
-1	fc171a6e-e37a-480a-8506-58259867ea58
-2	43a8034a-d4db-4a32-862a-8deffdf586d7
+1	2ee88c53-2add-40c0-a367-263eab3b15e2
+2	4d5e61aa-ad50-4070-a092-0bceaa300301
 \.
 
 
@@ -1320,9 +1361,9 @@ COPY public.api_user (user_ptr_id, uuid) FROM stdin;
 --
 
 COPY public.api_userpreference (id, uuid, preference, user_id, description, name) FROM stdin;
-1	2c4cb367-21e1-4e3b-b677-794995c4abca	{"currency": "USD"}	2	default preference	currency
-2	285f2082-f9fd-4f54-8617-c055301d9935	{"timezone": "UTC"}	2	default preference	timezone
-3	47310df3-f3ab-48e5-8ab3-bd7c44705176	{"locale": "en_US.UTF-8"}	2	default preference	locale
+1	aeafd915-0651-4e8b-ae81-d0d68da21ede	{"currency": "USD"}	2	default preference	currency
+2	b04c4c18-91f8-4e6c-872d-e1e3f5e1b9e4	{"timezone": "UTC"}	2	default preference	timezone
+3	c2441d1f-0382-43d0-bb33-22183d58c247	{"locale": "en_US.UTF-8"}	2	default preference	locale
 \.
 
 
@@ -1448,6 +1489,10 @@ COPY public.auth_permission (id, name, content_type_id, codename) FROM stdin;
 98	Can change si unit scale	25	change_siunitscale
 99	Can delete si unit scale	25	delete_siunitscale
 100	Can view si unit scale	25	view_siunitscale
+101	Can add region mapping	26	add_regionmapping
+102	Can change region mapping	26	change_regionmapping
+103	Can delete region mapping	26	delete_regionmapping
+104	Can view region mapping	26	view_regionmapping
 \.
 
 
@@ -1456,8 +1501,8 @@ COPY public.auth_permission (id, name, content_type_id, codename) FROM stdin;
 --
 
 COPY public.auth_user (id, password, last_login, is_superuser, username, first_name, last_name, email, is_staff, is_active, date_joined) FROM stdin;
-1	pbkdf2_sha256$120000$JYlOEdh3qy9X$/JxD347cslQPhaESeW6OuJZ7GTYMAz5sKZEkZnDaj/M=	\N	t	admin			admin@example.com	t	t	2018-08-03 20:12:39.790467+00
-2	pbkdf2_sha256$120000$gwGQ0pNrsFjR$n41CE09nOWN8/5EZNbyruFy6hNlzJJk6Y5Jd+npfnOw=	\N	f	test_customer			test@example.com	f	t	2018-08-03 20:12:49.109935+00
+1	pbkdf2_sha256$120000$zRsikpCCbndx$CPbLUrF7GFfGZBntdfGebkeJE0A9a4bN7y5fzc1qbBM=	\N	t	admin			admin@example.com	t	t	2018-08-13 15:53:37.514242+00
+2	pbkdf2_sha256$120000$nIld6UaWQCYo$B2AnsBqlDoQlTb4oLh/zatz5OzfXTv6BVWuo/z4lK78=	\N	f	test_customer			test@example.com	f	t	2018-08-13 15:53:48.238302+00
 \.
 
 
@@ -1483,7 +1528,7 @@ COPY public.auth_user_user_permissions (id, user_id, permission_id) FROM stdin;
 --
 
 COPY public.authtoken_token (key, created, user_id) FROM stdin;
-c54120e99eeb230757ff4e2e46d06b89488f2a62	2018-08-03 20:12:49.025433+00	1
+46b9b1380029f6e43c003383897ace4f908ca5b2	2018-08-13 15:53:48.155131+00	1
 \.
 
 
@@ -1525,6 +1570,7 @@ COPY public.django_content_type (id, app_label, model) FROM stdin;
 23	reporting_common	reportcolumnmap
 24	reporting_common	costusagereportstatus
 25	reporting_common	siunitscale
+26	reporting_common	regionmapping
 \.
 
 
@@ -1533,49 +1579,51 @@ COPY public.django_content_type (id, app_label, model) FROM stdin;
 --
 
 COPY public.django_migrations (id, app, name, applied) FROM stdin;
-1	contenttypes	0001_initial	2018-08-03 20:12:38.659103+00
-2	auth	0001_initial	2018-08-03 20:12:38.788213+00
-3	admin	0001_initial	2018-08-03 20:12:38.832029+00
-4	admin	0002_logentry_remove_auto_add	2018-08-03 20:12:38.847099+00
-5	admin	0003_logentry_add_action_flag_choices	2018-08-03 20:12:38.863694+00
-6	contenttypes	0002_remove_content_type_name	2018-08-03 20:12:38.897304+00
-7	auth	0002_alter_permission_name_max_length	2018-08-03 20:12:38.920266+00
-8	auth	0003_alter_user_email_max_length	2018-08-03 20:12:38.940917+00
-9	auth	0004_alter_user_username_opts	2018-08-03 20:12:38.958139+00
-10	auth	0005_alter_user_last_login_null	2018-08-03 20:12:38.980608+00
-11	auth	0006_require_contenttypes_0002	2018-08-03 20:12:38.988004+00
-12	auth	0007_alter_validators_add_error_messages	2018-08-03 20:12:39.004152+00
-13	auth	0008_alter_user_username_max_length	2018-08-03 20:12:39.027273+00
-14	auth	0009_alter_user_last_name_max_length	2018-08-03 20:12:39.046989+00
-15	api	0001_initial	2018-08-03 20:12:39.063603+00
-16	api	0002_auto_20180509_1400	2018-08-03 20:12:39.14811+00
-17	api	0003_auto_20180509_1849	2018-08-03 20:12:39.225137+00
-18	api	0004_auto_20180510_1824	2018-08-03 20:12:39.297572+00
-19	api	0005_auto_20180511_1445	2018-08-03 20:12:39.320453+00
-20	api	0006_resettoken	2018-08-03 20:12:39.35741+00
-21	api	0007_userpreference	2018-08-03 20:12:39.394398+00
-22	api	0008_provider	2018-08-03 20:12:39.506915+00
-23	api	0009_auto_20180523_0045	2018-08-03 20:12:39.547188+00
-24	api	0010_auto_20180523_1540	2018-08-03 20:12:39.606023+00
-25	api	0011_auto_20180524_1838	2018-08-03 20:12:39.661304+00
-26	api	0012_auto_20180529_1526	2018-08-03 20:12:39.83357+00
-27	api	0013_auto_20180531_1921	2018-08-03 20:12:39.857901+00
-28	api	0014_costusagereportstatus	2018-08-03 20:12:39.900796+00
-29	api	0015_auto_20180614_1343	2018-08-03 20:12:39.948741+00
-30	api	0016_auto_20180802_1911	2018-08-03 20:12:39.998592+00
-31	authtoken	0001_initial	2018-08-03 20:12:40.082559+00
-32	authtoken	0002_auto_20160226_1747	2018-08-03 20:12:40.140472+00
-33	reporting	0001_initial	2018-08-03 20:12:40.195887+00
-34	reporting	0002_auto_20180615_1725	2018-08-03 20:12:40.399205+00
-35	reporting	0003_auto_20180619_1833	2018-08-03 20:12:40.490122+00
-36	reporting	0004_auto_20180803_1926	2018-08-03 20:12:40.546735+00
-37	reporting_common	0001_initial	2018-08-03 20:12:40.572132+00
-38	reporting_common	0002_auto_20180608_1647	2018-08-03 20:12:40.718071+00
-39	reporting_common	0003_costusagereportstatus	2018-08-03 20:12:40.764016+00
-40	reporting_common	0004_siunitscale	2018-08-03 20:12:40.7906+00
-41	reporting_common	0005_auto_20180725_1523	2018-08-03 20:12:40.866544+00
-42	reporting_common	0006_auto_20180802_1911	2018-08-03 20:12:40.8792+00
-43	sessions	0001_initial	2018-08-03 20:12:40.909017+00
+1	contenttypes	0001_initial	2018-08-13 15:53:36.303714+00
+2	auth	0001_initial	2018-08-13 15:53:36.457256+00
+3	admin	0001_initial	2018-08-13 15:53:36.504243+00
+4	admin	0002_logentry_remove_auto_add	2018-08-13 15:53:36.520927+00
+5	admin	0003_logentry_add_action_flag_choices	2018-08-13 15:53:36.54227+00
+6	contenttypes	0002_remove_content_type_name	2018-08-13 15:53:36.583077+00
+7	auth	0002_alter_permission_name_max_length	2018-08-13 15:53:36.599327+00
+8	auth	0003_alter_user_email_max_length	2018-08-13 15:53:36.622547+00
+9	auth	0004_alter_user_username_opts	2018-08-13 15:53:36.638068+00
+10	auth	0005_alter_user_last_login_null	2018-08-13 15:53:36.662373+00
+11	auth	0006_require_contenttypes_0002	2018-08-13 15:53:36.672801+00
+12	auth	0007_alter_validators_add_error_messages	2018-08-13 15:53:36.690529+00
+13	auth	0008_alter_user_username_max_length	2018-08-13 15:53:36.717569+00
+14	auth	0009_alter_user_last_name_max_length	2018-08-13 15:53:36.742912+00
+15	api	0001_initial	2018-08-13 15:53:36.763083+00
+16	api	0002_auto_20180509_1400	2018-08-13 15:53:36.82719+00
+17	api	0003_auto_20180509_1849	2018-08-13 15:53:36.908335+00
+18	api	0004_auto_20180510_1824	2018-08-13 15:53:36.993183+00
+19	api	0005_auto_20180511_1445	2018-08-13 15:53:37.017142+00
+20	api	0006_resettoken	2018-08-13 15:53:37.058326+00
+21	api	0007_userpreference	2018-08-13 15:53:37.097864+00
+22	api	0008_provider	2018-08-13 15:53:37.217111+00
+23	api	0009_auto_20180523_0045	2018-08-13 15:53:37.261562+00
+24	api	0010_auto_20180523_1540	2018-08-13 15:53:37.324323+00
+25	api	0011_auto_20180524_1838	2018-08-13 15:53:37.389108+00
+26	api	0012_auto_20180529_1526	2018-08-13 15:53:37.550347+00
+27	api	0013_auto_20180531_1921	2018-08-13 15:53:37.572561+00
+28	api	0014_costusagereportstatus	2018-08-13 15:53:37.617114+00
+29	api	0015_auto_20180614_1343	2018-08-13 15:53:37.658279+00
+30	api	0016_auto_20180802_1911	2018-08-13 15:53:37.679593+00
+31	api	0017_auto_20180808_2134	2018-08-13 15:53:37.701172+00
+32	authtoken	0001_initial	2018-08-13 15:53:37.743957+00
+33	authtoken	0002_auto_20160226_1747	2018-08-13 15:53:37.799146+00
+34	reporting	0001_initial	2018-08-13 15:53:37.850787+00
+35	reporting	0002_auto_20180615_1725	2018-08-13 15:53:38.08394+00
+36	reporting	0003_auto_20180619_1833	2018-08-13 15:53:38.169607+00
+37	reporting	0004_auto_20180803_1926	2018-08-13 15:53:38.197594+00
+38	reporting_common	0001_initial	2018-08-13 15:53:38.22598+00
+39	reporting_common	0002_auto_20180608_1647	2018-08-13 15:53:38.38754+00
+40	reporting_common	0003_costusagereportstatus	2018-08-13 15:53:38.438227+00
+41	reporting_common	0004_siunitscale	2018-08-13 15:53:38.464535+00
+42	reporting_common	0005_auto_20180725_1523	2018-08-13 15:53:38.548649+00
+43	reporting_common	0006_auto_20180802_1911	2018-08-13 15:53:38.564503+00
+44	reporting_common	0007_auto_20180808_2134	2018-08-13 15:53:38.610168+00
+45	sessions	0001_initial	2018-08-13 15:53:38.641977+00
 \.
 
 
@@ -1584,6 +1632,14 @@ COPY public.django_migrations (id, app, name, applied) FROM stdin;
 --
 
 COPY public.django_session (session_key, session_data, expire_date) FROM stdin;
+\.
+
+
+--
+-- Data for Name: region_mapping; Type: TABLE DATA; Schema: public; Owner: kokuadmin
+--
+
+COPY public.region_mapping (id, region, region_name) FROM stdin;
 \.
 
 
@@ -1679,49 +1735,51 @@ COPY public.si_unit_scale (id, prefix, prefix_symbol, multiplying_factor) FROM s
 --
 
 COPY testcustomer.django_migrations (id, app, name, applied) FROM stdin;
-1	contenttypes	0001_initial	2018-08-03 20:12:49.483164+00
-2	auth	0001_initial	2018-08-03 20:12:49.505358+00
-3	admin	0001_initial	2018-08-03 20:12:49.522643+00
-4	admin	0002_logentry_remove_auto_add	2018-08-03 20:12:49.537906+00
-5	admin	0003_logentry_add_action_flag_choices	2018-08-03 20:12:49.55282+00
-6	contenttypes	0002_remove_content_type_name	2018-08-03 20:12:49.570778+00
-7	auth	0002_alter_permission_name_max_length	2018-08-03 20:12:49.582509+00
-8	auth	0003_alter_user_email_max_length	2018-08-03 20:12:49.598044+00
-9	auth	0004_alter_user_username_opts	2018-08-03 20:12:49.614567+00
-10	auth	0005_alter_user_last_login_null	2018-08-03 20:12:49.631542+00
-11	auth	0006_require_contenttypes_0002	2018-08-03 20:12:49.639944+00
-12	auth	0007_alter_validators_add_error_messages	2018-08-03 20:12:49.680019+00
-13	auth	0008_alter_user_username_max_length	2018-08-03 20:12:49.696749+00
-14	auth	0009_alter_user_last_name_max_length	2018-08-03 20:12:49.712318+00
-15	api	0001_initial	2018-08-03 20:12:49.72225+00
-16	api	0002_auto_20180509_1400	2018-08-03 20:12:49.754525+00
-17	api	0003_auto_20180509_1849	2018-08-03 20:12:49.791207+00
-18	api	0004_auto_20180510_1824	2018-08-03 20:12:49.827533+00
-19	api	0005_auto_20180511_1445	2018-08-03 20:12:49.851964+00
-20	api	0006_resettoken	2018-08-03 20:12:49.869818+00
-21	api	0007_userpreference	2018-08-03 20:12:49.887627+00
-22	api	0008_provider	2018-08-03 20:12:49.932663+00
-23	api	0009_auto_20180523_0045	2018-08-03 20:12:49.95552+00
-24	api	0010_auto_20180523_1540	2018-08-03 20:12:49.992798+00
-25	api	0011_auto_20180524_1838	2018-08-03 20:12:50.01534+00
-26	api	0012_auto_20180529_1526	2018-08-03 20:12:50.026084+00
-27	api	0013_auto_20180531_1921	2018-08-03 20:12:50.036543+00
-28	api	0014_costusagereportstatus	2018-08-03 20:12:50.056334+00
-29	api	0015_auto_20180614_1343	2018-08-03 20:12:50.077689+00
-30	api	0016_auto_20180802_1911	2018-08-03 20:12:50.097647+00
-31	authtoken	0001_initial	2018-08-03 20:12:50.119659+00
-32	authtoken	0002_auto_20160226_1747	2018-08-03 20:12:50.156603+00
-33	reporting	0001_initial	2018-08-03 20:12:50.331488+00
-34	reporting	0002_auto_20180615_1725	2018-08-03 20:12:50.960999+00
-35	reporting	0003_auto_20180619_1833	2018-08-03 20:12:51.288604+00
-36	reporting	0004_auto_20180803_1926	2018-08-03 20:12:51.330304+00
-37	reporting_common	0001_initial	2018-08-03 20:12:51.339653+00
-38	reporting_common	0002_auto_20180608_1647	2018-08-03 20:12:51.347992+00
-39	reporting_common	0003_costusagereportstatus	2018-08-03 20:12:51.369734+00
-40	reporting_common	0004_siunitscale	2018-08-03 20:12:51.381367+00
-41	reporting_common	0005_auto_20180725_1523	2018-08-03 20:12:51.391908+00
-42	reporting_common	0006_auto_20180802_1911	2018-08-03 20:12:51.402323+00
-43	sessions	0001_initial	2018-08-03 20:12:51.413193+00
+1	contenttypes	0001_initial	2018-08-13 15:53:48.754982+00
+2	auth	0001_initial	2018-08-13 15:53:48.775047+00
+3	admin	0001_initial	2018-08-13 15:53:48.793367+00
+4	admin	0002_logentry_remove_auto_add	2018-08-13 15:53:48.811939+00
+5	admin	0003_logentry_add_action_flag_choices	2018-08-13 15:53:48.828614+00
+6	contenttypes	0002_remove_content_type_name	2018-08-13 15:53:48.849306+00
+7	auth	0002_alter_permission_name_max_length	2018-08-13 15:53:48.861148+00
+8	auth	0003_alter_user_email_max_length	2018-08-13 15:53:48.876855+00
+9	auth	0004_alter_user_username_opts	2018-08-13 15:53:48.893661+00
+10	auth	0005_alter_user_last_login_null	2018-08-13 15:53:48.908871+00
+11	auth	0006_require_contenttypes_0002	2018-08-13 15:53:48.916985+00
+12	auth	0007_alter_validators_add_error_messages	2018-08-13 15:53:48.933055+00
+13	auth	0008_alter_user_username_max_length	2018-08-13 15:53:48.948827+00
+14	auth	0009_alter_user_last_name_max_length	2018-08-13 15:53:48.964678+00
+15	api	0001_initial	2018-08-13 15:53:48.975355+00
+16	api	0002_auto_20180509_1400	2018-08-13 15:53:49.007025+00
+17	api	0003_auto_20180509_1849	2018-08-13 15:53:49.038837+00
+18	api	0004_auto_20180510_1824	2018-08-13 15:53:49.079475+00
+19	api	0005_auto_20180511_1445	2018-08-13 15:53:49.104239+00
+20	api	0006_resettoken	2018-08-13 15:53:49.123094+00
+21	api	0007_userpreference	2018-08-13 15:53:49.142536+00
+22	api	0008_provider	2018-08-13 15:53:49.180592+00
+23	api	0009_auto_20180523_0045	2018-08-13 15:53:49.200761+00
+24	api	0010_auto_20180523_1540	2018-08-13 15:53:49.242533+00
+25	api	0011_auto_20180524_1838	2018-08-13 15:53:49.265503+00
+26	api	0012_auto_20180529_1526	2018-08-13 15:53:49.274266+00
+27	api	0013_auto_20180531_1921	2018-08-13 15:53:49.284584+00
+28	api	0014_costusagereportstatus	2018-08-13 15:53:49.305173+00
+29	api	0015_auto_20180614_1343	2018-08-13 15:53:49.329183+00
+30	api	0016_auto_20180802_1911	2018-08-13 15:53:49.34833+00
+31	api	0017_auto_20180808_2134	2018-08-13 15:53:49.368809+00
+32	authtoken	0001_initial	2018-08-13 15:53:49.389593+00
+33	authtoken	0002_auto_20160226_1747	2018-08-13 15:53:49.428051+00
+34	reporting	0001_initial	2018-08-13 15:53:49.615857+00
+35	reporting	0002_auto_20180615_1725	2018-08-13 15:53:50.071003+00
+36	reporting	0003_auto_20180619_1833	2018-08-13 15:53:50.473343+00
+37	reporting	0004_auto_20180803_1926	2018-08-13 15:53:50.516887+00
+38	reporting_common	0001_initial	2018-08-13 15:53:50.528063+00
+39	reporting_common	0002_auto_20180608_1647	2018-08-13 15:53:50.537299+00
+40	reporting_common	0003_costusagereportstatus	2018-08-13 15:53:50.558435+00
+41	reporting_common	0004_siunitscale	2018-08-13 15:53:50.568406+00
+42	reporting_common	0005_auto_20180725_1523	2018-08-13 15:53:50.576567+00
+43	reporting_common	0006_auto_20180802_1911	2018-08-13 15:53:50.586745+00
+44	reporting_common	0007_auto_20180808_2134	2018-08-13 15:53:50.599274+00
+45	sessions	0001_initial	2018-08-13 15:53:50.609656+00
 \.
 
 
@@ -1840,7 +1898,7 @@ SELECT pg_catalog.setval('public.auth_group_permissions_id_seq', 1, false);
 -- Name: auth_permission_id_seq; Type: SEQUENCE SET; Schema: public; Owner: kokuadmin
 --
 
-SELECT pg_catalog.setval('public.auth_permission_id_seq', 100, true);
+SELECT pg_catalog.setval('public.auth_permission_id_seq', 104, true);
 
 
 --
@@ -1875,14 +1933,21 @@ SELECT pg_catalog.setval('public.django_admin_log_id_seq', 1, false);
 -- Name: django_content_type_id_seq; Type: SEQUENCE SET; Schema: public; Owner: kokuadmin
 --
 
-SELECT pg_catalog.setval('public.django_content_type_id_seq', 25, true);
+SELECT pg_catalog.setval('public.django_content_type_id_seq', 26, true);
 
 
 --
 -- Name: django_migrations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: kokuadmin
 --
 
-SELECT pg_catalog.setval('public.django_migrations_id_seq', 43, true);
+SELECT pg_catalog.setval('public.django_migrations_id_seq', 45, true);
+
+
+--
+-- Name: region_mapping_id_seq; Type: SEQUENCE SET; Schema: public; Owner: kokuadmin
+--
+
+SELECT pg_catalog.setval('public.region_mapping_id_seq', 1, false);
 
 
 --
@@ -1910,7 +1975,7 @@ SELECT pg_catalog.setval('public.si_unit_scale_id_seq', 17, true);
 -- Name: django_migrations_id_seq; Type: SEQUENCE SET; Schema: testcustomer; Owner: kokuadmin
 --
 
-SELECT pg_catalog.setval('testcustomer.django_migrations_id_seq', 43, true);
+SELECT pg_catalog.setval('testcustomer.django_migrations_id_seq', 45, true);
 
 
 --
@@ -2260,6 +2325,30 @@ ALTER TABLE ONLY public.django_session
 
 
 --
+-- Name: region_mapping region_mapping_pkey; Type: CONSTRAINT; Schema: public; Owner: kokuadmin
+--
+
+ALTER TABLE ONLY public.region_mapping
+    ADD CONSTRAINT region_mapping_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: region_mapping region_mapping_region_key; Type: CONSTRAINT; Schema: public; Owner: kokuadmin
+--
+
+ALTER TABLE ONLY public.region_mapping
+    ADD CONSTRAINT region_mapping_region_key UNIQUE (region);
+
+
+--
+-- Name: region_mapping region_mapping_region_name_key; Type: CONSTRAINT; Schema: public; Owner: kokuadmin
+--
+
+ALTER TABLE ONLY public.region_mapping
+    ADD CONSTRAINT region_mapping_region_name_key UNIQUE (region_name);
+
+
+--
 -- Name: reporting_common_costusagereportstatus reporting_common_costusagereportstatus_pkey; Type: CONSTRAINT; Schema: public; Owner: kokuadmin
 --
 
@@ -2561,6 +2650,20 @@ CREATE INDEX django_session_expire_date_a5c62663 ON public.django_session USING 
 --
 
 CREATE INDEX django_session_session_key_c0390e0f_like ON public.django_session USING btree (session_key varchar_pattern_ops);
+
+
+--
+-- Name: region_mapping_region_9c0d71ba_like; Type: INDEX; Schema: public; Owner: kokuadmin
+--
+
+CREATE INDEX region_mapping_region_9c0d71ba_like ON public.region_mapping USING btree (region varchar_pattern_ops);
+
+
+--
+-- Name: region_mapping_region_name_ad295b89_like; Type: INDEX; Schema: public; Owner: kokuadmin
+--
+
+CREATE INDEX region_mapping_region_name_ad295b89_like ON public.region_mapping USING btree (region_name varchar_pattern_ops);
 
 
 --

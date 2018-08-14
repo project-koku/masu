@@ -492,18 +492,8 @@ class ReportProcessorTest(MasuTestCase):
     def test_create_cost_entry_pricing_already_processed(self):
         """Test that an already processed pricing id is returned."""
         expected_id = random.randint(1,9)
-        # Get the correct decimal precision to compare to stored
-        # values in the database
-        cost = Decimal(self.row.get('pricing/publicOnDemandCost')).quantize(
-            Decimal(self.processor._decimal_precision)
-        )
-        rate = Decimal(self.row.get('pricing/publicOnDemandRate')).quantize(
-            Decimal(self.processor._decimal_precision)
-        )
 
-        key = '{cost}-{rate}-{term}-{unit}'.format(
-            cost=cost,
-            rate=rate,
+        key = '{term}-{unit}'.format(
             term=self.row['pricing/term'],
             unit=self.row['pricing/unit']
         )
@@ -516,18 +506,8 @@ class ReportProcessorTest(MasuTestCase):
     def test_create_cost_entry_pricing_existing(self):
         """Test that a previously existing pricing id is returned."""
         expected_id = random.randint(1,9)
-        # Get the correct decimal precision to compare to stored
-        # values in the database
-        cost = Decimal(self.row.get('pricing/publicOnDemandCost')).quantize(
-            Decimal(self.processor._decimal_precision)
-        )
-        rate = Decimal(self.row.get('pricing/publicOnDemandRate')).quantize(
-            Decimal(self.processor._decimal_precision)
-        )
 
-        key = '{cost}-{rate}-{term}-{unit}'.format(
-            cost=cost,
-            rate=rate,
+        key = '{term}-{unit}'.format(
             term=self.row['pricing/term'],
             unit=self.row['pricing/unit']
         )

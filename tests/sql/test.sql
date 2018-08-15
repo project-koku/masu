@@ -944,7 +944,9 @@ CREATE TABLE testcustomer.reporting_awscostentrylineitem (
     cost_entry_pricing_id integer,
     cost_entry_product_id integer,
     cost_entry_reservation_id integer,
-    hash text
+    hash text,
+    public_on_demand_cost numeric(17,9),
+    public_on_demand_rate numeric(17,9)
 );
 
 
@@ -977,8 +979,6 @@ ALTER SEQUENCE testcustomer.reporting_awscostentrylineitem_id_seq OWNED BY testc
 
 CREATE TABLE testcustomer.reporting_awscostentrypricing (
     id integer NOT NULL,
-    public_on_demand_cost numeric(17,9) NOT NULL,
-    public_on_demand_rate numeric(17,9) NOT NULL,
     term character varying(63),
     unit character varying(63)
 );
@@ -1287,7 +1287,7 @@ ALTER TABLE ONLY testcustomer.reporting_awscostentryreservation ALTER COLUMN id 
 --
 
 COPY public.api_customer (group_ptr_id, date_created, owner_id, uuid, schema_name) FROM stdin;
-1	2018-08-13 15:53:48.677053+00	2	4ca1b0c8-8973-44f2-a630-66bab00f2eef	testcustomer
+1	2018-08-15 13:48:40.47327+00	2	d0339f56-d44d-4580-b1c6-c490eeaaea59	testcustomer
 \.
 
 
@@ -1323,7 +1323,7 @@ COPY public.api_providerbillingsource (id, uuid, bucket) FROM stdin;
 --
 
 COPY public.api_resettoken (id, token, expiration_date, used, user_id) FROM stdin;
-1	cb66674c-d485-434e-9aeb-85809978658c	2018-08-14 15:53:48.429627+00	f	2
+1	581534a9-b3d1-4780-aacd-15f2aaa1fc76	2018-08-16 13:48:40.449772+00	f	2
 \.
 
 
@@ -1332,7 +1332,7 @@ COPY public.api_resettoken (id, token, expiration_date, used, user_id) FROM stdi
 --
 
 COPY public.api_status (id, server_id) FROM stdin;
-1	a6c7b6e8-a0e5-48c0-bef9-8d621404d8b4
+1	85e538ba-2037-46f0-ad06-5b51f938f999
 \.
 
 
@@ -1351,8 +1351,8 @@ COPY public.api_tenant (id, schema_name) FROM stdin;
 --
 
 COPY public.api_user (user_ptr_id, uuid) FROM stdin;
-1	2ee88c53-2add-40c0-a367-263eab3b15e2
-2	4d5e61aa-ad50-4070-a092-0bceaa300301
+1	76a510da-1b00-450c-92c1-31b0ab646349
+2	21212a8b-9e2c-4c9a-99b2-b9c2c5b30ad8
 \.
 
 
@@ -1361,9 +1361,9 @@ COPY public.api_user (user_ptr_id, uuid) FROM stdin;
 --
 
 COPY public.api_userpreference (id, uuid, preference, user_id, description, name) FROM stdin;
-1	aeafd915-0651-4e8b-ae81-d0d68da21ede	{"currency": "USD"}	2	default preference	currency
-2	b04c4c18-91f8-4e6c-872d-e1e3f5e1b9e4	{"timezone": "UTC"}	2	default preference	timezone
-3	c2441d1f-0382-43d0-bb33-22183d58c247	{"locale": "en_US.UTF-8"}	2	default preference	locale
+1	9f5bb83a-1043-412e-8ced-34c85ac165a0	{"currency": "USD"}	2	default preference	currency
+2	e7fd85aa-d0d3-4583-a3e2-4fc858038a48	{"timezone": "UTC"}	2	default preference	timezone
+3	046c8416-a13d-4f35-82e8-faf819db1ca2	{"locale": "en_US.UTF-8"}	2	default preference	locale
 \.
 
 
@@ -1501,8 +1501,8 @@ COPY public.auth_permission (id, name, content_type_id, codename) FROM stdin;
 --
 
 COPY public.auth_user (id, password, last_login, is_superuser, username, first_name, last_name, email, is_staff, is_active, date_joined) FROM stdin;
-1	pbkdf2_sha256$120000$zRsikpCCbndx$CPbLUrF7GFfGZBntdfGebkeJE0A9a4bN7y5fzc1qbBM=	\N	t	admin			admin@example.com	t	t	2018-08-13 15:53:37.514242+00
-2	pbkdf2_sha256$120000$nIld6UaWQCYo$B2AnsBqlDoQlTb4oLh/zatz5OzfXTv6BVWuo/z4lK78=	\N	f	test_customer			test@example.com	f	t	2018-08-13 15:53:48.238302+00
+1	pbkdf2_sha256$120000$Beec98tbKFZA$ENHjBPfjSENexa0l9E64vGQIOUcXddDSNvkiY3HHZU8=	\N	t	admin			admin@example.com	t	t	2018-08-15 13:48:30.856238+00
+2	pbkdf2_sha256$120000$xlyeoXvEVALt$dIRM23mO167tjFG30iiEYfe8Td3HcWJmIpWkpblDxL8=	\N	f	test_customer			test@example.com	f	t	2018-08-15 13:48:40.266929+00
 \.
 
 
@@ -1528,7 +1528,7 @@ COPY public.auth_user_user_permissions (id, user_id, permission_id) FROM stdin;
 --
 
 COPY public.authtoken_token (key, created, user_id) FROM stdin;
-46b9b1380029f6e43c003383897ace4f908ca5b2	2018-08-13 15:53:48.155131+00	1
+0b59e5c75683dd4daa1c8eba89750e0664b07e43	2018-08-15 13:48:40.218652+00	1
 \.
 
 
@@ -1579,51 +1579,51 @@ COPY public.django_content_type (id, app_label, model) FROM stdin;
 --
 
 COPY public.django_migrations (id, app, name, applied) FROM stdin;
-1	contenttypes	0001_initial	2018-08-13 15:53:36.303714+00
-2	auth	0001_initial	2018-08-13 15:53:36.457256+00
-3	admin	0001_initial	2018-08-13 15:53:36.504243+00
-4	admin	0002_logentry_remove_auto_add	2018-08-13 15:53:36.520927+00
-5	admin	0003_logentry_add_action_flag_choices	2018-08-13 15:53:36.54227+00
-6	contenttypes	0002_remove_content_type_name	2018-08-13 15:53:36.583077+00
-7	auth	0002_alter_permission_name_max_length	2018-08-13 15:53:36.599327+00
-8	auth	0003_alter_user_email_max_length	2018-08-13 15:53:36.622547+00
-9	auth	0004_alter_user_username_opts	2018-08-13 15:53:36.638068+00
-10	auth	0005_alter_user_last_login_null	2018-08-13 15:53:36.662373+00
-11	auth	0006_require_contenttypes_0002	2018-08-13 15:53:36.672801+00
-12	auth	0007_alter_validators_add_error_messages	2018-08-13 15:53:36.690529+00
-13	auth	0008_alter_user_username_max_length	2018-08-13 15:53:36.717569+00
-14	auth	0009_alter_user_last_name_max_length	2018-08-13 15:53:36.742912+00
-15	api	0001_initial	2018-08-13 15:53:36.763083+00
-16	api	0002_auto_20180509_1400	2018-08-13 15:53:36.82719+00
-17	api	0003_auto_20180509_1849	2018-08-13 15:53:36.908335+00
-18	api	0004_auto_20180510_1824	2018-08-13 15:53:36.993183+00
-19	api	0005_auto_20180511_1445	2018-08-13 15:53:37.017142+00
-20	api	0006_resettoken	2018-08-13 15:53:37.058326+00
-21	api	0007_userpreference	2018-08-13 15:53:37.097864+00
-22	api	0008_provider	2018-08-13 15:53:37.217111+00
-23	api	0009_auto_20180523_0045	2018-08-13 15:53:37.261562+00
-24	api	0010_auto_20180523_1540	2018-08-13 15:53:37.324323+00
-25	api	0011_auto_20180524_1838	2018-08-13 15:53:37.389108+00
-26	api	0012_auto_20180529_1526	2018-08-13 15:53:37.550347+00
-27	api	0013_auto_20180531_1921	2018-08-13 15:53:37.572561+00
-28	api	0014_costusagereportstatus	2018-08-13 15:53:37.617114+00
-29	api	0015_auto_20180614_1343	2018-08-13 15:53:37.658279+00
-30	api	0016_auto_20180802_1911	2018-08-13 15:53:37.679593+00
-31	api	0017_auto_20180808_2134	2018-08-13 15:53:37.701172+00
-32	authtoken	0001_initial	2018-08-13 15:53:37.743957+00
-33	authtoken	0002_auto_20160226_1747	2018-08-13 15:53:37.799146+00
-34	reporting	0001_initial	2018-08-13 15:53:37.850787+00
-35	reporting	0002_auto_20180615_1725	2018-08-13 15:53:38.08394+00
-36	reporting	0003_auto_20180619_1833	2018-08-13 15:53:38.169607+00
-37	reporting	0004_auto_20180803_1926	2018-08-13 15:53:38.197594+00
-38	reporting_common	0001_initial	2018-08-13 15:53:38.22598+00
-39	reporting_common	0002_auto_20180608_1647	2018-08-13 15:53:38.38754+00
-40	reporting_common	0003_costusagereportstatus	2018-08-13 15:53:38.438227+00
-41	reporting_common	0004_siunitscale	2018-08-13 15:53:38.464535+00
-42	reporting_common	0005_auto_20180725_1523	2018-08-13 15:53:38.548649+00
-43	reporting_common	0006_auto_20180802_1911	2018-08-13 15:53:38.564503+00
-44	reporting_common	0007_auto_20180808_2134	2018-08-13 15:53:38.610168+00
-45	sessions	0001_initial	2018-08-13 15:53:38.641977+00
+1	contenttypes	0001_initial	2018-08-15 13:48:29.622971+00
+2	auth	0001_initial	2018-08-15 13:48:29.770832+00
+3	admin	0001_initial	2018-08-15 13:48:29.818252+00
+4	admin	0002_logentry_remove_auto_add	2018-08-15 13:48:29.834244+00
+5	admin	0003_logentry_add_action_flag_choices	2018-08-15 13:48:29.852843+00
+6	contenttypes	0002_remove_content_type_name	2018-08-15 13:48:29.892127+00
+7	auth	0002_alter_permission_name_max_length	2018-08-15 13:48:29.912671+00
+8	auth	0003_alter_user_email_max_length	2018-08-15 13:48:29.936335+00
+9	auth	0004_alter_user_username_opts	2018-08-15 13:48:29.962178+00
+10	auth	0005_alter_user_last_login_null	2018-08-15 13:48:29.989847+00
+11	auth	0006_require_contenttypes_0002	2018-08-15 13:48:29.999629+00
+12	auth	0007_alter_validators_add_error_messages	2018-08-15 13:48:30.015018+00
+13	auth	0008_alter_user_username_max_length	2018-08-15 13:48:30.041696+00
+14	auth	0009_alter_user_last_name_max_length	2018-08-15 13:48:30.070568+00
+15	api	0001_initial	2018-08-15 13:48:30.089427+00
+16	api	0002_auto_20180509_1400	2018-08-15 13:48:30.156691+00
+17	api	0003_auto_20180509_1849	2018-08-15 13:48:30.257462+00
+18	api	0004_auto_20180510_1824	2018-08-15 13:48:30.335662+00
+19	api	0005_auto_20180511_1445	2018-08-15 13:48:30.3597+00
+20	api	0006_resettoken	2018-08-15 13:48:30.401482+00
+21	api	0007_userpreference	2018-08-15 13:48:30.442273+00
+22	api	0008_provider	2018-08-15 13:48:30.556115+00
+23	api	0009_auto_20180523_0045	2018-08-15 13:48:30.597588+00
+24	api	0010_auto_20180523_1540	2018-08-15 13:48:30.658145+00
+25	api	0011_auto_20180524_1838	2018-08-15 13:48:30.723001+00
+26	api	0012_auto_20180529_1526	2018-08-15 13:48:30.897837+00
+27	api	0013_auto_20180531_1921	2018-08-15 13:48:30.924928+00
+28	api	0014_costusagereportstatus	2018-08-15 13:48:30.983165+00
+29	api	0015_auto_20180614_1343	2018-08-15 13:48:31.072837+00
+30	api	0016_auto_20180802_1911	2018-08-15 13:48:31.096599+00
+31	authtoken	0001_initial	2018-08-15 13:48:31.137467+00
+32	authtoken	0002_auto_20160226_1747	2018-08-15 13:48:31.198153+00
+33	reporting	0001_initial	2018-08-15 13:48:31.255735+00
+34	reporting	0002_auto_20180615_1725	2018-08-15 13:48:31.493978+00
+35	reporting	0003_auto_20180619_1833	2018-08-15 13:48:31.582284+00
+36	reporting	0004_auto_20180803_1926	2018-08-15 13:48:31.60627+00
+37	reporting	0005_auto_20180807_1819	2018-08-15 13:48:31.650248+00
+38	reporting_common	0001_initial	2018-08-15 13:48:31.675093+00
+39	reporting_common	0002_auto_20180608_1647	2018-08-15 13:48:31.828202+00
+40	reporting_common	0003_costusagereportstatus	2018-08-15 13:48:31.876593+00
+41	reporting_common	0004_siunitscale	2018-08-15 13:48:31.917158+00
+42	reporting_common	0005_auto_20180725_1523	2018-08-15 13:48:32.005157+00
+43	reporting_common	0006_auto_20180802_1911	2018-08-15 13:48:32.017125+00
+44	reporting_common	0007_auto_20180808_2134	2018-08-15 13:48:32.05428+00
+45	sessions	0001_initial	2018-08-15 13:48:32.091767+00
 \.
 
 
@@ -1680,8 +1680,8 @@ COPY public.reporting_common_reportcolumnmap (id, provider_type, provider_column
 22	AWS	lineItem/BlendedRate	reporting_awscostentrylineitem	blended_rate
 23	AWS	lineItem/BlendedCost	reporting_awscostentrylineitem	blended_cost
 24	AWS	lineItem/TaxType	reporting_awscostentrylineitem	tax_type
-25	AWS	pricing/publicOnDemandCost	reporting_awscostentrypricing	public_on_demand_cost
-26	AWS	pricing/publicOnDemandRate	reporting_awscostentrypricing	public_on_demand_rate
+25	AWS	pricing/publicOnDemandCost	reporting_awscostentrylineitem	public_on_demand_cost
+26	AWS	pricing/publicOnDemandRate	reporting_awscostentrylineitem	public_on_demand_rate
 27	AWS	pricing/term	reporting_awscostentrypricing	term
 28	AWS	pricing/unit	reporting_awscostentrypricing	unit
 29	AWS	product/sku	reporting_awscostentryproduct	sku
@@ -1735,51 +1735,51 @@ COPY public.si_unit_scale (id, prefix, prefix_symbol, multiplying_factor) FROM s
 --
 
 COPY testcustomer.django_migrations (id, app, name, applied) FROM stdin;
-1	contenttypes	0001_initial	2018-08-13 15:53:48.754982+00
-2	auth	0001_initial	2018-08-13 15:53:48.775047+00
-3	admin	0001_initial	2018-08-13 15:53:48.793367+00
-4	admin	0002_logentry_remove_auto_add	2018-08-13 15:53:48.811939+00
-5	admin	0003_logentry_add_action_flag_choices	2018-08-13 15:53:48.828614+00
-6	contenttypes	0002_remove_content_type_name	2018-08-13 15:53:48.849306+00
-7	auth	0002_alter_permission_name_max_length	2018-08-13 15:53:48.861148+00
-8	auth	0003_alter_user_email_max_length	2018-08-13 15:53:48.876855+00
-9	auth	0004_alter_user_username_opts	2018-08-13 15:53:48.893661+00
-10	auth	0005_alter_user_last_login_null	2018-08-13 15:53:48.908871+00
-11	auth	0006_require_contenttypes_0002	2018-08-13 15:53:48.916985+00
-12	auth	0007_alter_validators_add_error_messages	2018-08-13 15:53:48.933055+00
-13	auth	0008_alter_user_username_max_length	2018-08-13 15:53:48.948827+00
-14	auth	0009_alter_user_last_name_max_length	2018-08-13 15:53:48.964678+00
-15	api	0001_initial	2018-08-13 15:53:48.975355+00
-16	api	0002_auto_20180509_1400	2018-08-13 15:53:49.007025+00
-17	api	0003_auto_20180509_1849	2018-08-13 15:53:49.038837+00
-18	api	0004_auto_20180510_1824	2018-08-13 15:53:49.079475+00
-19	api	0005_auto_20180511_1445	2018-08-13 15:53:49.104239+00
-20	api	0006_resettoken	2018-08-13 15:53:49.123094+00
-21	api	0007_userpreference	2018-08-13 15:53:49.142536+00
-22	api	0008_provider	2018-08-13 15:53:49.180592+00
-23	api	0009_auto_20180523_0045	2018-08-13 15:53:49.200761+00
-24	api	0010_auto_20180523_1540	2018-08-13 15:53:49.242533+00
-25	api	0011_auto_20180524_1838	2018-08-13 15:53:49.265503+00
-26	api	0012_auto_20180529_1526	2018-08-13 15:53:49.274266+00
-27	api	0013_auto_20180531_1921	2018-08-13 15:53:49.284584+00
-28	api	0014_costusagereportstatus	2018-08-13 15:53:49.305173+00
-29	api	0015_auto_20180614_1343	2018-08-13 15:53:49.329183+00
-30	api	0016_auto_20180802_1911	2018-08-13 15:53:49.34833+00
-31	api	0017_auto_20180808_2134	2018-08-13 15:53:49.368809+00
-32	authtoken	0001_initial	2018-08-13 15:53:49.389593+00
-33	authtoken	0002_auto_20160226_1747	2018-08-13 15:53:49.428051+00
-34	reporting	0001_initial	2018-08-13 15:53:49.615857+00
-35	reporting	0002_auto_20180615_1725	2018-08-13 15:53:50.071003+00
-36	reporting	0003_auto_20180619_1833	2018-08-13 15:53:50.473343+00
-37	reporting	0004_auto_20180803_1926	2018-08-13 15:53:50.516887+00
-38	reporting_common	0001_initial	2018-08-13 15:53:50.528063+00
-39	reporting_common	0002_auto_20180608_1647	2018-08-13 15:53:50.537299+00
-40	reporting_common	0003_costusagereportstatus	2018-08-13 15:53:50.558435+00
-41	reporting_common	0004_siunitscale	2018-08-13 15:53:50.568406+00
-42	reporting_common	0005_auto_20180725_1523	2018-08-13 15:53:50.576567+00
-43	reporting_common	0006_auto_20180802_1911	2018-08-13 15:53:50.586745+00
-44	reporting_common	0007_auto_20180808_2134	2018-08-13 15:53:50.599274+00
-45	sessions	0001_initial	2018-08-13 15:53:50.609656+00
+1	contenttypes	0001_initial	2018-08-15 13:48:40.546859+00
+2	auth	0001_initial	2018-08-15 13:48:40.56667+00
+3	admin	0001_initial	2018-08-15 13:48:40.584273+00
+4	admin	0002_logentry_remove_auto_add	2018-08-15 13:48:40.604564+00
+5	admin	0003_logentry_add_action_flag_choices	2018-08-15 13:48:40.634847+00
+6	contenttypes	0002_remove_content_type_name	2018-08-15 13:48:40.652476+00
+7	auth	0002_alter_permission_name_max_length	2018-08-15 13:48:40.664646+00
+8	auth	0003_alter_user_email_max_length	2018-08-15 13:48:40.680593+00
+9	auth	0004_alter_user_username_opts	2018-08-15 13:48:40.695882+00
+10	auth	0005_alter_user_last_login_null	2018-08-15 13:48:40.710173+00
+11	auth	0006_require_contenttypes_0002	2018-08-15 13:48:40.718281+00
+12	auth	0007_alter_validators_add_error_messages	2018-08-15 13:48:40.734602+00
+13	auth	0008_alter_user_username_max_length	2018-08-15 13:48:40.749633+00
+14	auth	0009_alter_user_last_name_max_length	2018-08-15 13:48:40.765318+00
+15	api	0001_initial	2018-08-15 13:48:40.777329+00
+16	api	0002_auto_20180509_1400	2018-08-15 13:48:40.809733+00
+17	api	0003_auto_20180509_1849	2018-08-15 13:48:40.841614+00
+18	api	0004_auto_20180510_1824	2018-08-15 13:48:40.878862+00
+19	api	0005_auto_20180511_1445	2018-08-15 13:48:40.902875+00
+20	api	0006_resettoken	2018-08-15 13:48:40.921431+00
+21	api	0007_userpreference	2018-08-15 13:48:40.941096+00
+22	api	0008_provider	2018-08-15 13:48:40.982687+00
+23	api	0009_auto_20180523_0045	2018-08-15 13:48:41.003726+00
+24	api	0010_auto_20180523_1540	2018-08-15 13:48:41.042696+00
+25	api	0011_auto_20180524_1838	2018-08-15 13:48:41.063575+00
+26	api	0012_auto_20180529_1526	2018-08-15 13:48:41.075117+00
+27	api	0013_auto_20180531_1921	2018-08-15 13:48:41.087193+00
+28	api	0014_costusagereportstatus	2018-08-15 13:48:41.109671+00
+29	api	0015_auto_20180614_1343	2018-08-15 13:48:41.13199+00
+30	api	0016_auto_20180802_1911	2018-08-15 13:48:41.154275+00
+31	authtoken	0001_initial	2018-08-15 13:48:41.177356+00
+32	authtoken	0002_auto_20160226_1747	2018-08-15 13:48:41.217843+00
+33	reporting	0001_initial	2018-08-15 13:48:41.420463+00
+34	reporting	0002_auto_20180615_1725	2018-08-15 13:48:41.866121+00
+35	reporting	0003_auto_20180619_1833	2018-08-15 13:48:42.185535+00
+36	reporting	0004_auto_20180803_1926	2018-08-15 13:48:42.216778+00
+37	reporting	0005_auto_20180807_1819	2018-08-15 13:48:42.277698+00
+38	reporting_common	0001_initial	2018-08-15 13:48:42.288291+00
+39	reporting_common	0002_auto_20180608_1647	2018-08-15 13:48:42.297079+00
+40	reporting_common	0003_costusagereportstatus	2018-08-15 13:48:42.318384+00
+41	reporting_common	0004_siunitscale	2018-08-15 13:48:42.329659+00
+42	reporting_common	0005_auto_20180725_1523	2018-08-15 13:48:42.341076+00
+43	reporting_common	0006_auto_20180802_1911	2018-08-15 13:48:42.351595+00
+44	reporting_common	0007_auto_20180808_2134	2018-08-15 13:48:42.36176+00
+45	sessions	0001_initial	2018-08-15 13:48:42.372368+00
 \.
 
 
@@ -1803,7 +1803,7 @@ COPY testcustomer.reporting_awscostentrybill (id, billing_resource, bill_type, p
 -- Data for Name: reporting_awscostentrylineitem; Type: TABLE DATA; Schema: testcustomer; Owner: kokuadmin
 --
 
-COPY testcustomer.reporting_awscostentrylineitem (id, tags, invoice_id, line_item_type, usage_account_id, usage_start, usage_end, product_code, usage_type, operation, availability_zone, resource_id, usage_amount, normalization_factor, normalized_usage_amount, currency_code, unblended_rate, unblended_cost, blended_rate, blended_cost, tax_type, cost_entry_id, cost_entry_bill_id, cost_entry_pricing_id, cost_entry_product_id, cost_entry_reservation_id, hash) FROM stdin;
+COPY testcustomer.reporting_awscostentrylineitem (id, tags, invoice_id, line_item_type, usage_account_id, usage_start, usage_end, product_code, usage_type, operation, availability_zone, resource_id, usage_amount, normalization_factor, normalized_usage_amount, currency_code, unblended_rate, unblended_cost, blended_rate, blended_cost, tax_type, cost_entry_id, cost_entry_bill_id, cost_entry_pricing_id, cost_entry_product_id, cost_entry_reservation_id, hash, public_on_demand_cost, public_on_demand_rate) FROM stdin;
 \.
 
 
@@ -1811,7 +1811,7 @@ COPY testcustomer.reporting_awscostentrylineitem (id, tags, invoice_id, line_ite
 -- Data for Name: reporting_awscostentrypricing; Type: TABLE DATA; Schema: testcustomer; Owner: kokuadmin
 --
 
-COPY testcustomer.reporting_awscostentrypricing (id, public_on_demand_cost, public_on_demand_rate, term, unit) FROM stdin;
+COPY testcustomer.reporting_awscostentrypricing (id, term, unit) FROM stdin;
 \.
 
 
@@ -2437,19 +2437,19 @@ ALTER TABLE ONLY testcustomer.reporting_awscostentrylineitem
 
 
 --
--- Name: reporting_awscostentrypricing reporting_awscostentrypr_public_on_demand_cost_pu_cd3c5be0_uniq; Type: CONSTRAINT; Schema: testcustomer; Owner: kokuadmin
---
-
-ALTER TABLE ONLY testcustomer.reporting_awscostentrypricing
-    ADD CONSTRAINT reporting_awscostentrypr_public_on_demand_cost_pu_cd3c5be0_uniq UNIQUE (public_on_demand_cost, public_on_demand_rate, term, unit);
-
-
---
 -- Name: reporting_awscostentrypricing reporting_awscostentrypricing_pkey; Type: CONSTRAINT; Schema: testcustomer; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY testcustomer.reporting_awscostentrypricing
     ADD CONSTRAINT reporting_awscostentrypricing_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: reporting_awscostentrypricing reporting_awscostentrypricing_term_unit_c3978af3_uniq; Type: CONSTRAINT; Schema: testcustomer; Owner: kokuadmin
+--
+
+ALTER TABLE ONLY testcustomer.reporting_awscostentrypricing
+    ADD CONSTRAINT reporting_awscostentrypricing_term_unit_c3978af3_uniq UNIQUE (term, unit);
 
 
 --

@@ -37,6 +37,7 @@ Please use \`make <target>' where <target> is one of:
   oc-create-rabbitmq        create a RabbitMQ broker in an initialized openshift cluster
   oc-create-tags            create image stream tags
   oc-delete-all             delete Openshift objects without a cluster restart
+  oc-dev-db                 run Postgres in an openshift cluster
   oc-down                   stop openshift cluster and all running apps
   oc-forward-ports          port forward the DB to localhost
   oc-login-dev              to login to an openshift cluster as 'developer'
@@ -77,7 +78,7 @@ oc-clean: oc-down
 
 oc-create-all: oc-create-tags oc-create-db oc-create-rabbitmq oc-create-masu
 
-oc-create-db: oc-create-tags oc-create-db
+oc-dev-db: oc-create-tags oc-create-db
 
 oc-create-db:
 	oc process openshift//postgresql-persistent \
@@ -92,6 +93,8 @@ oc-create-db:
 oc-create-masu:
 	oc process -f $(TOPDIR)/openshift/masu-template.yaml \
 		-p SOURCE_REPOSITORY_REF=$(shell git rev-parse --abbrev-ref HEAD) \
+		-p AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) \
+		-p AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY) \
 	| oc create -f -
 
 oc-create-rabbitmq:
@@ -100,8 +103,8 @@ oc-create-rabbitmq:
 	| oc create -f -
 
 oc-create-tags:
-	oc get istag postgresql:$(PGSQL_VERSION) || oc create istag postgresql:$(PGSQL_VERSION)} --from-image=centos/postgresql-96-centos7
-	oc get istag python-36-centos7:latest || oc create istag python-36-centos7:latest --from-image=centos/python-36-centos7
+	oc create istag postgresql:$(PGSQL_VERSION) --from-image=centos/postgresql-96-centos7
+	oc create istag python-36-centos7:latest --from-image=centos/python-36-centos7
 
 oc-delete-all:
 	oc delete is --all && \

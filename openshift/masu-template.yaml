@@ -170,7 +170,8 @@ objects:
       name: ${NAME}
     resources:
       limits:
-        memory: ${MEMORY_LIMIT}
+        cpu: ${MASU_CPU_LIMIT}
+        memory: ${MASU_MEMORY_LIMIT}
     strategy:
       type: Recreate
     template:
@@ -274,7 +275,8 @@ objects:
             timeoutSeconds: 10
           resources:
             limits:
-              memory: ${MEMORY_LIMIT}
+              cpu: ${MASU_CPU_LIMIT}
+              memory: ${MASU_MEMORY_LIMIT}
     triggers:
     - type: ConfigChange
     - imageChangeParams:
@@ -298,8 +300,8 @@ objects:
       name: ${NAME}
     resources:
       limits:
-        cpu: ${CPU_LIMIT}
-        memory: ${MEMORY_LIMIT}
+        cpu: ${CELERY_WORKER_CPU_LIMIT}
+        memory: ${CELERY_WORKER_MEMORY_LIMIT}
     strategy:
       type: Recreate
     template:
@@ -404,7 +406,8 @@ objects:
                   optional: false
           resources:
             limits:
-              memory: ${MEMORY_LIMIT}
+              cpu: ${CELERY_WORKER_CPU_LIMIT}
+              memory: ${CELERY_WORKER_MEMORY_LIMIT}
           volumeMounts:
           - mountPath: /var/tmp/masu/
             name: ${NAME}-data
@@ -435,7 +438,8 @@ objects:
       name: ${NAME}
     resources:
       limits:
-        memory: ${MEMORY_LIMIT}
+        cpu: ${CELERY_FLOWER_CPU_LIMIT}
+        memory: ${CELERY_FLOWER_MEMORY_LIMIT}
     strategy:
       type: Recreate
     template:
@@ -522,7 +526,8 @@ objects:
             timeoutSeconds: 10
           resources:
             limits:
-              memory: ${MEMORY_LIMIT}
+              cpu: ${CELERY_FLOWER_CPU_LIMIT}
+              memory: ${CELERY_FLOWER_MEMORY_LIMIT}
     triggers:
     - type: ConfigChange
     - imageChangeParams:
@@ -564,12 +569,32 @@ parameters:
   value: 1Gi
 - description: Maximum amount of memory the app container can use.
   displayName: Memory Limit
-  name: MEMORY_LIMIT
+  name: MASU_MEMORY_LIMIT
+  required: true
+  value: 1Gi
+- description: Maximum amount of memory the Celery worker container can use.
+  displayName: Memory Limit
+  name: CELERY_WORKER_MEMORY_LIMIT
+  required: true
+  value: 4Gi
+- description: Maximum amount of memory the Flower container can use.
+  displayName: Memory Limit
+  name: CELERY_FLOWER_MEMORY_LIMIT
   required: true
   value: 1Gi
 - description: Maximum amount of CPU the app container can use.
   displayName: CPU Limit
-  name: CPU_LIMIT
+  name: MASU_CPU_LIMIT
+  required: true
+  value: '1'
+- description: Maximum amount of CPU the Celery Worker container can use.
+  displayName: CPU Limit
+  name: CELERY_WORKER_CPU_LIMIT
+  required: true
+  value: '4'
+- description: Maximum amount of CPU the Flower container can use.
+  displayName: CPU Limit
+  name: CELERY_FLOWER_CPU_LIMIT
   required: true
   value: '1'
 - description: The URL of the repository with your application source code.

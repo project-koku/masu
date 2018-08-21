@@ -456,7 +456,10 @@ class ReportProcessorTest(MasuTestCase):
         """Test that an already processed product id is returned."""
         expected_id = random.randint(1,9)
         sku = self.row.get('product/sku')
-        self.processor.processed_report.products.update({sku: expected_id})
+        product_name = self.row.get('product/ProductName')
+        region = self.row.get('product/region')
+        key = (sku, product_name, region)
+        self.processor.processed_report.products.update({key: expected_id})
 
         product_id = self.processor._create_cost_entry_product(self.row)
 
@@ -466,7 +469,10 @@ class ReportProcessorTest(MasuTestCase):
         """Test that a previously existing product id is returned."""
         expected_id = random.randint(1,9)
         sku = self.row.get('product/sku')
-        self.processor.existing_product_map.update({sku: expected_id})
+        product_name = self.row.get('product/ProductName')
+        region = self.row.get('product/region')
+        key = (sku, product_name, region)
+        self.processor.existing_product_map.update({key: expected_id})
 
         product_id = self.processor._create_cost_entry_product(self.row)
 
@@ -539,6 +545,43 @@ class ReportProcessorTest(MasuTestCase):
 
         self.assertEqual(reservation_id, id_in_db)
 
+    def test_create_cost_entry_reservation_update(self):
+        """Test that a cost entry reservation id is returned."""
+        # Ensure a reservation exists on the row
+        arn = 'TestARN'
+        row = copy.deepcopy(self.row)
+        row['reservation/ReservationARN'] = arn
+        row['reservation/NumberOfReservations'] = 1
+
+        table_name = AWS_CUR_TABLE_MAP['reservation']
+        table = getattr(self.report_schema, table_name)
+        id_column = getattr(table, 'id')
+
+        reservation_id = self.processor._create_cost_entry_reservation(row)
+
+        self.accessor.commit()
+
+        self.assertIsNotNone(reservation_id)
+
+        query = self.accessor._get_db_obj_query(table_name)
+        id_in_db = query.order_by(id_column.desc()).first().id
+
+        self.assertEqual(reservation_id, id_in_db)
+
+        row['lineItem/LineItemType'] = 'RIFee'
+        res_count = row['reservation/NumberOfReservations']
+        row['reservation/NumberOfReservations'] = res_count + 1
+        reservation_id = self.processor._create_cost_entry_reservation(row)
+        self.accessor.commit()
+
+        self.assertEqual(reservation_id, id_in_db)
+
+        db_row = query.filter_by(id=id_in_db).first()
+        self.assertEqual(db_row.number_of_reservations,
+                         row['reservation/NumberOfReservations'])
+
+
+
     def test_create_cost_entry_reservation_already_processed(self):
         """Test that an already processed reservation id is returned."""
         expected_id = random.randint(1,9)
@@ -594,7 +637,8 @@ class ReportProcessorTest(MasuTestCase):
 
         line_item = common_util.stringify_json_data(copy.deepcopy(line_item))
         line_item.pop('hash')
-        data = [line_item.get(column) for column in self.processor.hash_columns]
+        data = [line_item.get(column, 'None')
+                for column in self.processor.hash_columns]
         expected = ':'.join(data)
 
         result = self.processor._create_line_item_hash_string(line_item)

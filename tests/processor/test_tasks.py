@@ -19,6 +19,8 @@
 
 import random
 import string
+import shutil
+import tempfile
 import logging
 from datetime import datetime, timedelta
 
@@ -89,7 +91,9 @@ class ProcessReportFileTests(MasuTestCase):
     @patch('masu.processor._tasks.process.ReportStatsDBAccessor')
     def test_process_file(self, mock_accessor, mock_processor):
         """Test the process_report_file functionality."""
-        request = {'report_path': '/test/path/file1.csv',
+        report_dir = tempfile.mkdtemp()
+        path = '{}/{}'.format(report_dir, 'file1.csv')
+        request = {'report_path': path,
                    'compression': 'gzip',
                    'schema_name': 'testcustomer'}
 
@@ -102,6 +106,8 @@ class ProcessReportFileTests(MasuTestCase):
         mock_acc.log_last_started_datetime.assert_called()
         mock_acc.log_last_completed_datetime.assert_called()
         mock_acc.commit.assert_called()
+        shutil.rmtree(report_dir)
+
 
 
 class TestProcessorTasks(MasuTestCase):

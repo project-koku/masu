@@ -32,16 +32,20 @@ Please use \`make <target>' where <target> is one of:
 --- Commands using an OpenShift Cluster ---
   oc-clean                  stop openshift cluster & remove local config data
   oc-create-all             run all application services in openshift cluster
-  oc-create-db              create a Postgres DB in an initialized openshift cluster
-  oc-create-masu            create the masu app in an initialized openshift cluster
-  oc-create-rabbitmq        create a RabbitMQ broker in an initialized openshift cluster
+  oc-create-configmap       create configmaps in openshift cluster
+  oc-create-db              create a Postgres DB in an openshift cluster
+  oc-create-flower          create the celery monitoring app in an openshift cluster
+  oc-create-masu            create the masu app in an openshift cluster
+  oc-create-rabbitmq        create a RabbitMQ broker in an openshift cluster
+  oc-create-secrets         create secrets in openshift cluster
   oc-create-tags            create image stream tags
+  oc-create-worker          create the celery worker in an openshift cluster
   oc-delete-all             delete Openshift objects without a cluster restart
   oc-dev-db                 run Postgres in an openshift cluster
   oc-down                   stop openshift cluster and all running apps
   oc-forward-ports          port forward the DB to localhost
   oc-login-dev              to login to an openshift cluster as 'developer'
-  oc-reinit                 remove existing app and restart app in initialized openshift cluster
+  oc-reinit                 remove existing app and restart app in openshift cluster
   oc-serve                  run Flask server locally against an Openshift DB
   oc-stop-forwarding-ports  stop port forwarding the DB to localhost
   oc-test-db                create database schemas and tables
@@ -76,11 +80,16 @@ serve:
 oc-clean: oc-down
 	$(PREFIX) rm -rf $(OC_DATA_DIR)
 
-oc-create-all: oc-create-tags oc-create-db oc-create-rabbitmq oc-create-masu
+oc-create-all: oc-create-tags oc-create-configmap oc-create-secrets oc-create-db oc-create-rabbitmq oc-create-masu oc-create-worker oc-create-flower
 
-oc-dev-db: oc-create-tags oc-create-db
+oc-create-configmap:
+	oc get configmap/masu || \
+	oc process -f $(TOPDIR)/openshift/configmap.yaml \
+		   --param-file=$(TOPDIR)/openshift/configmap.env \
+	| oc create -f -
 
 oc-create-db:
+	oc get dc/koku-pgsql || \
 	oc process openshift//postgresql-persistent \
 		-p NAMESPACE=myproject \
 		-p POSTGRESQL_USER=kokuadmin \
@@ -90,21 +99,46 @@ oc-create-db:
 		-p DATABASE_SERVICE_NAME=koku-pgsql \
 	| oc create -f -
 
-oc-create-masu:
-	oc process -f $(TOPDIR)/openshift/masu-template.yaml \
+oc-create-flower: oc-create-configmap
+	oc get bc/masu-flower dc/masu-flower || \
+	oc process -f $(TOPDIR)/openshift/flower.yaml \
+		--param-file=$(TOPDIR)/openshift/flower.env \
 		-p SOURCE_REPOSITORY_REF=$(shell git rev-parse --abbrev-ref HEAD) \
-		-p AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) \
-		-p AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY) \
+	| oc create -f -
+
+oc-create-masu: oc-create-configmap oc-create-secrets
+	oc get bc/masu dc/masu || \
+	oc process -f $(TOPDIR)/openshift/masu.yaml \
+		--param-file=$(TOPDIR)/openshift/masu.env \
+		-p SOURCE_REPOSITORY_REF=$(shell git rev-parse --abbrev-ref HEAD) \
 	| oc create -f -
 
 oc-create-rabbitmq:
+	oc get statefulsets/rabbitmq || \
 	oc process -f $(TOPDIR)/openshift/rabbitmq.yaml \
 		-p SOURCE_REPOSITORY_REF=$(shell git rev-parse --abbrev-ref HEAD) \
 	| oc create -f -
 
+oc-create-secrets:
+	oc get secret/masu || \
+	oc process -f $(TOPDIR)/openshift/secrets.yaml \
+		   --param-file=$(TOPDIR)/openshift/secrets.env \
+	| oc create -f -
+
 oc-create-tags:
-	oc create istag postgresql:$(PGSQL_VERSION) --from-image=centos/postgresql-96-centos7
-	oc create istag python-36-centos7:latest --from-image=centos/python-36-centos7
+	oc get is/postgresql || \
+		oc create istag postgresql:$(PGSQL_VERSION) \
+			--from-image=centos/postgresql-96-centos7
+	oc get is/python-36-centos7 || \
+		oc create istag python-36-centos7:latest \
+			--from-image=centos/python-36-centos7
+
+oc-create-worker: oc-create-configmap oc-create-secrets
+	oc get bc/masu-worker dc/masu-worker || \
+	oc process -f $(TOPDIR)/openshift/worker.yaml \
+		--param-file=$(TOPDIR)/openshift/worker.env \
+		-p SOURCE_REPOSITORY_REF=$(shell git rev-parse --abbrev-ref HEAD) \
+	| oc create -f -
 
 oc-delete-all:
 	oc delete is --all && \
@@ -117,6 +151,8 @@ oc-delete-all:
 	oc delete configmap/masu \
 		secret/masu \
 		secret/koku-pgsql \
+
+oc-dev-db: oc-create-tags oc-create-db
 
 oc-down:
 	oc cluster down

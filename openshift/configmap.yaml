@@ -1,0 +1,51 @@
+kind: Template
+apiVersion: v1
+metadata:
+  name: masu-template
+  annotations:
+    openshift.io/display-name: "Masu"
+    description: "Data ingestion engine for Koku"
+    tags: "python,flask"
+    iconClass: "icon-python"
+    openshift.io/long-description: "This template defines resources needed to run the Masu application, including a build configuration and an application deployment configuration."
+    openshift.io/provider-display-name: "Red Hat, Inc."
+    openshift.io/documentation-url: "https://koku.readthedocs.io/en/latest/"
+labels:
+  app: masu
+  template: masu-template
+objects:
+- kind: ConfigMap
+  apiVersion: v1
+  metadata:
+    name: ${NAME}
+    labels:
+      name: ${NAME}
+  data:
+    database-engine: postgresql
+    database-name: koku
+    database-service-name: POSTGRES_SQL
+    postgres-sql-service-host: ${DATABASE_SERVICE_NAME}.${NAMESPACE}.svc
+    postgres-sql-service-port: "5432"
+    app-config: /opt/app-root/src/masu/gunicorn.py
+    app-home: /opt/app-root/src/masu
+    app-module: masu.__init__:create_app()
+    rabbitmq-host: rabbitmq.${NAMESPACE}.svc
+    log-level: INFO
+    worker-queues: 'celery,download,process,remove_expired'
+    schedule-check-interval: "60"
+    remove-expired-data-on-day: "1"
+parameters:
+- description: The name assigned to all frontend objects defined in this template.
+  displayName: Name
+  name: NAME
+  required: true
+  value: masu
+- description: The OpenShift Namespace where the ImageStream resides.
+  displayName: Namespace
+  name: NAMESPACE
+  required: true
+  value: myproject
+- displayName: Database Service Name
+  name: DATABASE_SERVICE_NAME
+  required: true
+  value: koku-pgsql

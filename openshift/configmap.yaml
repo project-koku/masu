@@ -45,7 +45,8 @@ parameters:
   name: NAMESPACE
   required: true
   value: myproject
-- displayName: Database Service Name
+- description: Database Service Name
+  displayName: Database Service Name
   name: DATABASE_SERVICE_NAME
   required: true
   value: koku-pgsql

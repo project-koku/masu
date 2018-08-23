@@ -65,7 +65,7 @@ objects:
         uri: ${SOURCE_REPOSITORY_URL}
       type: Git
     strategy:
-      sourceStrategy:
+      dockerStrategy:
         env:
           - name: PIP_INDEX_URL
             value: ${PIP_INDEX_URL}
@@ -129,11 +129,7 @@ objects:
         - name: ${NAME}-flower
           image: ${NAME}-flower
           command:
-            - /bin/bash
-            - -c
-            - >
-              PYTHONPATH=. scl enable rh-python36 --
-              flower -A masu.celery.worker
+            - /opt/app-root/src/run-flower.sh
           env:
             - name: DATABASE_USER
               valueFrom:
@@ -153,6 +149,42 @@ objects:
                   key: masu-secret-key
                   name: ${NAME}
                   optional: false
+            - name: FLOWER_AUTH_SCHEME
+              valueFrom:
+                secretKeyRef:
+                  key: flower-auth-scheme
+                  name: ${NAME}
+                  optional: true
+            - name: FLOWER_BASIC_AUTH_PARAMS
+              valueFrom:
+                secretKeyRef:
+                  key: flower-basic-auth-params
+                  name: ${NAME}
+                  optional: true
+            - name: FLOWER_OAUTH2_KEY
+              valueFrom:
+                secretKeyRef:
+                  key: flower-oauth2-key
+                  name: ${NAME}
+                  optional: true
+            - name: FLOWER_OAUTH2_SECRET
+              valueFrom:
+                secretKeyRef:
+                  key: flower-oauth2-secret
+                  name: ${NAME}
+                  optional: true
+            - name: FLOWER_OAUTH2_REDIRECT_URI
+              valueFrom:
+                secretKeyRef:
+                  key: flower-oauth2-redirect-uri
+                  name: ${NAME}
+                  optional: true
+            - name: FLOWER_OAUTH2_DOMAINS
+              valueFrom:
+                secretKeyRef:
+                  key: flower-oauth2-domains
+                  name: ${NAME}
+                  optional: true
             - name: DATABASE_ENGINE
               valueFrom:
                 configMapKeyRef:
@@ -192,11 +224,9 @@ objects:
             successThreshold: 1
             timeoutSeconds: 3
           readinessProbe:
-            httpGet:
-              path: /
+            tcpSocket:
               port: 5555
-              scheme: HTTP
-            initialDelaySeconds: 60
+            initialDelaySeconds: 30
             periodSeconds: 60
             successThreshold: 1
             failureThreshold: 3

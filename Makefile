@@ -99,7 +99,7 @@ oc-create-db:
 		-p DATABASE_SERVICE_NAME=koku-pgsql \
 	| oc create -f -
 
-oc-create-flower: oc-create-configmap
+oc-create-flower: oc-create-configmap oc-create-secrets
 	oc get bc/masu-flower dc/masu-flower || \
 	oc process -f $(TOPDIR)/openshift/flower.yaml \
 		--param-file=$(TOPDIR)/openshift/flower.env \

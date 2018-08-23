@@ -22,11 +22,13 @@ import string
 import shutil
 import tempfile
 import logging
+import os
 from datetime import datetime, timedelta
 
 import faker
 from unittest.mock import call, patch, Mock
 
+from masu.config import Config
 from masu.database.report_stats_db_accessor import ReportStatsDBAccessor
 from masu.external.report_downloader import ReportDownloaderError
 from masu.processor.expired_data_remover import ExpiredDataRemover
@@ -69,6 +71,48 @@ class GetReportFileTests(MasuTestCase):
 
         self.assertIsInstance(report, list)
         self.assertGreater(len(report), 0)
+
+    @patch('masu.processor._tasks.download.ReportDownloader._set_downloader',
+           return_value=FakeDownloader)
+    def test_disk_status_logging(self, fake_downloader):
+        """Test task for logging when temp directory exists."""
+        logging.disable(logging.NOTSET)
+
+        os.makedirs(Config.TMP_DIR, exist_ok=True)
+
+        account = fake_arn(service='iam', generate_account_id=True)
+        expected = 'INFO:masu.processor._tasks.download:Avaiable disk space'
+        with self.assertLogs('masu.processor._tasks.download', level='INFO') as logger:
+            _get_report_files(customer_name=self.fake.word(),
+                              authentication=account,
+                              provider_type='AWS',
+                              report_name=self.fake.word(),
+                              billing_source=self.fake.word())
+            statement_found = False
+            for log in logger.output:
+                if expected in log:
+                    statement_found = True
+            self.assertTrue(statement_found)
+
+        shutil.rmtree(Config.TMP_DIR, ignore_errors=True)
+
+    @patch('masu.processor._tasks.download.ReportDownloader._set_downloader',
+           return_value=FakeDownloader)
+    def test_disk_status_logging_no_dir(self, fake_downloader):
+        """Test task for logging when temp directory does not exist."""
+        logging.disable(logging.NOTSET)
+
+        shutil.rmtree(Config.TMP_DIR, ignore_errors=True)
+
+        account = fake_arn(service='iam', generate_account_id=True)
+        expected = 'INFO:masu.processor._tasks.download:Unable to find avaiable disk space. {} does not exist'.format(Config.TMP_DIR)
+        with self.assertLogs('masu.processor._tasks.download', level='INFO') as logger:
+            _get_report_files(customer_name=self.fake.word(),
+                              authentication=account,
+                              provider_type='AWS',
+                              report_name=self.fake.word(),
+                              billing_source=self.fake.word())
+            self.assertIn(expected, logger.output)
 
     @patch('masu.processor._tasks.download.ReportDownloader._set_downloader',
            side_effect=Exception('only a test'))

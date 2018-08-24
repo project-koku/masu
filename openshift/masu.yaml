@@ -4,7 +4,7 @@ metadata:
   name: masu-template
   annotations:
     openshift.io/display-name: "Masu"
-    description: "Data ingestion engine for Koku"
+    description: "App and API for data ingestion engine for Koku"
     tags: "python,flask"
     iconClass: "icon-python"
     openshift.io/long-description: "This template defines resources needed to run the Masu application, including a build configuration and an application deployment configuration."

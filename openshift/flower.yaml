@@ -56,6 +56,8 @@ objects:
         kind: ImageStreamTag
         name: ${NAME}-flower:latest
     resources:
+      requests:
+        memory: ${BUILD_MEMORY_REQUEST}
       limits:
         memory: ${BUILD_MEMORY_LIMIT}
     source:
@@ -110,10 +112,13 @@ objects:
     labels:
       app: ${NAME}
   spec:
-    replicas: 1
+    replicas: ${CELERY_FLOWER_REPLICAS}
     selector:
       name: ${NAME}-flower
     resources:
+      requests:
+        cpu: ${CELERY_FLOWER_CPU_REQUEST}
+        memory: ${CELERY_FLOWER_MEMORY_REQUEST}
       limits:
         cpu: ${CELERY_FLOWER_CPU_LIMIT}
         memory: ${CELERY_FLOWER_MEMORY_LIMIT}
@@ -232,6 +237,9 @@ objects:
             failureThreshold: 3
             timeoutSeconds: 10
           resources:
+            requests:
+              cpu: ${CELERY_FLOWER_CPU_REQUEST}
+              memory: ${CELERY_FLOWER_MEMORY_REQUEST}
             limits:
               cpu: ${CELERY_FLOWER_CPU_LIMIT}
               memory: ${CELERY_FLOWER_MEMORY_LIMIT}
@@ -264,18 +272,38 @@ parameters:
   name: NAMESPACE
   required: true
   value: myproject
+- description: Number of Celery Flower replicas
+  displayName: Celery Flower Replica count
+  name: CELERY_FLOWER_REPLICAS
+  required: true
+  value: '1'
+- description: Initial amount of memory the Flower container will request.
+  displayName: Celery Flower Memory Resource Request
+  name: CELERY_FLOWER_MEMORY_REQUEST
+  required: true
+  value: 512Mi
 - description: Maximum amount of memory the Flower container can use.
-  displayName: Memory Limit
+  displayName: Celery Flower Memory Resource Limit
   name: CELERY_FLOWER_MEMORY_LIMIT
   required: true
   value: 1Gi
+- description: Initial amount of CPU the Flower container will request.
+  displayName: Celery Flower CPU Resource Request
+  name: CELERY_FLOWER_CPU_REQUEST
+  required: true
+  value: 500m
 - description: Maximum amount of CPU the Flower container can use.
-  displayName: CPU Limit
+  displayName: Celery Flower CPU Resource Limit
   name: CELERY_FLOWER_CPU_LIMIT
   required: true
   value: '1'
+- description: Initial amount of memory the build container will request.
+  displayName: Build Memory Resource Request
+  name: BUILD_MEMORY_REQUEST
+  required: true
+  value: 512Mi
 - description: Maximum amount of memory the build container can use.
-  displayName: Build Memory Limit
+  displayName: Build Memory Resource Limit
   name: BUILD_MEMORY_LIMIT
   required: true
   value: 1Gi

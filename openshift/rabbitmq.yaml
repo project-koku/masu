@@ -57,7 +57,7 @@ objects:
       application: ${APPLICATION_NAME}
     name: ${APPLICATION_NAME}
   spec:
-    replicas: 3
+    replicas: ${RABBITMQ_REPLICAS}
     selector:
       matchLabels:
         application: ${APPLICATION_NAME}
@@ -97,6 +97,9 @@ objects:
           - containerPort: 5672
             protocol: TCP
           resources:
+            requests:
+              cpu: ${CPU_REQUEST}
+              memory: ${MEMORY_REQUEST}
             limits:
               cpu: ${CPU_LIMIT}
               memory: ${MEMORY_LIMIT}
@@ -240,11 +243,26 @@ parameters:
   name: RABBITMQ_ERLANG_COOKIE
   from: '[a-zA-Z0-9]{16}'
   generate: expression
+- description: Number of RabbitMQ Replicas to create
+  displayName: RabbitMQ Replicas
+  name: RABBITMQ_REPLICAS
+  required: true
+  value: '3'
+- description: Initial amount of memory the app container will request.
+  displayName: Memory Request
+  name: MEMORY_REQUEST
+  required: true
+  value: 512Mi
 - description: Maximum amount of memory the app container can use.
   displayName: Memory Limit
   name: MEMORY_LIMIT
   required: true
   value: 1Gi
+- description: Initial amount of CPU the app container will request.
+  displayName: CPU Request
+  name: CPU_REQUEST
+  required: true
+  value: '500m'
 - description: Maximum amount of CPU the app container can use.
   displayName: CPU Limit
   name: CPU_LIMIT

@@ -81,7 +81,12 @@ class ReportProcessorTest(MasuTestCase):
         cls.report_schema = cls.accessor.report_schema
         cls.session = cls.accessor._session
 
-        cls.report_tables = list(AWS_CUR_TABLE_MAP.values())
+
+        _report_tables = copy.deepcopy(AWS_CUR_TABLE_MAP)
+        _report_tables.pop('line_item_daily', None)
+        _report_tables.pop('line_item_daily_summary', None)
+        _report_tables.pop('line_item_aggregates', None)
+        cls.report_tables = list(_report_tables.values())
         # Grab a single row of test data to work with
         with open(cls.test_report, 'r') as f:
             reader = csv.DictReader(f)
@@ -135,14 +140,14 @@ class ReportProcessorTest(MasuTestCase):
         report_schema = report_db.report_schema
         for table_name in self.report_tables:
             table = getattr(report_schema, table_name)
-            count = report_db.session.query(table).count()
+            count = report_db._session.query(table).count()
             counts[table_name] = count
 
         processor.process()
 
         for table_name in self.report_tables:
             table = getattr(report_schema, table_name)
-            count = report_db.session.query(table).count()
+            count = report_db._session.query(table).count()
 
             if table_name == 'reporting_awscostentryreservation':
                 self.assertTrue(count >= counts[table_name])
@@ -164,14 +169,14 @@ class ReportProcessorTest(MasuTestCase):
         report_schema = report_db.report_schema
         for table_name in self.report_tables:
             table = getattr(report_schema, table_name)
-            count = report_db.session.query(table).count()
+            count = report_db._session.query(table).count()
             counts[table_name] = count
 
         processor.process()
 
         for table_name in self.report_tables:
             table = getattr(report_schema, table_name)
-            count = report_db.session.query(table).count()
+            count = report_db._session.query(table).count()
 
             if table_name == 'reporting_awscostentryreservation':
                 self.assertTrue(count >= counts[table_name])
@@ -197,7 +202,7 @@ class ReportProcessorTest(MasuTestCase):
 
         for table_name in self.report_tables:
             table = getattr(report_schema, table_name)
-            count = report_db.session.query(table).count()
+            count = report_db._session.query(table).count()
             counts[table_name] = count
 
         processor = ReportProcessor(
@@ -210,7 +215,7 @@ class ReportProcessorTest(MasuTestCase):
 
         for table_name in self.report_tables:
             table = getattr(report_schema, table_name)
-            count = report_db.session.query(table).count()
+            count = report_db._session.query(table).count()
             self.assertTrue(count == counts[table_name])
 
     def test_get_file_opener_default(self):

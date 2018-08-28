@@ -31,7 +31,7 @@ objects:
     app-module: masu.__init__:create_app()
     rabbitmq-host: rabbitmq.${NAMESPACE}.svc
     log-level: INFO
-    worker-queues: 'celery,download,process,remove_expired'
+    worker-queues: 'celery,download,process,remove_expired,reporting'
     schedule-check-interval: "60"
     remove-expired-data-on-day: "1"
 parameters:

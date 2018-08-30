@@ -437,6 +437,11 @@ class TestUpdateSummaryTablesTasks(MasuTestCase):
             cls.accessor.report_schema.column_types
         )
 
+    @classmethod
+    def tearDownClass(cls):
+        cls.accessor.close_connections()
+        cls.accessor.close_session()
+
     def setUp(self):
         """Set up each test."""
         super().setUp()

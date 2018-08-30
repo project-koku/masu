@@ -268,6 +268,8 @@ class AWSReportDownloaderTest(MasuTestCase):
 
             stats_recorder2 = ReportStatsDBAccessor(file_name)
             self.assertIsNone(stats_recorder2.get_etag())
+            stats_recorder.close_session()
+            stats_recorder2.close_session()
 
 
     @mock_s3

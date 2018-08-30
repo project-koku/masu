@@ -92,6 +92,11 @@ class ReportProcessorTest(MasuTestCase):
             reader = csv.DictReader(f)
             cls.row = next(reader)
 
+    @classmethod
+    def tearDownClass(cls):
+        cls.accessor.close_connections()
+        cls.accessor.close_session()
+
     def tearDown(self):
         """Return the database to a pre-test state."""
         self.session.rollback()

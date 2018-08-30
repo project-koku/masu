@@ -32,6 +32,7 @@ class ReportStatsDBAccessorTest(MasuTestCase):
 
         saver.remove()
         saver.commit()
+        saver.close_session()
 
     def test_initializer_preexisting_report(self):
         """Test getting a new accessor stats on a preexisting report."""
@@ -59,6 +60,8 @@ class ReportStatsDBAccessorTest(MasuTestCase):
 
         saver.remove()
         saver.commit()
+        saver.close_session()
+        saver2.close_session()
 
     def test_add_remove(self):
         """Test basic add/remove logic."""
@@ -73,6 +76,7 @@ class ReportStatsDBAccessorTest(MasuTestCase):
         saver.commit()
         returned_obj = saver._get_db_obj_query()
         self.assertIsNone(returned_obj.first())
+        saver.close_session()
 
     def test_update(self):
         """Test updating an existing row."""
@@ -119,6 +123,7 @@ class ReportStatsDBAccessorTest(MasuTestCase):
         saver.commit()
         returned_obj = saver._get_db_obj_query()
         self.assertIsNone(returned_obj.first())
+        saver.close_session()
 
     def test_log_last_started_datetime(self):
         """Test convience function for last started processing time."""
@@ -129,6 +134,7 @@ class ReportStatsDBAccessorTest(MasuTestCase):
 
         saver.remove()
         saver.commit()
+        saver.close_session()
 
     def test_log_last_completed_datetime(self):
         """Test convience function for last completed processing time."""
@@ -139,3 +145,4 @@ class ReportStatsDBAccessorTest(MasuTestCase):
 
         saver.remove()
         saver.commit()
+        saver.close_session()

@@ -32,7 +32,8 @@ class MasuTestCase(TestCase):
                 'TESTING': True,
                 'SQLALCHEMY_TRACK_MODIFICATIONS': False,
                 'SQLALCHEMY_DATABASE_URI': 'sqlite:///test.db',
-                'REMOVE_EXPIRED_REPORT_DATA_ON_DAY': '1'
+                'REMOVE_EXPIRED_REPORT_DATA_ON_DAY': '1',
+                'REMOVE_EXPIRED_REPORT_UTC_TIME': '00:00'
                 #'CELERY_RESULT_BACKEND': 'db+sqlite:///test.db'
             }
         )

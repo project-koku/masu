@@ -192,6 +192,12 @@ objects:
                   name: ${NAME}
                   key: remove-expired-data-on-day
                   optional: false
+            - name: REMOVE_EXPIRED_REPORT_UTC_TIME
+              valueFrom:
+                configMapKeyRef:
+                  name: ${NAME}
+                  key: remove-expired-data-utc-time
+                  optional: false
           resources:
             limits:
               cpu: ${CELERY_WORKER_CPU_LIMIT}

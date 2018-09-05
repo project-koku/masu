@@ -34,6 +34,7 @@ objects:
     worker-queues: 'celery,download,process,remove_expired,reporting'
     schedule-check-interval: "60"
     remove-expired-data-on-day: "1"
+    remove-expired-data-utc-time: "00:00"
 parameters:
 - description: The name assigned to all frontend objects defined in this template.
   displayName: Name

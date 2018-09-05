@@ -128,13 +128,12 @@ class GetReportFileTests(MasuTestCase):
         """Test task"""
         account = fake_arn(service='iam', generate_account_id=True)
 
-        report = _get_report_files(customer_name=self.fake.word(),
-                                   authentication=account,
-                                   provider_type='AWS',
-                                   report_name=self.fake.word(),
-                                   billing_source=self.fake.word())
-
-        self.assertEqual(report, [])
+        with self.assertRaises(Exception):
+            _get_report_files(customer_name=self.fake.word(),
+                              authentication=account,
+                              provider_type='AWS',
+                              report_name=self.fake.word(),
+                              billing_source=self.fake.word())
 
 class ProcessReportFileTests(MasuTestCase):
     """Test Cases for the Orchestrator object."""
@@ -216,7 +215,7 @@ class TestProcessorTasks(MasuTestCase):
 
         mock_process_files.delay.has_calls(expected_calls, any_order=True)
 
-    @patch('masu.processor._tasks.download._get_report_files',
+    @patch('masu.processor.tasks._get_report_files',
            return_value=[])
     @patch('masu.processor.tasks.process_report_file')
     def test_get_report_files_second_task_not_called(self,

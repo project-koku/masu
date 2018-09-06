@@ -31,11 +31,13 @@ from unittest.mock import ANY, Mock, patch, PropertyMock
 from celery.events.event import Event
 from masu import create_app
 from masu.api import API_VERSION
-from masu.api.status import ApplicationStatus, get_status
+from masu.api.status import (BROKER_CONNECTION_ERROR,
+                             CELERY_WORKER_NOT_FOUND,
+                             ApplicationStatus,
+                             get_status)
 from tests import MasuTestCase
 
 
-@patch('masu.api.status.celery_app', autospec=True)
 class StatusAPITest(MasuTestCase):
     """Test Cases for the Status API."""
 
@@ -43,7 +45,7 @@ class StatusAPITest(MasuTestCase):
         super().setUp()
         logging.disable(logging.NOTSET)
 
-    def test_status(self, mock_celery):
+    def test_status(self):
         """Test the status endpoint."""
         response = self.client.get('/api/v1/status/')
         body = response.json
@@ -73,14 +75,14 @@ class StatusAPITest(MasuTestCase):
 
 
     @patch.dict(os.environ, {'OPENSHIFT_BUILD_COMMIT': 'fake_commit_hash'})
-    def test_commit_with_env(self, mock_celery):
+    def test_commit_with_env(self):
         """Test the commit method via environment."""
         result = ApplicationStatus().commit
         self.assertEqual(result, 'fake_commit_hash')
 
     @patch('masu.api.status.subprocess.run')
     @patch('masu.api.status.os.environ.get', return_value=dict())
-    def test_commit_with_subprocess(self, mock_os, mock_subprocess, mock_celery):
+    def test_commit_with_subprocess(self, mock_os, mock_subprocess):
         """Test the commit method via subprocess."""
         expected = 'buildnum'
 
@@ -98,7 +100,7 @@ class StatusAPITest(MasuTestCase):
 
     @patch('masu.api.status.subprocess.run')
     @patch('masu.api.status.os.environ.get', return_value=dict())
-    def test_commit_with_subprocess_nostdout(self, mock_os, mock_subprocess, mock_celery):
+    def test_commit_with_subprocess_nostdout(self, mock_os, mock_subprocess):
         """Test the commit method via subprocess when stdout is none."""
         expected = 'buildnum'
 
@@ -115,7 +117,7 @@ class StatusAPITest(MasuTestCase):
         self.assertIsNone(result.stdout)
 
     @patch('masu.api.status.platform.uname')
-    def test_platform_info(self, mock_platform, mock_celery):
+    def test_platform_info(self, mock_platform):
         """Test the platform_info method."""
         platform_record = namedtuple('Platform', ['os', 'version'])
         a_plat = platform_record('Red Hat', '7.4')
@@ -125,7 +127,7 @@ class StatusAPITest(MasuTestCase):
         self.assertEqual(result['version'], '7.4')
 
     @patch('masu.api.status.sys.version')
-    def test_python_version(self, mock_sys_ver, mock_celery):
+    def test_python_version(self, mock_sys_ver):
         """Test the python_version method."""
         expected = 'Python 3.6'
         mock_sys_ver.replace.return_value = expected
@@ -133,7 +135,7 @@ class StatusAPITest(MasuTestCase):
         self.assertEqual(result, expected)
 
     @patch('masu.api.status.sys.modules')
-    def test_modules(self, mock_modules, mock_celery):
+    def test_modules(self, mock_modules):
         """Test the modules method."""
         expected = {'module1': 'version1',
                     'module2': 'version2'}
@@ -145,13 +147,13 @@ class StatusAPITest(MasuTestCase):
         self.assertEqual(result, expected)
 
     @patch('masu.api.status.LOG.info')
-    def test_startup_with_modules(self, mock_logger, mock_celery):
+    def test_startup_with_modules(self, mock_logger):
         """Test the startup method with a module list."""
         ApplicationStatus().startup()
         mock_logger.assert_called_with(ANY, ANY)
 
     @patch('masu.api.status.ApplicationStatus.modules', new_callable=PropertyMock)
-    def test_startup_without_modules(self, mock_mods, mock_celery):
+    def test_startup_without_modules(self, mock_mods):
         """Test the startup method without a module list."""
         mock_mods.return_value = {}
         expected = 'INFO:masu.api.status:Modules: None'
@@ -161,7 +163,7 @@ class StatusAPITest(MasuTestCase):
             self.assertIn(expected, logger.output)
 
     @patch('masu.external.date_accessor.DateAccessor.today')
-    def test_get_datetime(self, mock_date, mock_celery):
+    def test_get_datetime(self, mock_date):
         """Test the startup method for datetime."""
         mock_date_string = '2018-07-25 10:41:59.993536'
         mock_date_obj = datetime.strptime(mock_date_string, '%Y-%m-%d %H:%M:%S.%f')
@@ -171,63 +173,72 @@ class StatusAPITest(MasuTestCase):
             ApplicationStatus().startup()
             self.assertIn(str(expected), logger.output)
 
-    def test_get_debug(self, mock_celery):
+    def test_get_debug(self):
         """Test the startup method for debug state."""
         expected = 'INFO:masu.api.status:DEBUG enabled: {}'.format(str(False))
         with self.assertLogs('masu.api.status', level='INFO') as logger:
             ApplicationStatus().startup()
             self.assertIn(str(expected), logger.output)
 
+    @patch('masu.api.status.celery_app')
     def test_startup_has_celery_status(self, mock_celery):
         """test celery status is in startup() output."""
-        expected = 'INFO:masu.api.status:Celery Status: {}'
+        expected_status = {'Status': 'OK'}
+        expected = f'INFO:masu.api.status:Celery Status: {expected_status}'
+
+        mock_control = mock_celery.control
+        mock_control.inspect.return_value.stats.return_value = expected_status
 
         with self.assertLogs('masu.api.status', level='INFO') as logger:
             ApplicationStatus().startup()
             self.assertIn(expected, logger.output)
 
-    def test_celery_status_timeout(self, mock_celery):
-        """test celery status handles timeout."""
-        mock_celery.events.Receiver.return_value.capture.side_effect = socket.timeout
-        expected_log = 'INFO:masu.api.status:Timeout connecting to message broker.'
+    @patch('masu.api.status.celery_app')
+    def test_celery_status(self, mock_celery):
+        """Test that an error status is returned when Celery is down."""
+        expected_status = {'Status': 'OK'}
+        mock_control = mock_celery.control
+        mock_control.inspect.return_value.stats.return_value = expected_status
 
-        with self.assertLogs('masu.api.status', level='INFO') as logger:
-            status = ApplicationStatus().celery_status
-            self.assertEqual(status, dict())
-            self.assertIn(expected_log, logger.output)
+        status = ApplicationStatus().celery_status
+        self.assertEqual(status, expected_status)
 
-    def test_celery_status_reset(self, mock_celery):
-        """test celery status handles ConnectionResetError."""
-        mock_celery.events.Receiver.return_value.capture.side_effect = ConnectionResetError
-        expected_log = 'INFO:masu.api.status:Connection reset by message broker.'
+    @patch('masu.api.status.celery_app')
+    def test_celery_status_no_stats(self, mock_celery):
+        """Test that an error status is returned when Celery is down."""
+        mock_control = mock_celery.control
+        mock_control.inspect.return_value.stats.return_value = None
 
-        with self.assertLogs('masu.api.status', level='INFO') as logger:
-            status = ApplicationStatus().celery_status
-            self.assertEqual(status, dict())
-            self.assertIn(expected_log, logger.output)
+        expected_status = {'Error': CELERY_WORKER_NOT_FOUND}
+        status = ApplicationStatus().celery_status
+        self.assertEqual(status, expected_status)
 
-    def test_celery_status_oserror(self, mock_celery):
-        """test celery status handles OSError."""
-        mock_celery.events.Receiver.return_value.capture.side_effect = OSError
-        expected_log = r'INFO:masu.api.status: '
+    @patch('masu.api.status.celery_app')
+    def test_celery_heartbeat_failure(self, mock_celery):
+        """Test that heartbeat failure logs connection to broker issue."""
+        mock_conn = mock_celery.connection.return_value
+        mock_conn.heartbeat_check.side_effect = ConnectionRefusedError
 
-        with self.assertLogs('masu.api.status', level='INFO') as logger:
-            status = ApplicationStatus().celery_status
-            self.assertEqual(status, dict())
-            self.assertRegex(expected_log, ''.join(logger.output))
+        expected_status = {'Error': BROKER_CONNECTION_ERROR}
+        status = ApplicationStatus().celery_status
+        self.assertEqual(status, expected_status)
 
-    def test_announce_worker_status(self, mock_celery):
-        """Test the event announcement helper function."""
-        args = {'foo': 'bar', 'hostname': 'fake.host.name', 'timestamp': '12345'}
-        expected = {'fake.host.name': {'foo': 'bar', 'timestamp': '12345', 'type': 'fake'}}
-        fake_event = Event(type='fake', **args)
+    @patch('masu.api.status.celery_app')
+    def test_celery_status_connection_reset(self, mock_celery):
+        """Test that the status retrys on connection reset."""
+        mock_celery.control.inspect.side_effect = ConnectionResetError
+        stat = ApplicationStatus()
+        result = stat._check_celery_status()
 
-        status = ApplicationStatus()
-        status._announce_worker_event(fake_event)
+        self.assertIn('Error', result)
 
-        self.assertEqual(status._events, expected)
+        result = stat.celery_status
 
-    def test_database_status(self, mock_celery):
+        self.assertIn('Error', result)
+        # celery_app.control.inspect
+
+
+    def test_database_status(self):
         """test that fetching database status works."""
         expected = re.compile(r'INFO:masu.api.status:Database: \[{.*postgres.*}\]')
         with self.assertLogs('masu.api.status', level='INFO') as logger:
@@ -239,14 +250,14 @@ class StatusAPITest(MasuTestCase):
             self.assertIsNotNone(results)
 
     @patch('masu.api.status.psycopg2.connect', side_effect=psycopg2.InterfaceError)
-    def test_database_status_fail(self, mock_psql, mock_celery):
+    def test_database_status_fail(self, mock_psql):
         """test that fetching database handles errors."""
         expected = 'WARNING:masu.api.status:Unable to connect to DB: '
         with self.assertLogs('masu.api.status', level='INFO') as logger:
             ApplicationStatus().startup()
             self.assertIn(expected, logger.output)
 
-    def test_liveness(self, mock_celery):
+    def test_liveness(self):
         """Test the liveness response."""
         expected = {'alive': True}
         app = create_app(test_config=dict())

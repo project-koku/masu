@@ -40,6 +40,9 @@ Please use \`make <target>' where <target> is one of:
   oc-create-secrets         create secrets in openshift cluster
   oc-create-tags            create image stream tags
   oc-create-worker          create the celery worker in an openshift cluster
+  oc-delete-masu			delete Openshift masu objects without a cluster restart
+  oc-delete-worker			delete Openshift worker objects without a cluster restart
+  oc-delete-rabbit			delete Openshift rabbitmq objects without a cluster restart
   oc-delete-all             delete Openshift objects without a cluster restart
   oc-dev-db                 run Postgres in an openshift cluster
   oc-down                   stop openshift cluster and all running apps
@@ -139,6 +142,29 @@ oc-create-worker: oc-create-configmap oc-create-secrets
 		--param-file=$(TOPDIR)/openshift/worker.env \
 		-p SOURCE_REPOSITORY_REF=$(shell git rev-parse --abbrev-ref HEAD) \
 	| oc create -f -
+
+oc-delete-masu:
+	oc delete svc/masu \
+		route/masu \
+		buildconfigs/masu \
+		deploymentconfigs/masu \
+		imagestreams/masu \
+
+oc-delete-worker:
+	oc delete deploymentconfigs/masu-worker  \
+		buildconfigs/masu-worker \
+		imagestreams/masu-worker \
+		pvc/masu-worker-data \
+
+oc-delete-rabbit:
+	oc delete svc/rabbitmq \
+		imagestreams/rabbitmq \
+		rolebinding/view \
+		statefulsets/rabbitmq \
+		buildconfigs/rabbitmq \
+		pvc/mnesia-rabbitmq-0 \
+		pvc/mnesia-rabbitmq-1 \
+		pvc/mnesia-rabbitmq-2 \
 
 oc-delete-all:
 	oc delete is --all && \

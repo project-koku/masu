@@ -146,7 +146,8 @@ class ProcessReportFileTests(MasuTestCase):
         path = '{}/{}'.format(report_dir, 'file1.csv')
         request = {'report_path': path,
                    'compression': 'gzip',
-                   'schema_name': 'testcustomer'}
+                   'schema_name': 'testcustomer',
+                   'provider': 'AWS'}
 
         mock_proc = mock_processor()
         mock_acc = mock_accessor()
@@ -390,12 +391,14 @@ class TestProcessorTasks(MasuTestCase):
         schema_name = self.fake.word()
         report_path = 'path/to/file'
         compression = 'GZIP'
-        process_report_file(schema_name, report_path, compression)
+        provider = 'AWS'
+        process_report_file(schema_name, report_path, compression, provider)
 
         mock_process_files.assert_called_with(
             schema_name,
             report_path,
-            compression
+            compression,
+            provider
         )
         mock_update_task.delay.assert_called_with(schema_name, date.today())
 

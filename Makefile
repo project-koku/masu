@@ -83,7 +83,7 @@ serve:
 oc-clean: oc-down
 	$(PREFIX) rm -rf $(OC_DATA_DIR)
 
-oc-create-all: oc-create-tags oc-create-configmap oc-create-secrets oc-create-db oc-create-rabbitmq oc-create-masu oc-create-worker oc-create-flower
+oc-create-all: oc-create-tags oc-create-configmap oc-create-secrets oc-create-db oc-create-rabbitmq oc-create-masu oc-create-worker oc-create-scheduler oc-create-flower
 
 oc-create-configmap:
 	oc get configmap/masu || \
@@ -142,6 +142,18 @@ oc-create-worker: oc-create-configmap oc-create-secrets
 		--param-file=$(TOPDIR)/openshift/worker.env \
 		-p SOURCE_REPOSITORY_REF=$(shell git rev-parse --abbrev-ref HEAD) \
 	| oc create -f -
+
+oc-create-scheduler: oc-create-configmap oc-create-secrets
+	oc get bc/masu-scheduler dc/masu-scheduler || \
+	oc process -f $(TOPDIR)/openshift/scheduler.yaml \
+		--param-file=$(TOPDIR)/openshift/scheduler.env \
+		-p SOURCE_REPOSITORY_REF=$(shell git rev-parse --abbrev-ref HEAD) \
+	| oc create -f -
+
+oc-delete-scheduler:
+	oc delete deploymentconfigs/masu-scheduler  \
+		buildconfigs/masu-scheduler \
+		imagestreams/masu-scheduler \
 
 oc-delete-masu:
 	oc delete svc/masu \

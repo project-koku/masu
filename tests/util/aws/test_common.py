@@ -24,10 +24,11 @@ from datetime import datetime
 from unittest.mock import patch, Mock
 
 import boto3
+from botocore.exceptions import ClientError
 from faker import Faker
-from moto import mock_sts
+from moto import (mock_iam, mock_sts)
 
-from masu.external.downloader.aws import utils
+from masu.util.aws import common as utils
 from tests.external.downloader.aws import (fake_arn,
                                            fake_aws_account_id)
 from masu.external import AWS_REGIONS
@@ -78,7 +79,7 @@ class TestAWSUtils(TestCase):
         self.assertEqual(out, expected_string)
 
     @mock_sts
-    @patch('masu.external.downloader.aws.utils.get_cur_report_definitions',
+    @patch('masu.util.aws.common.get_cur_report_definitions',
            return_value=REPORT_DEFS)
     def test_cur_report_names_in_bucket(self, fake_report_defs):
         session = utils.get_assume_role_session(self.arn)
@@ -89,7 +90,7 @@ class TestAWSUtils(TestCase):
         self.assertIn(NAME, report_names)
 
     @mock_sts
-    @patch('masu.external.downloader.aws.utils.get_cur_report_definitions',
+    @patch('masu.util.aws.common.get_cur_report_definitions',
            return_value=REPORT_DEFS)
     def test_cur_report_names_in_bucket_malformed(self, fake_report_defs):
         session = utils.get_assume_role_session(self.arn)
@@ -104,11 +105,28 @@ class TestAWSUtils(TestCase):
         defs = utils.get_cur_report_definitions(self.arn, session)
         self.assertEqual(len(defs), 1)
 
-    @patch('masu.external.downloader.aws.utils.get_assume_role_session',
+    @patch('masu.util.aws.common.get_assume_role_session',
            return_value=FakeSession)
     def test_get_cur_report_definitions_no_session(self, fake_session):
         defs = utils.get_cur_report_definitions(self.arn)
         self.assertEqual(len(defs), 1)
+
+    @mock_sts
+    @mock_iam
+    def test_get_account_alias_from_role_arn(self):
+        mock_account_id = '111111111111'
+        role_arn = 'arn:aws:iam::{}:role/CostManagement'.format(mock_account_id)
+
+        client = boto3.client('iam', region_name='us-east-1')
+
+        mock_alias = 'test-alias'
+        client.create_account_alias(AccountAlias=mock_alias)
+
+        session = FakeSession()
+        account_id, account_alias = utils.get_account_alias_from_role_arn(role_arn, session)
+        self.assertEqual(mock_account_id, account_id)
+        self.assertEqual(mock_alias, account_alias)
+
 
 class AwsArnTest(TestCase):
     """AwnArn class test case."""

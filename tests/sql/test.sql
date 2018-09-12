@@ -842,6 +842,40 @@ ALTER SEQUENCE testcustomer.django_migrations_id_seq OWNED BY testcustomer.djang
 
 
 --
+-- Name: reporting_awsaccountalias; Type: TABLE; Schema: testcustomer; Owner: kokuadmin
+--
+
+CREATE TABLE testcustomer.reporting_awsaccountalias (
+    id integer NOT NULL,
+    account_id character varying(50) NOT NULL,
+    account_alias character varying(63)
+);
+
+
+ALTER TABLE testcustomer.reporting_awsaccountalias OWNER TO kokuadmin;
+
+--
+-- Name: reporting_awsaccountalias_id_seq; Type: SEQUENCE; Schema: testcustomer; Owner: kokuadmin
+--
+
+CREATE SEQUENCE testcustomer.reporting_awsaccountalias_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE testcustomer.reporting_awsaccountalias_id_seq OWNER TO kokuadmin;
+
+--
+-- Name: reporting_awsaccountalias_id_seq; Type: SEQUENCE OWNED BY; Schema: testcustomer; Owner: kokuadmin
+--
+
+ALTER SEQUENCE testcustomer.reporting_awsaccountalias_id_seq OWNED BY testcustomer.reporting_awsaccountalias.id;
+
+
+--
 -- Name: reporting_awscostentry; Type: TABLE; Schema: testcustomer; Owner: kokuadmin
 --
 
@@ -1388,6 +1422,13 @@ ALTER TABLE ONLY testcustomer.django_migrations ALTER COLUMN id SET DEFAULT next
 
 
 --
+-- Name: reporting_awsaccountalias id; Type: DEFAULT; Schema: testcustomer; Owner: kokuadmin
+--
+
+ALTER TABLE ONLY testcustomer.reporting_awsaccountalias ALTER COLUMN id SET DEFAULT nextval('testcustomer.reporting_awsaccountalias_id_seq'::regclass);
+
+
+--
 -- Name: reporting_awscostentry id; Type: DEFAULT; Schema: testcustomer; Owner: kokuadmin
 --
 
@@ -1455,7 +1496,7 @@ ALTER TABLE ONLY testcustomer.reporting_awscostentryreservation ALTER COLUMN id 
 --
 
 COPY public.api_customer (group_ptr_id, date_created, owner_id, uuid, schema_name) FROM stdin;
-1	2018-08-28 01:14:46.875046+00	2	e1d9991a-46a0-4b26-9b4e-b32d367c7ff6	testcustomer
+1	2018-09-07 13:06:13.545467+00	2	240e49c2-07f4-4ac7-a46f-c7f8ef464d2d	testcustomer
 \.
 
 
@@ -1491,7 +1532,7 @@ COPY public.api_providerbillingsource (id, uuid, bucket) FROM stdin;
 --
 
 COPY public.api_resettoken (id, token, expiration_date, used, user_id) FROM stdin;
-1	7e2f9696-78e7-4b01-bc33-107f5701b73d	2018-08-29 01:14:46.854721+00	f	2
+1	22fe8b6f-4d47-4e65-b2f1-50be9edab601	2018-09-08 13:06:13.337096+00	f	2
 \.
 
 
@@ -1500,7 +1541,7 @@ COPY public.api_resettoken (id, token, expiration_date, used, user_id) FROM stdi
 --
 
 COPY public.api_status (id, server_id) FROM stdin;
-1	1d0099f1-f157-42ec-a06a-b4bd5fbc6a9d
+1	b4a43ed8-015a-436f-8383-f680583991a6
 \.
 
 
@@ -1519,8 +1560,8 @@ COPY public.api_tenant (id, schema_name) FROM stdin;
 --
 
 COPY public.api_user (user_ptr_id, uuid) FROM stdin;
-1	8c6597a9-ceb1-4f17-a1ea-9e77beafa267
-2	413c52de-e439-4047-924b-1dd00a4d58d8
+1	e3a05798-3846-4bdf-a8ab-3046cf98c1d2
+2	1a234585-04a5-447d-ab70-30cb479314bd
 \.
 
 
@@ -1529,9 +1570,9 @@ COPY public.api_user (user_ptr_id, uuid) FROM stdin;
 --
 
 COPY public.api_userpreference (id, uuid, preference, user_id, description, name) FROM stdin;
-1	d36fc643-0977-4a43-a87d-83dd1a7bf624	{"currency": "USD"}	2	default preference	currency
-2	c60dbd7c-a01e-4e46-9776-c258d2ada279	{"timezone": "UTC"}	2	default preference	timezone
-3	3f0d7e6a-6f34-44ee-83d4-fabe1efe4ae8	{"locale": "en_US.UTF-8"}	2	default preference	locale
+1	eab25ca8-2525-4354-8b6a-b6ae8e28c35d	{"currency": "USD"}	2	default preference	currency
+2	ede3da6b-b10a-45a6-b36a-c0af10cd3522	{"timezone": "UTC"}	2	default preference	timezone
+3	89f5fea9-15f0-474d-b3c4-bad8e2a00e9e	{"locale": "en_US.UTF-8"}	2	default preference	locale
 \.
 
 
@@ -1657,22 +1698,26 @@ COPY public.auth_permission (id, name, content_type_id, codename) FROM stdin;
 98	Can change aws cost entry line item daily summary	25	change_awscostentrylineitemdailysummary
 99	Can delete aws cost entry line item daily summary	25	delete_awscostentrylineitemdailysummary
 100	Can view aws cost entry line item daily summary	25	view_awscostentrylineitemdailysummary
-101	Can add report column map	26	add_reportcolumnmap
-102	Can change report column map	26	change_reportcolumnmap
-103	Can delete report column map	26	delete_reportcolumnmap
-104	Can view report column map	26	view_reportcolumnmap
-105	Can add cost usage report status	27	add_costusagereportstatus
-106	Can change cost usage report status	27	change_costusagereportstatus
-107	Can delete cost usage report status	27	delete_costusagereportstatus
-108	Can view cost usage report status	27	view_costusagereportstatus
-109	Can add si unit scale	28	add_siunitscale
-110	Can change si unit scale	28	change_siunitscale
-111	Can delete si unit scale	28	delete_siunitscale
-112	Can view si unit scale	28	view_siunitscale
-113	Can add region mapping	29	add_regionmapping
-114	Can change region mapping	29	change_regionmapping
-115	Can delete region mapping	29	delete_regionmapping
-116	Can view region mapping	29	view_regionmapping
+101	Can add aws account alias	26	add_awsaccountalias
+102	Can change aws account alias	26	change_awsaccountalias
+103	Can delete aws account alias	26	delete_awsaccountalias
+104	Can view aws account alias	26	view_awsaccountalias
+105	Can add report column map	27	add_reportcolumnmap
+106	Can change report column map	27	change_reportcolumnmap
+107	Can delete report column map	27	delete_reportcolumnmap
+108	Can view report column map	27	view_reportcolumnmap
+109	Can add cost usage report status	28	add_costusagereportstatus
+110	Can change cost usage report status	28	change_costusagereportstatus
+111	Can delete cost usage report status	28	delete_costusagereportstatus
+112	Can view cost usage report status	28	view_costusagereportstatus
+113	Can add si unit scale	29	add_siunitscale
+114	Can change si unit scale	29	change_siunitscale
+115	Can delete si unit scale	29	delete_siunitscale
+116	Can view si unit scale	29	view_siunitscale
+117	Can add region mapping	30	add_regionmapping
+118	Can change region mapping	30	change_regionmapping
+119	Can delete region mapping	30	delete_regionmapping
+120	Can view region mapping	30	view_regionmapping
 \.
 
 
@@ -1681,8 +1726,8 @@ COPY public.auth_permission (id, name, content_type_id, codename) FROM stdin;
 --
 
 COPY public.auth_user (id, password, last_login, is_superuser, username, first_name, last_name, email, is_staff, is_active, date_joined) FROM stdin;
-1	pbkdf2_sha256$120000$5Gijs1EaJTTw$hm5DNrvsq09ri/R9wO704Lc2tyLT7CFmpd88LUsKtwI=	\N	t	admin			admin@example.com	t	t	2018-08-28 01:14:37.14187+00
-2	pbkdf2_sha256$120000$zLr6boMqvF5b$Llux4qMzu+CSOee7gEzoWNmpg22+CMP2yxcCGIOCN4w=	\N	f	test_customer			test@example.com	f	t	2018-08-28 01:14:46.646914+00
+1	pbkdf2_sha256$120000$l0XHpNNaCWRJ$gkS9D+hrygZeKct3x2LfKB8n3pcSt+YYxcAfT8Zlipg=	\N	t	admin			admin@example.com	t	t	2018-09-07 13:06:03.335674+00
+2	pbkdf2_sha256$120000$BcnyL4ZWtdoL$TsTMdbn3vS5AiWWlYC2TTeREi8esenPdeqxvObKoUzM=	\N	f	test_customer			test@example.com	f	t	2018-09-07 13:06:13.01415+00
 \.
 
 
@@ -1708,7 +1753,7 @@ COPY public.auth_user_user_permissions (id, user_id, permission_id) FROM stdin;
 --
 
 COPY public.authtoken_token (key, created, user_id) FROM stdin;
-0b43c1a8b50bb1a83185f34342b0bd9ced0a29eb	2018-08-28 01:14:46.552627+00	1
+f7bfff9388859d43a6a347527f1e7983eb907999	2018-09-07 13:06:12.965624+00	1
 \.
 
 
@@ -1750,10 +1795,11 @@ COPY public.django_content_type (id, app_label, model) FROM stdin;
 23	reporting	awscostentrylineitemaggregates
 24	reporting	awscostentrylineitemdaily
 25	reporting	awscostentrylineitemdailysummary
-26	reporting_common	reportcolumnmap
-27	reporting_common	costusagereportstatus
-28	reporting_common	siunitscale
-29	reporting_common	regionmapping
+26	reporting	awsaccountalias
+27	reporting_common	reportcolumnmap
+28	reporting_common	costusagereportstatus
+29	reporting_common	siunitscale
+30	reporting_common	regionmapping
 \.
 
 
@@ -1762,54 +1808,55 @@ COPY public.django_content_type (id, app_label, model) FROM stdin;
 --
 
 COPY public.django_migrations (id, app, name, applied) FROM stdin;
-1	contenttypes	0001_initial	2018-08-28 01:14:35.933416+00
-2	auth	0001_initial	2018-08-28 01:14:36.055864+00
-3	admin	0001_initial	2018-08-28 01:14:36.098206+00
-4	admin	0002_logentry_remove_auto_add	2018-08-28 01:14:36.115867+00
-5	admin	0003_logentry_add_action_flag_choices	2018-08-28 01:14:36.13323+00
-6	contenttypes	0002_remove_content_type_name	2018-08-28 01:14:36.177311+00
-7	auth	0002_alter_permission_name_max_length	2018-08-28 01:14:36.199154+00
-8	auth	0003_alter_user_email_max_length	2018-08-28 01:14:36.229728+00
-9	auth	0004_alter_user_username_opts	2018-08-28 01:14:36.248227+00
-10	auth	0005_alter_user_last_login_null	2018-08-28 01:14:36.27642+00
-11	auth	0006_require_contenttypes_0002	2018-08-28 01:14:36.28488+00
-12	auth	0007_alter_validators_add_error_messages	2018-08-28 01:14:36.312373+00
-13	auth	0008_alter_user_username_max_length	2018-08-28 01:14:36.341944+00
-14	auth	0009_alter_user_last_name_max_length	2018-08-28 01:14:36.36758+00
-15	api	0001_initial	2018-08-28 01:14:36.395372+00
-16	api	0002_auto_20180509_1400	2018-08-28 01:14:36.467969+00
-17	api	0003_auto_20180509_1849	2018-08-28 01:14:36.546312+00
-18	api	0004_auto_20180510_1824	2018-08-28 01:14:36.620447+00
-19	api	0005_auto_20180511_1445	2018-08-28 01:14:36.646118+00
-20	api	0006_resettoken	2018-08-28 01:14:36.68896+00
-21	api	0007_userpreference	2018-08-28 01:14:36.734993+00
-22	api	0008_provider	2018-08-28 01:14:36.847675+00
-23	api	0009_auto_20180523_0045	2018-08-28 01:14:36.885974+00
-24	api	0010_auto_20180523_1540	2018-08-28 01:14:36.953941+00
-25	api	0011_auto_20180524_1838	2018-08-28 01:14:37.015664+00
-26	api	0012_auto_20180529_1526	2018-08-28 01:14:37.174803+00
-27	api	0013_auto_20180531_1921	2018-08-28 01:14:37.197492+00
-28	api	0014_costusagereportstatus	2018-08-28 01:14:37.244956+00
-29	api	0015_auto_20180614_1343	2018-08-28 01:14:37.289507+00
-30	api	0016_auto_20180802_1911	2018-08-28 01:14:37.309623+00
-31	api	0017_auto_20180815_1716	2018-08-28 01:14:37.340802+00
-32	authtoken	0001_initial	2018-08-28 01:14:37.384791+00
-33	authtoken	0002_auto_20160226_1747	2018-08-28 01:14:37.444697+00
-34	reporting	0001_initial	2018-08-28 01:14:37.499387+00
-35	reporting	0002_auto_20180615_1725	2018-08-28 01:14:37.736065+00
-36	reporting	0003_auto_20180619_1833	2018-08-28 01:14:37.822955+00
-37	reporting	0004_auto_20180803_1926	2018-08-28 01:14:37.847131+00
-38	reporting	0005_auto_20180807_1819	2018-08-28 01:14:37.89344+00
-39	reporting	0006_auto_20180821_1654	2018-08-28 01:14:37.998071+00
-40	reporting	0007_auto_20180824_0035	2018-08-28 01:14:38.08378+00
-41	reporting_common	0001_initial	2018-08-28 01:14:38.112169+00
-42	reporting_common	0002_auto_20180608_1647	2018-08-28 01:14:38.259203+00
-43	reporting_common	0003_costusagereportstatus	2018-08-28 01:14:38.30739+00
-44	reporting_common	0004_siunitscale	2018-08-28 01:14:38.333976+00
-45	reporting_common	0005_auto_20180725_1523	2018-08-28 01:14:38.416301+00
-46	reporting_common	0006_auto_20180802_1911	2018-08-28 01:14:38.428523+00
-47	reporting_common	0007_auto_20180808_2134	2018-08-28 01:14:38.466594+00
-48	sessions	0001_initial	2018-08-28 01:14:38.500937+00
+1	contenttypes	0001_initial	2018-09-07 13:06:02.069835+00
+2	auth	0001_initial	2018-09-07 13:06:02.237345+00
+3	admin	0001_initial	2018-09-07 13:06:02.293066+00
+4	admin	0002_logentry_remove_auto_add	2018-09-07 13:06:02.309+00
+5	admin	0003_logentry_add_action_flag_choices	2018-09-07 13:06:02.325435+00
+6	contenttypes	0002_remove_content_type_name	2018-09-07 13:06:02.389097+00
+7	auth	0002_alter_permission_name_max_length	2018-09-07 13:06:02.408429+00
+8	auth	0003_alter_user_email_max_length	2018-09-07 13:06:02.432477+00
+9	auth	0004_alter_user_username_opts	2018-09-07 13:06:02.44891+00
+10	auth	0005_alter_user_last_login_null	2018-09-07 13:06:02.471162+00
+11	auth	0006_require_contenttypes_0002	2018-09-07 13:06:02.479778+00
+12	auth	0007_alter_validators_add_error_messages	2018-09-07 13:06:02.498048+00
+13	auth	0008_alter_user_username_max_length	2018-09-07 13:06:02.527972+00
+14	auth	0009_alter_user_last_name_max_length	2018-09-07 13:06:02.551399+00
+15	api	0001_initial	2018-09-07 13:06:02.572033+00
+16	api	0002_auto_20180509_1400	2018-09-07 13:06:02.642901+00
+17	api	0003_auto_20180509_1849	2018-09-07 13:06:02.728995+00
+18	api	0004_auto_20180510_1824	2018-09-07 13:06:02.805716+00
+19	api	0005_auto_20180511_1445	2018-09-07 13:06:02.828593+00
+20	api	0006_resettoken	2018-09-07 13:06:02.8752+00
+21	api	0007_userpreference	2018-09-07 13:06:02.924578+00
+22	api	0008_provider	2018-09-07 13:06:03.044619+00
+23	api	0009_auto_20180523_0045	2018-09-07 13:06:03.082614+00
+24	api	0010_auto_20180523_1540	2018-09-07 13:06:03.150699+00
+25	api	0011_auto_20180524_1838	2018-09-07 13:06:03.207736+00
+26	api	0012_auto_20180529_1526	2018-09-07 13:06:03.372085+00
+27	api	0013_auto_20180531_1921	2018-09-07 13:06:03.401167+00
+28	api	0014_costusagereportstatus	2018-09-07 13:06:03.472259+00
+29	api	0015_auto_20180614_1343	2018-09-07 13:06:03.571933+00
+30	api	0016_auto_20180802_1911	2018-09-07 13:06:03.606395+00
+31	api	0017_auto_20180815_1716	2018-09-07 13:06:03.646105+00
+32	authtoken	0001_initial	2018-09-07 13:06:03.709742+00
+33	authtoken	0002_auto_20160226_1747	2018-09-07 13:06:03.769475+00
+34	reporting	0001_initial	2018-09-07 13:06:03.826655+00
+35	reporting	0002_auto_20180615_1725	2018-09-07 13:06:04.075504+00
+36	reporting	0003_auto_20180619_1833	2018-09-07 13:06:04.162487+00
+37	reporting	0004_auto_20180803_1926	2018-09-07 13:06:04.185652+00
+38	reporting	0005_auto_20180807_1819	2018-09-07 13:06:04.221265+00
+39	reporting	0006_auto_20180821_1654	2018-09-07 13:06:04.326566+00
+40	reporting	0007_auto_20180824_0035	2018-09-07 13:06:04.412975+00
+41	reporting	0008_awsaccountalias	2018-09-07 13:06:04.424288+00
+42	reporting_common	0001_initial	2018-09-07 13:06:04.450637+00
+43	reporting_common	0002_auto_20180608_1647	2018-09-07 13:06:04.61019+00
+44	reporting_common	0003_costusagereportstatus	2018-09-07 13:06:04.659493+00
+45	reporting_common	0004_siunitscale	2018-09-07 13:06:04.686404+00
+46	reporting_common	0005_auto_20180725_1523	2018-09-07 13:06:04.774981+00
+47	reporting_common	0006_auto_20180802_1911	2018-09-07 13:06:04.787016+00
+48	reporting_common	0007_auto_20180808_2134	2018-09-07 13:06:04.818547+00
+49	sessions	0001_initial	2018-09-07 13:06:04.8487+00
 \.
 
 
@@ -1922,54 +1969,63 @@ COPY public.si_unit_scale (id, prefix, prefix_symbol, multiplying_factor) FROM s
 --
 
 COPY testcustomer.django_migrations (id, app, name, applied) FROM stdin;
-1	contenttypes	0001_initial	2018-08-28 01:14:46.947064+00
-2	auth	0001_initial	2018-08-28 01:14:46.966383+00
-3	admin	0001_initial	2018-08-28 01:14:46.983664+00
-4	admin	0002_logentry_remove_auto_add	2018-08-28 01:14:46.998055+00
-5	admin	0003_logentry_add_action_flag_choices	2018-08-28 01:14:47.011352+00
-6	contenttypes	0002_remove_content_type_name	2018-08-28 01:14:47.03068+00
-7	auth	0002_alter_permission_name_max_length	2018-08-28 01:14:47.041632+00
-8	auth	0003_alter_user_email_max_length	2018-08-28 01:14:47.055375+00
-9	auth	0004_alter_user_username_opts	2018-08-28 01:14:47.069334+00
-10	auth	0005_alter_user_last_login_null	2018-08-28 01:14:47.08285+00
-11	auth	0006_require_contenttypes_0002	2018-08-28 01:14:47.089942+00
-12	auth	0007_alter_validators_add_error_messages	2018-08-28 01:14:47.104079+00
-13	auth	0008_alter_user_username_max_length	2018-08-28 01:14:47.119542+00
-14	auth	0009_alter_user_last_name_max_length	2018-08-28 01:14:47.136162+00
-15	api	0001_initial	2018-08-28 01:14:47.147032+00
-16	api	0002_auto_20180509_1400	2018-08-28 01:14:47.177897+00
-17	api	0003_auto_20180509_1849	2018-08-28 01:14:47.210139+00
-18	api	0004_auto_20180510_1824	2018-08-28 01:14:47.246371+00
-19	api	0005_auto_20180511_1445	2018-08-28 01:14:47.268951+00
-20	api	0006_resettoken	2018-08-28 01:14:47.28581+00
-21	api	0007_userpreference	2018-08-28 01:14:47.303062+00
-22	api	0008_provider	2018-08-28 01:14:47.342683+00
-23	api	0009_auto_20180523_0045	2018-08-28 01:14:47.364622+00
-24	api	0010_auto_20180523_1540	2018-08-28 01:14:47.401233+00
-25	api	0011_auto_20180524_1838	2018-08-28 01:14:47.422257+00
-26	api	0012_auto_20180529_1526	2018-08-28 01:14:47.432609+00
-27	api	0013_auto_20180531_1921	2018-08-28 01:14:47.442653+00
-28	api	0014_costusagereportstatus	2018-08-28 01:14:47.462514+00
-29	api	0015_auto_20180614_1343	2018-08-28 01:14:47.485384+00
-30	api	0016_auto_20180802_1911	2018-08-28 01:14:47.519905+00
-31	api	0017_auto_20180815_1716	2018-08-28 01:14:47.539586+00
-32	authtoken	0001_initial	2018-08-28 01:14:47.560606+00
-33	authtoken	0002_auto_20160226_1747	2018-08-28 01:14:47.598619+00
-34	reporting	0001_initial	2018-08-28 01:14:47.753431+00
-35	reporting	0002_auto_20180615_1725	2018-08-28 01:14:48.132808+00
-36	reporting	0003_auto_20180619_1833	2018-08-28 01:14:48.400852+00
-37	reporting	0004_auto_20180803_1926	2018-08-28 01:14:48.432446+00
-38	reporting	0005_auto_20180807_1819	2018-08-28 01:14:48.483251+00
-39	reporting	0006_auto_20180821_1654	2018-08-28 01:14:48.676499+00
-40	reporting	0007_auto_20180824_0035	2018-08-28 01:14:48.838333+00
-41	reporting_common	0001_initial	2018-08-28 01:14:48.848004+00
-42	reporting_common	0002_auto_20180608_1647	2018-08-28 01:14:48.856705+00
-43	reporting_common	0003_costusagereportstatus	2018-08-28 01:14:48.877698+00
-44	reporting_common	0004_siunitscale	2018-08-28 01:14:48.888087+00
-45	reporting_common	0005_auto_20180725_1523	2018-08-28 01:14:48.897784+00
-46	reporting_common	0006_auto_20180802_1911	2018-08-28 01:14:48.907724+00
-47	reporting_common	0007_auto_20180808_2134	2018-08-28 01:14:48.917009+00
-48	sessions	0001_initial	2018-08-28 01:14:48.927341+00
+1	contenttypes	0001_initial	2018-09-07 13:06:13.704411+00
+2	auth	0001_initial	2018-09-07 13:06:13.726677+00
+3	admin	0001_initial	2018-09-07 13:06:13.747275+00
+4	admin	0002_logentry_remove_auto_add	2018-09-07 13:06:13.76221+00
+5	admin	0003_logentry_add_action_flag_choices	2018-09-07 13:06:13.776861+00
+6	contenttypes	0002_remove_content_type_name	2018-09-07 13:06:13.7942+00
+7	auth	0002_alter_permission_name_max_length	2018-09-07 13:06:13.807102+00
+8	auth	0003_alter_user_email_max_length	2018-09-07 13:06:13.822117+00
+9	auth	0004_alter_user_username_opts	2018-09-07 13:06:13.837205+00
+10	auth	0005_alter_user_last_login_null	2018-09-07 13:06:13.854697+00
+11	auth	0006_require_contenttypes_0002	2018-09-07 13:06:13.862246+00
+12	auth	0007_alter_validators_add_error_messages	2018-09-07 13:06:13.8783+00
+13	auth	0008_alter_user_username_max_length	2018-09-07 13:06:13.892209+00
+14	auth	0009_alter_user_last_name_max_length	2018-09-07 13:06:13.906404+00
+15	api	0001_initial	2018-09-07 13:06:13.91572+00
+16	api	0002_auto_20180509_1400	2018-09-07 13:06:13.944202+00
+17	api	0003_auto_20180509_1849	2018-09-07 13:06:13.975801+00
+18	api	0004_auto_20180510_1824	2018-09-07 13:06:14.012655+00
+19	api	0005_auto_20180511_1445	2018-09-07 13:06:14.036101+00
+20	api	0006_resettoken	2018-09-07 13:06:14.053968+00
+21	api	0007_userpreference	2018-09-07 13:06:14.071533+00
+22	api	0008_provider	2018-09-07 13:06:14.110406+00
+23	api	0009_auto_20180523_0045	2018-09-07 13:06:14.129335+00
+24	api	0010_auto_20180523_1540	2018-09-07 13:06:14.164562+00
+25	api	0011_auto_20180524_1838	2018-09-07 13:06:14.185804+00
+26	api	0012_auto_20180529_1526	2018-09-07 13:06:14.196062+00
+27	api	0013_auto_20180531_1921	2018-09-07 13:06:14.206656+00
+28	api	0014_costusagereportstatus	2018-09-07 13:06:14.227192+00
+29	api	0015_auto_20180614_1343	2018-09-07 13:06:14.24824+00
+30	api	0016_auto_20180802_1911	2018-09-07 13:06:14.267089+00
+31	api	0017_auto_20180815_1716	2018-09-07 13:06:14.28594+00
+32	authtoken	0001_initial	2018-09-07 13:06:14.307889+00
+33	authtoken	0002_auto_20160226_1747	2018-09-07 13:06:14.344562+00
+34	reporting	0001_initial	2018-09-07 13:06:14.510856+00
+35	reporting	0002_auto_20180615_1725	2018-09-07 13:06:14.925671+00
+36	reporting	0003_auto_20180619_1833	2018-09-07 13:06:15.239741+00
+37	reporting	0004_auto_20180803_1926	2018-09-07 13:06:15.270388+00
+38	reporting	0005_auto_20180807_1819	2018-09-07 13:06:15.317729+00
+39	reporting	0006_auto_20180821_1654	2018-09-07 13:06:15.53086+00
+40	reporting	0007_auto_20180824_0035	2018-09-07 13:06:15.71687+00
+41	reporting	0008_awsaccountalias	2018-09-07 13:06:15.740954+00
+42	reporting_common	0001_initial	2018-09-07 13:06:15.751118+00
+43	reporting_common	0002_auto_20180608_1647	2018-09-07 13:06:15.760207+00
+44	reporting_common	0003_costusagereportstatus	2018-09-07 13:06:15.783409+00
+45	reporting_common	0004_siunitscale	2018-09-07 13:06:15.793868+00
+46	reporting_common	0005_auto_20180725_1523	2018-09-07 13:06:15.803598+00
+47	reporting_common	0006_auto_20180802_1911	2018-09-07 13:06:15.814389+00
+48	reporting_common	0007_auto_20180808_2134	2018-09-07 13:06:15.8246+00
+49	sessions	0001_initial	2018-09-07 13:06:15.834939+00
+\.
+
+
+--
+-- Data for Name: reporting_awsaccountalias; Type: TABLE DATA; Schema: testcustomer; Owner: kokuadmin
+--
+
+COPY testcustomer.reporting_awsaccountalias (id, account_id, account_alias) FROM stdin;
 \.
 
 
@@ -2112,7 +2168,7 @@ SELECT pg_catalog.setval('public.auth_group_permissions_id_seq', 1, false);
 -- Name: auth_permission_id_seq; Type: SEQUENCE SET; Schema: public; Owner: kokuadmin
 --
 
-SELECT pg_catalog.setval('public.auth_permission_id_seq', 116, true);
+SELECT pg_catalog.setval('public.auth_permission_id_seq', 120, true);
 
 
 --
@@ -2147,14 +2203,14 @@ SELECT pg_catalog.setval('public.django_admin_log_id_seq', 1, false);
 -- Name: django_content_type_id_seq; Type: SEQUENCE SET; Schema: public; Owner: kokuadmin
 --
 
-SELECT pg_catalog.setval('public.django_content_type_id_seq', 29, true);
+SELECT pg_catalog.setval('public.django_content_type_id_seq', 30, true);
 
 
 --
 -- Name: django_migrations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: kokuadmin
 --
 
-SELECT pg_catalog.setval('public.django_migrations_id_seq', 48, true);
+SELECT pg_catalog.setval('public.django_migrations_id_seq', 49, true);
 
 
 --
@@ -2189,7 +2245,14 @@ SELECT pg_catalog.setval('public.si_unit_scale_id_seq', 17, true);
 -- Name: django_migrations_id_seq; Type: SEQUENCE SET; Schema: testcustomer; Owner: kokuadmin
 --
 
-SELECT pg_catalog.setval('testcustomer.django_migrations_id_seq', 48, true);
+SELECT pg_catalog.setval('testcustomer.django_migrations_id_seq', 49, true);
+
+
+--
+-- Name: reporting_awsaccountalias_id_seq; Type: SEQUENCE SET; Schema: testcustomer; Owner: kokuadmin
+--
+
+SELECT pg_catalog.setval('testcustomer.reporting_awsaccountalias_id_seq', 1, false);
 
 
 --
@@ -2648,6 +2711,22 @@ ALTER TABLE ONLY testcustomer.django_migrations
 
 
 --
+-- Name: reporting_awsaccountalias reporting_awsaccountalias_account_id_key; Type: CONSTRAINT; Schema: testcustomer; Owner: kokuadmin
+--
+
+ALTER TABLE ONLY testcustomer.reporting_awsaccountalias
+    ADD CONSTRAINT reporting_awsaccountalias_account_id_key UNIQUE (account_id);
+
+
+--
+-- Name: reporting_awsaccountalias reporting_awsaccountalias_pkey; Type: CONSTRAINT; Schema: testcustomer; Owner: kokuadmin
+--
+
+ALTER TABLE ONLY testcustomer.reporting_awsaccountalias
+    ADD CONSTRAINT reporting_awsaccountalias_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: reporting_awscostentry reporting_awscostentry_pkey; Type: CONSTRAINT; Schema: testcustomer; Owner: kokuadmin
 --
 
@@ -2980,6 +3059,13 @@ CREATE INDEX product_code_idx ON testcustomer.reporting_awscostentrylineitem_dai
 --
 
 CREATE INDEX region_idx ON testcustomer.reporting_awscostentryproduct USING btree (region);
+
+
+--
+-- Name: reporting_awsaccountalias_account_id_85724b8c_like; Type: INDEX; Schema: testcustomer; Owner: kokuadmin
+--
+
+CREATE INDEX reporting_awsaccountalias_account_id_85724b8c_like ON testcustomer.reporting_awsaccountalias USING btree (account_id varchar_pattern_ops);
 
 
 --

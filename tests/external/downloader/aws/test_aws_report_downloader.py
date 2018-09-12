@@ -37,7 +37,7 @@ from masu.database.report_stats_db_accessor import ReportStatsDBAccessor
 from masu.exceptions import MasuProviderError
 from masu.external.downloader.aws.aws_report_downloader import (AWSReportDownloader,
                                                                 AWSReportDownloaderError)
-from masu.external.downloader.aws import utils
+from masu.util.aws import common as utils
 from masu.external import AWS_REGIONS
 from tests import MasuTestCase
 from tests.external.downloader.aws import fake_arn
@@ -106,7 +106,7 @@ class AWSReportDownloaderTest(MasuTestCase):
 
     fake = Faker()
 
-    @patch('masu.external.downloader.aws.utils.get_assume_role_session',
+    @patch('masu.util.aws.common.get_assume_role_session',
            return_value=FakeSession)
     def setUp(self, fake_session):
         os.makedirs(DATA_DIR, exist_ok=True)
@@ -376,7 +376,7 @@ class AWSReportDownloaderTest(MasuTestCase):
             self.assertEqual(files_list, expected_paths)
 
     @mock_s3
-    @patch('masu.external.downloader.aws.utils.get_assume_role_session',
+    @patch('masu.util.aws.common.get_assume_role_session',
            return_value=FakeSession)
     def test_missing_report_name(self, fake_session):
         """Test downloading a report with an invalid report name."""
@@ -390,7 +390,7 @@ class AWSReportDownloaderTest(MasuTestCase):
 
 
     @mock_s3
-    @patch('masu.external.downloader.aws.utils.get_assume_role_session',
+    @patch('masu.util.aws.common.get_assume_role_session',
            return_value=FakeSession)
     def test_download_default_report(self, fake_session):
         fake_report_date = self.fake.date_time().replace(day=1)
@@ -439,9 +439,9 @@ class AWSReportDownloaderTest(MasuTestCase):
         self.assertEqual(downloader.report_name, self.fake_report_name)
 
     @mock_s3
-    @patch('masu.external.downloader.aws.utils.get_assume_role_session',
+    @patch('masu.util.aws.common.get_assume_role_session',
            return_value=FakeSessionNoReport)
-    @patch('masu.external.downloader.aws.utils.get_cur_report_definitions',
+    @patch('masu.util.aws.common.get_cur_report_definitions',
            return_value=[])
     def test_download_default_report_no_report_found(self, fake_session, fake_report_list):
         auth_credential = fake_arn(service='iam', generate_account_id=True)

@@ -75,9 +75,10 @@ class OrchestratorTest(MasuTestCase):
         self.assertEqual(account.get('customer_name'), 'Test Customer')
         self.assertEqual(account.get('provider_type'), AMAZON_WEB_SERVICES)
 
+    @patch('masu.external.account_label.AccountLabel._set_labler', return_value=None)
     @patch('masu.external.report_downloader.ReportDownloader._set_downloader', return_value=FakeDownloader)
     @patch('masu.processor.orchestrator.get_report_files.delay', return_value=True)
-    def test_prepare(self, mock_downloader, mock_task):
+    def test_prepare(self, mock_task, mock_downloader, mock_labeler):
         """Test downloading cost usage reports."""
         orchestrator = Orchestrator()
 

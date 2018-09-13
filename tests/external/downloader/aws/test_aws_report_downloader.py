@@ -36,7 +36,8 @@ from masu.config import Config
 from masu.database.report_stats_db_accessor import ReportStatsDBAccessor
 from masu.exceptions import MasuProviderError
 from masu.external.downloader.aws.aws_report_downloader import (AWSReportDownloader,
-                                                                AWSReportDownloaderError)
+                                                                AWSReportDownloaderError,
+                                                                AWSReportDownloaderNoFileError)
 from masu.util.aws import common as utils
 from masu.external import AWS_REGIONS
 from tests import MasuTestCase
@@ -290,7 +291,7 @@ class AWSReportDownloaderTest(MasuTestCase):
         conn.Object(self.fake_bucket_name, fake_object).put(Body='test')
 
         missing_key = 'missing' + fake_object
-        with self.assertRaises(AWSReportDownloaderError) as error:
+        with self.assertRaises(AWSReportDownloaderNoFileError) as error:
             self.report_downloader.download_file(missing_key)
         expected_err = 'Unable to find {} in S3 Bucket: {}'.format(missing_key, self.fake_bucket_name)
         self.assertEqual(expected_err, str(error.exception))
@@ -374,6 +375,24 @@ class AWSReportDownloaderTest(MasuTestCase):
                                                         file_name)
                 expected_paths.append(expected_path)
             self.assertEqual(files_list, expected_paths)
+
+    @mock_s3
+    def test_download_report_missing_manifest(self):
+        fake_report_date = self.fake.date_time().replace(day=1)
+
+        # Moto setup
+        conn = boto3.resource('s3', region_name=self.selected_region)
+        conn.create_bucket(Bucket=self.fake_bucket_name)
+
+        out = self.report_downloader.download_report(fake_report_date)
+        self.assertEqual(out, [])
+
+    @mock_s3
+    def test_download_report_missing_bucket(self):
+        fake_report_date = self.fake.date_time().replace(day=1)
+
+        with self.assertRaises(AWSReportDownloaderError) as error:
+            self.report_downloader.download_report(fake_report_date)
 
     @mock_s3
     @patch('masu.util.aws.common.get_assume_role_session',

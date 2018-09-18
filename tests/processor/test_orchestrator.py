@@ -35,8 +35,7 @@ from tests.external.downloader.aws import fake_arn
 
 class FakeDownloader():
     fake = faker.Faker()
-
-    def download_current_report(self):
+    def download_reports(self, number_of_months=1):
         path = '/var/tmp/masu'
         fake_files = []
         for _ in range(1,random.randint(5,50)):

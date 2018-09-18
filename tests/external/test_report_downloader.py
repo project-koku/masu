@@ -71,25 +71,13 @@ class ReportDownloaderTest(MasuTestCase):
                              provider_type='unknown')
 
     @patch('masu.external.downloader.aws.aws_report_downloader.AWSReportDownloader.__init__', return_value=None)
-    def test_get_current_report(self, fake_downloader):
-        """Test get_current_report function."""
+    def test_get_reports_error(self, fake_downloader):
+        """Test get_reports function with error."""
         downloader = ReportDownloader(customer_name='customer name',
                                       access_credential=self.fake_creds,
                                       report_source='hereiam',
                                       report_name='bestreport',
                                       provider_type=AMAZON_WEB_SERVICES)
-        with patch.object(AWSReportDownloader, 'download_current_report', return_value=self.file_list):
-            files = downloader.get_current_report()
-            self.assertEqual(len(files), len(self.file_list))
-
-    @patch('masu.external.downloader.aws.aws_report_downloader.AWSReportDownloader.__init__', return_value=None)
-    def test_get_current_report_error(self, fake_downloader):
-        """Test get_current_report function with error."""
-        downloader = ReportDownloader(customer_name='customer name',
-                                      access_credential=self.fake_creds,
-                                      report_source='hereiam',
-                                      report_name='bestreport',
-                                      provider_type=AMAZON_WEB_SERVICES)
-        with patch.object(AWSReportDownloader, 'download_current_report', side_effect=Exception('some error')):
+        with patch.object(AWSReportDownloader, 'download_report', side_effect=Exception('some error')):
             with self.assertRaises(ReportDownloaderError):
-                downloader.get_current_report()
+                downloader.get_reports()

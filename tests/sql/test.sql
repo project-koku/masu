@@ -69,7 +69,8 @@ CREATE TABLE public.api_provider (
     authentication_id integer,
     billing_source_id integer,
     created_by_id integer,
-    customer_id integer
+    customer_id integer,
+    setup_complete boolean NOT NULL
 );
 
 
@@ -198,39 +199,6 @@ ALTER TABLE public.api_resettoken_id_seq OWNER TO kokuadmin;
 --
 
 ALTER SEQUENCE public.api_resettoken_id_seq OWNED BY public.api_resettoken.id;
-
-
---
--- Name: api_status; Type: TABLE; Schema: public; Owner: kokuadmin
---
-
-CREATE TABLE public.api_status (
-    id integer NOT NULL,
-    server_id uuid NOT NULL
-);
-
-
-ALTER TABLE public.api_status OWNER TO kokuadmin;
-
---
--- Name: api_status_id_seq; Type: SEQUENCE; Schema: public; Owner: kokuadmin
---
-
-CREATE SEQUENCE public.api_status_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.api_status_id_seq OWNER TO kokuadmin;
-
---
--- Name: api_status_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: kokuadmin
---
-
-ALTER SEQUENCE public.api_status_id_seq OWNED BY public.api_status.id;
 
 
 --
@@ -1303,13 +1271,6 @@ ALTER TABLE ONLY public.api_resettoken ALTER COLUMN id SET DEFAULT nextval('publ
 
 
 --
--- Name: api_status id; Type: DEFAULT; Schema: public; Owner: kokuadmin
---
-
-ALTER TABLE ONLY public.api_status ALTER COLUMN id SET DEFAULT nextval('public.api_status_id_seq'::regclass);
-
-
---
 -- Name: api_tenant id; Type: DEFAULT; Schema: public; Owner: kokuadmin
 --
 
@@ -1496,7 +1457,7 @@ ALTER TABLE ONLY testcustomer.reporting_awscostentryreservation ALTER COLUMN id 
 --
 
 COPY public.api_customer (group_ptr_id, date_created, owner_id, uuid, schema_name) FROM stdin;
-1	2018-09-07 13:06:13.545467+00	2	240e49c2-07f4-4ac7-a46f-c7f8ef464d2d	testcustomer
+1	2018-09-18 17:36:29.612193+00	2	2b498175-4258-4bc1-9c6d-62ce0960345c	testcustomer
 \.
 
 
@@ -1504,8 +1465,8 @@ COPY public.api_customer (group_ptr_id, date_created, owner_id, uuid, schema_nam
 -- Data for Name: api_provider; Type: TABLE DATA; Schema: public; Owner: kokuadmin
 --
 
-COPY public.api_provider (id, uuid, name, type, authentication_id, billing_source_id, created_by_id, customer_id) FROM stdin;
-1	6e212746-484a-40cd-bba0-09a19d132d64	Test Provider	AWS	1	1	2	1
+COPY public.api_provider (id, uuid, name, type, authentication_id, billing_source_id, created_by_id, customer_id, setup_complete) FROM stdin;
+1	6e212746-484a-40cd-bba0-09a19d132d64	Test Provider	AWS	1	1	2	1	f
 \.
 
 
@@ -1532,16 +1493,7 @@ COPY public.api_providerbillingsource (id, uuid, bucket) FROM stdin;
 --
 
 COPY public.api_resettoken (id, token, expiration_date, used, user_id) FROM stdin;
-1	22fe8b6f-4d47-4e65-b2f1-50be9edab601	2018-09-08 13:06:13.337096+00	f	2
-\.
-
-
---
--- Data for Name: api_status; Type: TABLE DATA; Schema: public; Owner: kokuadmin
---
-
-COPY public.api_status (id, server_id) FROM stdin;
-1	b4a43ed8-015a-436f-8383-f680583991a6
+1	c461920a-91e2-44a5-9394-b1a8bbade5df	2018-09-19 17:36:29.603072+00	f	2
 \.
 
 
@@ -1560,8 +1512,8 @@ COPY public.api_tenant (id, schema_name) FROM stdin;
 --
 
 COPY public.api_user (user_ptr_id, uuid) FROM stdin;
-1	e3a05798-3846-4bdf-a8ab-3046cf98c1d2
-2	1a234585-04a5-447d-ab70-30cb479314bd
+1	a0dc7eca-026a-43a6-a41b-d68d8517f62e
+2	87c64760-6897-4bcf-9657-171da3c2c6f3
 \.
 
 
@@ -1570,9 +1522,9 @@ COPY public.api_user (user_ptr_id, uuid) FROM stdin;
 --
 
 COPY public.api_userpreference (id, uuid, preference, user_id, description, name) FROM stdin;
-1	eab25ca8-2525-4354-8b6a-b6ae8e28c35d	{"currency": "USD"}	2	default preference	currency
-2	ede3da6b-b10a-45a6-b36a-c0af10cd3522	{"timezone": "UTC"}	2	default preference	timezone
-3	89f5fea9-15f0-474d-b3c4-bad8e2a00e9e	{"locale": "en_US.UTF-8"}	2	default preference	locale
+1	4e73f8a1-37b3-4713-ab9d-d29608d47ed9	{"currency": "USD"}	2	default preference	currency
+2	a826b56f-f712-47ad-8d7a-6cc606b8ff3b	{"timezone": "UTC"}	2	default preference	timezone
+3	d041cc4e-407d-4e4a-8340-6b001b8a146f	{"locale": "en_US.UTF-8"}	2	default preference	locale
 \.
 
 
@@ -1626,98 +1578,94 @@ COPY public.auth_permission (id, name, content_type_id, codename) FROM stdin;
 26	Can change Token	7	change_token
 27	Can delete Token	7	delete_token
 28	Can view Token	7	view_token
-29	Can add status	8	add_status
-30	Can change status	8	change_status
-31	Can delete status	8	delete_status
-32	Can view status	8	view_status
-33	Can add customer	9	add_customer
-34	Can change customer	9	change_customer
-35	Can delete customer	9	delete_customer
-36	Can view customer	9	view_customer
-37	Can add user	10	add_user
-38	Can change user	10	change_user
-39	Can delete user	10	delete_user
-40	Can view user	10	view_user
-41	Can add reset token	11	add_resettoken
-42	Can change reset token	11	change_resettoken
-43	Can delete reset token	11	delete_resettoken
-44	Can view reset token	11	view_resettoken
-45	Can add user preference	12	add_userpreference
-46	Can change user preference	12	change_userpreference
-47	Can delete user preference	12	delete_userpreference
-48	Can view user preference	12	view_userpreference
-49	Can add provider	13	add_provider
-50	Can change provider	13	change_provider
-51	Can delete provider	13	delete_provider
-52	Can view provider	13	view_provider
-53	Can add provider authentication	14	add_providerauthentication
-54	Can change provider authentication	14	change_providerauthentication
-55	Can delete provider authentication	14	delete_providerauthentication
-56	Can view provider authentication	14	view_providerauthentication
-57	Can add provider billing source	15	add_providerbillingsource
-58	Can change provider billing source	15	change_providerbillingsource
-59	Can delete provider billing source	15	delete_providerbillingsource
-60	Can view provider billing source	15	view_providerbillingsource
-61	Can add tenant	16	add_tenant
-62	Can change tenant	16	change_tenant
-63	Can delete tenant	16	delete_tenant
-64	Can view tenant	16	view_tenant
-65	Can add aws cost entry	17	add_awscostentry
-66	Can change aws cost entry	17	change_awscostentry
-67	Can delete aws cost entry	17	delete_awscostentry
-68	Can view aws cost entry	17	view_awscostentry
-69	Can add aws cost entry bill	18	add_awscostentrybill
-70	Can change aws cost entry bill	18	change_awscostentrybill
-71	Can delete aws cost entry bill	18	delete_awscostentrybill
-72	Can view aws cost entry bill	18	view_awscostentrybill
-73	Can add aws cost entry line item	19	add_awscostentrylineitem
-74	Can change aws cost entry line item	19	change_awscostentrylineitem
-75	Can delete aws cost entry line item	19	delete_awscostentrylineitem
-76	Can view aws cost entry line item	19	view_awscostentrylineitem
-77	Can add aws cost entry pricing	20	add_awscostentrypricing
-78	Can change aws cost entry pricing	20	change_awscostentrypricing
-79	Can delete aws cost entry pricing	20	delete_awscostentrypricing
-80	Can view aws cost entry pricing	20	view_awscostentrypricing
-81	Can add aws cost entry product	21	add_awscostentryproduct
-82	Can change aws cost entry product	21	change_awscostentryproduct
-83	Can delete aws cost entry product	21	delete_awscostentryproduct
-84	Can view aws cost entry product	21	view_awscostentryproduct
-85	Can add aws cost entry reservation	22	add_awscostentryreservation
-86	Can change aws cost entry reservation	22	change_awscostentryreservation
-87	Can delete aws cost entry reservation	22	delete_awscostentryreservation
-88	Can view aws cost entry reservation	22	view_awscostentryreservation
-89	Can add aws cost entry line item aggregates	23	add_awscostentrylineitemaggregates
-90	Can change aws cost entry line item aggregates	23	change_awscostentrylineitemaggregates
-91	Can delete aws cost entry line item aggregates	23	delete_awscostentrylineitemaggregates
-92	Can view aws cost entry line item aggregates	23	view_awscostentrylineitemaggregates
-93	Can add aws cost entry line item daily	24	add_awscostentrylineitemdaily
-94	Can change aws cost entry line item daily	24	change_awscostentrylineitemdaily
-95	Can delete aws cost entry line item daily	24	delete_awscostentrylineitemdaily
-96	Can view aws cost entry line item daily	24	view_awscostentrylineitemdaily
-97	Can add aws cost entry line item daily summary	25	add_awscostentrylineitemdailysummary
-98	Can change aws cost entry line item daily summary	25	change_awscostentrylineitemdailysummary
-99	Can delete aws cost entry line item daily summary	25	delete_awscostentrylineitemdailysummary
-100	Can view aws cost entry line item daily summary	25	view_awscostentrylineitemdailysummary
-101	Can add aws account alias	26	add_awsaccountalias
-102	Can change aws account alias	26	change_awsaccountalias
-103	Can delete aws account alias	26	delete_awsaccountalias
-104	Can view aws account alias	26	view_awsaccountalias
-105	Can add report column map	27	add_reportcolumnmap
-106	Can change report column map	27	change_reportcolumnmap
-107	Can delete report column map	27	delete_reportcolumnmap
-108	Can view report column map	27	view_reportcolumnmap
-109	Can add cost usage report status	28	add_costusagereportstatus
-110	Can change cost usage report status	28	change_costusagereportstatus
-111	Can delete cost usage report status	28	delete_costusagereportstatus
-112	Can view cost usage report status	28	view_costusagereportstatus
-113	Can add si unit scale	29	add_siunitscale
-114	Can change si unit scale	29	change_siunitscale
-115	Can delete si unit scale	29	delete_siunitscale
-116	Can view si unit scale	29	view_siunitscale
-117	Can add region mapping	30	add_regionmapping
-118	Can change region mapping	30	change_regionmapping
-119	Can delete region mapping	30	delete_regionmapping
-120	Can view region mapping	30	view_regionmapping
+29	Can add customer	8	add_customer
+30	Can change customer	8	change_customer
+31	Can delete customer	8	delete_customer
+32	Can view customer	8	view_customer
+33	Can add user	9	add_user
+34	Can change user	9	change_user
+35	Can delete user	9	delete_user
+36	Can view user	9	view_user
+37	Can add reset token	10	add_resettoken
+38	Can change reset token	10	change_resettoken
+39	Can delete reset token	10	delete_resettoken
+40	Can view reset token	10	view_resettoken
+41	Can add user preference	11	add_userpreference
+42	Can change user preference	11	change_userpreference
+43	Can delete user preference	11	delete_userpreference
+44	Can view user preference	11	view_userpreference
+45	Can add provider	12	add_provider
+46	Can change provider	12	change_provider
+47	Can delete provider	12	delete_provider
+48	Can view provider	12	view_provider
+49	Can add provider authentication	13	add_providerauthentication
+50	Can change provider authentication	13	change_providerauthentication
+51	Can delete provider authentication	13	delete_providerauthentication
+52	Can view provider authentication	13	view_providerauthentication
+53	Can add provider billing source	14	add_providerbillingsource
+54	Can change provider billing source	14	change_providerbillingsource
+55	Can delete provider billing source	14	delete_providerbillingsource
+56	Can view provider billing source	14	view_providerbillingsource
+57	Can add tenant	15	add_tenant
+58	Can change tenant	15	change_tenant
+59	Can delete tenant	15	delete_tenant
+60	Can view tenant	15	view_tenant
+61	Can add aws cost entry	16	add_awscostentry
+62	Can change aws cost entry	16	change_awscostentry
+63	Can delete aws cost entry	16	delete_awscostentry
+64	Can view aws cost entry	16	view_awscostentry
+65	Can add aws cost entry bill	17	add_awscostentrybill
+66	Can change aws cost entry bill	17	change_awscostentrybill
+67	Can delete aws cost entry bill	17	delete_awscostentrybill
+68	Can view aws cost entry bill	17	view_awscostentrybill
+69	Can add aws cost entry line item	18	add_awscostentrylineitem
+70	Can change aws cost entry line item	18	change_awscostentrylineitem
+71	Can delete aws cost entry line item	18	delete_awscostentrylineitem
+72	Can view aws cost entry line item	18	view_awscostentrylineitem
+73	Can add aws cost entry pricing	19	add_awscostentrypricing
+74	Can change aws cost entry pricing	19	change_awscostentrypricing
+75	Can delete aws cost entry pricing	19	delete_awscostentrypricing
+76	Can view aws cost entry pricing	19	view_awscostentrypricing
+77	Can add aws cost entry product	20	add_awscostentryproduct
+78	Can change aws cost entry product	20	change_awscostentryproduct
+79	Can delete aws cost entry product	20	delete_awscostentryproduct
+80	Can view aws cost entry product	20	view_awscostentryproduct
+81	Can add aws cost entry reservation	21	add_awscostentryreservation
+82	Can change aws cost entry reservation	21	change_awscostentryreservation
+83	Can delete aws cost entry reservation	21	delete_awscostentryreservation
+84	Can view aws cost entry reservation	21	view_awscostentryreservation
+85	Can add aws cost entry line item aggregates	22	add_awscostentrylineitemaggregates
+86	Can change aws cost entry line item aggregates	22	change_awscostentrylineitemaggregates
+87	Can delete aws cost entry line item aggregates	22	delete_awscostentrylineitemaggregates
+88	Can view aws cost entry line item aggregates	22	view_awscostentrylineitemaggregates
+89	Can add aws cost entry line item daily	23	add_awscostentrylineitemdaily
+90	Can change aws cost entry line item daily	23	change_awscostentrylineitemdaily
+91	Can delete aws cost entry line item daily	23	delete_awscostentrylineitemdaily
+92	Can view aws cost entry line item daily	23	view_awscostentrylineitemdaily
+93	Can add aws cost entry line item daily summary	24	add_awscostentrylineitemdailysummary
+94	Can change aws cost entry line item daily summary	24	change_awscostentrylineitemdailysummary
+95	Can delete aws cost entry line item daily summary	24	delete_awscostentrylineitemdailysummary
+96	Can view aws cost entry line item daily summary	24	view_awscostentrylineitemdailysummary
+97	Can add aws account alias	25	add_awsaccountalias
+98	Can change aws account alias	25	change_awsaccountalias
+99	Can delete aws account alias	25	delete_awsaccountalias
+100	Can view aws account alias	25	view_awsaccountalias
+101	Can add report column map	26	add_reportcolumnmap
+102	Can change report column map	26	change_reportcolumnmap
+103	Can delete report column map	26	delete_reportcolumnmap
+104	Can view report column map	26	view_reportcolumnmap
+105	Can add cost usage report status	27	add_costusagereportstatus
+106	Can change cost usage report status	27	change_costusagereportstatus
+107	Can delete cost usage report status	27	delete_costusagereportstatus
+108	Can view cost usage report status	27	view_costusagereportstatus
+109	Can add si unit scale	28	add_siunitscale
+110	Can change si unit scale	28	change_siunitscale
+111	Can delete si unit scale	28	delete_siunitscale
+112	Can view si unit scale	28	view_siunitscale
+113	Can add region mapping	29	add_regionmapping
+114	Can change region mapping	29	change_regionmapping
+115	Can delete region mapping	29	delete_regionmapping
+116	Can view region mapping	29	view_regionmapping
 \.
 
 
@@ -1726,8 +1674,8 @@ COPY public.auth_permission (id, name, content_type_id, codename) FROM stdin;
 --
 
 COPY public.auth_user (id, password, last_login, is_superuser, username, first_name, last_name, email, is_staff, is_active, date_joined) FROM stdin;
-1	pbkdf2_sha256$120000$l0XHpNNaCWRJ$gkS9D+hrygZeKct3x2LfKB8n3pcSt+YYxcAfT8Zlipg=	\N	t	admin			admin@example.com	t	t	2018-09-07 13:06:03.335674+00
-2	pbkdf2_sha256$120000$BcnyL4ZWtdoL$TsTMdbn3vS5AiWWlYC2TTeREi8esenPdeqxvObKoUzM=	\N	f	test_customer			test@example.com	f	t	2018-09-07 13:06:13.01415+00
+1	pbkdf2_sha256$120000$jf6yOEd8KULl$5eCxupWGGF8mhN+aplUX1V/L55bjh8ADdgsYQ2Txkz8=	\N	t	admin			admin@example.com	t	t	2018-09-18 17:36:19.641122+00
+2	pbkdf2_sha256$120000$W0IpbsawR2z2$2CdYqxKGpytq8k5OB7HHGvsE/XTyDCiQa8EbC7N1S58=	\N	f	test_customer			test@example.com	f	t	2018-09-18 17:36:29.359585+00
 \.
 
 
@@ -1753,7 +1701,7 @@ COPY public.auth_user_user_permissions (id, user_id, permission_id) FROM stdin;
 --
 
 COPY public.authtoken_token (key, created, user_id) FROM stdin;
-f7bfff9388859d43a6a347527f1e7983eb907999	2018-09-07 13:06:12.965624+00	1
+0f070d5acffabfc4d4e79302f1531f96c3ac4449	2018-09-18 17:36:29.266173+00	1
 \.
 
 
@@ -1777,29 +1725,28 @@ COPY public.django_content_type (id, app_label, model) FROM stdin;
 5	contenttypes	contenttype
 6	sessions	session
 7	authtoken	token
-8	api	status
-9	api	customer
-10	api	user
-11	api	resettoken
-12	api	userpreference
-13	api	provider
-14	api	providerauthentication
-15	api	providerbillingsource
-16	api	tenant
-17	reporting	awscostentry
-18	reporting	awscostentrybill
-19	reporting	awscostentrylineitem
-20	reporting	awscostentrypricing
-21	reporting	awscostentryproduct
-22	reporting	awscostentryreservation
-23	reporting	awscostentrylineitemaggregates
-24	reporting	awscostentrylineitemdaily
-25	reporting	awscostentrylineitemdailysummary
-26	reporting	awsaccountalias
-27	reporting_common	reportcolumnmap
-28	reporting_common	costusagereportstatus
-29	reporting_common	siunitscale
-30	reporting_common	regionmapping
+8	api	customer
+9	api	user
+10	api	resettoken
+11	api	userpreference
+12	api	provider
+13	api	providerauthentication
+14	api	providerbillingsource
+15	api	tenant
+16	reporting	awscostentry
+17	reporting	awscostentrybill
+18	reporting	awscostentrylineitem
+19	reporting	awscostentrypricing
+20	reporting	awscostentryproduct
+21	reporting	awscostentryreservation
+22	reporting	awscostentrylineitemaggregates
+23	reporting	awscostentrylineitemdaily
+24	reporting	awscostentrylineitemdailysummary
+25	reporting	awsaccountalias
+26	reporting_common	reportcolumnmap
+27	reporting_common	costusagereportstatus
+28	reporting_common	siunitscale
+29	reporting_common	regionmapping
 \.
 
 
@@ -1808,55 +1755,57 @@ COPY public.django_content_type (id, app_label, model) FROM stdin;
 --
 
 COPY public.django_migrations (id, app, name, applied) FROM stdin;
-1	contenttypes	0001_initial	2018-09-07 13:06:02.069835+00
-2	auth	0001_initial	2018-09-07 13:06:02.237345+00
-3	admin	0001_initial	2018-09-07 13:06:02.293066+00
-4	admin	0002_logentry_remove_auto_add	2018-09-07 13:06:02.309+00
-5	admin	0003_logentry_add_action_flag_choices	2018-09-07 13:06:02.325435+00
-6	contenttypes	0002_remove_content_type_name	2018-09-07 13:06:02.389097+00
-7	auth	0002_alter_permission_name_max_length	2018-09-07 13:06:02.408429+00
-8	auth	0003_alter_user_email_max_length	2018-09-07 13:06:02.432477+00
-9	auth	0004_alter_user_username_opts	2018-09-07 13:06:02.44891+00
-10	auth	0005_alter_user_last_login_null	2018-09-07 13:06:02.471162+00
-11	auth	0006_require_contenttypes_0002	2018-09-07 13:06:02.479778+00
-12	auth	0007_alter_validators_add_error_messages	2018-09-07 13:06:02.498048+00
-13	auth	0008_alter_user_username_max_length	2018-09-07 13:06:02.527972+00
-14	auth	0009_alter_user_last_name_max_length	2018-09-07 13:06:02.551399+00
-15	api	0001_initial	2018-09-07 13:06:02.572033+00
-16	api	0002_auto_20180509_1400	2018-09-07 13:06:02.642901+00
-17	api	0003_auto_20180509_1849	2018-09-07 13:06:02.728995+00
-18	api	0004_auto_20180510_1824	2018-09-07 13:06:02.805716+00
-19	api	0005_auto_20180511_1445	2018-09-07 13:06:02.828593+00
-20	api	0006_resettoken	2018-09-07 13:06:02.8752+00
-21	api	0007_userpreference	2018-09-07 13:06:02.924578+00
-22	api	0008_provider	2018-09-07 13:06:03.044619+00
-23	api	0009_auto_20180523_0045	2018-09-07 13:06:03.082614+00
-24	api	0010_auto_20180523_1540	2018-09-07 13:06:03.150699+00
-25	api	0011_auto_20180524_1838	2018-09-07 13:06:03.207736+00
-26	api	0012_auto_20180529_1526	2018-09-07 13:06:03.372085+00
-27	api	0013_auto_20180531_1921	2018-09-07 13:06:03.401167+00
-28	api	0014_costusagereportstatus	2018-09-07 13:06:03.472259+00
-29	api	0015_auto_20180614_1343	2018-09-07 13:06:03.571933+00
-30	api	0016_auto_20180802_1911	2018-09-07 13:06:03.606395+00
-31	api	0017_auto_20180815_1716	2018-09-07 13:06:03.646105+00
-32	authtoken	0001_initial	2018-09-07 13:06:03.709742+00
-33	authtoken	0002_auto_20160226_1747	2018-09-07 13:06:03.769475+00
-34	reporting	0001_initial	2018-09-07 13:06:03.826655+00
-35	reporting	0002_auto_20180615_1725	2018-09-07 13:06:04.075504+00
-36	reporting	0003_auto_20180619_1833	2018-09-07 13:06:04.162487+00
-37	reporting	0004_auto_20180803_1926	2018-09-07 13:06:04.185652+00
-38	reporting	0005_auto_20180807_1819	2018-09-07 13:06:04.221265+00
-39	reporting	0006_auto_20180821_1654	2018-09-07 13:06:04.326566+00
-40	reporting	0007_auto_20180824_0035	2018-09-07 13:06:04.412975+00
-41	reporting	0008_awsaccountalias	2018-09-07 13:06:04.424288+00
-42	reporting_common	0001_initial	2018-09-07 13:06:04.450637+00
-43	reporting_common	0002_auto_20180608_1647	2018-09-07 13:06:04.61019+00
-44	reporting_common	0003_costusagereportstatus	2018-09-07 13:06:04.659493+00
-45	reporting_common	0004_siunitscale	2018-09-07 13:06:04.686404+00
-46	reporting_common	0005_auto_20180725_1523	2018-09-07 13:06:04.774981+00
-47	reporting_common	0006_auto_20180802_1911	2018-09-07 13:06:04.787016+00
-48	reporting_common	0007_auto_20180808_2134	2018-09-07 13:06:04.818547+00
-49	sessions	0001_initial	2018-09-07 13:06:04.8487+00
+1	contenttypes	0001_initial	2018-09-18 17:36:18.452898+00
+2	auth	0001_initial	2018-09-18 17:36:18.603537+00
+3	admin	0001_initial	2018-09-18 17:36:18.647259+00
+4	admin	0002_logentry_remove_auto_add	2018-09-18 17:36:18.66265+00
+5	admin	0003_logentry_add_action_flag_choices	2018-09-18 17:36:18.679424+00
+6	contenttypes	0002_remove_content_type_name	2018-09-18 17:36:18.710716+00
+7	auth	0002_alter_permission_name_max_length	2018-09-18 17:36:18.728587+00
+8	auth	0003_alter_user_email_max_length	2018-09-18 17:36:18.751882+00
+9	auth	0004_alter_user_username_opts	2018-09-18 17:36:18.765918+00
+10	auth	0005_alter_user_last_login_null	2018-09-18 17:36:18.787715+00
+11	auth	0006_require_contenttypes_0002	2018-09-18 17:36:18.796588+00
+12	auth	0007_alter_validators_add_error_messages	2018-09-18 17:36:18.811203+00
+13	auth	0008_alter_user_username_max_length	2018-09-18 17:36:18.838653+00
+14	auth	0009_alter_user_last_name_max_length	2018-09-18 17:36:18.860489+00
+15	api	0001_initial	2018-09-18 17:36:18.877597+00
+16	api	0002_auto_20180509_1400	2018-09-18 17:36:18.937223+00
+17	api	0003_auto_20180509_1849	2018-09-18 17:36:19.011119+00
+18	api	0004_auto_20180510_1824	2018-09-18 17:36:19.11117+00
+19	api	0005_auto_20180511_1445	2018-09-18 17:36:19.148897+00
+20	api	0006_resettoken	2018-09-18 17:36:19.200098+00
+21	api	0007_userpreference	2018-09-18 17:36:19.243876+00
+22	api	0008_provider	2018-09-18 17:36:19.36719+00
+23	api	0009_auto_20180523_0045	2018-09-18 17:36:19.40594+00
+24	api	0010_auto_20180523_1540	2018-09-18 17:36:19.462471+00
+25	api	0011_auto_20180524_1838	2018-09-18 17:36:19.515913+00
+26	api	0012_auto_20180529_1526	2018-09-18 17:36:19.677889+00
+27	api	0013_auto_20180531_1921	2018-09-18 17:36:19.700682+00
+28	api	0014_costusagereportstatus	2018-09-18 17:36:19.741582+00
+29	api	0015_auto_20180614_1343	2018-09-18 17:36:19.782324+00
+30	api	0016_auto_20180802_1911	2018-09-18 17:36:19.802346+00
+31	api	0017_auto_20180815_1716	2018-09-18 17:36:19.829861+00
+32	api	0018_delete_status	2018-09-18 17:36:19.844241+00
+33	api	0019_provider_setup_complete	2018-09-18 17:36:19.87916+00
+34	authtoken	0001_initial	2018-09-18 17:36:19.915282+00
+35	authtoken	0002_auto_20160226_1747	2018-09-18 17:36:19.972064+00
+36	reporting	0001_initial	2018-09-18 17:36:20.027579+00
+37	reporting	0002_auto_20180615_1725	2018-09-18 17:36:20.263584+00
+38	reporting	0003_auto_20180619_1833	2018-09-18 17:36:20.344322+00
+39	reporting	0004_auto_20180803_1926	2018-09-18 17:36:20.373126+00
+40	reporting	0005_auto_20180807_1819	2018-09-18 17:36:20.413669+00
+41	reporting	0006_auto_20180821_1654	2018-09-18 17:36:20.5111+00
+42	reporting	0007_auto_20180824_0035	2018-09-18 17:36:20.592489+00
+43	reporting	0008_awsaccountalias	2018-09-18 17:36:20.606429+00
+44	reporting_common	0001_initial	2018-09-18 17:36:20.634508+00
+45	reporting_common	0002_auto_20180608_1647	2018-09-18 17:36:20.775834+00
+46	reporting_common	0003_costusagereportstatus	2018-09-18 17:36:20.819816+00
+47	reporting_common	0004_siunitscale	2018-09-18 17:36:20.874886+00
+48	reporting_common	0005_auto_20180725_1523	2018-09-18 17:36:21.052599+00
+49	reporting_common	0006_auto_20180802_1911	2018-09-18 17:36:21.070691+00
+50	reporting_common	0007_auto_20180808_2134	2018-09-18 17:36:21.112372+00
+51	sessions	0001_initial	2018-09-18 17:36:21.170247+00
 \.
 
 
@@ -1969,55 +1918,57 @@ COPY public.si_unit_scale (id, prefix, prefix_symbol, multiplying_factor) FROM s
 --
 
 COPY testcustomer.django_migrations (id, app, name, applied) FROM stdin;
-1	contenttypes	0001_initial	2018-09-07 13:06:13.704411+00
-2	auth	0001_initial	2018-09-07 13:06:13.726677+00
-3	admin	0001_initial	2018-09-07 13:06:13.747275+00
-4	admin	0002_logentry_remove_auto_add	2018-09-07 13:06:13.76221+00
-5	admin	0003_logentry_add_action_flag_choices	2018-09-07 13:06:13.776861+00
-6	contenttypes	0002_remove_content_type_name	2018-09-07 13:06:13.7942+00
-7	auth	0002_alter_permission_name_max_length	2018-09-07 13:06:13.807102+00
-8	auth	0003_alter_user_email_max_length	2018-09-07 13:06:13.822117+00
-9	auth	0004_alter_user_username_opts	2018-09-07 13:06:13.837205+00
-10	auth	0005_alter_user_last_login_null	2018-09-07 13:06:13.854697+00
-11	auth	0006_require_contenttypes_0002	2018-09-07 13:06:13.862246+00
-12	auth	0007_alter_validators_add_error_messages	2018-09-07 13:06:13.8783+00
-13	auth	0008_alter_user_username_max_length	2018-09-07 13:06:13.892209+00
-14	auth	0009_alter_user_last_name_max_length	2018-09-07 13:06:13.906404+00
-15	api	0001_initial	2018-09-07 13:06:13.91572+00
-16	api	0002_auto_20180509_1400	2018-09-07 13:06:13.944202+00
-17	api	0003_auto_20180509_1849	2018-09-07 13:06:13.975801+00
-18	api	0004_auto_20180510_1824	2018-09-07 13:06:14.012655+00
-19	api	0005_auto_20180511_1445	2018-09-07 13:06:14.036101+00
-20	api	0006_resettoken	2018-09-07 13:06:14.053968+00
-21	api	0007_userpreference	2018-09-07 13:06:14.071533+00
-22	api	0008_provider	2018-09-07 13:06:14.110406+00
-23	api	0009_auto_20180523_0045	2018-09-07 13:06:14.129335+00
-24	api	0010_auto_20180523_1540	2018-09-07 13:06:14.164562+00
-25	api	0011_auto_20180524_1838	2018-09-07 13:06:14.185804+00
-26	api	0012_auto_20180529_1526	2018-09-07 13:06:14.196062+00
-27	api	0013_auto_20180531_1921	2018-09-07 13:06:14.206656+00
-28	api	0014_costusagereportstatus	2018-09-07 13:06:14.227192+00
-29	api	0015_auto_20180614_1343	2018-09-07 13:06:14.24824+00
-30	api	0016_auto_20180802_1911	2018-09-07 13:06:14.267089+00
-31	api	0017_auto_20180815_1716	2018-09-07 13:06:14.28594+00
-32	authtoken	0001_initial	2018-09-07 13:06:14.307889+00
-33	authtoken	0002_auto_20160226_1747	2018-09-07 13:06:14.344562+00
-34	reporting	0001_initial	2018-09-07 13:06:14.510856+00
-35	reporting	0002_auto_20180615_1725	2018-09-07 13:06:14.925671+00
-36	reporting	0003_auto_20180619_1833	2018-09-07 13:06:15.239741+00
-37	reporting	0004_auto_20180803_1926	2018-09-07 13:06:15.270388+00
-38	reporting	0005_auto_20180807_1819	2018-09-07 13:06:15.317729+00
-39	reporting	0006_auto_20180821_1654	2018-09-07 13:06:15.53086+00
-40	reporting	0007_auto_20180824_0035	2018-09-07 13:06:15.71687+00
-41	reporting	0008_awsaccountalias	2018-09-07 13:06:15.740954+00
-42	reporting_common	0001_initial	2018-09-07 13:06:15.751118+00
-43	reporting_common	0002_auto_20180608_1647	2018-09-07 13:06:15.760207+00
-44	reporting_common	0003_costusagereportstatus	2018-09-07 13:06:15.783409+00
-45	reporting_common	0004_siunitscale	2018-09-07 13:06:15.793868+00
-46	reporting_common	0005_auto_20180725_1523	2018-09-07 13:06:15.803598+00
-47	reporting_common	0006_auto_20180802_1911	2018-09-07 13:06:15.814389+00
-48	reporting_common	0007_auto_20180808_2134	2018-09-07 13:06:15.8246+00
-49	sessions	0001_initial	2018-09-07 13:06:15.834939+00
+1	contenttypes	0001_initial	2018-09-18 17:36:29.679868+00
+2	auth	0001_initial	2018-09-18 17:36:29.698544+00
+3	admin	0001_initial	2018-09-18 17:36:29.713915+00
+4	admin	0002_logentry_remove_auto_add	2018-09-18 17:36:29.729283+00
+5	admin	0003_logentry_add_action_flag_choices	2018-09-18 17:36:29.74311+00
+6	contenttypes	0002_remove_content_type_name	2018-09-18 17:36:29.760112+00
+7	auth	0002_alter_permission_name_max_length	2018-09-18 17:36:29.77139+00
+8	auth	0003_alter_user_email_max_length	2018-09-18 17:36:29.787431+00
+9	auth	0004_alter_user_username_opts	2018-09-18 17:36:29.802143+00
+10	auth	0005_alter_user_last_login_null	2018-09-18 17:36:29.816717+00
+11	auth	0006_require_contenttypes_0002	2018-09-18 17:36:29.82471+00
+12	auth	0007_alter_validators_add_error_messages	2018-09-18 17:36:29.840045+00
+13	auth	0008_alter_user_username_max_length	2018-09-18 17:36:29.85461+00
+14	auth	0009_alter_user_last_name_max_length	2018-09-18 17:36:29.869515+00
+15	api	0001_initial	2018-09-18 17:36:29.878376+00
+16	api	0002_auto_20180509_1400	2018-09-18 17:36:29.910066+00
+17	api	0003_auto_20180509_1849	2018-09-18 17:36:29.940002+00
+18	api	0004_auto_20180510_1824	2018-09-18 17:36:29.976335+00
+19	api	0005_auto_20180511_1445	2018-09-18 17:36:30.001131+00
+20	api	0006_resettoken	2018-09-18 17:36:30.018313+00
+21	api	0007_userpreference	2018-09-18 17:36:30.036025+00
+22	api	0008_provider	2018-09-18 17:36:30.108604+00
+23	api	0009_auto_20180523_0045	2018-09-18 17:36:30.129415+00
+24	api	0010_auto_20180523_1540	2018-09-18 17:36:30.218352+00
+25	api	0011_auto_20180524_1838	2018-09-18 17:36:30.237645+00
+26	api	0012_auto_20180529_1526	2018-09-18 17:36:30.247088+00
+27	api	0013_auto_20180531_1921	2018-09-18 17:36:30.257923+00
+28	api	0014_costusagereportstatus	2018-09-18 17:36:30.276929+00
+29	api	0015_auto_20180614_1343	2018-09-18 17:36:30.2976+00
+30	api	0016_auto_20180802_1911	2018-09-18 17:36:30.31665+00
+31	api	0017_auto_20180815_1716	2018-09-18 17:36:30.333618+00
+32	api	0018_delete_status	2018-09-18 17:36:30.349516+00
+33	api	0019_provider_setup_complete	2018-09-18 17:36:30.36849+00
+34	authtoken	0001_initial	2018-09-18 17:36:30.387985+00
+35	authtoken	0002_auto_20160226_1747	2018-09-18 17:36:30.426208+00
+36	reporting	0001_initial	2018-09-18 17:36:30.579391+00
+37	reporting	0002_auto_20180615_1725	2018-09-18 17:36:31.01659+00
+38	reporting	0003_auto_20180619_1833	2018-09-18 17:36:31.41731+00
+39	reporting	0004_auto_20180803_1926	2018-09-18 17:36:31.454992+00
+40	reporting	0005_auto_20180807_1819	2018-09-18 17:36:31.508058+00
+41	reporting	0006_auto_20180821_1654	2018-09-18 17:36:31.742303+00
+42	reporting	0007_auto_20180824_0035	2018-09-18 17:36:31.90256+00
+43	reporting	0008_awsaccountalias	2018-09-18 17:36:31.924084+00
+44	reporting_common	0001_initial	2018-09-18 17:36:31.933311+00
+45	reporting_common	0002_auto_20180608_1647	2018-09-18 17:36:31.941874+00
+46	reporting_common	0003_costusagereportstatus	2018-09-18 17:36:31.962957+00
+47	reporting_common	0004_siunitscale	2018-09-18 17:36:31.973298+00
+48	reporting_common	0005_auto_20180725_1523	2018-09-18 17:36:31.982094+00
+49	reporting_common	0006_auto_20180802_1911	2018-09-18 17:36:31.994709+00
+50	reporting_common	0007_auto_20180808_2134	2018-09-18 17:36:32.004751+00
+51	sessions	0001_initial	2018-09-18 17:36:32.014884+00
 \.
 
 
@@ -2130,13 +2081,6 @@ SELECT pg_catalog.setval('public.api_resettoken_id_seq', 1, true);
 
 
 --
--- Name: api_status_id_seq; Type: SEQUENCE SET; Schema: public; Owner: kokuadmin
---
-
-SELECT pg_catalog.setval('public.api_status_id_seq', 1, true);
-
-
---
 -- Name: api_tenant_id_seq; Type: SEQUENCE SET; Schema: public; Owner: kokuadmin
 --
 
@@ -2168,7 +2112,7 @@ SELECT pg_catalog.setval('public.auth_group_permissions_id_seq', 1, false);
 -- Name: auth_permission_id_seq; Type: SEQUENCE SET; Schema: public; Owner: kokuadmin
 --
 
-SELECT pg_catalog.setval('public.auth_permission_id_seq', 120, true);
+SELECT pg_catalog.setval('public.auth_permission_id_seq', 116, true);
 
 
 --
@@ -2203,14 +2147,14 @@ SELECT pg_catalog.setval('public.django_admin_log_id_seq', 1, false);
 -- Name: django_content_type_id_seq; Type: SEQUENCE SET; Schema: public; Owner: kokuadmin
 --
 
-SELECT pg_catalog.setval('public.django_content_type_id_seq', 30, true);
+SELECT pg_catalog.setval('public.django_content_type_id_seq', 29, true);
 
 
 --
 -- Name: django_migrations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: kokuadmin
 --
 
-SELECT pg_catalog.setval('public.django_migrations_id_seq', 49, true);
+SELECT pg_catalog.setval('public.django_migrations_id_seq', 51, true);
 
 
 --
@@ -2245,7 +2189,7 @@ SELECT pg_catalog.setval('public.si_unit_scale_id_seq', 17, true);
 -- Name: django_migrations_id_seq; Type: SEQUENCE SET; Schema: testcustomer; Owner: kokuadmin
 --
 
-SELECT pg_catalog.setval('testcustomer.django_migrations_id_seq', 49, true);
+SELECT pg_catalog.setval('testcustomer.django_migrations_id_seq', 51, true);
 
 
 --
@@ -2412,14 +2356,6 @@ ALTER TABLE ONLY public.api_resettoken
 
 ALTER TABLE ONLY public.api_resettoken
     ADD CONSTRAINT api_resettoken_token_key UNIQUE (token);
-
-
---
--- Name: api_status api_status_pkey; Type: CONSTRAINT; Schema: public; Owner: kokuadmin
---
-
-ALTER TABLE ONLY public.api_status
-    ADD CONSTRAINT api_status_pkey PRIMARY KEY (id);
 
 
 --

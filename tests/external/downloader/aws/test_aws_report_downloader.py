@@ -38,6 +38,7 @@ from masu.exceptions import MasuProviderError
 from masu.external.downloader.aws.aws_report_downloader import (AWSReportDownloader,
                                                                 AWSReportDownloaderError,
                                                                 AWSReportDownloaderNoFileError)
+from masu.external.report_downloader import ReportDownloader
 from masu.util.aws import common as utils
 from masu.external import AWS_REGIONS
 from tests import MasuTestCase
@@ -118,10 +119,15 @@ class AWSReportDownloaderTest(MasuTestCase):
         self.fake_bucket_prefix = PREFIX
         self.selected_region = REGION
 
-        auth_credential = fake_arn(service='iam', generate_account_id=True)
+        self.auth_credential = fake_arn(service='iam', generate_account_id=True)
 
-        self.report_downloader = AWSReportDownloader(**{'customer_name': self.fake_customer_name,
-                                                        'auth_credential': auth_credential,
+        self.report_downloader = ReportDownloader(self.fake_customer_name,
+                                                  self.auth_credential,
+                                                  self.fake_bucket_name,
+                                                  'AWS')
+
+        self.aws_report_downloader = AWSReportDownloader(**{'customer_name': self.fake_customer_name,
+                                                        'auth_credential': self.auth_credential,
                                                         'bucket': self.fake_bucket_name,
                                                         'report_name': self.fake_report_name})
 
@@ -175,7 +181,7 @@ class AWSReportDownloaderTest(MasuTestCase):
         self.assertEqual(fake_object_body, json.load(key['Body']))
 
         # actual test
-        out = self.report_downloader.download_bucket()
+        out = self.aws_report_downloader.download_bucket()
         expected_files = []
         for csv_filename in fake_csv_files:
             report_key = fake_csv_files_with_key.get(csv_filename)
@@ -195,66 +201,74 @@ class AWSReportDownloaderTest(MasuTestCase):
 
 
     @mock_s3
-    def test_download_current_report(self):
-        fake_report_date = datetime.today().replace(day=1)
-        fake_report_end_date = fake_report_date + relativedelta(months=+1)
-        report_range = '{}-{}'.format(fake_report_date.strftime('%Y%m%d'),
-                                      fake_report_end_date.strftime('%Y%m%d'))
+    def test_download_reports(self):
+        today = datetime.today().replace(day=1)
+        last_month = today + relativedelta(months=-1)
+        bill_months = [last_month, today]
 
-        # Moto setup
-        conn = boto3.resource('s3', region_name=self.selected_region)
-        conn.create_bucket(Bucket=self.fake_bucket_name)
+        expected_csv_list = []
+        for bill_month in bill_months:
+            fake_report_date = bill_month
+            fake_report_end_date = fake_report_date + relativedelta(months=+1)
+            report_range = '{}-{}'.format(fake_report_date.strftime('%Y%m%d'),
+                                        fake_report_end_date.strftime('%Y%m%d'))
 
-        # push mocked csvs into Moto env
-        fake_csv_files = {}
-        for x in range(0, random.randint(2, 10)):
-            csv_filename = '{}.csv'.format('-'.join(self.fake.words(random.randint(2, 5))))
+            # Moto setup
+            conn = boto3.resource('s3', region_name=self.selected_region)
+            conn.create_bucket(Bucket=self.fake_bucket_name)
 
-            # mocked report file definition
-            fake_report_file = '{}/{}/{}/{}/{}'.format(
+            # push mocked csvs into Moto env
+            fake_csv_files = {}
+            for x in range(0, random.randint(2, 10)):
+                csv_filename = '{}.csv'.format('-'.join(self.fake.words(random.randint(2, 5))))
+
+                # mocked report file definition
+                fake_report_file = '{}/{}/{}/{}/{}'.format(
+                    self.fake_bucket_prefix,
+                    self.fake_report_name,
+                    report_range,
+                    uuid.uuid4(),
+                    csv_filename)
+                fake_csv_files[csv_filename] = fake_report_file
+
+                fake_csv_body = ','.join(self.fake.words(random.randint(5, 10)))
+                conn.Object(self.fake_bucket_name,
+                            fake_report_file).put(Body=fake_csv_body)
+                key = conn.Object(self.fake_bucket_name, fake_report_file).get()
+                self.assertEqual(fake_csv_body, str(key['Body'].read(), 'utf-8'))
+
+            # mocked Manifest definition
+            selected_csv = random.choice(list(fake_csv_files.keys()))
+            fake_object = '{}/{}/{}/{}-Manifest.json'.format(
                 self.fake_bucket_prefix,
                 self.fake_report_name,
                 report_range,
-                uuid.uuid4(),
-                csv_filename)
-            fake_csv_files[csv_filename] = fake_report_file
+                self.fake_report_name)
+            fake_object_body = {'reportKeys': [fake_csv_files[selected_csv]]}
 
-            fake_csv_body = ','.join(self.fake.words(random.randint(5, 10)))
+            # push mocked manifest into Moto env
             conn.Object(self.fake_bucket_name,
-                        fake_report_file).put(Body=fake_csv_body)
-            key = conn.Object(self.fake_bucket_name, fake_report_file).get()
-            self.assertEqual(fake_csv_body, str(key['Body'].read(), 'utf-8'))
+                        fake_object).put(Body=json.dumps(fake_object_body))
+            key = conn.Object(self.fake_bucket_name, fake_object).get()
+            self.assertEqual(fake_object_body, json.load(key['Body']))
+            report_key = fake_object_body.get('reportKeys').pop()
+            expected_assembly_id = utils.get_assembly_id_from_cur_key(report_key)
+            expected_csv = '{}/{}/aws/{}/{}-{}'.format(DATA_DIR,
+                                                       self.fake_customer_name,
+                                                       self.fake_bucket_name,
+                                                       expected_assembly_id,
+                                                       selected_csv)
+            expected_csv_list.append(expected_csv)
 
-        # mocked Manifest definition
-        selected_csv = random.choice(list(fake_csv_files.keys()))
-        fake_object = '{}/{}/{}/{}-Manifest.json'.format(
-            self.fake_bucket_prefix,
-            self.fake_report_name,
-            report_range,
-            self.fake_report_name)
-        fake_object_body = {'reportKeys': [fake_csv_files[selected_csv]]}
-
-        # push mocked manifest into Moto env
-        conn.Object(self.fake_bucket_name,
-                    fake_object).put(Body=json.dumps(fake_object_body))
-        key = conn.Object(self.fake_bucket_name, fake_object).get()
-        self.assertEqual(fake_object_body, json.load(key['Body']))
 
         # actual test
-        out = self.report_downloader.download_current_report()
+        out = self.report_downloader.get_reports(len(bill_months))
         files_list = []
         for cur_dict in out:
             files_list.append(cur_dict['file'])
             self.assertIsNotNone(cur_dict['compression'])
 
-        report_key = fake_object_body.get('reportKeys').pop()
-        expected_assembly_id = utils.get_assembly_id_from_cur_key(report_key)
-        expected_csv = '{}/{}/aws/{}/{}-{}'.format(DATA_DIR,
-                                             self.fake_customer_name,
-                                             self.fake_bucket_name,
-                                             expected_assembly_id,
-                                             selected_csv)
-        self.assertEqual(files_list, [expected_csv])
+        self.assertEqual(files_list, expected_csv_list)
 
         # Verify etag is stored
         for cur_dict in out:
@@ -280,7 +294,7 @@ class AWSReportDownloaderTest(MasuTestCase):
         conn.create_bucket(Bucket=self.fake_bucket_name)
         conn.Object(self.fake_bucket_name, fake_object).put(Body='test')
 
-        out, _ = self.report_downloader.download_file(fake_object)
+        out, _ = self.aws_report_downloader.download_file(fake_object)
         self.assertEqual(out, DATA_DIR+'/'+self.fake_customer_name+'/aws/'+self.fake_bucket_name+'/'+fake_object)
 
     @mock_s3
@@ -292,7 +306,7 @@ class AWSReportDownloaderTest(MasuTestCase):
 
         missing_key = 'missing' + fake_object
         with self.assertRaises(AWSReportDownloaderNoFileError) as error:
-            self.report_downloader.download_file(missing_key)
+            self.aws_report_downloader.download_file(missing_key)
         expected_err = 'Unable to find {} in S3 Bucket: {}'.format(missing_key, self.fake_bucket_name)
         self.assertEqual(expected_err, str(error.exception))
 
@@ -301,7 +315,7 @@ class AWSReportDownloaderTest(MasuTestCase):
         fake_object = self.fake.word().lower()
         # No S3 bucket created
         with self.assertRaises(AWSReportDownloaderError) as error:
-            self.report_downloader.download_file(fake_object)
+            self.aws_report_downloader.download_file(fake_object)
         self.assertTrue('NoSuchBucket' in str(error.exception))
 
     @mock_s3
@@ -355,7 +369,7 @@ class AWSReportDownloaderTest(MasuTestCase):
 
         # actual test. Run twice
         for _ in range(2):
-            out = self.report_downloader.download_report(fake_report_date)
+            out = self.aws_report_downloader.download_report(fake_report_date)
             files_list = []
             for cur_dict in out:
                 files_list.append(cur_dict['file'])
@@ -384,7 +398,7 @@ class AWSReportDownloaderTest(MasuTestCase):
         conn = boto3.resource('s3', region_name=self.selected_region)
         conn.create_bucket(Bucket=self.fake_bucket_name)
 
-        out = self.report_downloader.download_report(fake_report_date)
+        out = self.aws_report_downloader.download_report(fake_report_date)
         self.assertEqual(out, [])
 
     @mock_s3
@@ -392,7 +406,7 @@ class AWSReportDownloaderTest(MasuTestCase):
         fake_report_date = self.fake.date_time().replace(day=1)
 
         with self.assertRaises(AWSReportDownloaderError) as error:
-            self.report_downloader.download_report(fake_report_date)
+            self.aws_report_downloader.download_report(fake_report_date)
 
     @mock_s3
     @patch('masu.util.aws.common.get_assume_role_session',

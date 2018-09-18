@@ -76,7 +76,7 @@ class AWSLocalReportDownloaderTest(MasuTestCase):
         """Test to verify that basic report downloading works."""
         test_report_date = datetime(year=2018, month=8, day=7)
         with patch.object(DateAccessor, 'today', return_value=test_report_date):
-            self.report_downloader.download_current_report()
+            self.report_downloader.download_report(test_report_date)
         expected_path = '{}/{}/{}'.format(DATA_DIR, self.fake_customer_name, 'aws-local')
         self.assertTrue(os.path.isdir(expected_path))
  
@@ -109,7 +109,7 @@ class AWSLocalReportDownloaderTest(MasuTestCase):
             # Names from test report .gz file
             self.assertEqual(report_downloader.report_name, 'my-report')
             self.assertEqual(report_downloader.report_prefix, 'my-prefix')
-            report_downloader.download_current_report()
+            report_downloader.download_report(test_report_date)
         expected_path = '{}/{}/{}'.format(DATA_DIR, self.fake_customer_name, 'aws-local')
         self.assertTrue(os.path.isdir(expected_path))
 

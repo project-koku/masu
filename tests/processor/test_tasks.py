@@ -34,7 +34,7 @@ from masu.database import AWS_CUR_TABLE_MAP
 from masu.database.report_db_accessor import ReportDBAccessor
 from masu.database.reporting_common_db_accessor import ReportingCommonDBAccessor
 from masu.database.report_stats_db_accessor import ReportStatsDBAccessor
-from masu.external.report_downloader import ReportDownloaderError
+from masu.external.report_downloader import ReportDownloader, ReportDownloaderError
 from masu.processor.expired_data_remover import ExpiredDataRemover
 from masu.processor._tasks.download import _get_report_files
 from masu.processor._tasks.process import _process_report_file
@@ -48,7 +48,7 @@ from tests.database.helpers import ReportObjectCreator
 from tests.external.downloader.aws import fake_arn
 
 class FakeDownloader(Mock):
-    def download_current_report():
+    def download_report(date_time):
         fake = faker.Faker()
         path = '/var/tmp/masu'
         fake_files = []
@@ -75,6 +75,7 @@ class GetReportFileTests(MasuTestCase):
                                    authentication=account,
                                    provider_type='AWS',
                                    report_name=self.fake.word(),
+                                   provider_uuid='6e212746-484a-40cd-bba0-09a19d132d64',
                                    billing_source=self.fake.word())
 
         self.assertIsInstance(report, list)
@@ -95,6 +96,7 @@ class GetReportFileTests(MasuTestCase):
                               authentication=account,
                               provider_type='AWS',
                               report_name=self.fake.word(),
+                              provider_uuid='6e212746-484a-40cd-bba0-09a19d132d64',
                               billing_source=self.fake.word())
             statement_found = False
             for log in logger.output:
@@ -119,6 +121,7 @@ class GetReportFileTests(MasuTestCase):
                               authentication=account,
                               provider_type='AWS',
                               report_name=self.fake.word(),
+                              provider_uuid='6e212746-484a-40cd-bba0-09a19d132d64',
                               billing_source=self.fake.word())
             self.assertIn(expected, logger.output)
 
@@ -133,7 +136,32 @@ class GetReportFileTests(MasuTestCase):
                               authentication=account,
                               provider_type='AWS',
                               report_name=self.fake.word(),
+                              provider_uuid='6e212746-484a-40cd-bba0-09a19d132d64',
                               billing_source=self.fake.word())
+
+    @patch('masu.processor._tasks.download.ReportDownloader._set_downloader',
+           return_value=FakeDownloader)
+    @patch('masu.database.provider_db_accessor.ProviderDBAccessor.get_setup_complete',
+           return_value=True)
+    def test_get_report_with_override(self, fake_accessor, fake_downloader):
+        """Test _get_report_files on non-initial load with override set."""
+        Config.INGEST_OVERRIDE = True
+        Config.INITIAL_INGEST_NUM_MONTHS = 5
+        initial_month_qty = Config.INITIAL_INGEST_NUM_MONTHS
+
+        account = fake_arn(service='iam', generate_account_id=True)
+        with patch.object(ReportDownloader, 'get_reports') as download_call:
+            _get_report_files(customer_name=self.fake.word(),
+                            authentication=account,
+                            provider_type='AWS',
+                            report_name=self.fake.word(),
+                            provider_uuid='6e212746-484a-40cd-bba0-09a19d132d64',
+                            billing_source=self.fake.word())
+
+            download_call.assert_called_with(initial_month_qty)
+
+        Config.INGEST_OVERRIDE = False
+        Config.INITIAL_INGEST_NUM_MONTHS = 2
 
 class ProcessReportFileTests(MasuTestCase):
     """Test Cases for the Orchestrator object."""
@@ -147,7 +175,8 @@ class ProcessReportFileTests(MasuTestCase):
         request = {'report_path': path,
                    'compression': 'gzip',
                    'schema_name': 'testcustomer',
-                   'provider': 'AWS'}
+                   'provider': 'AWS',
+                   'provider_uuid': '6e212746-484a-40cd-bba0-09a19d132d64'}
 
         mock_proc = mock_processor()
         mock_acc = mock_accessor()
@@ -192,9 +221,9 @@ class TestProcessorTasks(MasuTestCase):
         self.fake_get_report_args = {'customer_name': self.fake.word(),
                                      'authentication': self.fake_account,
                                      'provider_type': 'AWS',
-                                     'report_name': self.fake.word(),
                                      'schema_name': self.fake.word(),
-                                     'billing_source': self.fake.word()}
+                                     'billing_source': self.fake.word(),
+                                     'provider_uuid': '6e212746-484a-40cd-bba0-09a19d132d64'}
 
     @patch('masu.processor.tasks._get_report_files')
     @patch('masu.processor.tasks.process_report_file')
@@ -392,15 +421,18 @@ class TestProcessorTasks(MasuTestCase):
         report_path = 'path/to/file'
         compression = 'GZIP'
         provider = 'AWS'
-        process_report_file(schema_name, report_path, compression, provider)
+        start_date = datetime.utcnow()
+        provider_uuid = '6e212746-484a-40cd-bba0-09a19d132d64'
+        process_report_file(schema_name, report_path, compression, provider, start_date, provider_uuid)
 
         mock_process_files.assert_called_with(
             schema_name,
             report_path,
             compression,
-            provider
+            provider,
+            provider_uuid
         )
-        mock_update_task.delay.assert_called_with(schema_name, date.today())
+        mock_update_task.delay.assert_called_with(schema_name, start_date)
 
 class TestRemoveExpiredDataTasks(MasuTestCase):
     """Test cases for Processor Celery tasks."""
@@ -500,7 +532,7 @@ class TestUpdateSummaryTablesTasks(MasuTestCase):
         self.assertEqual(initial_summary_count, 0)
         self.assertEqual(initial_agg_count, 0)
 
-        update_summary_tables('testcustomer', start_date)
+        update_summary_tables('testcustomer', str(start_date))
 
         self.assertNotEqual(daily_query.count(), initial_daily_count)
         self.assertNotEqual(summary_query.count(), initial_summary_count)
@@ -532,7 +564,7 @@ class TestUpdateSummaryTablesTasks(MasuTestCase):
         expected_start_date = max(start_date, ce_start_date.date())
         expected_end_date = min(end_date, ce_end_date.date())
 
-        update_summary_tables('testcustomer', start_date, end_date)
+        update_summary_tables('testcustomer', str(start_date), str(end_date))
 
         result_start_date, result_end_date = self.accessor._session.query(
             func.min(daily_table.usage_start),

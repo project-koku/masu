@@ -20,7 +20,7 @@
 from unittest.mock import patch
 
 from masu.exceptions import MasuProcessingError
-from masu.external import (AMAZON_WEB_SERVICES, LOCAL_SERVICE_PROVIDER)
+from masu.external import (AMAZON_WEB_SERVICES, AWS_LOCAL_SERVICE_PROVIDER)
 from masu.processor.report_processor import (ReportProcessor, ReportProcessorError)
 from masu.processor.providers.aws_report_processor import AWSReportProcessor
 
@@ -44,7 +44,7 @@ class ReportProcessorTest(MasuTestCase):
         processor = ReportProcessor(schema_name='testcustomer',
                                      report_path='/my/report/file',
                                      compression='GZIP',
-                                     provider=LOCAL_SERVICE_PROVIDER)
+                                     provider=AWS_LOCAL_SERVICE_PROVIDER)
         self.assertIsNotNone(processor._processor)
 
     @patch('masu.processor.providers.aws_report_processor.AWSReportProcessor.__init__', side_effect=MasuProcessingError)

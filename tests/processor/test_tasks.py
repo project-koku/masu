@@ -449,7 +449,7 @@ class TestRemoveExpiredDataTasks(MasuTestCase):
 
         logging.disable(logging.NOTSET) # We are currently disabling all logging below CRITICAL in masu/__init__.py
         with self.assertLogs('masu.processor._tasks.remove_expired') as logger:
-            remove_expired_data(schema_name='testcustomer', simulate=True)
+            remove_expired_data(schema_name='testcustomer', provider='AWS', simulate=True)
             self.assertIn(expected.format(str(expected_results)), logger.output)
 
 

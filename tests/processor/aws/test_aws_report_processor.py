@@ -25,16 +25,19 @@ import gzip
 from itertools import islice
 import json
 import random
+import shutil
+import tempfile
 
 from sqlalchemy.sql.expression import delete
 
 from masu.config import Config
 from masu.database import AWS_CUR_TABLE_MAP
 from masu.database.report_db_accessor import ReportDBAccessor
+from masu.database.report_stats_db_accessor import ReportStatsDBAccessor
 from masu.database.reporting_common_db_accessor import ReportingCommonDBAccessor
 from masu.exceptions import MasuProcessingError
 from masu.external import GZIP_COMPRESSED, UNCOMPRESSED
-from masu.processor.providers.aws_report_processor import AWSReportProcessor, ProcessedReport
+from masu.processor.aws.aws_report_processor import AWSReportProcessor, ProcessedReport
 import masu.util.common as common_util
 from tests import MasuTestCase
 
@@ -652,3 +655,41 @@ class AWSReportProcessorTest(MasuTestCase):
         result = self.processor._create_line_item_hash_string(line_item)
 
         self.assertEqual(result, expected)
+        result = self.processor._create_line_item_hash_string(line_item)
+
+        self.assertEqual(result, expected)
+
+    def test_remove_temp_cur_files(self):
+        """Test to remove temporary cost usage files."""
+        cur_dir = tempfile.mkdtemp()
+
+        manifest_data = {"assemblyId": "6e019de5-a41d-4cdb-b9a0-99bfba9a9cb5"}
+        manifest = '{}/{}'.format(cur_dir, 'koku-Manifest.json')
+        with open(manifest, 'w') as outfile:
+            json.dump(manifest_data, outfile)
+
+        file_list = [{'file': '6e019de5-a41d-4cdb-b9a0-99bfba9a9cb5-koku-1.csv.gz',
+                      'processed_date': datetime.datetime(year=2018, month=5, day=3)},
+                     {'file': '6e019de5-a41d-4cdb-b9a0-99bfba9a9cb5-koku-2.csv.gz',
+                      'processed_date': datetime.datetime(year=2018, month=5, day=3)},
+                     {'file': '2aeb9169-2526-441c-9eca-d7ed015d52bd-koku-1.csv.gz',
+                      'processed_date': datetime.datetime(year=2018, month=5, day=2)},
+                     {'file': '6c8487e8-c590-4e6a-b2c2-91a2375c0bad-koku-1.csv.gz',
+                      'processed_date': datetime.datetime(year=2018, month=5, day=1)},
+                     {'file': '6c8487e8-c590-4e6a-b2c2-91a2375d0bed-koku-1.csv.gz',
+                      'processed_date': None}]
+        expected_delete_list = []
+        for item in file_list:
+            path = '{}/{}'.format(cur_dir, item['file'])
+            f = open(path, 'w')
+            stats = ReportStatsDBAccessor(item['file'])
+            stats.update(last_completed_datetime=item['processed_date'])
+            stats.commit()
+            stats.close_session()
+            f.close()
+            if not item['file'].startswith(manifest_data.get('assemblyId')) and item['processed_date']:
+                expected_delete_list.append(path)
+
+        removed_files = self.processor.remove_temp_cur_files(cur_dir)
+        self.assertEqual(sorted(removed_files), sorted(expected_delete_list))
+        shutil.rmtree(cur_dir)

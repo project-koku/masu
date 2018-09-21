@@ -22,7 +22,8 @@ from datetime import datetime
 import pytz
 
 from masu.external.date_accessor import DateAccessor
-from masu.processor.expired_data_remover import ExpiredDataRemover
+from masu.processor.aws.aws_report_db_cleaner import AWSReportDBCleaner
+from masu.processor.expired_data_remover import ExpiredDataRemover, ExpiredDataRemoverError
 from tests import MasuTestCase
 
 
@@ -31,9 +32,20 @@ class ExpiredDataRemoverTest(MasuTestCase):
 
     def test_initializer(self):
         """Test to init"""
-        remover = ExpiredDataRemover('testcustomer')
+        remover = ExpiredDataRemover('testcustomer', 'AWS')
         self.assertEqual(remover._months_to_keep, 3)
         self.assertIsInstance(remover._expiration_date, datetime)
+
+    def test_initializer_invalid_provider(self):
+        """Test to init with unknown provider"""
+        with self.assertRaises(ExpiredDataRemoverError):
+            ExpiredDataRemover('testcustomer', 'BAD')
+
+    @patch('masu.processor.aws.aws_report_db_cleaner.AWSReportDBCleaner.__init__', side_effect=Exception)
+    def test_initializer_provider_exception(self, mock_aws_cleaner):
+        """Test to init"""
+        with self.assertRaises(ExpiredDataRemoverError):
+            ExpiredDataRemover('testcustomer', 'AWS')
 
     def test_calculate_expiration_date(self):
         """Test that the expiration date is correctly calculated."""
@@ -59,14 +71,14 @@ class ExpiredDataRemoverTest(MasuTestCase):
             with patch.object(DateAccessor, 'today', return_value=test_case.get('current_date')):
                 retention_policy = test_case.get('months_to_keep')
                 if retention_policy:
-                    remover = ExpiredDataRemover('testcustomer', retention_policy)
+                    remover = ExpiredDataRemover('testcustomer', 'AWS', retention_policy)
                 else:
-                    remover = ExpiredDataRemover('testcustomer')
+                    remover = ExpiredDataRemover('testcustomer', 'AWS')
                 expire_date = remover._calculate_expiration_date()
                 self.assertEqual(expire_date, test_case.get('expected_expire'))
 
     def test_remove(self):
         """Test that removes the expired data based on the retention policy."""
-        remover = ExpiredDataRemover('testcustomer')
+        remover = ExpiredDataRemover('testcustomer', 'AWS')
         removed_data = remover.remove()
         self.assertEqual(len(removed_data), 0)

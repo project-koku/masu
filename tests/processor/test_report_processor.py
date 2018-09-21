@@ -22,7 +22,7 @@ from unittest.mock import patch
 from masu.exceptions import MasuProcessingError
 from masu.external import (AMAZON_WEB_SERVICES, AWS_LOCAL_SERVICE_PROVIDER)
 from masu.processor.report_processor import (ReportProcessor, ReportProcessorError)
-from masu.processor.providers.aws_report_processor import AWSReportProcessor
+from masu.processor.aws.aws_report_processor import AWSReportProcessor
 
 from tests import MasuTestCase
 from tests.external.downloader.aws import fake_arn
@@ -47,7 +47,7 @@ class ReportProcessorTest(MasuTestCase):
                                      provider=AWS_LOCAL_SERVICE_PROVIDER)
         self.assertIsNotNone(processor._processor)
 
-    @patch('masu.processor.providers.aws_report_processor.AWSReportProcessor.__init__', side_effect=MasuProcessingError)
+    @patch('masu.processor.aws.aws_report_processor.AWSReportProcessor.__init__', side_effect=MasuProcessingError)
     def test_initializer_error(self, fake_processor):
         """Test to initializer with error."""
         with self.assertRaises(ReportProcessorError):
@@ -64,7 +64,7 @@ class ReportProcessorTest(MasuTestCase):
                             compression='GZIP',
                             provider='unknown')
 
-    @patch('masu.processor.providers.aws_report_processor.AWSReportProcessor.process', return_value=None)
+    @patch('masu.processor.aws.aws_report_processor.AWSReportProcessor.process', return_value=None)
     def test_aws_process(self, fake_process):
         """Test to process for AWS"""
         processor = ReportProcessor(schema_name='testcustomer',
@@ -76,7 +76,7 @@ class ReportProcessorTest(MasuTestCase):
         except Exception:
             self.fail('unexpected error')
 
-    @patch('masu.processor.providers.aws_report_processor.AWSReportProcessor.process', side_effect=MasuProcessingError)
+    @patch('masu.processor.aws.aws_report_processor.AWSReportProcessor.process', side_effect=MasuProcessingError)
     def test_aws_process_error(self, fake_process):
         """Test to process for AWS with processing error"""
 

@@ -1015,7 +1015,7 @@ CREATE TABLE testcustomer.reporting_awscostentrylineitem_daily (
     id bigint NOT NULL,
     line_item_type character varying(50) NOT NULL,
     usage_account_id character varying(50) NOT NULL,
-    usage_start date NOT NULL,
+    usage_start timestamp with time zone NOT NULL,
     product_code character varying(50) NOT NULL,
     usage_type character varying(50),
     operation character varying(50),
@@ -1035,7 +1035,8 @@ CREATE TABLE testcustomer.reporting_awscostentrylineitem_daily (
     tags jsonb,
     cost_entry_pricing_id integer,
     cost_entry_product_id integer,
-    cost_entry_reservation_id integer
+    cost_entry_reservation_id integer,
+    usage_end timestamp with time zone
 );
 
 
@@ -1068,7 +1069,7 @@ ALTER SEQUENCE testcustomer.reporting_awscostentrylineitem_daily_id_seq OWNED BY
 
 CREATE TABLE testcustomer.reporting_awscostentrylineitem_daily_summary (
     id bigint NOT NULL,
-    usage_start date NOT NULL,
+    usage_start timestamp with time zone NOT NULL,
     usage_account_id character varying(50) NOT NULL,
     product_code character varying(50) NOT NULL,
     product_family character varying(150),
@@ -1087,7 +1088,8 @@ CREATE TABLE testcustomer.reporting_awscostentrylineitem_daily_summary (
     blended_cost numeric(17,9),
     public_on_demand_cost numeric(17,9),
     public_on_demand_rate numeric(17,9),
-    tax_type text
+    tax_type text,
+    usage_end timestamp with time zone
 );
 
 
@@ -1464,7 +1466,7 @@ ALTER TABLE ONLY testcustomer.reporting_awscostentryreservation ALTER COLUMN id 
 --
 
 COPY public.api_customer (group_ptr_id, date_created, owner_id, uuid, schema_name) FROM stdin;
-1	2018-09-21 14:47:09.114518+00	2	a8f534df-406a-4a01-86fd-fa1af3316104	testcustomer
+1	2018-09-19 13:35:30.416961+00	2	50d914b7-544c-4757-a818-517b09442c4a	testcustomer
 \.
 
 
@@ -1500,7 +1502,7 @@ COPY public.api_providerbillingsource (id, uuid, bucket) FROM stdin;
 --
 
 COPY public.api_resettoken (id, token, expiration_date, used, user_id) FROM stdin;
-1	36081abe-d13f-4fd1-afd1-92df5b6efdcb	2018-09-22 14:47:08.899785+00	f	2
+1	f5b73149-c0d0-4264-8052-0bd181b526db	2018-09-20 13:35:30.173413+00	f	2
 \.
 
 
@@ -1519,8 +1521,8 @@ COPY public.api_tenant (id, schema_name) FROM stdin;
 --
 
 COPY public.api_user (user_ptr_id, uuid) FROM stdin;
-1	23024a1f-6e8b-4672-b86a-afdc3adb155e
-2	6fa24afa-735c-4185-9dee-33006a41bff5
+1	ad982b30-bfc2-4971-9679-045b538853a4
+2	2ed9d42b-00bc-4ada-a6e4-76f23b399458
 \.
 
 
@@ -1529,9 +1531,9 @@ COPY public.api_user (user_ptr_id, uuid) FROM stdin;
 --
 
 COPY public.api_userpreference (id, uuid, preference, user_id, description, name) FROM stdin;
-1	257061ad-3dc8-4616-b945-3fe28d0800db	{"currency": "USD"}	2	default preference	currency
-2	7e98ea6b-49f8-4fb6-95c3-5f926e5b2f2a	{"timezone": "UTC"}	2	default preference	timezone
-3	d89c742b-b21f-4430-b0bd-cab0e027ba61	{"locale": "en_US.UTF-8"}	2	default preference	locale
+1	7d765367-39e3-4ded-a8c6-a8c3845e73fb	{"currency": "USD"}	2	default preference	currency
+2	858c0f1d-948e-4148-a3b2-e3fa34e8a73c	{"timezone": "UTC"}	2	default preference	timezone
+3	8a5a4ed7-d41f-4108-9622-2527aff1c5d4	{"locale": "en_US.UTF-8"}	2	default preference	locale
 \.
 
 
@@ -1681,8 +1683,8 @@ COPY public.auth_permission (id, name, content_type_id, codename) FROM stdin;
 --
 
 COPY public.auth_user (id, password, last_login, is_superuser, username, first_name, last_name, email, is_staff, is_active, date_joined) FROM stdin;
-1	pbkdf2_sha256$120000$xtPvMdepaL4W$1cXuzfuw9m0fS1uzGf5bPyGvvRjrkT1ZqvKQ3PJhAuc=	\N	t	admin			admin@example.com	t	t	2018-09-21 14:46:58.955631+00
-2	pbkdf2_sha256$120000$QrPqKFLUItUo$wFHVmW3i2cNBJSzTMP6sW0JoOX+XhQdCg8A/K9VG+q8=	\N	f	test_customer			test@example.com	f	t	2018-09-21 14:47:08.57689+00
+1	pbkdf2_sha256$120000$AKeeNJluzSYc$RGZeVUgedF64OaDn+NB43MPGrT8+Q1v/V05iCM36+WM=	\N	t	admin			admin@example.com	t	t	2018-09-19 13:35:20.210752+00
+2	pbkdf2_sha256$120000$cVAZSIRSS7RK$0QBr7/D/0c10HQPsrN945oiZOr06Fk5FfEeIz3JyqCU=	\N	f	test_customer			test@example.com	f	t	2018-09-19 13:35:29.838899+00
 \.
 
 
@@ -1708,7 +1710,7 @@ COPY public.auth_user_user_permissions (id, user_id, permission_id) FROM stdin;
 --
 
 COPY public.authtoken_token (key, created, user_id) FROM stdin;
-edcd36ede34eb9efa74135403b2a596dc7b2283c	2018-09-21 14:47:08.506984+00	1
+875287c60c12fd195e754bb44fc424fbbc860a42	2018-09-19 13:35:29.794372+00	1
 \.
 
 
@@ -1762,6 +1764,7 @@ COPY public.django_content_type (id, app_label, model) FROM stdin;
 --
 
 COPY public.django_migrations (id, app, name, applied) FROM stdin;
+
 1	contenttypes	0001_initial	2018-09-21 14:46:57.831384+00
 2	auth	0001_initial	2018-09-21 14:46:57.981702+00
 3	admin	0001_initial	2018-09-21 14:46:58.022664+00
@@ -2027,7 +2030,7 @@ COPY testcustomer.reporting_awscostentrylineitem_aggregates (id, time_scope_valu
 -- Data for Name: reporting_awscostentrylineitem_daily; Type: TABLE DATA; Schema: testcustomer; Owner: postgres
 --
 
-COPY testcustomer.reporting_awscostentrylineitem_daily (id, line_item_type, usage_account_id, usage_start, product_code, usage_type, operation, availability_zone, resource_id, usage_amount, normalization_factor, normalized_usage_amount, currency_code, unblended_rate, unblended_cost, blended_rate, blended_cost, public_on_demand_cost, public_on_demand_rate, tax_type, tags, cost_entry_pricing_id, cost_entry_product_id, cost_entry_reservation_id) FROM stdin;
+COPY testcustomer.reporting_awscostentrylineitem_daily (id, line_item_type, usage_account_id, usage_start, product_code, usage_type, operation, availability_zone, resource_id, usage_amount, normalization_factor, normalized_usage_amount, currency_code, unblended_rate, unblended_cost, blended_rate, blended_cost, public_on_demand_cost, public_on_demand_rate, tax_type, tags, cost_entry_pricing_id, cost_entry_product_id, cost_entry_reservation_id, usage_end) FROM stdin;
 \.
 
 
@@ -2035,7 +2038,7 @@ COPY testcustomer.reporting_awscostentrylineitem_daily (id, line_item_type, usag
 -- Data for Name: reporting_awscostentrylineitem_daily_summary; Type: TABLE DATA; Schema: testcustomer; Owner: postgres
 --
 
-COPY testcustomer.reporting_awscostentrylineitem_daily_summary (id, usage_start, usage_account_id, product_code, product_family, availability_zone, region, instance_type, unit, resource_count, usage_amount, normalization_factor, normalized_usage_amount, currency_code, unblended_rate, unblended_cost, blended_rate, blended_cost, public_on_demand_cost, public_on_demand_rate, tax_type) FROM stdin;
+COPY testcustomer.reporting_awscostentrylineitem_daily_summary (id, usage_start, usage_account_id, product_code, product_family, availability_zone, region, instance_type, unit, resource_count, usage_amount, normalization_factor, normalized_usage_amount, currency_code, unblended_rate, unblended_cost, blended_rate, blended_cost, public_on_demand_cost, public_on_demand_rate, tax_type, usage_end) FROM stdin;
 \.
 
 

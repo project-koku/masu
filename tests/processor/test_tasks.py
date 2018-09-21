@@ -27,6 +27,7 @@ from datetime import date, datetime, timedelta
 from unittest.mock import call, patch, Mock
 
 import faker
+import psycopg2
 from sqlalchemy.sql import func
 
 from masu.config import Config
@@ -545,8 +546,14 @@ class TestUpdateSummaryTablesTasks(MasuTestCase):
         summary_table_name = AWS_CUR_TABLE_MAP['line_item_daily_summary']
 
         start_date = datetime.utcnow()
-        start_date = start_date.replace(day=1, month=(start_date.month - 1)).date()
+        start_date = start_date.replace(day=1, month=(start_date.month - 1),
+                                        hour=0, minute=0, second=0,
+                                        microsecond=0)
+        start_date = start_date.replace(
+            tzinfo=psycopg2.tz.FixedOffsetTimezone(offset=0, name=None)
+        )
         end_date = start_date + timedelta(days=10)
+        end_date = end_date.replace(hour=23, minute=59, second=59)
 
         daily_table = getattr(self.accessor.report_schema, daily_table_name)
         summary_table = getattr(self.accessor.report_schema, summary_table_name)
@@ -554,21 +561,26 @@ class TestUpdateSummaryTablesTasks(MasuTestCase):
 
         ce_start_date = self.accessor._session\
             .query(func.min(ce_table.interval_start))\
-            .filter(func.date(ce_table.interval_start) >= start_date).first()[0]
+            .filter(ce_table.interval_start >= start_date).first()[0]
 
         ce_end_date = self.accessor._session\
             .query(func.max(ce_table.interval_start))\
-            .filter(func.date(ce_table.interval_start) <= end_date).first()[0]
+            .filter(ce_table.interval_start <= end_date).first()[0]
 
         # The summary tables will only include dates where there is data
-        expected_start_date = max(start_date, ce_start_date.date())
-        expected_end_date = min(end_date, ce_end_date.date())
+        expected_start_date = max(start_date, ce_start_date)
+        expected_start_date = expected_start_date.replace(hour=0, minute=0,
+                                                          second=0,
+                                                          microsecond=0)
+        expected_end_date = min(end_date, ce_end_date)
+        expected_end_date = expected_end_date.replace(hour=0, minute=0,
+                                                      second=0, microsecond=0)
 
         update_summary_tables('testcustomer', str(start_date), str(end_date))
 
         result_start_date, result_end_date = self.accessor._session.query(
             func.min(daily_table.usage_start),
-            func.max(daily_table.usage_start)
+            func.max(daily_table.usage_end)
         ).first()
 
         self.assertEqual(result_start_date, expected_start_date)
@@ -576,7 +588,7 @@ class TestUpdateSummaryTablesTasks(MasuTestCase):
 
         result_start_date, result_end_date = self.accessor._session.query(
             func.min(summary_table.usage_start),
-            func.max(summary_table.usage_start)
+            func.max(summary_table.usage_end)
         ).first()
 
         self.assertEqual(result_start_date, expected_start_date)

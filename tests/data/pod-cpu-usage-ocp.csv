@@ -1,0 +1,2 @@
+period_start,period_end,pod,namespace,node,data_start,data_end,pod_usage_cpu_core_seconds,pod_cpu_usage_percent,pod_cost
+2018-06-01 00:00:00 +0000 UTC,2018-07-30 00:00:00 +0000 UTC,alertmanager-main-0,tectonic-system,ip-10-0-39-235.us-west-1.compute.internal,2018-07-13 23:46:00 +0000 UTC,2018-07-19 00:20:00 +0000 UTC,292.24626,8.9406395124727E-06,0.002459074625691

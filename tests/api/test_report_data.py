@@ -29,7 +29,7 @@ from tests import MasuTestCase
 class ReportDataTests(MasuTestCase):
     """Test Cases for the report_data endpoint."""
 
-    @patch('masu.api.report_data.update_summary_tables')
+    @patch('masu.processor.report_processor.ReportProcessor.summarize_report_data')
     def test_get_report_data(self, mock_update):
         """Test the GET report_data endpoint."""
         start_date = datetime.date.today()
@@ -45,12 +45,11 @@ class ReportDataTests(MasuTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         self.assertIn(expected_key, body)
-        mock_update.delay.assert_called_with(
-            params['schema'],
+        mock_update.assert_called_with(
             str(params['start_date'])
         )
 
-    @patch('masu.api.report_data.update_summary_tables')
+    @patch('masu.processor.report_processor.ReportProcessor.summarize_report_data')
     def test_get_report_data_schema_missing(self, mock_update):
         """Test GET report_data endpoint returns a 400 for missing schema."""
         start_date = datetime.date.today()
@@ -69,7 +68,7 @@ class ReportDataTests(MasuTestCase):
         self.assertIn(expected_key, body)
         self.assertEqual(body[expected_key], expected_message)
 
-    @patch('masu.api.report_data.update_summary_tables')
+    @patch('masu.processor.report_processor.ReportProcessor.summarize_report_data')
     def test_get_report_data_date_missing(self, mock_update):
         """Test GET report_data endpoint returns a 400 for missing date."""
         params = {'schema': 'testcustomer'}
@@ -87,7 +86,7 @@ class ReportDataTests(MasuTestCase):
         self.assertIn(expected_key, body)
         self.assertEqual(body[expected_key], expected_message)
 
-    @patch('masu.api.report_data.update_summary_tables')
+    @patch('masu.processor.report_processor.ReportProcessor.summarize_report_data')
     def test_get_report_data_with_end_date(self, mock_update):
         """Test GET report_data endpoint with end date."""
         start_date = datetime.date.today()
@@ -108,8 +107,7 @@ class ReportDataTests(MasuTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         self.assertIn(expected_key, body)
-        mock_update.delay.assert_called_with(
-            params['schema'],
+        mock_update.assert_called_with(
             str(params['start_date']),
             str(params['end_date'])
         )

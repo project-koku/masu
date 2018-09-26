@@ -27,8 +27,6 @@ from datetime import date, datetime, timedelta
 from unittest.mock import call, patch, Mock
 
 import faker
-import psycopg2
-from sqlalchemy.sql import func
 
 from masu.config import Config
 from masu.database import AWS_CUR_TABLE_MAP
@@ -41,11 +39,9 @@ from masu.processor._tasks.download import _get_report_files
 from masu.processor._tasks.process import _process_report_file
 from masu.processor.tasks import (get_report_files,
                                   process_report_file,
-                                  remove_expired_data,
-                                  update_summary_tables)
+                                  remove_expired_data)
 
 from tests import MasuTestCase
-from tests.database.helpers import ReportObjectCreator
 from tests.external.downloader.aws import fake_arn
 
 class FakeDownloader(Mock):
@@ -177,7 +173,8 @@ class ProcessReportFileTests(MasuTestCase):
                    'compression': 'gzip',
                    'schema_name': 'testcustomer',
                    'provider': 'AWS',
-                   'provider_uuid': '6e212746-484a-40cd-bba0-09a19d132d64'}
+                   'provider_uuid': '6e212746-484a-40cd-bba0-09a19d132d64',
+                   'start_date': str(datetime.today())}
 
         mock_proc = mock_processor()
         mock_acc = mock_accessor()
@@ -414,7 +411,7 @@ class TestProcessorTasks(MasuTestCase):
         get_report_files(**self.fake_get_report_args)
         mock_process_files.delay.assert_called()
 
-    @patch('masu.processor.tasks.update_summary_tables')
+    @patch('masu.processor.aws.aws_report_processor.AWSReportProcessor.update_summary_tables')
     @patch('masu.processor.tasks._process_report_file')
     def test_process_report_file(self, mock_process_files, mock_update_task):
         """Test process report file functionality."""
@@ -431,9 +428,9 @@ class TestProcessorTasks(MasuTestCase):
             report_path,
             compression,
             provider,
-            provider_uuid
+            provider_uuid,
+            start_date
         )
-        mock_update_task.delay.assert_called_with(schema_name, start_date)
 
 class TestRemoveExpiredDataTasks(MasuTestCase):
     """Test cases for Processor Celery tasks."""
@@ -451,145 +448,3 @@ class TestRemoveExpiredDataTasks(MasuTestCase):
         with self.assertLogs('masu.processor._tasks.remove_expired') as logger:
             remove_expired_data(schema_name='testcustomer', provider='AWS', simulate=True)
             self.assertIn(expected.format(str(expected_results)), logger.output)
-
-
-class TestUpdateSummaryTablesTasks(MasuTestCase):
-    """Test cases for Processor summary table Celery tasks."""
-
-    @classmethod
-    def setUpClass(cls):
-        """Setup for the class."""
-        cls.all_tables = list(AWS_CUR_TABLE_MAP.values())
-        report_common_db = ReportingCommonDBAccessor()
-        column_map = report_common_db.column_map
-        report_common_db.close_session()
-        cls.accessor = ReportDBAccessor(schema='testcustomer',
-                                     column_map=column_map)
-
-        cls.creator = ReportObjectCreator(
-            cls.accessor,
-            column_map,
-            cls.accessor.report_schema.column_types
-        )
-
-    @classmethod
-    def tearDownClass(cls):
-        cls.accessor.close_connections()
-        cls.accessor.close_session()
-
-    def setUp(self):
-        """Set up each test."""
-        super().setUp()
-        if self.accessor._conn.closed:
-            self.accessor._conn = self.accessor._db.connect()
-        if self.accessor._pg2_conn.closed:
-            self.accessor._pg2_conn = self.accessor._get_psycopg2_connection()
-        if self.accessor._cursor.closed:
-            self.accessor._cursor = self.accessor._get_psycopg2_cursor()
-
-        # Populate some line item data so that the summary tables
-        # have something to pull from
-        for _ in range(25):
-            bill = self.creator.create_cost_entry_bill()
-            cost_entry = self.creator.create_cost_entry(bill)
-            product = self.creator.create_cost_entry_product()
-            pricing = self.creator.create_cost_entry_pricing()
-            reservation = self.creator.create_cost_entry_reservation()
-            self.creator.create_cost_entry_line_item(
-                bill,
-                cost_entry,
-                product,
-                pricing,
-                reservation
-            )
-
-    def tearDown(self):
-        """Return the database to a pre-test state."""
-        self.accessor._session.rollback()
-
-        for table_name in self.all_tables:
-            tables = self.accessor._get_db_obj_query(table_name).all()
-            for table in tables:
-                self.accessor._session.delete(table)
-        self.accessor.commit()
-
-    def test_update_summary_tables(self):
-        """Test that the summary table task runs."""
-        daily_table_name = AWS_CUR_TABLE_MAP['line_item_daily']
-        summary_table_name = AWS_CUR_TABLE_MAP['line_item_daily_summary']
-        agg_table_name = AWS_CUR_TABLE_MAP['line_item_aggregates']
-        start_date = datetime.utcnow()
-        start_date = start_date.replace(day=1, month=(start_date.month - 1))
-
-        daily_query = self.accessor._get_db_obj_query(daily_table_name)
-        summary_query = self.accessor._get_db_obj_query(summary_table_name)
-        agg_query = self.accessor._get_db_obj_query(agg_table_name)
-
-        initial_daily_count = daily_query.count()
-        initial_summary_count = summary_query.count()
-        initial_agg_count = agg_query.count()
-
-        self.assertEqual(initial_daily_count, 0)
-        self.assertEqual(initial_summary_count, 0)
-        self.assertEqual(initial_agg_count, 0)
-
-        update_summary_tables('testcustomer', str(start_date))
-
-        self.assertNotEqual(daily_query.count(), initial_daily_count)
-        self.assertNotEqual(summary_query.count(), initial_summary_count)
-        self.assertNotEqual(agg_query.count(), initial_agg_count)
-
-    def test_update_summary_tables_end_date(self):
-        """Test that the summary table task respects a date range."""
-        ce_table_name = AWS_CUR_TABLE_MAP['cost_entry']
-        daily_table_name = AWS_CUR_TABLE_MAP['line_item_daily']
-        summary_table_name = AWS_CUR_TABLE_MAP['line_item_daily_summary']
-
-        start_date = datetime.utcnow()
-        start_date = start_date.replace(day=1, month=(start_date.month - 1),
-                                        hour=0, minute=0, second=0,
-                                        microsecond=0)
-        start_date = start_date.replace(
-            tzinfo=psycopg2.tz.FixedOffsetTimezone(offset=0, name=None)
-        )
-        end_date = start_date + timedelta(days=10)
-        end_date = end_date.replace(hour=23, minute=59, second=59)
-
-        daily_table = getattr(self.accessor.report_schema, daily_table_name)
-        summary_table = getattr(self.accessor.report_schema, summary_table_name)
-        ce_table = getattr(self.accessor.report_schema, ce_table_name)
-
-        ce_start_date = self.accessor._session\
-            .query(func.min(ce_table.interval_start))\
-            .filter(ce_table.interval_start >= start_date).first()[0]
-
-        ce_end_date = self.accessor._session\
-            .query(func.max(ce_table.interval_start))\
-            .filter(ce_table.interval_start <= end_date).first()[0]
-
-        # The summary tables will only include dates where there is data
-        expected_start_date = max(start_date, ce_start_date)
-        expected_start_date = expected_start_date.replace(hour=0, minute=0,
-                                                          second=0,
-                                                          microsecond=0)
-        expected_end_date = min(end_date, ce_end_date)
-        expected_end_date = expected_end_date.replace(hour=0, minute=0,
-                                                      second=0, microsecond=0)
-
-        update_summary_tables('testcustomer', str(start_date), str(end_date))
-
-        result_start_date, result_end_date = self.accessor._session.query(
-            func.min(daily_table.usage_start),
-            func.max(daily_table.usage_end)
-        ).first()
-
-        self.assertEqual(result_start_date, expected_start_date)
-        self.assertEqual(result_end_date, expected_end_date)
-
-        result_start_date, result_end_date = self.accessor._session.query(
-            func.min(summary_table.usage_start),
-            func.max(summary_table.usage_end)
-        ).first()
-
-        self.assertEqual(result_start_date, expected_start_date)
-        self.assertEqual(result_end_date, expected_end_date)

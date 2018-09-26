@@ -16,20 +16,13 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
--- Name: DATABASE postgres; Type: COMMENT; Schema: -; Owner: postgres
---
-
-COMMENT ON DATABASE postgres IS 'default administrative connection database';
-
-
---
--- Name: testcustomer; Type: SCHEMA; Schema: -; Owner: postgres
+-- Name: testcustomer; Type: SCHEMA; Schema: -; Owner: kokuadmin
 --
 
 CREATE SCHEMA testcustomer;
 
 
-ALTER SCHEMA testcustomer OWNER TO postgres;
+ALTER SCHEMA testcustomer OWNER TO kokuadmin;
 
 --
 -- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: 
@@ -50,7 +43,7 @@ SET default_tablespace = '';
 SET default_with_oids = false;
 
 --
--- Name: api_customer; Type: TABLE; Schema: public; Owner: postgres
+-- Name: api_customer; Type: TABLE; Schema: public; Owner: kokuadmin
 --
 
 CREATE TABLE public.api_customer (
@@ -62,10 +55,10 @@ CREATE TABLE public.api_customer (
 );
 
 
-ALTER TABLE public.api_customer OWNER TO postgres;
+ALTER TABLE public.api_customer OWNER TO kokuadmin;
 
 --
--- Name: api_provider; Type: TABLE; Schema: public; Owner: postgres
+-- Name: api_provider; Type: TABLE; Schema: public; Owner: kokuadmin
 --
 
 CREATE TABLE public.api_provider (
@@ -81,10 +74,10 @@ CREATE TABLE public.api_provider (
 );
 
 
-ALTER TABLE public.api_provider OWNER TO postgres;
+ALTER TABLE public.api_provider OWNER TO kokuadmin;
 
 --
--- Name: api_provider_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+-- Name: api_provider_id_seq; Type: SEQUENCE; Schema: public; Owner: kokuadmin
 --
 
 CREATE SEQUENCE public.api_provider_id_seq
@@ -95,17 +88,17 @@ CREATE SEQUENCE public.api_provider_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.api_provider_id_seq OWNER TO postgres;
+ALTER TABLE public.api_provider_id_seq OWNER TO kokuadmin;
 
 --
--- Name: api_provider_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+-- Name: api_provider_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: kokuadmin
 --
 
 ALTER SEQUENCE public.api_provider_id_seq OWNED BY public.api_provider.id;
 
 
 --
--- Name: api_providerauthentication; Type: TABLE; Schema: public; Owner: postgres
+-- Name: api_providerauthentication; Type: TABLE; Schema: public; Owner: kokuadmin
 --
 
 CREATE TABLE public.api_providerauthentication (
@@ -115,10 +108,10 @@ CREATE TABLE public.api_providerauthentication (
 );
 
 
-ALTER TABLE public.api_providerauthentication OWNER TO postgres;
+ALTER TABLE public.api_providerauthentication OWNER TO kokuadmin;
 
 --
--- Name: api_providerauthentication_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+-- Name: api_providerauthentication_id_seq; Type: SEQUENCE; Schema: public; Owner: kokuadmin
 --
 
 CREATE SEQUENCE public.api_providerauthentication_id_seq
@@ -129,17 +122,17 @@ CREATE SEQUENCE public.api_providerauthentication_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.api_providerauthentication_id_seq OWNER TO postgres;
+ALTER TABLE public.api_providerauthentication_id_seq OWNER TO kokuadmin;
 
 --
--- Name: api_providerauthentication_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+-- Name: api_providerauthentication_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: kokuadmin
 --
 
 ALTER SEQUENCE public.api_providerauthentication_id_seq OWNED BY public.api_providerauthentication.id;
 
 
 --
--- Name: api_providerbillingsource; Type: TABLE; Schema: public; Owner: postgres
+-- Name: api_providerbillingsource; Type: TABLE; Schema: public; Owner: kokuadmin
 --
 
 CREATE TABLE public.api_providerbillingsource (
@@ -149,10 +142,10 @@ CREATE TABLE public.api_providerbillingsource (
 );
 
 
-ALTER TABLE public.api_providerbillingsource OWNER TO postgres;
+ALTER TABLE public.api_providerbillingsource OWNER TO kokuadmin;
 
 --
--- Name: api_providerbillingsource_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+-- Name: api_providerbillingsource_id_seq; Type: SEQUENCE; Schema: public; Owner: kokuadmin
 --
 
 CREATE SEQUENCE public.api_providerbillingsource_id_seq
@@ -163,17 +156,17 @@ CREATE SEQUENCE public.api_providerbillingsource_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.api_providerbillingsource_id_seq OWNER TO postgres;
+ALTER TABLE public.api_providerbillingsource_id_seq OWNER TO kokuadmin;
 
 --
--- Name: api_providerbillingsource_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+-- Name: api_providerbillingsource_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: kokuadmin
 --
 
 ALTER SEQUENCE public.api_providerbillingsource_id_seq OWNED BY public.api_providerbillingsource.id;
 
 
 --
--- Name: api_resettoken; Type: TABLE; Schema: public; Owner: postgres
+-- Name: api_resettoken; Type: TABLE; Schema: public; Owner: kokuadmin
 --
 
 CREATE TABLE public.api_resettoken (
@@ -185,10 +178,10 @@ CREATE TABLE public.api_resettoken (
 );
 
 
-ALTER TABLE public.api_resettoken OWNER TO postgres;
+ALTER TABLE public.api_resettoken OWNER TO kokuadmin;
 
 --
--- Name: api_resettoken_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+-- Name: api_resettoken_id_seq; Type: SEQUENCE; Schema: public; Owner: kokuadmin
 --
 
 CREATE SEQUENCE public.api_resettoken_id_seq
@@ -199,17 +192,17 @@ CREATE SEQUENCE public.api_resettoken_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.api_resettoken_id_seq OWNER TO postgres;
+ALTER TABLE public.api_resettoken_id_seq OWNER TO kokuadmin;
 
 --
--- Name: api_resettoken_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+-- Name: api_resettoken_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: kokuadmin
 --
 
 ALTER SEQUENCE public.api_resettoken_id_seq OWNED BY public.api_resettoken.id;
 
 
 --
--- Name: api_tenant; Type: TABLE; Schema: public; Owner: postgres
+-- Name: api_tenant; Type: TABLE; Schema: public; Owner: kokuadmin
 --
 
 CREATE TABLE public.api_tenant (
@@ -218,10 +211,10 @@ CREATE TABLE public.api_tenant (
 );
 
 
-ALTER TABLE public.api_tenant OWNER TO postgres;
+ALTER TABLE public.api_tenant OWNER TO kokuadmin;
 
 --
--- Name: api_tenant_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+-- Name: api_tenant_id_seq; Type: SEQUENCE; Schema: public; Owner: kokuadmin
 --
 
 CREATE SEQUENCE public.api_tenant_id_seq
@@ -232,17 +225,17 @@ CREATE SEQUENCE public.api_tenant_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.api_tenant_id_seq OWNER TO postgres;
+ALTER TABLE public.api_tenant_id_seq OWNER TO kokuadmin;
 
 --
--- Name: api_tenant_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+-- Name: api_tenant_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: kokuadmin
 --
 
 ALTER SEQUENCE public.api_tenant_id_seq OWNED BY public.api_tenant.id;
 
 
 --
--- Name: api_user; Type: TABLE; Schema: public; Owner: postgres
+-- Name: api_user; Type: TABLE; Schema: public; Owner: kokuadmin
 --
 
 CREATE TABLE public.api_user (
@@ -251,10 +244,10 @@ CREATE TABLE public.api_user (
 );
 
 
-ALTER TABLE public.api_user OWNER TO postgres;
+ALTER TABLE public.api_user OWNER TO kokuadmin;
 
 --
--- Name: api_userpreference; Type: TABLE; Schema: public; Owner: postgres
+-- Name: api_userpreference; Type: TABLE; Schema: public; Owner: kokuadmin
 --
 
 CREATE TABLE public.api_userpreference (
@@ -267,10 +260,10 @@ CREATE TABLE public.api_userpreference (
 );
 
 
-ALTER TABLE public.api_userpreference OWNER TO postgres;
+ALTER TABLE public.api_userpreference OWNER TO kokuadmin;
 
 --
--- Name: api_userpreference_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+-- Name: api_userpreference_id_seq; Type: SEQUENCE; Schema: public; Owner: kokuadmin
 --
 
 CREATE SEQUENCE public.api_userpreference_id_seq
@@ -281,17 +274,17 @@ CREATE SEQUENCE public.api_userpreference_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.api_userpreference_id_seq OWNER TO postgres;
+ALTER TABLE public.api_userpreference_id_seq OWNER TO kokuadmin;
 
 --
--- Name: api_userpreference_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+-- Name: api_userpreference_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: kokuadmin
 --
 
 ALTER SEQUENCE public.api_userpreference_id_seq OWNED BY public.api_userpreference.id;
 
 
 --
--- Name: auth_group; Type: TABLE; Schema: public; Owner: postgres
+-- Name: auth_group; Type: TABLE; Schema: public; Owner: kokuadmin
 --
 
 CREATE TABLE public.auth_group (
@@ -300,10 +293,10 @@ CREATE TABLE public.auth_group (
 );
 
 
-ALTER TABLE public.auth_group OWNER TO postgres;
+ALTER TABLE public.auth_group OWNER TO kokuadmin;
 
 --
--- Name: auth_group_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+-- Name: auth_group_id_seq; Type: SEQUENCE; Schema: public; Owner: kokuadmin
 --
 
 CREATE SEQUENCE public.auth_group_id_seq
@@ -314,17 +307,17 @@ CREATE SEQUENCE public.auth_group_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.auth_group_id_seq OWNER TO postgres;
+ALTER TABLE public.auth_group_id_seq OWNER TO kokuadmin;
 
 --
--- Name: auth_group_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+-- Name: auth_group_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: kokuadmin
 --
 
 ALTER SEQUENCE public.auth_group_id_seq OWNED BY public.auth_group.id;
 
 
 --
--- Name: auth_group_permissions; Type: TABLE; Schema: public; Owner: postgres
+-- Name: auth_group_permissions; Type: TABLE; Schema: public; Owner: kokuadmin
 --
 
 CREATE TABLE public.auth_group_permissions (
@@ -334,10 +327,10 @@ CREATE TABLE public.auth_group_permissions (
 );
 
 
-ALTER TABLE public.auth_group_permissions OWNER TO postgres;
+ALTER TABLE public.auth_group_permissions OWNER TO kokuadmin;
 
 --
--- Name: auth_group_permissions_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+-- Name: auth_group_permissions_id_seq; Type: SEQUENCE; Schema: public; Owner: kokuadmin
 --
 
 CREATE SEQUENCE public.auth_group_permissions_id_seq
@@ -348,17 +341,17 @@ CREATE SEQUENCE public.auth_group_permissions_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.auth_group_permissions_id_seq OWNER TO postgres;
+ALTER TABLE public.auth_group_permissions_id_seq OWNER TO kokuadmin;
 
 --
--- Name: auth_group_permissions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+-- Name: auth_group_permissions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: kokuadmin
 --
 
 ALTER SEQUENCE public.auth_group_permissions_id_seq OWNED BY public.auth_group_permissions.id;
 
 
 --
--- Name: auth_permission; Type: TABLE; Schema: public; Owner: postgres
+-- Name: auth_permission; Type: TABLE; Schema: public; Owner: kokuadmin
 --
 
 CREATE TABLE public.auth_permission (
@@ -369,10 +362,10 @@ CREATE TABLE public.auth_permission (
 );
 
 
-ALTER TABLE public.auth_permission OWNER TO postgres;
+ALTER TABLE public.auth_permission OWNER TO kokuadmin;
 
 --
--- Name: auth_permission_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+-- Name: auth_permission_id_seq; Type: SEQUENCE; Schema: public; Owner: kokuadmin
 --
 
 CREATE SEQUENCE public.auth_permission_id_seq
@@ -383,17 +376,17 @@ CREATE SEQUENCE public.auth_permission_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.auth_permission_id_seq OWNER TO postgres;
+ALTER TABLE public.auth_permission_id_seq OWNER TO kokuadmin;
 
 --
--- Name: auth_permission_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+-- Name: auth_permission_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: kokuadmin
 --
 
 ALTER SEQUENCE public.auth_permission_id_seq OWNED BY public.auth_permission.id;
 
 
 --
--- Name: auth_user; Type: TABLE; Schema: public; Owner: postgres
+-- Name: auth_user; Type: TABLE; Schema: public; Owner: kokuadmin
 --
 
 CREATE TABLE public.auth_user (
@@ -411,10 +404,10 @@ CREATE TABLE public.auth_user (
 );
 
 
-ALTER TABLE public.auth_user OWNER TO postgres;
+ALTER TABLE public.auth_user OWNER TO kokuadmin;
 
 --
--- Name: auth_user_groups; Type: TABLE; Schema: public; Owner: postgres
+-- Name: auth_user_groups; Type: TABLE; Schema: public; Owner: kokuadmin
 --
 
 CREATE TABLE public.auth_user_groups (
@@ -424,10 +417,10 @@ CREATE TABLE public.auth_user_groups (
 );
 
 
-ALTER TABLE public.auth_user_groups OWNER TO postgres;
+ALTER TABLE public.auth_user_groups OWNER TO kokuadmin;
 
 --
--- Name: auth_user_groups_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+-- Name: auth_user_groups_id_seq; Type: SEQUENCE; Schema: public; Owner: kokuadmin
 --
 
 CREATE SEQUENCE public.auth_user_groups_id_seq
@@ -438,17 +431,17 @@ CREATE SEQUENCE public.auth_user_groups_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.auth_user_groups_id_seq OWNER TO postgres;
+ALTER TABLE public.auth_user_groups_id_seq OWNER TO kokuadmin;
 
 --
--- Name: auth_user_groups_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+-- Name: auth_user_groups_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: kokuadmin
 --
 
 ALTER SEQUENCE public.auth_user_groups_id_seq OWNED BY public.auth_user_groups.id;
 
 
 --
--- Name: auth_user_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+-- Name: auth_user_id_seq; Type: SEQUENCE; Schema: public; Owner: kokuadmin
 --
 
 CREATE SEQUENCE public.auth_user_id_seq
@@ -459,17 +452,17 @@ CREATE SEQUENCE public.auth_user_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.auth_user_id_seq OWNER TO postgres;
+ALTER TABLE public.auth_user_id_seq OWNER TO kokuadmin;
 
 --
--- Name: auth_user_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+-- Name: auth_user_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: kokuadmin
 --
 
 ALTER SEQUENCE public.auth_user_id_seq OWNED BY public.auth_user.id;
 
 
 --
--- Name: auth_user_user_permissions; Type: TABLE; Schema: public; Owner: postgres
+-- Name: auth_user_user_permissions; Type: TABLE; Schema: public; Owner: kokuadmin
 --
 
 CREATE TABLE public.auth_user_user_permissions (
@@ -479,10 +472,10 @@ CREATE TABLE public.auth_user_user_permissions (
 );
 
 
-ALTER TABLE public.auth_user_user_permissions OWNER TO postgres;
+ALTER TABLE public.auth_user_user_permissions OWNER TO kokuadmin;
 
 --
--- Name: auth_user_user_permissions_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+-- Name: auth_user_user_permissions_id_seq; Type: SEQUENCE; Schema: public; Owner: kokuadmin
 --
 
 CREATE SEQUENCE public.auth_user_user_permissions_id_seq
@@ -493,17 +486,17 @@ CREATE SEQUENCE public.auth_user_user_permissions_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.auth_user_user_permissions_id_seq OWNER TO postgres;
+ALTER TABLE public.auth_user_user_permissions_id_seq OWNER TO kokuadmin;
 
 --
--- Name: auth_user_user_permissions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+-- Name: auth_user_user_permissions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: kokuadmin
 --
 
 ALTER SEQUENCE public.auth_user_user_permissions_id_seq OWNED BY public.auth_user_user_permissions.id;
 
 
 --
--- Name: authtoken_token; Type: TABLE; Schema: public; Owner: postgres
+-- Name: authtoken_token; Type: TABLE; Schema: public; Owner: kokuadmin
 --
 
 CREATE TABLE public.authtoken_token (
@@ -513,10 +506,10 @@ CREATE TABLE public.authtoken_token (
 );
 
 
-ALTER TABLE public.authtoken_token OWNER TO postgres;
+ALTER TABLE public.authtoken_token OWNER TO kokuadmin;
 
 --
--- Name: django_admin_log; Type: TABLE; Schema: public; Owner: postgres
+-- Name: django_admin_log; Type: TABLE; Schema: public; Owner: kokuadmin
 --
 
 CREATE TABLE public.django_admin_log (
@@ -532,10 +525,10 @@ CREATE TABLE public.django_admin_log (
 );
 
 
-ALTER TABLE public.django_admin_log OWNER TO postgres;
+ALTER TABLE public.django_admin_log OWNER TO kokuadmin;
 
 --
--- Name: django_admin_log_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+-- Name: django_admin_log_id_seq; Type: SEQUENCE; Schema: public; Owner: kokuadmin
 --
 
 CREATE SEQUENCE public.django_admin_log_id_seq
@@ -546,17 +539,17 @@ CREATE SEQUENCE public.django_admin_log_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.django_admin_log_id_seq OWNER TO postgres;
+ALTER TABLE public.django_admin_log_id_seq OWNER TO kokuadmin;
 
 --
--- Name: django_admin_log_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+-- Name: django_admin_log_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: kokuadmin
 --
 
 ALTER SEQUENCE public.django_admin_log_id_seq OWNED BY public.django_admin_log.id;
 
 
 --
--- Name: django_content_type; Type: TABLE; Schema: public; Owner: postgres
+-- Name: django_content_type; Type: TABLE; Schema: public; Owner: kokuadmin
 --
 
 CREATE TABLE public.django_content_type (
@@ -566,10 +559,10 @@ CREATE TABLE public.django_content_type (
 );
 
 
-ALTER TABLE public.django_content_type OWNER TO postgres;
+ALTER TABLE public.django_content_type OWNER TO kokuadmin;
 
 --
--- Name: django_content_type_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+-- Name: django_content_type_id_seq; Type: SEQUENCE; Schema: public; Owner: kokuadmin
 --
 
 CREATE SEQUENCE public.django_content_type_id_seq
@@ -580,17 +573,17 @@ CREATE SEQUENCE public.django_content_type_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.django_content_type_id_seq OWNER TO postgres;
+ALTER TABLE public.django_content_type_id_seq OWNER TO kokuadmin;
 
 --
--- Name: django_content_type_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+-- Name: django_content_type_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: kokuadmin
 --
 
 ALTER SEQUENCE public.django_content_type_id_seq OWNED BY public.django_content_type.id;
 
 
 --
--- Name: django_migrations; Type: TABLE; Schema: public; Owner: postgres
+-- Name: django_migrations; Type: TABLE; Schema: public; Owner: kokuadmin
 --
 
 CREATE TABLE public.django_migrations (
@@ -601,10 +594,10 @@ CREATE TABLE public.django_migrations (
 );
 
 
-ALTER TABLE public.django_migrations OWNER TO postgres;
+ALTER TABLE public.django_migrations OWNER TO kokuadmin;
 
 --
--- Name: django_migrations_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+-- Name: django_migrations_id_seq; Type: SEQUENCE; Schema: public; Owner: kokuadmin
 --
 
 CREATE SEQUENCE public.django_migrations_id_seq
@@ -615,17 +608,17 @@ CREATE SEQUENCE public.django_migrations_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.django_migrations_id_seq OWNER TO postgres;
+ALTER TABLE public.django_migrations_id_seq OWNER TO kokuadmin;
 
 --
--- Name: django_migrations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+-- Name: django_migrations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: kokuadmin
 --
 
 ALTER SEQUENCE public.django_migrations_id_seq OWNED BY public.django_migrations.id;
 
 
 --
--- Name: django_session; Type: TABLE; Schema: public; Owner: postgres
+-- Name: django_session; Type: TABLE; Schema: public; Owner: kokuadmin
 --
 
 CREATE TABLE public.django_session (
@@ -635,10 +628,10 @@ CREATE TABLE public.django_session (
 );
 
 
-ALTER TABLE public.django_session OWNER TO postgres;
+ALTER TABLE public.django_session OWNER TO kokuadmin;
 
 --
--- Name: region_mapping; Type: TABLE; Schema: public; Owner: postgres
+-- Name: region_mapping; Type: TABLE; Schema: public; Owner: kokuadmin
 --
 
 CREATE TABLE public.region_mapping (
@@ -648,10 +641,10 @@ CREATE TABLE public.region_mapping (
 );
 
 
-ALTER TABLE public.region_mapping OWNER TO postgres;
+ALTER TABLE public.region_mapping OWNER TO kokuadmin;
 
 --
--- Name: region_mapping_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+-- Name: region_mapping_id_seq; Type: SEQUENCE; Schema: public; Owner: kokuadmin
 --
 
 CREATE SEQUENCE public.region_mapping_id_seq
@@ -662,17 +655,17 @@ CREATE SEQUENCE public.region_mapping_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.region_mapping_id_seq OWNER TO postgres;
+ALTER TABLE public.region_mapping_id_seq OWNER TO kokuadmin;
 
 --
--- Name: region_mapping_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+-- Name: region_mapping_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: kokuadmin
 --
 
 ALTER SEQUENCE public.region_mapping_id_seq OWNED BY public.region_mapping.id;
 
 
 --
--- Name: reporting_common_costusagereportstatus; Type: TABLE; Schema: public; Owner: postgres
+-- Name: reporting_common_costusagereportstatus; Type: TABLE; Schema: public; Owner: kokuadmin
 --
 
 CREATE TABLE public.reporting_common_costusagereportstatus (
@@ -687,10 +680,10 @@ CREATE TABLE public.reporting_common_costusagereportstatus (
 );
 
 
-ALTER TABLE public.reporting_common_costusagereportstatus OWNER TO postgres;
+ALTER TABLE public.reporting_common_costusagereportstatus OWNER TO kokuadmin;
 
 --
--- Name: reporting_common_costusagereportstatus_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+-- Name: reporting_common_costusagereportstatus_id_seq; Type: SEQUENCE; Schema: public; Owner: kokuadmin
 --
 
 CREATE SEQUENCE public.reporting_common_costusagereportstatus_id_seq
@@ -701,17 +694,17 @@ CREATE SEQUENCE public.reporting_common_costusagereportstatus_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.reporting_common_costusagereportstatus_id_seq OWNER TO postgres;
+ALTER TABLE public.reporting_common_costusagereportstatus_id_seq OWNER TO kokuadmin;
 
 --
--- Name: reporting_common_costusagereportstatus_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+-- Name: reporting_common_costusagereportstatus_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: kokuadmin
 --
 
 ALTER SEQUENCE public.reporting_common_costusagereportstatus_id_seq OWNED BY public.reporting_common_costusagereportstatus.id;
 
 
 --
--- Name: reporting_common_reportcolumnmap; Type: TABLE; Schema: public; Owner: postgres
+-- Name: reporting_common_reportcolumnmap; Type: TABLE; Schema: public; Owner: kokuadmin
 --
 
 CREATE TABLE public.reporting_common_reportcolumnmap (
@@ -723,10 +716,10 @@ CREATE TABLE public.reporting_common_reportcolumnmap (
 );
 
 
-ALTER TABLE public.reporting_common_reportcolumnmap OWNER TO postgres;
+ALTER TABLE public.reporting_common_reportcolumnmap OWNER TO kokuadmin;
 
 --
--- Name: reporting_common_reportcolumnmap_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+-- Name: reporting_common_reportcolumnmap_id_seq; Type: SEQUENCE; Schema: public; Owner: kokuadmin
 --
 
 CREATE SEQUENCE public.reporting_common_reportcolumnmap_id_seq
@@ -737,17 +730,17 @@ CREATE SEQUENCE public.reporting_common_reportcolumnmap_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.reporting_common_reportcolumnmap_id_seq OWNER TO postgres;
+ALTER TABLE public.reporting_common_reportcolumnmap_id_seq OWNER TO kokuadmin;
 
 --
--- Name: reporting_common_reportcolumnmap_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+-- Name: reporting_common_reportcolumnmap_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: kokuadmin
 --
 
 ALTER SEQUENCE public.reporting_common_reportcolumnmap_id_seq OWNED BY public.reporting_common_reportcolumnmap.id;
 
 
 --
--- Name: si_unit_scale; Type: TABLE; Schema: public; Owner: postgres
+-- Name: si_unit_scale; Type: TABLE; Schema: public; Owner: kokuadmin
 --
 
 CREATE TABLE public.si_unit_scale (
@@ -758,10 +751,10 @@ CREATE TABLE public.si_unit_scale (
 );
 
 
-ALTER TABLE public.si_unit_scale OWNER TO postgres;
+ALTER TABLE public.si_unit_scale OWNER TO kokuadmin;
 
 --
--- Name: si_unit_scale_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+-- Name: si_unit_scale_id_seq; Type: SEQUENCE; Schema: public; Owner: kokuadmin
 --
 
 CREATE SEQUENCE public.si_unit_scale_id_seq
@@ -772,17 +765,17 @@ CREATE SEQUENCE public.si_unit_scale_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.si_unit_scale_id_seq OWNER TO postgres;
+ALTER TABLE public.si_unit_scale_id_seq OWNER TO kokuadmin;
 
 --
--- Name: si_unit_scale_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+-- Name: si_unit_scale_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: kokuadmin
 --
 
 ALTER SEQUENCE public.si_unit_scale_id_seq OWNED BY public.si_unit_scale.id;
 
 
 --
--- Name: django_migrations; Type: TABLE; Schema: testcustomer; Owner: postgres
+-- Name: django_migrations; Type: TABLE; Schema: testcustomer; Owner: kokuadmin
 --
 
 CREATE TABLE testcustomer.django_migrations (
@@ -793,10 +786,10 @@ CREATE TABLE testcustomer.django_migrations (
 );
 
 
-ALTER TABLE testcustomer.django_migrations OWNER TO postgres;
+ALTER TABLE testcustomer.django_migrations OWNER TO kokuadmin;
 
 --
--- Name: django_migrations_id_seq; Type: SEQUENCE; Schema: testcustomer; Owner: postgres
+-- Name: django_migrations_id_seq; Type: SEQUENCE; Schema: testcustomer; Owner: kokuadmin
 --
 
 CREATE SEQUENCE testcustomer.django_migrations_id_seq
@@ -807,17 +800,17 @@ CREATE SEQUENCE testcustomer.django_migrations_id_seq
     CACHE 1;
 
 
-ALTER TABLE testcustomer.django_migrations_id_seq OWNER TO postgres;
+ALTER TABLE testcustomer.django_migrations_id_seq OWNER TO kokuadmin;
 
 --
--- Name: django_migrations_id_seq; Type: SEQUENCE OWNED BY; Schema: testcustomer; Owner: postgres
+-- Name: django_migrations_id_seq; Type: SEQUENCE OWNED BY; Schema: testcustomer; Owner: kokuadmin
 --
 
 ALTER SEQUENCE testcustomer.django_migrations_id_seq OWNED BY testcustomer.django_migrations.id;
 
 
 --
--- Name: reporting_awsaccountalias; Type: TABLE; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awsaccountalias; Type: TABLE; Schema: testcustomer; Owner: kokuadmin
 --
 
 CREATE TABLE testcustomer.reporting_awsaccountalias (
@@ -827,10 +820,10 @@ CREATE TABLE testcustomer.reporting_awsaccountalias (
 );
 
 
-ALTER TABLE testcustomer.reporting_awsaccountalias OWNER TO postgres;
+ALTER TABLE testcustomer.reporting_awsaccountalias OWNER TO kokuadmin;
 
 --
--- Name: reporting_awsaccountalias_id_seq; Type: SEQUENCE; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awsaccountalias_id_seq; Type: SEQUENCE; Schema: testcustomer; Owner: kokuadmin
 --
 
 CREATE SEQUENCE testcustomer.reporting_awsaccountalias_id_seq
@@ -841,17 +834,17 @@ CREATE SEQUENCE testcustomer.reporting_awsaccountalias_id_seq
     CACHE 1;
 
 
-ALTER TABLE testcustomer.reporting_awsaccountalias_id_seq OWNER TO postgres;
+ALTER TABLE testcustomer.reporting_awsaccountalias_id_seq OWNER TO kokuadmin;
 
 --
--- Name: reporting_awsaccountalias_id_seq; Type: SEQUENCE OWNED BY; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awsaccountalias_id_seq; Type: SEQUENCE OWNED BY; Schema: testcustomer; Owner: kokuadmin
 --
 
 ALTER SEQUENCE testcustomer.reporting_awsaccountalias_id_seq OWNED BY testcustomer.reporting_awsaccountalias.id;
 
 
 --
--- Name: reporting_awscostentry; Type: TABLE; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awscostentry; Type: TABLE; Schema: testcustomer; Owner: kokuadmin
 --
 
 CREATE TABLE testcustomer.reporting_awscostentry (
@@ -862,10 +855,10 @@ CREATE TABLE testcustomer.reporting_awscostentry (
 );
 
 
-ALTER TABLE testcustomer.reporting_awscostentry OWNER TO postgres;
+ALTER TABLE testcustomer.reporting_awscostentry OWNER TO kokuadmin;
 
 --
--- Name: reporting_awscostentry_id_seq; Type: SEQUENCE; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awscostentry_id_seq; Type: SEQUENCE; Schema: testcustomer; Owner: kokuadmin
 --
 
 CREATE SEQUENCE testcustomer.reporting_awscostentry_id_seq
@@ -876,17 +869,17 @@ CREATE SEQUENCE testcustomer.reporting_awscostentry_id_seq
     CACHE 1;
 
 
-ALTER TABLE testcustomer.reporting_awscostentry_id_seq OWNER TO postgres;
+ALTER TABLE testcustomer.reporting_awscostentry_id_seq OWNER TO kokuadmin;
 
 --
--- Name: reporting_awscostentry_id_seq; Type: SEQUENCE OWNED BY; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awscostentry_id_seq; Type: SEQUENCE OWNED BY; Schema: testcustomer; Owner: kokuadmin
 --
 
 ALTER SEQUENCE testcustomer.reporting_awscostentry_id_seq OWNED BY testcustomer.reporting_awscostentry.id;
 
 
 --
--- Name: reporting_awscostentrybill; Type: TABLE; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awscostentrybill; Type: TABLE; Schema: testcustomer; Owner: kokuadmin
 --
 
 CREATE TABLE testcustomer.reporting_awscostentrybill (
@@ -899,10 +892,10 @@ CREATE TABLE testcustomer.reporting_awscostentrybill (
 );
 
 
-ALTER TABLE testcustomer.reporting_awscostentrybill OWNER TO postgres;
+ALTER TABLE testcustomer.reporting_awscostentrybill OWNER TO kokuadmin;
 
 --
--- Name: reporting_awscostentrybill_id_seq; Type: SEQUENCE; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awscostentrybill_id_seq; Type: SEQUENCE; Schema: testcustomer; Owner: kokuadmin
 --
 
 CREATE SEQUENCE testcustomer.reporting_awscostentrybill_id_seq
@@ -913,17 +906,17 @@ CREATE SEQUENCE testcustomer.reporting_awscostentrybill_id_seq
     CACHE 1;
 
 
-ALTER TABLE testcustomer.reporting_awscostentrybill_id_seq OWNER TO postgres;
+ALTER TABLE testcustomer.reporting_awscostentrybill_id_seq OWNER TO kokuadmin;
 
 --
--- Name: reporting_awscostentrybill_id_seq; Type: SEQUENCE OWNED BY; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awscostentrybill_id_seq; Type: SEQUENCE OWNED BY; Schema: testcustomer; Owner: kokuadmin
 --
 
 ALTER SEQUENCE testcustomer.reporting_awscostentrybill_id_seq OWNED BY testcustomer.reporting_awscostentrybill.id;
 
 
 --
--- Name: reporting_awscostentrylineitem; Type: TABLE; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awscostentrylineitem; Type: TABLE; Schema: testcustomer; Owner: kokuadmin
 --
 
 CREATE TABLE testcustomer.reporting_awscostentrylineitem (
@@ -964,10 +957,10 @@ CREATE TABLE testcustomer.reporting_awscostentrylineitem (
 );
 
 
-ALTER TABLE testcustomer.reporting_awscostentrylineitem OWNER TO postgres;
+ALTER TABLE testcustomer.reporting_awscostentrylineitem OWNER TO kokuadmin;
 
 --
--- Name: reporting_awscostentrylineitem_aggregates; Type: TABLE; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awscostentrylineitem_aggregates; Type: TABLE; Schema: testcustomer; Owner: kokuadmin
 --
 
 CREATE TABLE testcustomer.reporting_awscostentrylineitem_aggregates (
@@ -984,10 +977,10 @@ CREATE TABLE testcustomer.reporting_awscostentrylineitem_aggregates (
 );
 
 
-ALTER TABLE testcustomer.reporting_awscostentrylineitem_aggregates OWNER TO postgres;
+ALTER TABLE testcustomer.reporting_awscostentrylineitem_aggregates OWNER TO kokuadmin;
 
 --
--- Name: reporting_awscostentrylineitem_aggregates_id_seq; Type: SEQUENCE; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awscostentrylineitem_aggregates_id_seq; Type: SEQUENCE; Schema: testcustomer; Owner: kokuadmin
 --
 
 CREATE SEQUENCE testcustomer.reporting_awscostentrylineitem_aggregates_id_seq
@@ -998,17 +991,17 @@ CREATE SEQUENCE testcustomer.reporting_awscostentrylineitem_aggregates_id_seq
     CACHE 1;
 
 
-ALTER TABLE testcustomer.reporting_awscostentrylineitem_aggregates_id_seq OWNER TO postgres;
+ALTER TABLE testcustomer.reporting_awscostentrylineitem_aggregates_id_seq OWNER TO kokuadmin;
 
 --
--- Name: reporting_awscostentrylineitem_aggregates_id_seq; Type: SEQUENCE OWNED BY; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awscostentrylineitem_aggregates_id_seq; Type: SEQUENCE OWNED BY; Schema: testcustomer; Owner: kokuadmin
 --
 
 ALTER SEQUENCE testcustomer.reporting_awscostentrylineitem_aggregates_id_seq OWNED BY testcustomer.reporting_awscostentrylineitem_aggregates.id;
 
 
 --
--- Name: reporting_awscostentrylineitem_daily; Type: TABLE; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awscostentrylineitem_daily; Type: TABLE; Schema: testcustomer; Owner: kokuadmin
 --
 
 CREATE TABLE testcustomer.reporting_awscostentrylineitem_daily (
@@ -1040,10 +1033,10 @@ CREATE TABLE testcustomer.reporting_awscostentrylineitem_daily (
 );
 
 
-ALTER TABLE testcustomer.reporting_awscostentrylineitem_daily OWNER TO postgres;
+ALTER TABLE testcustomer.reporting_awscostentrylineitem_daily OWNER TO kokuadmin;
 
 --
--- Name: reporting_awscostentrylineitem_daily_id_seq; Type: SEQUENCE; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awscostentrylineitem_daily_id_seq; Type: SEQUENCE; Schema: testcustomer; Owner: kokuadmin
 --
 
 CREATE SEQUENCE testcustomer.reporting_awscostentrylineitem_daily_id_seq
@@ -1054,17 +1047,17 @@ CREATE SEQUENCE testcustomer.reporting_awscostentrylineitem_daily_id_seq
     CACHE 1;
 
 
-ALTER TABLE testcustomer.reporting_awscostentrylineitem_daily_id_seq OWNER TO postgres;
+ALTER TABLE testcustomer.reporting_awscostentrylineitem_daily_id_seq OWNER TO kokuadmin;
 
 --
--- Name: reporting_awscostentrylineitem_daily_id_seq; Type: SEQUENCE OWNED BY; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awscostentrylineitem_daily_id_seq; Type: SEQUENCE OWNED BY; Schema: testcustomer; Owner: kokuadmin
 --
 
 ALTER SEQUENCE testcustomer.reporting_awscostentrylineitem_daily_id_seq OWNED BY testcustomer.reporting_awscostentrylineitem_daily.id;
 
 
 --
--- Name: reporting_awscostentrylineitem_daily_summary; Type: TABLE; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awscostentrylineitem_daily_summary; Type: TABLE; Schema: testcustomer; Owner: kokuadmin
 --
 
 CREATE TABLE testcustomer.reporting_awscostentrylineitem_daily_summary (
@@ -1089,14 +1082,15 @@ CREATE TABLE testcustomer.reporting_awscostentrylineitem_daily_summary (
     public_on_demand_cost numeric(17,9),
     public_on_demand_rate numeric(17,9),
     tax_type text,
-    usage_end timestamp with time zone
+    usage_end timestamp with time zone,
+    account_alias_id integer
 );
 
 
-ALTER TABLE testcustomer.reporting_awscostentrylineitem_daily_summary OWNER TO postgres;
+ALTER TABLE testcustomer.reporting_awscostentrylineitem_daily_summary OWNER TO kokuadmin;
 
 --
--- Name: reporting_awscostentrylineitem_daily_summary_id_seq; Type: SEQUENCE; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awscostentrylineitem_daily_summary_id_seq; Type: SEQUENCE; Schema: testcustomer; Owner: kokuadmin
 --
 
 CREATE SEQUENCE testcustomer.reporting_awscostentrylineitem_daily_summary_id_seq
@@ -1107,17 +1101,17 @@ CREATE SEQUENCE testcustomer.reporting_awscostentrylineitem_daily_summary_id_seq
     CACHE 1;
 
 
-ALTER TABLE testcustomer.reporting_awscostentrylineitem_daily_summary_id_seq OWNER TO postgres;
+ALTER TABLE testcustomer.reporting_awscostentrylineitem_daily_summary_id_seq OWNER TO kokuadmin;
 
 --
--- Name: reporting_awscostentrylineitem_daily_summary_id_seq; Type: SEQUENCE OWNED BY; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awscostentrylineitem_daily_summary_id_seq; Type: SEQUENCE OWNED BY; Schema: testcustomer; Owner: kokuadmin
 --
 
 ALTER SEQUENCE testcustomer.reporting_awscostentrylineitem_daily_summary_id_seq OWNED BY testcustomer.reporting_awscostentrylineitem_daily_summary.id;
 
 
 --
--- Name: reporting_awscostentrylineitem_id_seq; Type: SEQUENCE; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awscostentrylineitem_id_seq; Type: SEQUENCE; Schema: testcustomer; Owner: kokuadmin
 --
 
 CREATE SEQUENCE testcustomer.reporting_awscostentrylineitem_id_seq
@@ -1128,17 +1122,17 @@ CREATE SEQUENCE testcustomer.reporting_awscostentrylineitem_id_seq
     CACHE 1;
 
 
-ALTER TABLE testcustomer.reporting_awscostentrylineitem_id_seq OWNER TO postgres;
+ALTER TABLE testcustomer.reporting_awscostentrylineitem_id_seq OWNER TO kokuadmin;
 
 --
--- Name: reporting_awscostentrylineitem_id_seq; Type: SEQUENCE OWNED BY; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awscostentrylineitem_id_seq; Type: SEQUENCE OWNED BY; Schema: testcustomer; Owner: kokuadmin
 --
 
 ALTER SEQUENCE testcustomer.reporting_awscostentrylineitem_id_seq OWNED BY testcustomer.reporting_awscostentrylineitem.id;
 
 
 --
--- Name: reporting_awscostentrypricing; Type: TABLE; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awscostentrypricing; Type: TABLE; Schema: testcustomer; Owner: kokuadmin
 --
 
 CREATE TABLE testcustomer.reporting_awscostentrypricing (
@@ -1148,10 +1142,10 @@ CREATE TABLE testcustomer.reporting_awscostentrypricing (
 );
 
 
-ALTER TABLE testcustomer.reporting_awscostentrypricing OWNER TO postgres;
+ALTER TABLE testcustomer.reporting_awscostentrypricing OWNER TO kokuadmin;
 
 --
--- Name: reporting_awscostentrypricing_id_seq; Type: SEQUENCE; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awscostentrypricing_id_seq; Type: SEQUENCE; Schema: testcustomer; Owner: kokuadmin
 --
 
 CREATE SEQUENCE testcustomer.reporting_awscostentrypricing_id_seq
@@ -1162,17 +1156,17 @@ CREATE SEQUENCE testcustomer.reporting_awscostentrypricing_id_seq
     CACHE 1;
 
 
-ALTER TABLE testcustomer.reporting_awscostentrypricing_id_seq OWNER TO postgres;
+ALTER TABLE testcustomer.reporting_awscostentrypricing_id_seq OWNER TO kokuadmin;
 
 --
--- Name: reporting_awscostentrypricing_id_seq; Type: SEQUENCE OWNED BY; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awscostentrypricing_id_seq; Type: SEQUENCE OWNED BY; Schema: testcustomer; Owner: kokuadmin
 --
 
 ALTER SEQUENCE testcustomer.reporting_awscostentrypricing_id_seq OWNED BY testcustomer.reporting_awscostentrypricing.id;
 
 
 --
--- Name: reporting_awscostentryproduct; Type: TABLE; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awscostentryproduct; Type: TABLE; Schema: testcustomer; Owner: kokuadmin
 --
 
 CREATE TABLE testcustomer.reporting_awscostentryproduct (
@@ -1190,10 +1184,10 @@ CREATE TABLE testcustomer.reporting_awscostentryproduct (
 );
 
 
-ALTER TABLE testcustomer.reporting_awscostentryproduct OWNER TO postgres;
+ALTER TABLE testcustomer.reporting_awscostentryproduct OWNER TO kokuadmin;
 
 --
--- Name: reporting_awscostentryproduct_id_seq; Type: SEQUENCE; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awscostentryproduct_id_seq; Type: SEQUENCE; Schema: testcustomer; Owner: kokuadmin
 --
 
 CREATE SEQUENCE testcustomer.reporting_awscostentryproduct_id_seq
@@ -1204,17 +1198,17 @@ CREATE SEQUENCE testcustomer.reporting_awscostentryproduct_id_seq
     CACHE 1;
 
 
-ALTER TABLE testcustomer.reporting_awscostentryproduct_id_seq OWNER TO postgres;
+ALTER TABLE testcustomer.reporting_awscostentryproduct_id_seq OWNER TO kokuadmin;
 
 --
--- Name: reporting_awscostentryproduct_id_seq; Type: SEQUENCE OWNED BY; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awscostentryproduct_id_seq; Type: SEQUENCE OWNED BY; Schema: testcustomer; Owner: kokuadmin
 --
 
 ALTER SEQUENCE testcustomer.reporting_awscostentryproduct_id_seq OWNED BY testcustomer.reporting_awscostentryproduct.id;
 
 
 --
--- Name: reporting_awscostentryreservation; Type: TABLE; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awscostentryreservation; Type: TABLE; Schema: testcustomer; Owner: kokuadmin
 --
 
 CREATE TABLE testcustomer.reporting_awscostentryreservation (
@@ -1228,10 +1222,10 @@ CREATE TABLE testcustomer.reporting_awscostentryreservation (
 );
 
 
-ALTER TABLE testcustomer.reporting_awscostentryreservation OWNER TO postgres;
+ALTER TABLE testcustomer.reporting_awscostentryreservation OWNER TO kokuadmin;
 
 --
--- Name: reporting_awscostentryreservation_id_seq; Type: SEQUENCE; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awscostentryreservation_id_seq; Type: SEQUENCE; Schema: testcustomer; Owner: kokuadmin
 --
 
 CREATE SEQUENCE testcustomer.reporting_awscostentryreservation_id_seq
@@ -1242,236 +1236,236 @@ CREATE SEQUENCE testcustomer.reporting_awscostentryreservation_id_seq
     CACHE 1;
 
 
-ALTER TABLE testcustomer.reporting_awscostentryreservation_id_seq OWNER TO postgres;
+ALTER TABLE testcustomer.reporting_awscostentryreservation_id_seq OWNER TO kokuadmin;
 
 --
--- Name: reporting_awscostentryreservation_id_seq; Type: SEQUENCE OWNED BY; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awscostentryreservation_id_seq; Type: SEQUENCE OWNED BY; Schema: testcustomer; Owner: kokuadmin
 --
 
 ALTER SEQUENCE testcustomer.reporting_awscostentryreservation_id_seq OWNED BY testcustomer.reporting_awscostentryreservation.id;
 
 
 --
--- Name: api_provider id; Type: DEFAULT; Schema: public; Owner: postgres
+-- Name: api_provider id; Type: DEFAULT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.api_provider ALTER COLUMN id SET DEFAULT nextval('public.api_provider_id_seq'::regclass);
 
 
 --
--- Name: api_providerauthentication id; Type: DEFAULT; Schema: public; Owner: postgres
+-- Name: api_providerauthentication id; Type: DEFAULT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.api_providerauthentication ALTER COLUMN id SET DEFAULT nextval('public.api_providerauthentication_id_seq'::regclass);
 
 
 --
--- Name: api_providerbillingsource id; Type: DEFAULT; Schema: public; Owner: postgres
+-- Name: api_providerbillingsource id; Type: DEFAULT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.api_providerbillingsource ALTER COLUMN id SET DEFAULT nextval('public.api_providerbillingsource_id_seq'::regclass);
 
 
 --
--- Name: api_resettoken id; Type: DEFAULT; Schema: public; Owner: postgres
+-- Name: api_resettoken id; Type: DEFAULT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.api_resettoken ALTER COLUMN id SET DEFAULT nextval('public.api_resettoken_id_seq'::regclass);
 
 
 --
--- Name: api_tenant id; Type: DEFAULT; Schema: public; Owner: postgres
+-- Name: api_tenant id; Type: DEFAULT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.api_tenant ALTER COLUMN id SET DEFAULT nextval('public.api_tenant_id_seq'::regclass);
 
 
 --
--- Name: api_userpreference id; Type: DEFAULT; Schema: public; Owner: postgres
+-- Name: api_userpreference id; Type: DEFAULT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.api_userpreference ALTER COLUMN id SET DEFAULT nextval('public.api_userpreference_id_seq'::regclass);
 
 
 --
--- Name: auth_group id; Type: DEFAULT; Schema: public; Owner: postgres
+-- Name: auth_group id; Type: DEFAULT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.auth_group ALTER COLUMN id SET DEFAULT nextval('public.auth_group_id_seq'::regclass);
 
 
 --
--- Name: auth_group_permissions id; Type: DEFAULT; Schema: public; Owner: postgres
+-- Name: auth_group_permissions id; Type: DEFAULT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.auth_group_permissions ALTER COLUMN id SET DEFAULT nextval('public.auth_group_permissions_id_seq'::regclass);
 
 
 --
--- Name: auth_permission id; Type: DEFAULT; Schema: public; Owner: postgres
+-- Name: auth_permission id; Type: DEFAULT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.auth_permission ALTER COLUMN id SET DEFAULT nextval('public.auth_permission_id_seq'::regclass);
 
 
 --
--- Name: auth_user id; Type: DEFAULT; Schema: public; Owner: postgres
+-- Name: auth_user id; Type: DEFAULT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.auth_user ALTER COLUMN id SET DEFAULT nextval('public.auth_user_id_seq'::regclass);
 
 
 --
--- Name: auth_user_groups id; Type: DEFAULT; Schema: public; Owner: postgres
+-- Name: auth_user_groups id; Type: DEFAULT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.auth_user_groups ALTER COLUMN id SET DEFAULT nextval('public.auth_user_groups_id_seq'::regclass);
 
 
 --
--- Name: auth_user_user_permissions id; Type: DEFAULT; Schema: public; Owner: postgres
+-- Name: auth_user_user_permissions id; Type: DEFAULT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.auth_user_user_permissions ALTER COLUMN id SET DEFAULT nextval('public.auth_user_user_permissions_id_seq'::regclass);
 
 
 --
--- Name: django_admin_log id; Type: DEFAULT; Schema: public; Owner: postgres
+-- Name: django_admin_log id; Type: DEFAULT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.django_admin_log ALTER COLUMN id SET DEFAULT nextval('public.django_admin_log_id_seq'::regclass);
 
 
 --
--- Name: django_content_type id; Type: DEFAULT; Schema: public; Owner: postgres
+-- Name: django_content_type id; Type: DEFAULT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.django_content_type ALTER COLUMN id SET DEFAULT nextval('public.django_content_type_id_seq'::regclass);
 
 
 --
--- Name: django_migrations id; Type: DEFAULT; Schema: public; Owner: postgres
+-- Name: django_migrations id; Type: DEFAULT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.django_migrations ALTER COLUMN id SET DEFAULT nextval('public.django_migrations_id_seq'::regclass);
 
 
 --
--- Name: region_mapping id; Type: DEFAULT; Schema: public; Owner: postgres
+-- Name: region_mapping id; Type: DEFAULT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.region_mapping ALTER COLUMN id SET DEFAULT nextval('public.region_mapping_id_seq'::regclass);
 
 
 --
--- Name: reporting_common_costusagereportstatus id; Type: DEFAULT; Schema: public; Owner: postgres
+-- Name: reporting_common_costusagereportstatus id; Type: DEFAULT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.reporting_common_costusagereportstatus ALTER COLUMN id SET DEFAULT nextval('public.reporting_common_costusagereportstatus_id_seq'::regclass);
 
 
 --
--- Name: reporting_common_reportcolumnmap id; Type: DEFAULT; Schema: public; Owner: postgres
+-- Name: reporting_common_reportcolumnmap id; Type: DEFAULT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.reporting_common_reportcolumnmap ALTER COLUMN id SET DEFAULT nextval('public.reporting_common_reportcolumnmap_id_seq'::regclass);
 
 
 --
--- Name: si_unit_scale id; Type: DEFAULT; Schema: public; Owner: postgres
+-- Name: si_unit_scale id; Type: DEFAULT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.si_unit_scale ALTER COLUMN id SET DEFAULT nextval('public.si_unit_scale_id_seq'::regclass);
 
 
 --
--- Name: django_migrations id; Type: DEFAULT; Schema: testcustomer; Owner: postgres
+-- Name: django_migrations id; Type: DEFAULT; Schema: testcustomer; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY testcustomer.django_migrations ALTER COLUMN id SET DEFAULT nextval('testcustomer.django_migrations_id_seq'::regclass);
 
 
 --
--- Name: reporting_awsaccountalias id; Type: DEFAULT; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awsaccountalias id; Type: DEFAULT; Schema: testcustomer; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY testcustomer.reporting_awsaccountalias ALTER COLUMN id SET DEFAULT nextval('testcustomer.reporting_awsaccountalias_id_seq'::regclass);
 
 
 --
--- Name: reporting_awscostentry id; Type: DEFAULT; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awscostentry id; Type: DEFAULT; Schema: testcustomer; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY testcustomer.reporting_awscostentry ALTER COLUMN id SET DEFAULT nextval('testcustomer.reporting_awscostentry_id_seq'::regclass);
 
 
 --
--- Name: reporting_awscostentrybill id; Type: DEFAULT; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awscostentrybill id; Type: DEFAULT; Schema: testcustomer; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY testcustomer.reporting_awscostentrybill ALTER COLUMN id SET DEFAULT nextval('testcustomer.reporting_awscostentrybill_id_seq'::regclass);
 
 
 --
--- Name: reporting_awscostentrylineitem id; Type: DEFAULT; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awscostentrylineitem id; Type: DEFAULT; Schema: testcustomer; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY testcustomer.reporting_awscostentrylineitem ALTER COLUMN id SET DEFAULT nextval('testcustomer.reporting_awscostentrylineitem_id_seq'::regclass);
 
 
 --
--- Name: reporting_awscostentrylineitem_aggregates id; Type: DEFAULT; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awscostentrylineitem_aggregates id; Type: DEFAULT; Schema: testcustomer; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY testcustomer.reporting_awscostentrylineitem_aggregates ALTER COLUMN id SET DEFAULT nextval('testcustomer.reporting_awscostentrylineitem_aggregates_id_seq'::regclass);
 
 
 --
--- Name: reporting_awscostentrylineitem_daily id; Type: DEFAULT; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awscostentrylineitem_daily id; Type: DEFAULT; Schema: testcustomer; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY testcustomer.reporting_awscostentrylineitem_daily ALTER COLUMN id SET DEFAULT nextval('testcustomer.reporting_awscostentrylineitem_daily_id_seq'::regclass);
 
 
 --
--- Name: reporting_awscostentrylineitem_daily_summary id; Type: DEFAULT; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awscostentrylineitem_daily_summary id; Type: DEFAULT; Schema: testcustomer; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY testcustomer.reporting_awscostentrylineitem_daily_summary ALTER COLUMN id SET DEFAULT nextval('testcustomer.reporting_awscostentrylineitem_daily_summary_id_seq'::regclass);
 
 
 --
--- Name: reporting_awscostentrypricing id; Type: DEFAULT; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awscostentrypricing id; Type: DEFAULT; Schema: testcustomer; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY testcustomer.reporting_awscostentrypricing ALTER COLUMN id SET DEFAULT nextval('testcustomer.reporting_awscostentrypricing_id_seq'::regclass);
 
 
 --
--- Name: reporting_awscostentryproduct id; Type: DEFAULT; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awscostentryproduct id; Type: DEFAULT; Schema: testcustomer; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY testcustomer.reporting_awscostentryproduct ALTER COLUMN id SET DEFAULT nextval('testcustomer.reporting_awscostentryproduct_id_seq'::regclass);
 
 
 --
--- Name: reporting_awscostentryreservation id; Type: DEFAULT; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awscostentryreservation id; Type: DEFAULT; Schema: testcustomer; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY testcustomer.reporting_awscostentryreservation ALTER COLUMN id SET DEFAULT nextval('testcustomer.reporting_awscostentryreservation_id_seq'::regclass);
 
 
 --
--- Data for Name: api_customer; Type: TABLE DATA; Schema: public; Owner: postgres
+-- Data for Name: api_customer; Type: TABLE DATA; Schema: public; Owner: kokuadmin
 --
 
 COPY public.api_customer (group_ptr_id, date_created, owner_id, uuid, schema_name) FROM stdin;
-1	2018-09-19 13:35:30.416961+00	2	50d914b7-544c-4757-a818-517b09442c4a	testcustomer
+1	2018-09-25 16:41:47.540431+00	2	a38890ca-f53c-4732-9f44-4f94f6e6277d	testcustomer
 \.
 
 
 --
--- Data for Name: api_provider; Type: TABLE DATA; Schema: public; Owner: postgres
+-- Data for Name: api_provider; Type: TABLE DATA; Schema: public; Owner: kokuadmin
 --
 
 COPY public.api_provider (id, uuid, name, type, authentication_id, billing_source_id, created_by_id, customer_id, setup_complete) FROM stdin;
@@ -1480,7 +1474,7 @@ COPY public.api_provider (id, uuid, name, type, authentication_id, billing_sourc
 
 
 --
--- Data for Name: api_providerauthentication; Type: TABLE DATA; Schema: public; Owner: postgres
+-- Data for Name: api_providerauthentication; Type: TABLE DATA; Schema: public; Owner: kokuadmin
 --
 
 COPY public.api_providerauthentication (id, uuid, provider_resource_name) FROM stdin;
@@ -1489,7 +1483,7 @@ COPY public.api_providerauthentication (id, uuid, provider_resource_name) FROM s
 
 
 --
--- Data for Name: api_providerbillingsource; Type: TABLE DATA; Schema: public; Owner: postgres
+-- Data for Name: api_providerbillingsource; Type: TABLE DATA; Schema: public; Owner: kokuadmin
 --
 
 COPY public.api_providerbillingsource (id, uuid, bucket) FROM stdin;
@@ -1498,16 +1492,16 @@ COPY public.api_providerbillingsource (id, uuid, bucket) FROM stdin;
 
 
 --
--- Data for Name: api_resettoken; Type: TABLE DATA; Schema: public; Owner: postgres
+-- Data for Name: api_resettoken; Type: TABLE DATA; Schema: public; Owner: kokuadmin
 --
 
 COPY public.api_resettoken (id, token, expiration_date, used, user_id) FROM stdin;
-1	f5b73149-c0d0-4264-8052-0bd181b526db	2018-09-20 13:35:30.173413+00	f	2
+1	810d0bd7-4e20-49d9-be97-c41dc71d5fdb	2018-09-26 16:41:47.4196+00	f	2
 \.
 
 
 --
--- Data for Name: api_tenant; Type: TABLE DATA; Schema: public; Owner: postgres
+-- Data for Name: api_tenant; Type: TABLE DATA; Schema: public; Owner: kokuadmin
 --
 
 COPY public.api_tenant (id, schema_name) FROM stdin;
@@ -1517,28 +1511,28 @@ COPY public.api_tenant (id, schema_name) FROM stdin;
 
 
 --
--- Data for Name: api_user; Type: TABLE DATA; Schema: public; Owner: postgres
+-- Data for Name: api_user; Type: TABLE DATA; Schema: public; Owner: kokuadmin
 --
 
 COPY public.api_user (user_ptr_id, uuid) FROM stdin;
-1	ad982b30-bfc2-4971-9679-045b538853a4
-2	2ed9d42b-00bc-4ada-a6e4-76f23b399458
+1	defe3f08-101a-434f-8b98-97c77978112d
+2	ed068a5c-200f-4b42-9a83-a82108dbbba1
 \.
 
 
 --
--- Data for Name: api_userpreference; Type: TABLE DATA; Schema: public; Owner: postgres
+-- Data for Name: api_userpreference; Type: TABLE DATA; Schema: public; Owner: kokuadmin
 --
 
 COPY public.api_userpreference (id, uuid, preference, user_id, description, name) FROM stdin;
-1	7d765367-39e3-4ded-a8c6-a8c3845e73fb	{"currency": "USD"}	2	default preference	currency
-2	858c0f1d-948e-4148-a3b2-e3fa34e8a73c	{"timezone": "UTC"}	2	default preference	timezone
-3	8a5a4ed7-d41f-4108-9622-2527aff1c5d4	{"locale": "en_US.UTF-8"}	2	default preference	locale
+1	2cf8b244-4460-4567-a4d9-061313c20000	{"currency": "USD"}	2	default preference	currency
+2	29add574-d9ab-4e6b-b7b1-84025de0ca74	{"timezone": "UTC"}	2	default preference	timezone
+3	76d9ed59-3a90-4600-bb99-7065ce12d99f	{"locale": "en_US.UTF-8"}	2	default preference	locale
 \.
 
 
 --
--- Data for Name: auth_group; Type: TABLE DATA; Schema: public; Owner: postgres
+-- Data for Name: auth_group; Type: TABLE DATA; Schema: public; Owner: kokuadmin
 --
 
 COPY public.auth_group (id, name) FROM stdin;
@@ -1547,7 +1541,7 @@ COPY public.auth_group (id, name) FROM stdin;
 
 
 --
--- Data for Name: auth_group_permissions; Type: TABLE DATA; Schema: public; Owner: postgres
+-- Data for Name: auth_group_permissions; Type: TABLE DATA; Schema: public; Owner: kokuadmin
 --
 
 COPY public.auth_group_permissions (id, group_id, permission_id) FROM stdin;
@@ -1555,7 +1549,7 @@ COPY public.auth_group_permissions (id, group_id, permission_id) FROM stdin;
 
 
 --
--- Data for Name: auth_permission; Type: TABLE DATA; Schema: public; Owner: postgres
+-- Data for Name: auth_permission; Type: TABLE DATA; Schema: public; Owner: kokuadmin
 --
 
 COPY public.auth_permission (id, name, content_type_id, codename) FROM stdin;
@@ -1679,17 +1673,17 @@ COPY public.auth_permission (id, name, content_type_id, codename) FROM stdin;
 
 
 --
--- Data for Name: auth_user; Type: TABLE DATA; Schema: public; Owner: postgres
+-- Data for Name: auth_user; Type: TABLE DATA; Schema: public; Owner: kokuadmin
 --
 
 COPY public.auth_user (id, password, last_login, is_superuser, username, first_name, last_name, email, is_staff, is_active, date_joined) FROM stdin;
-1	pbkdf2_sha256$120000$AKeeNJluzSYc$RGZeVUgedF64OaDn+NB43MPGrT8+Q1v/V05iCM36+WM=	\N	t	admin			admin@example.com	t	t	2018-09-19 13:35:20.210752+00
-2	pbkdf2_sha256$120000$cVAZSIRSS7RK$0QBr7/D/0c10HQPsrN945oiZOr06Fk5FfEeIz3JyqCU=	\N	f	test_customer			test@example.com	f	t	2018-09-19 13:35:29.838899+00
+1	pbkdf2_sha256$120000$2MEmjDZK8Cyb$QGokifHCkqQlunA35jmz2dBmciLiVhmDvicCTtO0eI8=	\N	t	admin			admin@example.com	t	t	2018-09-25 16:41:37.307149+00
+2	pbkdf2_sha256$120000$0clvVrdHXU7r$LTLeO2D8j2jH642i2gtI95NH+w+tlOEu8DghPtk9Q2s=	\N	f	test_customer			test@example.com	f	t	2018-09-25 16:41:47.024917+00
 \.
 
 
 --
--- Data for Name: auth_user_groups; Type: TABLE DATA; Schema: public; Owner: postgres
+-- Data for Name: auth_user_groups; Type: TABLE DATA; Schema: public; Owner: kokuadmin
 --
 
 COPY public.auth_user_groups (id, user_id, group_id) FROM stdin;
@@ -1698,7 +1692,7 @@ COPY public.auth_user_groups (id, user_id, group_id) FROM stdin;
 
 
 --
--- Data for Name: auth_user_user_permissions; Type: TABLE DATA; Schema: public; Owner: postgres
+-- Data for Name: auth_user_user_permissions; Type: TABLE DATA; Schema: public; Owner: kokuadmin
 --
 
 COPY public.auth_user_user_permissions (id, user_id, permission_id) FROM stdin;
@@ -1706,16 +1700,16 @@ COPY public.auth_user_user_permissions (id, user_id, permission_id) FROM stdin;
 
 
 --
--- Data for Name: authtoken_token; Type: TABLE DATA; Schema: public; Owner: postgres
+-- Data for Name: authtoken_token; Type: TABLE DATA; Schema: public; Owner: kokuadmin
 --
 
 COPY public.authtoken_token (key, created, user_id) FROM stdin;
-875287c60c12fd195e754bb44fc424fbbc860a42	2018-09-19 13:35:29.794372+00	1
+398f435634c7ac82e16e9bef7328c311a9bfbca6	2018-09-25 16:41:46.976332+00	1
 \.
 
 
 --
--- Data for Name: django_admin_log; Type: TABLE DATA; Schema: public; Owner: postgres
+-- Data for Name: django_admin_log; Type: TABLE DATA; Schema: public; Owner: kokuadmin
 --
 
 COPY public.django_admin_log (id, action_time, object_id, object_repr, action_flag, change_message, content_type_id, user_id) FROM stdin;
@@ -1723,7 +1717,7 @@ COPY public.django_admin_log (id, action_time, object_id, object_repr, action_fl
 
 
 --
--- Data for Name: django_content_type; Type: TABLE DATA; Schema: public; Owner: postgres
+-- Data for Name: django_content_type; Type: TABLE DATA; Schema: public; Owner: kokuadmin
 --
 
 COPY public.django_content_type (id, app_label, model) FROM stdin;
@@ -1760,69 +1754,70 @@ COPY public.django_content_type (id, app_label, model) FROM stdin;
 
 
 --
--- Data for Name: django_migrations; Type: TABLE DATA; Schema: public; Owner: postgres
+-- Data for Name: django_migrations; Type: TABLE DATA; Schema: public; Owner: kokuadmin
 --
 
 COPY public.django_migrations (id, app, name, applied) FROM stdin;
-
-1	contenttypes	0001_initial	2018-09-21 14:46:57.831384+00
-2	auth	0001_initial	2018-09-21 14:46:57.981702+00
-3	admin	0001_initial	2018-09-21 14:46:58.022664+00
-4	admin	0002_logentry_remove_auto_add	2018-09-21 14:46:58.039255+00
-5	admin	0003_logentry_add_action_flag_choices	2018-09-21 14:46:58.056253+00
-6	contenttypes	0002_remove_content_type_name	2018-09-21 14:46:58.088406+00
-7	auth	0002_alter_permission_name_max_length	2018-09-21 14:46:58.104774+00
-8	auth	0003_alter_user_email_max_length	2018-09-21 14:46:58.130696+00
-9	auth	0004_alter_user_username_opts	2018-09-21 14:46:58.145033+00
-10	auth	0005_alter_user_last_login_null	2018-09-21 14:46:58.165919+00
-11	auth	0006_require_contenttypes_0002	2018-09-21 14:46:58.175586+00
-12	auth	0007_alter_validators_add_error_messages	2018-09-21 14:46:58.193438+00
-13	auth	0008_alter_user_username_max_length	2018-09-21 14:46:58.217703+00
-14	auth	0009_alter_user_last_name_max_length	2018-09-21 14:46:58.237547+00
-15	api	0001_initial	2018-09-21 14:46:58.253318+00
-16	api	0002_auto_20180509_1400	2018-09-21 14:46:58.313711+00
-17	api	0003_auto_20180509_1849	2018-09-21 14:46:58.385404+00
-18	api	0004_auto_20180510_1824	2018-09-21 14:46:58.462242+00
-19	api	0005_auto_20180511_1445	2018-09-21 14:46:58.508454+00
-20	api	0006_resettoken	2018-09-21 14:46:58.542797+00
-21	api	0007_userpreference	2018-09-21 14:46:58.578963+00
-22	api	0008_provider	2018-09-21 14:46:58.682808+00
-23	api	0009_auto_20180523_0045	2018-09-21 14:46:58.720611+00
-24	api	0010_auto_20180523_1540	2018-09-21 14:46:58.779579+00
-25	api	0011_auto_20180524_1838	2018-09-21 14:46:58.831018+00
-26	api	0012_auto_20180529_1526	2018-09-21 14:46:58.994956+00
-27	api	0013_auto_20180531_1921	2018-09-21 14:46:59.018125+00
-28	api	0014_costusagereportstatus	2018-09-21 14:46:59.059105+00
-29	api	0015_auto_20180614_1343	2018-09-21 14:46:59.098275+00
-30	api	0016_auto_20180802_1911	2018-09-21 14:46:59.118377+00
-31	api	0017_auto_20180815_1716	2018-09-21 14:46:59.149631+00
-32	api	0018_delete_status	2018-09-21 14:46:59.165606+00
-33	api	0019_provider_setup_complete	2018-09-21 14:46:59.20197+00
-34	api	0020_auto_20180920_1917	2018-09-21 14:46:59.245734+00
-35	authtoken	0001_initial	2018-09-21 14:46:59.28373+00
-36	authtoken	0002_auto_20160226_1747	2018-09-21 14:46:59.339783+00
-37	reporting	0001_initial	2018-09-21 14:46:59.393956+00
-38	reporting	0002_auto_20180615_1725	2018-09-21 14:46:59.622+00
-39	reporting	0003_auto_20180619_1833	2018-09-21 14:46:59.709798+00
-40	reporting	0004_auto_20180803_1926	2018-09-21 14:46:59.73627+00
-41	reporting	0005_auto_20180807_1819	2018-09-21 14:46:59.772918+00
-42	reporting	0006_auto_20180821_1654	2018-09-21 14:46:59.877909+00
-43	reporting	0007_auto_20180824_0035	2018-09-21 14:46:59.963551+00
-44	reporting	0008_awsaccountalias	2018-09-21 14:46:59.974531+00
-45	reporting_common	0001_initial	2018-09-21 14:46:59.997486+00
-46	reporting_common	0002_auto_20180608_1647	2018-09-21 14:47:00.142898+00
-47	reporting_common	0003_costusagereportstatus	2018-09-21 14:47:00.18953+00
-48	reporting_common	0004_siunitscale	2018-09-21 14:47:00.212841+00
-49	reporting_common	0005_auto_20180725_1523	2018-09-21 14:47:00.29075+00
-50	reporting_common	0006_auto_20180802_1911	2018-09-21 14:47:00.302239+00
-51	reporting_common	0007_auto_20180808_2134	2018-09-21 14:47:00.329667+00
-52	reporting_common	0008_auto_20180920_1917	2018-09-21 14:47:00.340751+00
-53	sessions	0001_initial	2018-09-21 14:47:00.366987+00
+1	contenttypes	0001_initial	2018-09-25 16:41:36.042965+00
+2	auth	0001_initial	2018-09-25 16:41:36.189257+00
+3	admin	0001_initial	2018-09-25 16:41:36.234302+00
+4	admin	0002_logentry_remove_auto_add	2018-09-25 16:41:36.254041+00
+5	admin	0003_logentry_add_action_flag_choices	2018-09-25 16:41:36.269431+00
+6	contenttypes	0002_remove_content_type_name	2018-09-25 16:41:36.307985+00
+7	auth	0002_alter_permission_name_max_length	2018-09-25 16:41:36.325681+00
+8	auth	0003_alter_user_email_max_length	2018-09-25 16:41:36.403923+00
+9	auth	0004_alter_user_username_opts	2018-09-25 16:41:36.419323+00
+10	auth	0005_alter_user_last_login_null	2018-09-25 16:41:36.443231+00
+11	auth	0006_require_contenttypes_0002	2018-09-25 16:41:36.451061+00
+12	auth	0007_alter_validators_add_error_messages	2018-09-25 16:41:36.468316+00
+13	auth	0008_alter_user_username_max_length	2018-09-25 16:41:36.492839+00
+14	auth	0009_alter_user_last_name_max_length	2018-09-25 16:41:36.513281+00
+15	api	0001_initial	2018-09-25 16:41:36.532718+00
+16	api	0002_auto_20180509_1400	2018-09-25 16:41:36.648124+00
+17	api	0003_auto_20180509_1849	2018-09-25 16:41:36.727095+00
+18	api	0004_auto_20180510_1824	2018-09-25 16:41:36.805629+00
+19	api	0005_auto_20180511_1445	2018-09-25 16:41:36.832577+00
+20	api	0006_resettoken	2018-09-25 16:41:36.867489+00
+21	api	0007_userpreference	2018-09-25 16:41:36.905098+00
+22	api	0008_provider	2018-09-25 16:41:37.016821+00
+23	api	0009_auto_20180523_0045	2018-09-25 16:41:37.059745+00
+24	api	0010_auto_20180523_1540	2018-09-25 16:41:37.118671+00
+25	api	0011_auto_20180524_1838	2018-09-25 16:41:37.177305+00
+26	api	0012_auto_20180529_1526	2018-09-25 16:41:37.34788+00
+27	api	0013_auto_20180531_1921	2018-09-25 16:41:37.371966+00
+28	api	0014_costusagereportstatus	2018-09-25 16:41:37.419819+00
+29	api	0015_auto_20180614_1343	2018-09-25 16:41:37.466603+00
+30	api	0016_auto_20180802_1911	2018-09-25 16:41:37.487239+00
+31	api	0017_auto_20180815_1716	2018-09-25 16:41:37.517717+00
+32	api	0018_delete_status	2018-09-25 16:41:37.533772+00
+33	api	0019_provider_setup_complete	2018-09-25 16:41:37.572784+00
+34	api	0020_auto_20180920_1917	2018-09-25 16:41:37.621918+00
+35	authtoken	0001_initial	2018-09-25 16:41:37.658847+00
+36	authtoken	0002_auto_20160226_1747	2018-09-25 16:41:37.717473+00
+37	reporting	0001_initial	2018-09-25 16:41:37.770049+00
+38	reporting	0002_auto_20180615_1725	2018-09-25 16:41:38.009506+00
+39	reporting	0003_auto_20180619_1833	2018-09-25 16:41:38.095878+00
+40	reporting	0004_auto_20180803_1926	2018-09-25 16:41:38.121074+00
+41	reporting	0005_auto_20180807_1819	2018-09-25 16:41:38.17807+00
+42	reporting	0006_auto_20180821_1654	2018-09-25 16:41:38.287396+00
+43	reporting	0007_auto_20180824_0035	2018-09-25 16:41:38.373684+00
+44	reporting	0008_awsaccountalias	2018-09-25 16:41:38.385873+00
+45	reporting	0009_auto_20180918_1915	2018-09-25 16:41:38.41732+00
+46	reporting	0010_awscostentrylineitemdailysummary_account_alias	2018-09-25 16:41:38.429415+00
+47	reporting_common	0001_initial	2018-09-25 16:41:38.455507+00
+48	reporting_common	0002_auto_20180608_1647	2018-09-25 16:41:38.611888+00
+49	reporting_common	0003_costusagereportstatus	2018-09-25 16:41:38.657192+00
+50	reporting_common	0004_siunitscale	2018-09-25 16:41:38.681859+00
+51	reporting_common	0005_auto_20180725_1523	2018-09-25 16:41:38.7613+00
+52	reporting_common	0006_auto_20180802_1911	2018-09-25 16:41:38.773901+00
+53	reporting_common	0007_auto_20180808_2134	2018-09-25 16:41:38.808187+00
+54	reporting_common	0008_auto_20180920_1917	2018-09-25 16:41:38.820913+00
+55	sessions	0001_initial	2018-09-25 16:41:38.847506+00
 \.
 
 
 --
--- Data for Name: django_session; Type: TABLE DATA; Schema: public; Owner: postgres
+-- Data for Name: django_session; Type: TABLE DATA; Schema: public; Owner: kokuadmin
 --
 
 COPY public.django_session (session_key, session_data, expire_date) FROM stdin;
@@ -1830,7 +1825,7 @@ COPY public.django_session (session_key, session_data, expire_date) FROM stdin;
 
 
 --
--- Data for Name: region_mapping; Type: TABLE DATA; Schema: public; Owner: postgres
+-- Data for Name: region_mapping; Type: TABLE DATA; Schema: public; Owner: kokuadmin
 --
 
 COPY public.region_mapping (id, region, region_name) FROM stdin;
@@ -1838,7 +1833,7 @@ COPY public.region_mapping (id, region, region_name) FROM stdin;
 
 
 --
--- Data for Name: reporting_common_costusagereportstatus; Type: TABLE DATA; Schema: public; Owner: postgres
+-- Data for Name: reporting_common_costusagereportstatus; Type: TABLE DATA; Schema: public; Owner: kokuadmin
 --
 
 COPY public.reporting_common_costusagereportstatus (id, report_name, cursor_position, last_completed_datetime, last_started_datetime, etag, provider_id) FROM stdin;
@@ -1846,7 +1841,7 @@ COPY public.reporting_common_costusagereportstatus (id, report_name, cursor_posi
 
 
 --
--- Data for Name: reporting_common_reportcolumnmap; Type: TABLE DATA; Schema: public; Owner: postgres
+-- Data for Name: reporting_common_reportcolumnmap; Type: TABLE DATA; Schema: public; Owner: kokuadmin
 --
 
 COPY public.reporting_common_reportcolumnmap (id, provider_type, provider_column_name, database_table, database_column) FROM stdin;
@@ -1901,7 +1896,7 @@ COPY public.reporting_common_reportcolumnmap (id, provider_type, provider_column
 
 
 --
--- Data for Name: si_unit_scale; Type: TABLE DATA; Schema: public; Owner: postgres
+-- Data for Name: si_unit_scale; Type: TABLE DATA; Schema: public; Owner: kokuadmin
 --
 
 COPY public.si_unit_scale (id, prefix, prefix_symbol, multiplying_factor) FROM stdin;
@@ -1926,68 +1921,70 @@ COPY public.si_unit_scale (id, prefix, prefix_symbol, multiplying_factor) FROM s
 
 
 --
--- Data for Name: django_migrations; Type: TABLE DATA; Schema: testcustomer; Owner: postgres
+-- Data for Name: django_migrations; Type: TABLE DATA; Schema: testcustomer; Owner: kokuadmin
 --
 
 COPY testcustomer.django_migrations (id, app, name, applied) FROM stdin;
-1	contenttypes	0001_initial	2018-09-21 14:47:09.181766+00
-2	auth	0001_initial	2018-09-21 14:47:09.200059+00
-3	admin	0001_initial	2018-09-21 14:47:09.216519+00
-4	admin	0002_logentry_remove_auto_add	2018-09-21 14:47:09.233487+00
-5	admin	0003_logentry_add_action_flag_choices	2018-09-21 14:47:09.247723+00
-6	contenttypes	0002_remove_content_type_name	2018-09-21 14:47:09.266186+00
-7	auth	0002_alter_permission_name_max_length	2018-09-21 14:47:09.27778+00
-8	auth	0003_alter_user_email_max_length	2018-09-21 14:47:09.292078+00
-9	auth	0004_alter_user_username_opts	2018-09-21 14:47:09.306612+00
-10	auth	0005_alter_user_last_login_null	2018-09-21 14:47:09.32137+00
-11	auth	0006_require_contenttypes_0002	2018-09-21 14:47:09.328662+00
-12	auth	0007_alter_validators_add_error_messages	2018-09-21 14:47:09.343802+00
-13	auth	0008_alter_user_username_max_length	2018-09-21 14:47:09.360672+00
-14	auth	0009_alter_user_last_name_max_length	2018-09-21 14:47:09.375951+00
-15	api	0001_initial	2018-09-21 14:47:09.386527+00
-16	api	0002_auto_20180509_1400	2018-09-21 14:47:09.417852+00
-17	api	0003_auto_20180509_1849	2018-09-21 14:47:09.451075+00
-18	api	0004_auto_20180510_1824	2018-09-21 14:47:09.487954+00
-19	api	0005_auto_20180511_1445	2018-09-21 14:47:09.511499+00
-20	api	0006_resettoken	2018-09-21 14:47:09.53121+00
-21	api	0007_userpreference	2018-09-21 14:47:09.548712+00
-22	api	0008_provider	2018-09-21 14:47:09.585916+00
-23	api	0009_auto_20180523_0045	2018-09-21 14:47:09.607594+00
-24	api	0010_auto_20180523_1540	2018-09-21 14:47:09.645411+00
-25	api	0011_auto_20180524_1838	2018-09-21 14:47:09.667451+00
-26	api	0012_auto_20180529_1526	2018-09-21 14:47:09.676944+00
-27	api	0013_auto_20180531_1921	2018-09-21 14:47:09.688491+00
-28	api	0014_costusagereportstatus	2018-09-21 14:47:09.712024+00
-29	api	0015_auto_20180614_1343	2018-09-21 14:47:09.73299+00
-30	api	0016_auto_20180802_1911	2018-09-21 14:47:09.751705+00
-31	api	0017_auto_20180815_1716	2018-09-21 14:47:09.771973+00
-32	api	0018_delete_status	2018-09-21 14:47:09.780881+00
-33	api	0019_provider_setup_complete	2018-09-21 14:47:09.800206+00
-34	api	0020_auto_20180920_1917	2018-09-21 14:47:09.831549+00
-35	authtoken	0001_initial	2018-09-21 14:47:09.851868+00
-36	authtoken	0002_auto_20160226_1747	2018-09-21 14:47:09.893204+00
-37	reporting	0001_initial	2018-09-21 14:47:10.126705+00
-38	reporting	0002_auto_20180615_1725	2018-09-21 14:47:10.520158+00
-39	reporting	0003_auto_20180619_1833	2018-09-21 14:47:10.777299+00
-40	reporting	0004_auto_20180803_1926	2018-09-21 14:47:10.809535+00
-41	reporting	0005_auto_20180807_1819	2018-09-21 14:47:10.85875+00
-42	reporting	0006_auto_20180821_1654	2018-09-21 14:47:11.055369+00
-43	reporting	0007_auto_20180824_0035	2018-09-21 14:47:11.214866+00
-44	reporting	0008_awsaccountalias	2018-09-21 14:47:11.235199+00
-45	reporting_common	0001_initial	2018-09-21 14:47:11.244754+00
-46	reporting_common	0002_auto_20180608_1647	2018-09-21 14:47:11.253101+00
-47	reporting_common	0003_costusagereportstatus	2018-09-21 14:47:11.273471+00
-48	reporting_common	0004_siunitscale	2018-09-21 14:47:11.282896+00
-49	reporting_common	0005_auto_20180725_1523	2018-09-21 14:47:11.291142+00
-50	reporting_common	0006_auto_20180802_1911	2018-09-21 14:47:11.300347+00
-51	reporting_common	0007_auto_20180808_2134	2018-09-21 14:47:11.309195+00
-52	reporting_common	0008_auto_20180920_1917	2018-09-21 14:47:11.318838+00
-53	sessions	0001_initial	2018-09-21 14:47:11.32832+00
+1	contenttypes	0001_initial	2018-09-25 16:41:47.62078+00
+2	auth	0001_initial	2018-09-25 16:41:47.638352+00
+3	admin	0001_initial	2018-09-25 16:41:47.655704+00
+4	admin	0002_logentry_remove_auto_add	2018-09-25 16:41:47.671686+00
+5	admin	0003_logentry_add_action_flag_choices	2018-09-25 16:41:47.686422+00
+6	contenttypes	0002_remove_content_type_name	2018-09-25 16:41:47.7081+00
+7	auth	0002_alter_permission_name_max_length	2018-09-25 16:41:47.720063+00
+8	auth	0003_alter_user_email_max_length	2018-09-25 16:41:47.735065+00
+9	auth	0004_alter_user_username_opts	2018-09-25 16:41:47.75036+00
+10	auth	0005_alter_user_last_login_null	2018-09-25 16:41:47.765329+00
+11	auth	0006_require_contenttypes_0002	2018-09-25 16:41:47.773762+00
+12	auth	0007_alter_validators_add_error_messages	2018-09-25 16:41:47.788746+00
+13	auth	0008_alter_user_username_max_length	2018-09-25 16:41:47.803561+00
+14	auth	0009_alter_user_last_name_max_length	2018-09-25 16:41:47.818815+00
+15	api	0001_initial	2018-09-25 16:41:47.828694+00
+16	api	0002_auto_20180509_1400	2018-09-25 16:41:47.860296+00
+17	api	0003_auto_20180509_1849	2018-09-25 16:41:47.894962+00
+18	api	0004_auto_20180510_1824	2018-09-25 16:41:47.935231+00
+19	api	0005_auto_20180511_1445	2018-09-25 16:41:47.959119+00
+20	api	0006_resettoken	2018-09-25 16:41:47.976384+00
+21	api	0007_userpreference	2018-09-25 16:41:47.995817+00
+22	api	0008_provider	2018-09-25 16:41:48.035594+00
+23	api	0009_auto_20180523_0045	2018-09-25 16:41:48.055785+00
+24	api	0010_auto_20180523_1540	2018-09-25 16:41:48.097345+00
+25	api	0011_auto_20180524_1838	2018-09-25 16:41:48.117072+00
+26	api	0012_auto_20180529_1526	2018-09-25 16:41:48.131566+00
+27	api	0013_auto_20180531_1921	2018-09-25 16:41:48.142631+00
+28	api	0014_costusagereportstatus	2018-09-25 16:41:48.164478+00
+29	api	0015_auto_20180614_1343	2018-09-25 16:41:48.188828+00
+30	api	0016_auto_20180802_1911	2018-09-25 16:41:48.208395+00
+31	api	0017_auto_20180815_1716	2018-09-25 16:41:48.22776+00
+32	api	0018_delete_status	2018-09-25 16:41:48.238632+00
+33	api	0019_provider_setup_complete	2018-09-25 16:41:48.258157+00
+34	api	0020_auto_20180920_1917	2018-09-25 16:41:48.290265+00
+35	authtoken	0001_initial	2018-09-25 16:41:48.31079+00
+36	authtoken	0002_auto_20160226_1747	2018-09-25 16:41:48.348154+00
+37	reporting	0001_initial	2018-09-25 16:41:48.515421+00
+38	reporting	0002_auto_20180615_1725	2018-09-25 16:41:48.928888+00
+39	reporting	0003_auto_20180619_1833	2018-09-25 16:41:49.219025+00
+40	reporting	0004_auto_20180803_1926	2018-09-25 16:41:49.253822+00
+41	reporting	0005_auto_20180807_1819	2018-09-25 16:41:49.310331+00
+42	reporting	0006_auto_20180821_1654	2018-09-25 16:41:49.528083+00
+43	reporting	0007_auto_20180824_0035	2018-09-25 16:41:49.702853+00
+44	reporting	0008_awsaccountalias	2018-09-25 16:41:49.72659+00
+45	reporting	0009_auto_20180918_1915	2018-09-25 16:41:49.804076+00
+46	reporting	0010_awscostentrylineitemdailysummary_account_alias	2018-09-25 16:41:49.827517+00
+47	reporting_common	0001_initial	2018-09-25 16:41:49.836818+00
+48	reporting_common	0002_auto_20180608_1647	2018-09-25 16:41:49.845528+00
+49	reporting_common	0003_costusagereportstatus	2018-09-25 16:41:49.866493+00
+50	reporting_common	0004_siunitscale	2018-09-25 16:41:49.876973+00
+51	reporting_common	0005_auto_20180725_1523	2018-09-25 16:41:49.885623+00
+52	reporting_common	0006_auto_20180802_1911	2018-09-25 16:41:49.896464+00
+53	reporting_common	0007_auto_20180808_2134	2018-09-25 16:41:49.907415+00
+54	reporting_common	0008_auto_20180920_1917	2018-09-25 16:41:49.918376+00
+55	sessions	0001_initial	2018-09-25 16:41:49.928466+00
 \.
 
 
 --
--- Data for Name: reporting_awsaccountalias; Type: TABLE DATA; Schema: testcustomer; Owner: postgres
+-- Data for Name: reporting_awsaccountalias; Type: TABLE DATA; Schema: testcustomer; Owner: kokuadmin
 --
 
 COPY testcustomer.reporting_awsaccountalias (id, account_id, account_alias) FROM stdin;
@@ -1995,7 +1992,7 @@ COPY testcustomer.reporting_awsaccountalias (id, account_id, account_alias) FROM
 
 
 --
--- Data for Name: reporting_awscostentry; Type: TABLE DATA; Schema: testcustomer; Owner: postgres
+-- Data for Name: reporting_awscostentry; Type: TABLE DATA; Schema: testcustomer; Owner: kokuadmin
 --
 
 COPY testcustomer.reporting_awscostentry (id, interval_start, interval_end, bill_id) FROM stdin;
@@ -2003,7 +2000,7 @@ COPY testcustomer.reporting_awscostentry (id, interval_start, interval_end, bill
 
 
 --
--- Data for Name: reporting_awscostentrybill; Type: TABLE DATA; Schema: testcustomer; Owner: postgres
+-- Data for Name: reporting_awscostentrybill; Type: TABLE DATA; Schema: testcustomer; Owner: kokuadmin
 --
 
 COPY testcustomer.reporting_awscostentrybill (id, billing_resource, bill_type, payer_account_id, billing_period_start, billing_period_end) FROM stdin;
@@ -2011,7 +2008,7 @@ COPY testcustomer.reporting_awscostentrybill (id, billing_resource, bill_type, p
 
 
 --
--- Data for Name: reporting_awscostentrylineitem; Type: TABLE DATA; Schema: testcustomer; Owner: postgres
+-- Data for Name: reporting_awscostentrylineitem; Type: TABLE DATA; Schema: testcustomer; Owner: kokuadmin
 --
 
 COPY testcustomer.reporting_awscostentrylineitem (id, tags, invoice_id, line_item_type, usage_account_id, usage_start, usage_end, product_code, usage_type, operation, availability_zone, resource_id, usage_amount, normalization_factor, normalized_usage_amount, currency_code, unblended_rate, unblended_cost, blended_rate, blended_cost, tax_type, cost_entry_id, cost_entry_bill_id, cost_entry_pricing_id, cost_entry_product_id, cost_entry_reservation_id, hash, public_on_demand_cost, public_on_demand_rate, reservation_amortized_upfront_cost_for_usage, reservation_amortized_upfront_fee, reservation_recurring_fee_for_usage, reservation_unused_quantity, reservation_unused_recurring_fee) FROM stdin;
@@ -2019,7 +2016,7 @@ COPY testcustomer.reporting_awscostentrylineitem (id, tags, invoice_id, line_ite
 
 
 --
--- Data for Name: reporting_awscostentrylineitem_aggregates; Type: TABLE DATA; Schema: testcustomer; Owner: postgres
+-- Data for Name: reporting_awscostentrylineitem_aggregates; Type: TABLE DATA; Schema: testcustomer; Owner: kokuadmin
 --
 
 COPY testcustomer.reporting_awscostentrylineitem_aggregates (id, time_scope_value, report_type, usage_account_id, product_code, region, availability_zone, usage_amount, unblended_cost, resource_count) FROM stdin;
@@ -2027,7 +2024,7 @@ COPY testcustomer.reporting_awscostentrylineitem_aggregates (id, time_scope_valu
 
 
 --
--- Data for Name: reporting_awscostentrylineitem_daily; Type: TABLE DATA; Schema: testcustomer; Owner: postgres
+-- Data for Name: reporting_awscostentrylineitem_daily; Type: TABLE DATA; Schema: testcustomer; Owner: kokuadmin
 --
 
 COPY testcustomer.reporting_awscostentrylineitem_daily (id, line_item_type, usage_account_id, usage_start, product_code, usage_type, operation, availability_zone, resource_id, usage_amount, normalization_factor, normalized_usage_amount, currency_code, unblended_rate, unblended_cost, blended_rate, blended_cost, public_on_demand_cost, public_on_demand_rate, tax_type, tags, cost_entry_pricing_id, cost_entry_product_id, cost_entry_reservation_id, usage_end) FROM stdin;
@@ -2035,15 +2032,15 @@ COPY testcustomer.reporting_awscostentrylineitem_daily (id, line_item_type, usag
 
 
 --
--- Data for Name: reporting_awscostentrylineitem_daily_summary; Type: TABLE DATA; Schema: testcustomer; Owner: postgres
+-- Data for Name: reporting_awscostentrylineitem_daily_summary; Type: TABLE DATA; Schema: testcustomer; Owner: kokuadmin
 --
 
-COPY testcustomer.reporting_awscostentrylineitem_daily_summary (id, usage_start, usage_account_id, product_code, product_family, availability_zone, region, instance_type, unit, resource_count, usage_amount, normalization_factor, normalized_usage_amount, currency_code, unblended_rate, unblended_cost, blended_rate, blended_cost, public_on_demand_cost, public_on_demand_rate, tax_type, usage_end) FROM stdin;
+COPY testcustomer.reporting_awscostentrylineitem_daily_summary (id, usage_start, usage_account_id, product_code, product_family, availability_zone, region, instance_type, unit, resource_count, usage_amount, normalization_factor, normalized_usage_amount, currency_code, unblended_rate, unblended_cost, blended_rate, blended_cost, public_on_demand_cost, public_on_demand_rate, tax_type, usage_end, account_alias_id) FROM stdin;
 \.
 
 
 --
--- Data for Name: reporting_awscostentrypricing; Type: TABLE DATA; Schema: testcustomer; Owner: postgres
+-- Data for Name: reporting_awscostentrypricing; Type: TABLE DATA; Schema: testcustomer; Owner: kokuadmin
 --
 
 COPY testcustomer.reporting_awscostentrypricing (id, term, unit) FROM stdin;
@@ -2051,7 +2048,7 @@ COPY testcustomer.reporting_awscostentrypricing (id, term, unit) FROM stdin;
 
 
 --
--- Data for Name: reporting_awscostentryproduct; Type: TABLE DATA; Schema: testcustomer; Owner: postgres
+-- Data for Name: reporting_awscostentryproduct; Type: TABLE DATA; Schema: testcustomer; Owner: kokuadmin
 --
 
 COPY testcustomer.reporting_awscostentryproduct (id, sku, product_name, product_family, service_code, region, instance_type, memory, vcpu, memory_unit) FROM stdin;
@@ -2059,7 +2056,7 @@ COPY testcustomer.reporting_awscostentryproduct (id, sku, product_name, product_
 
 
 --
--- Data for Name: reporting_awscostentryreservation; Type: TABLE DATA; Schema: testcustomer; Owner: postgres
+-- Data for Name: reporting_awscostentryreservation; Type: TABLE DATA; Schema: testcustomer; Owner: kokuadmin
 --
 
 COPY testcustomer.reporting_awscostentryreservation (id, reservation_arn, number_of_reservations, units_per_reservation, start_time, end_time) FROM stdin;
@@ -2067,217 +2064,217 @@ COPY testcustomer.reporting_awscostentryreservation (id, reservation_arn, number
 
 
 --
--- Name: api_provider_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+-- Name: api_provider_id_seq; Type: SEQUENCE SET; Schema: public; Owner: kokuadmin
 --
 
 SELECT pg_catalog.setval('public.api_provider_id_seq', 1, true);
 
 
 --
--- Name: api_providerauthentication_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+-- Name: api_providerauthentication_id_seq; Type: SEQUENCE SET; Schema: public; Owner: kokuadmin
 --
 
 SELECT pg_catalog.setval('public.api_providerauthentication_id_seq', 1, true);
 
 
 --
--- Name: api_providerbillingsource_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+-- Name: api_providerbillingsource_id_seq; Type: SEQUENCE SET; Schema: public; Owner: kokuadmin
 --
 
 SELECT pg_catalog.setval('public.api_providerbillingsource_id_seq', 1, true);
 
 
 --
--- Name: api_resettoken_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+-- Name: api_resettoken_id_seq; Type: SEQUENCE SET; Schema: public; Owner: kokuadmin
 --
 
 SELECT pg_catalog.setval('public.api_resettoken_id_seq', 1, true);
 
 
 --
--- Name: api_tenant_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+-- Name: api_tenant_id_seq; Type: SEQUENCE SET; Schema: public; Owner: kokuadmin
 --
 
 SELECT pg_catalog.setval('public.api_tenant_id_seq', 2, true);
 
 
 --
--- Name: api_userpreference_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+-- Name: api_userpreference_id_seq; Type: SEQUENCE SET; Schema: public; Owner: kokuadmin
 --
 
 SELECT pg_catalog.setval('public.api_userpreference_id_seq', 3, true);
 
 
 --
--- Name: auth_group_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+-- Name: auth_group_id_seq; Type: SEQUENCE SET; Schema: public; Owner: kokuadmin
 --
 
 SELECT pg_catalog.setval('public.auth_group_id_seq', 1, true);
 
 
 --
--- Name: auth_group_permissions_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+-- Name: auth_group_permissions_id_seq; Type: SEQUENCE SET; Schema: public; Owner: kokuadmin
 --
 
 SELECT pg_catalog.setval('public.auth_group_permissions_id_seq', 1, false);
 
 
 --
--- Name: auth_permission_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+-- Name: auth_permission_id_seq; Type: SEQUENCE SET; Schema: public; Owner: kokuadmin
 --
 
 SELECT pg_catalog.setval('public.auth_permission_id_seq', 116, true);
 
 
 --
--- Name: auth_user_groups_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+-- Name: auth_user_groups_id_seq; Type: SEQUENCE SET; Schema: public; Owner: kokuadmin
 --
 
 SELECT pg_catalog.setval('public.auth_user_groups_id_seq', 1, true);
 
 
 --
--- Name: auth_user_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+-- Name: auth_user_id_seq; Type: SEQUENCE SET; Schema: public; Owner: kokuadmin
 --
 
 SELECT pg_catalog.setval('public.auth_user_id_seq', 2, true);
 
 
 --
--- Name: auth_user_user_permissions_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+-- Name: auth_user_user_permissions_id_seq; Type: SEQUENCE SET; Schema: public; Owner: kokuadmin
 --
 
 SELECT pg_catalog.setval('public.auth_user_user_permissions_id_seq', 1, false);
 
 
 --
--- Name: django_admin_log_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+-- Name: django_admin_log_id_seq; Type: SEQUENCE SET; Schema: public; Owner: kokuadmin
 --
 
 SELECT pg_catalog.setval('public.django_admin_log_id_seq', 1, false);
 
 
 --
--- Name: django_content_type_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+-- Name: django_content_type_id_seq; Type: SEQUENCE SET; Schema: public; Owner: kokuadmin
 --
 
 SELECT pg_catalog.setval('public.django_content_type_id_seq', 29, true);
 
 
 --
--- Name: django_migrations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+-- Name: django_migrations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: kokuadmin
 --
 
-SELECT pg_catalog.setval('public.django_migrations_id_seq', 53, true);
+SELECT pg_catalog.setval('public.django_migrations_id_seq', 55, true);
 
 
 --
--- Name: region_mapping_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+-- Name: region_mapping_id_seq; Type: SEQUENCE SET; Schema: public; Owner: kokuadmin
 --
 
 SELECT pg_catalog.setval('public.region_mapping_id_seq', 1, false);
 
 
 --
--- Name: reporting_common_costusagereportstatus_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+-- Name: reporting_common_costusagereportstatus_id_seq; Type: SEQUENCE SET; Schema: public; Owner: kokuadmin
 --
 
 SELECT pg_catalog.setval('public.reporting_common_costusagereportstatus_id_seq', 1, false);
 
 
 --
--- Name: reporting_common_reportcolumnmap_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+-- Name: reporting_common_reportcolumnmap_id_seq; Type: SEQUENCE SET; Schema: public; Owner: kokuadmin
 --
 
 SELECT pg_catalog.setval('public.reporting_common_reportcolumnmap_id_seq', 47, true);
 
 
 --
--- Name: si_unit_scale_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+-- Name: si_unit_scale_id_seq; Type: SEQUENCE SET; Schema: public; Owner: kokuadmin
 --
 
 SELECT pg_catalog.setval('public.si_unit_scale_id_seq', 17, true);
 
 
 --
--- Name: django_migrations_id_seq; Type: SEQUENCE SET; Schema: testcustomer; Owner: postgres
+-- Name: django_migrations_id_seq; Type: SEQUENCE SET; Schema: testcustomer; Owner: kokuadmin
 --
 
-SELECT pg_catalog.setval('testcustomer.django_migrations_id_seq', 53, true);
+SELECT pg_catalog.setval('testcustomer.django_migrations_id_seq', 55, true);
 
 
 --
--- Name: reporting_awsaccountalias_id_seq; Type: SEQUENCE SET; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awsaccountalias_id_seq; Type: SEQUENCE SET; Schema: testcustomer; Owner: kokuadmin
 --
 
 SELECT pg_catalog.setval('testcustomer.reporting_awsaccountalias_id_seq', 1, false);
 
 
 --
--- Name: reporting_awscostentry_id_seq; Type: SEQUENCE SET; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awscostentry_id_seq; Type: SEQUENCE SET; Schema: testcustomer; Owner: kokuadmin
 --
 
 SELECT pg_catalog.setval('testcustomer.reporting_awscostentry_id_seq', 1, false);
 
 
 --
--- Name: reporting_awscostentrybill_id_seq; Type: SEQUENCE SET; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awscostentrybill_id_seq; Type: SEQUENCE SET; Schema: testcustomer; Owner: kokuadmin
 --
 
 SELECT pg_catalog.setval('testcustomer.reporting_awscostentrybill_id_seq', 1, false);
 
 
 --
--- Name: reporting_awscostentrylineitem_aggregates_id_seq; Type: SEQUENCE SET; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awscostentrylineitem_aggregates_id_seq; Type: SEQUENCE SET; Schema: testcustomer; Owner: kokuadmin
 --
 
 SELECT pg_catalog.setval('testcustomer.reporting_awscostentrylineitem_aggregates_id_seq', 1, false);
 
 
 --
--- Name: reporting_awscostentrylineitem_daily_id_seq; Type: SEQUENCE SET; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awscostentrylineitem_daily_id_seq; Type: SEQUENCE SET; Schema: testcustomer; Owner: kokuadmin
 --
 
 SELECT pg_catalog.setval('testcustomer.reporting_awscostentrylineitem_daily_id_seq', 1, false);
 
 
 --
--- Name: reporting_awscostentrylineitem_daily_summary_id_seq; Type: SEQUENCE SET; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awscostentrylineitem_daily_summary_id_seq; Type: SEQUENCE SET; Schema: testcustomer; Owner: kokuadmin
 --
 
 SELECT pg_catalog.setval('testcustomer.reporting_awscostentrylineitem_daily_summary_id_seq', 1, false);
 
 
 --
--- Name: reporting_awscostentrylineitem_id_seq; Type: SEQUENCE SET; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awscostentrylineitem_id_seq; Type: SEQUENCE SET; Schema: testcustomer; Owner: kokuadmin
 --
 
 SELECT pg_catalog.setval('testcustomer.reporting_awscostentrylineitem_id_seq', 1, false);
 
 
 --
--- Name: reporting_awscostentrypricing_id_seq; Type: SEQUENCE SET; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awscostentrypricing_id_seq; Type: SEQUENCE SET; Schema: testcustomer; Owner: kokuadmin
 --
 
 SELECT pg_catalog.setval('testcustomer.reporting_awscostentrypricing_id_seq', 1, false);
 
 
 --
--- Name: reporting_awscostentryproduct_id_seq; Type: SEQUENCE SET; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awscostentryproduct_id_seq; Type: SEQUENCE SET; Schema: testcustomer; Owner: kokuadmin
 --
 
 SELECT pg_catalog.setval('testcustomer.reporting_awscostentryproduct_id_seq', 1, false);
 
 
 --
--- Name: reporting_awscostentryreservation_id_seq; Type: SEQUENCE SET; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awscostentryreservation_id_seq; Type: SEQUENCE SET; Schema: testcustomer; Owner: kokuadmin
 --
 
 SELECT pg_catalog.setval('testcustomer.reporting_awscostentryreservation_id_seq', 1, false);
 
 
 --
--- Name: api_customer api_customer_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: api_customer api_customer_pkey; Type: CONSTRAINT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.api_customer
@@ -2285,7 +2282,7 @@ ALTER TABLE ONLY public.api_customer
 
 
 --
--- Name: api_customer api_customer_schema_name_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: api_customer api_customer_schema_name_key; Type: CONSTRAINT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.api_customer
@@ -2293,7 +2290,7 @@ ALTER TABLE ONLY public.api_customer
 
 
 --
--- Name: api_customer api_customer_uuid_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: api_customer api_customer_uuid_key; Type: CONSTRAINT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.api_customer
@@ -2301,7 +2298,7 @@ ALTER TABLE ONLY public.api_customer
 
 
 --
--- Name: api_provider api_provider_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: api_provider api_provider_pkey; Type: CONSTRAINT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.api_provider
@@ -2309,7 +2306,7 @@ ALTER TABLE ONLY public.api_provider
 
 
 --
--- Name: api_provider api_provider_uuid_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: api_provider api_provider_uuid_key; Type: CONSTRAINT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.api_provider
@@ -2317,7 +2314,7 @@ ALTER TABLE ONLY public.api_provider
 
 
 --
--- Name: api_providerauthentication api_providerauthentication_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: api_providerauthentication api_providerauthentication_pkey; Type: CONSTRAINT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.api_providerauthentication
@@ -2325,7 +2322,7 @@ ALTER TABLE ONLY public.api_providerauthentication
 
 
 --
--- Name: api_providerauthentication api_providerauthentication_provider_resource_name_fa7deecb_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: api_providerauthentication api_providerauthentication_provider_resource_name_fa7deecb_uniq; Type: CONSTRAINT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.api_providerauthentication
@@ -2333,7 +2330,7 @@ ALTER TABLE ONLY public.api_providerauthentication
 
 
 --
--- Name: api_providerauthentication api_providerauthentication_uuid_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: api_providerauthentication api_providerauthentication_uuid_key; Type: CONSTRAINT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.api_providerauthentication
@@ -2341,7 +2338,7 @@ ALTER TABLE ONLY public.api_providerauthentication
 
 
 --
--- Name: api_providerbillingsource api_providerbillingsource_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: api_providerbillingsource api_providerbillingsource_pkey; Type: CONSTRAINT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.api_providerbillingsource
@@ -2349,7 +2346,7 @@ ALTER TABLE ONLY public.api_providerbillingsource
 
 
 --
--- Name: api_providerbillingsource api_providerbillingsource_uuid_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: api_providerbillingsource api_providerbillingsource_uuid_key; Type: CONSTRAINT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.api_providerbillingsource
@@ -2357,7 +2354,7 @@ ALTER TABLE ONLY public.api_providerbillingsource
 
 
 --
--- Name: api_resettoken api_resettoken_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: api_resettoken api_resettoken_pkey; Type: CONSTRAINT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.api_resettoken
@@ -2365,7 +2362,7 @@ ALTER TABLE ONLY public.api_resettoken
 
 
 --
--- Name: api_resettoken api_resettoken_token_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: api_resettoken api_resettoken_token_key; Type: CONSTRAINT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.api_resettoken
@@ -2373,7 +2370,7 @@ ALTER TABLE ONLY public.api_resettoken
 
 
 --
--- Name: api_tenant api_tenant_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: api_tenant api_tenant_pkey; Type: CONSTRAINT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.api_tenant
@@ -2381,7 +2378,7 @@ ALTER TABLE ONLY public.api_tenant
 
 
 --
--- Name: api_tenant api_tenant_schema_name_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: api_tenant api_tenant_schema_name_key; Type: CONSTRAINT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.api_tenant
@@ -2389,7 +2386,7 @@ ALTER TABLE ONLY public.api_tenant
 
 
 --
--- Name: api_user api_user_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: api_user api_user_pkey; Type: CONSTRAINT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.api_user
@@ -2397,7 +2394,7 @@ ALTER TABLE ONLY public.api_user
 
 
 --
--- Name: api_user api_user_uuid_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: api_user api_user_uuid_key; Type: CONSTRAINT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.api_user
@@ -2405,7 +2402,7 @@ ALTER TABLE ONLY public.api_user
 
 
 --
--- Name: api_userpreference api_userpreference_name_user_id_9f2a465b_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: api_userpreference api_userpreference_name_user_id_9f2a465b_uniq; Type: CONSTRAINT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.api_userpreference
@@ -2413,7 +2410,7 @@ ALTER TABLE ONLY public.api_userpreference
 
 
 --
--- Name: api_userpreference api_userpreference_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: api_userpreference api_userpreference_pkey; Type: CONSTRAINT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.api_userpreference
@@ -2421,7 +2418,7 @@ ALTER TABLE ONLY public.api_userpreference
 
 
 --
--- Name: api_userpreference api_userpreference_uuid_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: api_userpreference api_userpreference_uuid_key; Type: CONSTRAINT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.api_userpreference
@@ -2429,7 +2426,7 @@ ALTER TABLE ONLY public.api_userpreference
 
 
 --
--- Name: auth_group auth_group_name_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: auth_group auth_group_name_key; Type: CONSTRAINT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.auth_group
@@ -2437,7 +2434,7 @@ ALTER TABLE ONLY public.auth_group
 
 
 --
--- Name: auth_group_permissions auth_group_permissions_group_id_permission_id_0cd325b0_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: auth_group_permissions auth_group_permissions_group_id_permission_id_0cd325b0_uniq; Type: CONSTRAINT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.auth_group_permissions
@@ -2445,7 +2442,7 @@ ALTER TABLE ONLY public.auth_group_permissions
 
 
 --
--- Name: auth_group_permissions auth_group_permissions_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: auth_group_permissions auth_group_permissions_pkey; Type: CONSTRAINT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.auth_group_permissions
@@ -2453,7 +2450,7 @@ ALTER TABLE ONLY public.auth_group_permissions
 
 
 --
--- Name: auth_group auth_group_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: auth_group auth_group_pkey; Type: CONSTRAINT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.auth_group
@@ -2461,7 +2458,7 @@ ALTER TABLE ONLY public.auth_group
 
 
 --
--- Name: auth_permission auth_permission_content_type_id_codename_01ab375a_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: auth_permission auth_permission_content_type_id_codename_01ab375a_uniq; Type: CONSTRAINT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.auth_permission
@@ -2469,7 +2466,7 @@ ALTER TABLE ONLY public.auth_permission
 
 
 --
--- Name: auth_permission auth_permission_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: auth_permission auth_permission_pkey; Type: CONSTRAINT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.auth_permission
@@ -2477,7 +2474,7 @@ ALTER TABLE ONLY public.auth_permission
 
 
 --
--- Name: auth_user_groups auth_user_groups_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: auth_user_groups auth_user_groups_pkey; Type: CONSTRAINT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.auth_user_groups
@@ -2485,7 +2482,7 @@ ALTER TABLE ONLY public.auth_user_groups
 
 
 --
--- Name: auth_user_groups auth_user_groups_user_id_group_id_94350c0c_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: auth_user_groups auth_user_groups_user_id_group_id_94350c0c_uniq; Type: CONSTRAINT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.auth_user_groups
@@ -2493,7 +2490,7 @@ ALTER TABLE ONLY public.auth_user_groups
 
 
 --
--- Name: auth_user auth_user_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: auth_user auth_user_pkey; Type: CONSTRAINT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.auth_user
@@ -2501,7 +2498,7 @@ ALTER TABLE ONLY public.auth_user
 
 
 --
--- Name: auth_user_user_permissions auth_user_user_permissions_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: auth_user_user_permissions auth_user_user_permissions_pkey; Type: CONSTRAINT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.auth_user_user_permissions
@@ -2509,7 +2506,7 @@ ALTER TABLE ONLY public.auth_user_user_permissions
 
 
 --
--- Name: auth_user_user_permissions auth_user_user_permissions_user_id_permission_id_14a6b632_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: auth_user_user_permissions auth_user_user_permissions_user_id_permission_id_14a6b632_uniq; Type: CONSTRAINT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.auth_user_user_permissions
@@ -2517,7 +2514,7 @@ ALTER TABLE ONLY public.auth_user_user_permissions
 
 
 --
--- Name: auth_user auth_user_username_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: auth_user auth_user_username_key; Type: CONSTRAINT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.auth_user
@@ -2525,7 +2522,7 @@ ALTER TABLE ONLY public.auth_user
 
 
 --
--- Name: authtoken_token authtoken_token_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: authtoken_token authtoken_token_pkey; Type: CONSTRAINT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.authtoken_token
@@ -2533,7 +2530,7 @@ ALTER TABLE ONLY public.authtoken_token
 
 
 --
--- Name: authtoken_token authtoken_token_user_id_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: authtoken_token authtoken_token_user_id_key; Type: CONSTRAINT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.authtoken_token
@@ -2541,7 +2538,7 @@ ALTER TABLE ONLY public.authtoken_token
 
 
 --
--- Name: django_admin_log django_admin_log_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: django_admin_log django_admin_log_pkey; Type: CONSTRAINT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.django_admin_log
@@ -2549,7 +2546,7 @@ ALTER TABLE ONLY public.django_admin_log
 
 
 --
--- Name: django_content_type django_content_type_app_label_model_76bd3d3b_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: django_content_type django_content_type_app_label_model_76bd3d3b_uniq; Type: CONSTRAINT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.django_content_type
@@ -2557,7 +2554,7 @@ ALTER TABLE ONLY public.django_content_type
 
 
 --
--- Name: django_content_type django_content_type_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: django_content_type django_content_type_pkey; Type: CONSTRAINT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.django_content_type
@@ -2565,7 +2562,7 @@ ALTER TABLE ONLY public.django_content_type
 
 
 --
--- Name: django_migrations django_migrations_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: django_migrations django_migrations_pkey; Type: CONSTRAINT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.django_migrations
@@ -2573,7 +2570,7 @@ ALTER TABLE ONLY public.django_migrations
 
 
 --
--- Name: django_session django_session_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: django_session django_session_pkey; Type: CONSTRAINT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.django_session
@@ -2581,7 +2578,7 @@ ALTER TABLE ONLY public.django_session
 
 
 --
--- Name: region_mapping region_mapping_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: region_mapping region_mapping_pkey; Type: CONSTRAINT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.region_mapping
@@ -2589,7 +2586,7 @@ ALTER TABLE ONLY public.region_mapping
 
 
 --
--- Name: region_mapping region_mapping_region_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: region_mapping region_mapping_region_key; Type: CONSTRAINT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.region_mapping
@@ -2597,7 +2594,7 @@ ALTER TABLE ONLY public.region_mapping
 
 
 --
--- Name: region_mapping region_mapping_region_name_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: region_mapping region_mapping_region_name_key; Type: CONSTRAINT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.region_mapping
@@ -2605,7 +2602,7 @@ ALTER TABLE ONLY public.region_mapping
 
 
 --
--- Name: reporting_common_costusagereportstatus reporting_common_costusagereportstatus_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: reporting_common_costusagereportstatus reporting_common_costusagereportstatus_pkey; Type: CONSTRAINT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.reporting_common_costusagereportstatus
@@ -2613,7 +2610,7 @@ ALTER TABLE ONLY public.reporting_common_costusagereportstatus
 
 
 --
--- Name: reporting_common_costusagereportstatus reporting_common_costusagereportstatus_report_name_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: reporting_common_costusagereportstatus reporting_common_costusagereportstatus_report_name_key; Type: CONSTRAINT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.reporting_common_costusagereportstatus
@@ -2621,7 +2618,7 @@ ALTER TABLE ONLY public.reporting_common_costusagereportstatus
 
 
 --
--- Name: reporting_common_reportcolumnmap reporting_common_reportcolumnmap_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: reporting_common_reportcolumnmap reporting_common_reportcolumnmap_pkey; Type: CONSTRAINT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.reporting_common_reportcolumnmap
@@ -2629,7 +2626,7 @@ ALTER TABLE ONLY public.reporting_common_reportcolumnmap
 
 
 --
--- Name: reporting_common_reportcolumnmap reporting_common_reportcolumnmap_provider_column_name_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: reporting_common_reportcolumnmap reporting_common_reportcolumnmap_provider_column_name_key; Type: CONSTRAINT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.reporting_common_reportcolumnmap
@@ -2637,7 +2634,7 @@ ALTER TABLE ONLY public.reporting_common_reportcolumnmap
 
 
 --
--- Name: si_unit_scale si_unit_scale_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: si_unit_scale si_unit_scale_pkey; Type: CONSTRAINT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.si_unit_scale
@@ -2645,7 +2642,7 @@ ALTER TABLE ONLY public.si_unit_scale
 
 
 --
--- Name: si_unit_scale si_unit_scale_prefix_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: si_unit_scale si_unit_scale_prefix_key; Type: CONSTRAINT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.si_unit_scale
@@ -2653,7 +2650,7 @@ ALTER TABLE ONLY public.si_unit_scale
 
 
 --
--- Name: django_migrations django_migrations_pkey; Type: CONSTRAINT; Schema: testcustomer; Owner: postgres
+-- Name: django_migrations django_migrations_pkey; Type: CONSTRAINT; Schema: testcustomer; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY testcustomer.django_migrations
@@ -2661,7 +2658,7 @@ ALTER TABLE ONLY testcustomer.django_migrations
 
 
 --
--- Name: reporting_awsaccountalias reporting_awsaccountalias_account_id_key; Type: CONSTRAINT; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awsaccountalias reporting_awsaccountalias_account_id_key; Type: CONSTRAINT; Schema: testcustomer; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY testcustomer.reporting_awsaccountalias
@@ -2669,7 +2666,7 @@ ALTER TABLE ONLY testcustomer.reporting_awsaccountalias
 
 
 --
--- Name: reporting_awsaccountalias reporting_awsaccountalias_pkey; Type: CONSTRAINT; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awsaccountalias reporting_awsaccountalias_pkey; Type: CONSTRAINT; Schema: testcustomer; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY testcustomer.reporting_awsaccountalias
@@ -2677,7 +2674,7 @@ ALTER TABLE ONLY testcustomer.reporting_awsaccountalias
 
 
 --
--- Name: reporting_awscostentry reporting_awscostentry_pkey; Type: CONSTRAINT; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awscostentry reporting_awscostentry_pkey; Type: CONSTRAINT; Schema: testcustomer; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY testcustomer.reporting_awscostentry
@@ -2685,7 +2682,7 @@ ALTER TABLE ONLY testcustomer.reporting_awscostentry
 
 
 --
--- Name: reporting_awscostentrybill reporting_awscostentrybill_pkey; Type: CONSTRAINT; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awscostentrybill reporting_awscostentrybill_pkey; Type: CONSTRAINT; Schema: testcustomer; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY testcustomer.reporting_awscostentrybill
@@ -2693,7 +2690,7 @@ ALTER TABLE ONLY testcustomer.reporting_awscostentrybill
 
 
 --
--- Name: reporting_awscostentrylineitem_aggregates reporting_awscostentrylineitem_aggregates_pkey; Type: CONSTRAINT; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awscostentrylineitem_aggregates reporting_awscostentrylineitem_aggregates_pkey; Type: CONSTRAINT; Schema: testcustomer; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY testcustomer.reporting_awscostentrylineitem_aggregates
@@ -2701,7 +2698,7 @@ ALTER TABLE ONLY testcustomer.reporting_awscostentrylineitem_aggregates
 
 
 --
--- Name: reporting_awscostentrylineitem_daily reporting_awscostentrylineitem_daily_pkey; Type: CONSTRAINT; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awscostentrylineitem_daily reporting_awscostentrylineitem_daily_pkey; Type: CONSTRAINT; Schema: testcustomer; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY testcustomer.reporting_awscostentrylineitem_daily
@@ -2709,7 +2706,7 @@ ALTER TABLE ONLY testcustomer.reporting_awscostentrylineitem_daily
 
 
 --
--- Name: reporting_awscostentrylineitem_daily_summary reporting_awscostentrylineitem_daily_summary_pkey; Type: CONSTRAINT; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awscostentrylineitem_daily_summary reporting_awscostentrylineitem_daily_summary_pkey; Type: CONSTRAINT; Schema: testcustomer; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY testcustomer.reporting_awscostentrylineitem_daily_summary
@@ -2717,7 +2714,7 @@ ALTER TABLE ONLY testcustomer.reporting_awscostentrylineitem_daily_summary
 
 
 --
--- Name: reporting_awscostentrylineitem reporting_awscostentrylineitem_hash_cost_entry_id_f3893306_uniq; Type: CONSTRAINT; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awscostentrylineitem reporting_awscostentrylineitem_hash_cost_entry_id_f3893306_uniq; Type: CONSTRAINT; Schema: testcustomer; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY testcustomer.reporting_awscostentrylineitem
@@ -2725,7 +2722,7 @@ ALTER TABLE ONLY testcustomer.reporting_awscostentrylineitem
 
 
 --
--- Name: reporting_awscostentrylineitem reporting_awscostentrylineitem_pkey; Type: CONSTRAINT; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awscostentrylineitem reporting_awscostentrylineitem_pkey; Type: CONSTRAINT; Schema: testcustomer; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY testcustomer.reporting_awscostentrylineitem
@@ -2733,7 +2730,7 @@ ALTER TABLE ONLY testcustomer.reporting_awscostentrylineitem
 
 
 --
--- Name: reporting_awscostentryproduct reporting_awscostentrypr_sku_product_name_region_fea902ae_uniq; Type: CONSTRAINT; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awscostentryproduct reporting_awscostentrypr_sku_product_name_region_fea902ae_uniq; Type: CONSTRAINT; Schema: testcustomer; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY testcustomer.reporting_awscostentryproduct
@@ -2741,7 +2738,7 @@ ALTER TABLE ONLY testcustomer.reporting_awscostentryproduct
 
 
 --
--- Name: reporting_awscostentrypricing reporting_awscostentrypricing_pkey; Type: CONSTRAINT; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awscostentrypricing reporting_awscostentrypricing_pkey; Type: CONSTRAINT; Schema: testcustomer; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY testcustomer.reporting_awscostentrypricing
@@ -2749,7 +2746,7 @@ ALTER TABLE ONLY testcustomer.reporting_awscostentrypricing
 
 
 --
--- Name: reporting_awscostentrypricing reporting_awscostentrypricing_term_unit_c3978af3_uniq; Type: CONSTRAINT; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awscostentrypricing reporting_awscostentrypricing_term_unit_c3978af3_uniq; Type: CONSTRAINT; Schema: testcustomer; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY testcustomer.reporting_awscostentrypricing
@@ -2757,7 +2754,7 @@ ALTER TABLE ONLY testcustomer.reporting_awscostentrypricing
 
 
 --
--- Name: reporting_awscostentryproduct reporting_awscostentryproduct_pkey; Type: CONSTRAINT; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awscostentryproduct reporting_awscostentryproduct_pkey; Type: CONSTRAINT; Schema: testcustomer; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY testcustomer.reporting_awscostentryproduct
@@ -2765,7 +2762,7 @@ ALTER TABLE ONLY testcustomer.reporting_awscostentryproduct
 
 
 --
--- Name: reporting_awscostentryreservation reporting_awscostentryreservation_pkey; Type: CONSTRAINT; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awscostentryreservation reporting_awscostentryreservation_pkey; Type: CONSTRAINT; Schema: testcustomer; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY testcustomer.reporting_awscostentryreservation
@@ -2773,7 +2770,7 @@ ALTER TABLE ONLY testcustomer.reporting_awscostentryreservation
 
 
 --
--- Name: reporting_awscostentryreservation reporting_awscostentryreservation_reservation_arn_key; Type: CONSTRAINT; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awscostentryreservation reporting_awscostentryreservation_reservation_arn_key; Type: CONSTRAINT; Schema: testcustomer; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY testcustomer.reporting_awscostentryreservation
@@ -2781,350 +2778,357 @@ ALTER TABLE ONLY testcustomer.reporting_awscostentryreservation
 
 
 --
--- Name: api_customer_owner_id_c1534767; Type: INDEX; Schema: public; Owner: postgres
+-- Name: api_customer_owner_id_c1534767; Type: INDEX; Schema: public; Owner: kokuadmin
 --
 
 CREATE INDEX api_customer_owner_id_c1534767 ON public.api_customer USING btree (owner_id);
 
 
 --
--- Name: api_customer_schema_name_6b716c4b_like; Type: INDEX; Schema: public; Owner: postgres
+-- Name: api_customer_schema_name_6b716c4b_like; Type: INDEX; Schema: public; Owner: kokuadmin
 --
 
 CREATE INDEX api_customer_schema_name_6b716c4b_like ON public.api_customer USING btree (schema_name text_pattern_ops);
 
 
 --
--- Name: api_provider_authentication_id_201fd4b9; Type: INDEX; Schema: public; Owner: postgres
+-- Name: api_provider_authentication_id_201fd4b9; Type: INDEX; Schema: public; Owner: kokuadmin
 --
 
 CREATE INDEX api_provider_authentication_id_201fd4b9 ON public.api_provider USING btree (authentication_id);
 
 
 --
--- Name: api_provider_billing_source_id_cb6b5a6f; Type: INDEX; Schema: public; Owner: postgres
+-- Name: api_provider_billing_source_id_cb6b5a6f; Type: INDEX; Schema: public; Owner: kokuadmin
 --
 
 CREATE INDEX api_provider_billing_source_id_cb6b5a6f ON public.api_provider USING btree (billing_source_id);
 
 
 --
--- Name: api_provider_created_by_id_e740fc35; Type: INDEX; Schema: public; Owner: postgres
+-- Name: api_provider_created_by_id_e740fc35; Type: INDEX; Schema: public; Owner: kokuadmin
 --
 
 CREATE INDEX api_provider_created_by_id_e740fc35 ON public.api_provider USING btree (created_by_id);
 
 
 --
--- Name: api_provider_customer_id_87062290; Type: INDEX; Schema: public; Owner: postgres
+-- Name: api_provider_customer_id_87062290; Type: INDEX; Schema: public; Owner: kokuadmin
 --
 
 CREATE INDEX api_provider_customer_id_87062290 ON public.api_provider USING btree (customer_id);
 
 
 --
--- Name: api_providerauthentication_provider_resource_name_fa7deecb_like; Type: INDEX; Schema: public; Owner: postgres
+-- Name: api_providerauthentication_provider_resource_name_fa7deecb_like; Type: INDEX; Schema: public; Owner: kokuadmin
 --
 
 CREATE INDEX api_providerauthentication_provider_resource_name_fa7deecb_like ON public.api_providerauthentication USING btree (provider_resource_name text_pattern_ops);
 
 
 --
--- Name: api_resettoken_user_id_4b3d42c0; Type: INDEX; Schema: public; Owner: postgres
+-- Name: api_resettoken_user_id_4b3d42c0; Type: INDEX; Schema: public; Owner: kokuadmin
 --
 
 CREATE INDEX api_resettoken_user_id_4b3d42c0 ON public.api_resettoken USING btree (user_id);
 
 
 --
--- Name: api_tenant_schema_name_733d339b_like; Type: INDEX; Schema: public; Owner: postgres
+-- Name: api_tenant_schema_name_733d339b_like; Type: INDEX; Schema: public; Owner: kokuadmin
 --
 
 CREATE INDEX api_tenant_schema_name_733d339b_like ON public.api_tenant USING btree (schema_name varchar_pattern_ops);
 
 
 --
--- Name: api_userpreference_user_id_e62eaffa; Type: INDEX; Schema: public; Owner: postgres
+-- Name: api_userpreference_user_id_e62eaffa; Type: INDEX; Schema: public; Owner: kokuadmin
 --
 
 CREATE INDEX api_userpreference_user_id_e62eaffa ON public.api_userpreference USING btree (user_id);
 
 
 --
--- Name: auth_group_name_a6ea08ec_like; Type: INDEX; Schema: public; Owner: postgres
+-- Name: auth_group_name_a6ea08ec_like; Type: INDEX; Schema: public; Owner: kokuadmin
 --
 
 CREATE INDEX auth_group_name_a6ea08ec_like ON public.auth_group USING btree (name varchar_pattern_ops);
 
 
 --
--- Name: auth_group_permissions_group_id_b120cbf9; Type: INDEX; Schema: public; Owner: postgres
+-- Name: auth_group_permissions_group_id_b120cbf9; Type: INDEX; Schema: public; Owner: kokuadmin
 --
 
 CREATE INDEX auth_group_permissions_group_id_b120cbf9 ON public.auth_group_permissions USING btree (group_id);
 
 
 --
--- Name: auth_group_permissions_permission_id_84c5c92e; Type: INDEX; Schema: public; Owner: postgres
+-- Name: auth_group_permissions_permission_id_84c5c92e; Type: INDEX; Schema: public; Owner: kokuadmin
 --
 
 CREATE INDEX auth_group_permissions_permission_id_84c5c92e ON public.auth_group_permissions USING btree (permission_id);
 
 
 --
--- Name: auth_permission_content_type_id_2f476e4b; Type: INDEX; Schema: public; Owner: postgres
+-- Name: auth_permission_content_type_id_2f476e4b; Type: INDEX; Schema: public; Owner: kokuadmin
 --
 
 CREATE INDEX auth_permission_content_type_id_2f476e4b ON public.auth_permission USING btree (content_type_id);
 
 
 --
--- Name: auth_user_groups_group_id_97559544; Type: INDEX; Schema: public; Owner: postgres
+-- Name: auth_user_groups_group_id_97559544; Type: INDEX; Schema: public; Owner: kokuadmin
 --
 
 CREATE INDEX auth_user_groups_group_id_97559544 ON public.auth_user_groups USING btree (group_id);
 
 
 --
--- Name: auth_user_groups_user_id_6a12ed8b; Type: INDEX; Schema: public; Owner: postgres
+-- Name: auth_user_groups_user_id_6a12ed8b; Type: INDEX; Schema: public; Owner: kokuadmin
 --
 
 CREATE INDEX auth_user_groups_user_id_6a12ed8b ON public.auth_user_groups USING btree (user_id);
 
 
 --
--- Name: auth_user_user_permissions_permission_id_1fbb5f2c; Type: INDEX; Schema: public; Owner: postgres
+-- Name: auth_user_user_permissions_permission_id_1fbb5f2c; Type: INDEX; Schema: public; Owner: kokuadmin
 --
 
 CREATE INDEX auth_user_user_permissions_permission_id_1fbb5f2c ON public.auth_user_user_permissions USING btree (permission_id);
 
 
 --
--- Name: auth_user_user_permissions_user_id_a95ead1b; Type: INDEX; Schema: public; Owner: postgres
+-- Name: auth_user_user_permissions_user_id_a95ead1b; Type: INDEX; Schema: public; Owner: kokuadmin
 --
 
 CREATE INDEX auth_user_user_permissions_user_id_a95ead1b ON public.auth_user_user_permissions USING btree (user_id);
 
 
 --
--- Name: auth_user_username_6821ab7c_like; Type: INDEX; Schema: public; Owner: postgres
+-- Name: auth_user_username_6821ab7c_like; Type: INDEX; Schema: public; Owner: kokuadmin
 --
 
 CREATE INDEX auth_user_username_6821ab7c_like ON public.auth_user USING btree (username varchar_pattern_ops);
 
 
 --
--- Name: authtoken_token_key_10f0b77e_like; Type: INDEX; Schema: public; Owner: postgres
+-- Name: authtoken_token_key_10f0b77e_like; Type: INDEX; Schema: public; Owner: kokuadmin
 --
 
 CREATE INDEX authtoken_token_key_10f0b77e_like ON public.authtoken_token USING btree (key varchar_pattern_ops);
 
 
 --
--- Name: django_admin_log_content_type_id_c4bce8eb; Type: INDEX; Schema: public; Owner: postgres
+-- Name: django_admin_log_content_type_id_c4bce8eb; Type: INDEX; Schema: public; Owner: kokuadmin
 --
 
 CREATE INDEX django_admin_log_content_type_id_c4bce8eb ON public.django_admin_log USING btree (content_type_id);
 
 
 --
--- Name: django_admin_log_user_id_c564eba6; Type: INDEX; Schema: public; Owner: postgres
+-- Name: django_admin_log_user_id_c564eba6; Type: INDEX; Schema: public; Owner: kokuadmin
 --
 
 CREATE INDEX django_admin_log_user_id_c564eba6 ON public.django_admin_log USING btree (user_id);
 
 
 --
--- Name: django_session_expire_date_a5c62663; Type: INDEX; Schema: public; Owner: postgres
+-- Name: django_session_expire_date_a5c62663; Type: INDEX; Schema: public; Owner: kokuadmin
 --
 
 CREATE INDEX django_session_expire_date_a5c62663 ON public.django_session USING btree (expire_date);
 
 
 --
--- Name: django_session_session_key_c0390e0f_like; Type: INDEX; Schema: public; Owner: postgres
+-- Name: django_session_session_key_c0390e0f_like; Type: INDEX; Schema: public; Owner: kokuadmin
 --
 
 CREATE INDEX django_session_session_key_c0390e0f_like ON public.django_session USING btree (session_key varchar_pattern_ops);
 
 
 --
--- Name: region_mapping_region_9c0d71ba_like; Type: INDEX; Schema: public; Owner: postgres
+-- Name: region_mapping_region_9c0d71ba_like; Type: INDEX; Schema: public; Owner: kokuadmin
 --
 
 CREATE INDEX region_mapping_region_9c0d71ba_like ON public.region_mapping USING btree (region varchar_pattern_ops);
 
 
 --
--- Name: region_mapping_region_name_ad295b89_like; Type: INDEX; Schema: public; Owner: postgres
+-- Name: region_mapping_region_name_ad295b89_like; Type: INDEX; Schema: public; Owner: kokuadmin
 --
 
 CREATE INDEX region_mapping_region_name_ad295b89_like ON public.region_mapping USING btree (region_name varchar_pattern_ops);
 
 
 --
--- Name: reporting_common_costusa_report_name_134674b5_like; Type: INDEX; Schema: public; Owner: postgres
+-- Name: reporting_common_costusa_report_name_134674b5_like; Type: INDEX; Schema: public; Owner: kokuadmin
 --
 
 CREATE INDEX reporting_common_costusa_report_name_134674b5_like ON public.reporting_common_costusagereportstatus USING btree (report_name varchar_pattern_ops);
 
 
 --
--- Name: reporting_common_costusagereportstatus_provider_id_f012c75a; Type: INDEX; Schema: public; Owner: postgres
+-- Name: reporting_common_costusagereportstatus_provider_id_f012c75a; Type: INDEX; Schema: public; Owner: kokuadmin
 --
 
 CREATE INDEX reporting_common_costusagereportstatus_provider_id_f012c75a ON public.reporting_common_costusagereportstatus USING btree (provider_id);
 
 
 --
--- Name: reporting_common_reportc_provider_column_name_e01eaba3_like; Type: INDEX; Schema: public; Owner: postgres
+-- Name: reporting_common_reportc_provider_column_name_e01eaba3_like; Type: INDEX; Schema: public; Owner: kokuadmin
 --
 
 CREATE INDEX reporting_common_reportc_provider_column_name_e01eaba3_like ON public.reporting_common_reportcolumnmap USING btree (provider_column_name varchar_pattern_ops);
 
 
 --
--- Name: si_unit_scale_prefix_eb9daade_like; Type: INDEX; Schema: public; Owner: postgres
+-- Name: si_unit_scale_prefix_eb9daade_like; Type: INDEX; Schema: public; Owner: kokuadmin
 --
 
 CREATE INDEX si_unit_scale_prefix_eb9daade_like ON public.si_unit_scale USING btree (prefix varchar_pattern_ops);
 
 
 --
--- Name: interval_start_idx; Type: INDEX; Schema: testcustomer; Owner: postgres
+-- Name: interval_start_idx; Type: INDEX; Schema: testcustomer; Owner: kokuadmin
 --
 
 CREATE INDEX interval_start_idx ON testcustomer.reporting_awscostentry USING btree (interval_start);
 
 
 --
--- Name: product_code_idx; Type: INDEX; Schema: testcustomer; Owner: postgres
+-- Name: product_code_idx; Type: INDEX; Schema: testcustomer; Owner: kokuadmin
 --
 
 CREATE INDEX product_code_idx ON testcustomer.reporting_awscostentrylineitem_daily USING btree (product_code);
 
 
 --
--- Name: region_idx; Type: INDEX; Schema: testcustomer; Owner: postgres
+-- Name: region_idx; Type: INDEX; Schema: testcustomer; Owner: kokuadmin
 --
 
 CREATE INDEX region_idx ON testcustomer.reporting_awscostentryproduct USING btree (region);
 
 
 --
--- Name: reporting_awsaccountalias_account_id_85724b8c_like; Type: INDEX; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awsaccountalias_account_id_85724b8c_like; Type: INDEX; Schema: testcustomer; Owner: kokuadmin
 --
 
 CREATE INDEX reporting_awsaccountalias_account_id_85724b8c_like ON testcustomer.reporting_awsaccountalias USING btree (account_id varchar_pattern_ops);
 
 
 --
--- Name: reporting_awscostentry_bill_id_017f27a3; Type: INDEX; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awscostentry_bill_id_017f27a3; Type: INDEX; Schema: testcustomer; Owner: kokuadmin
 --
 
 CREATE INDEX reporting_awscostentry_bill_id_017f27a3 ON testcustomer.reporting_awscostentry USING btree (bill_id);
 
 
 --
--- Name: reporting_awscostentryline_cost_entry_pricing_id_5a6a9b38; Type: INDEX; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awscostentryline_account_alias_id_684d6c01; Type: INDEX; Schema: testcustomer; Owner: kokuadmin
+--
+
+CREATE INDEX reporting_awscostentryline_account_alias_id_684d6c01 ON testcustomer.reporting_awscostentrylineitem_daily_summary USING btree (account_alias_id);
+
+
+--
+-- Name: reporting_awscostentryline_cost_entry_pricing_id_5a6a9b38; Type: INDEX; Schema: testcustomer; Owner: kokuadmin
 --
 
 CREATE INDEX reporting_awscostentryline_cost_entry_pricing_id_5a6a9b38 ON testcustomer.reporting_awscostentrylineitem_daily USING btree (cost_entry_pricing_id);
 
 
 --
--- Name: reporting_awscostentryline_cost_entry_product_id_4d8ef2fd; Type: INDEX; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awscostentryline_cost_entry_product_id_4d8ef2fd; Type: INDEX; Schema: testcustomer; Owner: kokuadmin
 --
 
 CREATE INDEX reporting_awscostentryline_cost_entry_product_id_4d8ef2fd ON testcustomer.reporting_awscostentrylineitem_daily USING btree (cost_entry_product_id);
 
 
 --
--- Name: reporting_awscostentryline_cost_entry_reservation_id_13b1cb08; Type: INDEX; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awscostentryline_cost_entry_reservation_id_13b1cb08; Type: INDEX; Schema: testcustomer; Owner: kokuadmin
 --
 
 CREATE INDEX reporting_awscostentryline_cost_entry_reservation_id_13b1cb08 ON testcustomer.reporting_awscostentrylineitem_daily USING btree (cost_entry_reservation_id);
 
 
 --
--- Name: reporting_awscostentryline_cost_entry_reservation_id_9332b371; Type: INDEX; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awscostentryline_cost_entry_reservation_id_9332b371; Type: INDEX; Schema: testcustomer; Owner: kokuadmin
 --
 
 CREATE INDEX reporting_awscostentryline_cost_entry_reservation_id_9332b371 ON testcustomer.reporting_awscostentrylineitem USING btree (cost_entry_reservation_id);
 
 
 --
--- Name: reporting_awscostentrylineitem_cost_entry_bill_id_5ae74e09; Type: INDEX; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awscostentrylineitem_cost_entry_bill_id_5ae74e09; Type: INDEX; Schema: testcustomer; Owner: kokuadmin
 --
 
 CREATE INDEX reporting_awscostentrylineitem_cost_entry_bill_id_5ae74e09 ON testcustomer.reporting_awscostentrylineitem USING btree (cost_entry_bill_id);
 
 
 --
--- Name: reporting_awscostentrylineitem_cost_entry_id_4d1a7fc4; Type: INDEX; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awscostentrylineitem_cost_entry_id_4d1a7fc4; Type: INDEX; Schema: testcustomer; Owner: kokuadmin
 --
 
 CREATE INDEX reporting_awscostentrylineitem_cost_entry_id_4d1a7fc4 ON testcustomer.reporting_awscostentrylineitem USING btree (cost_entry_id);
 
 
 --
--- Name: reporting_awscostentrylineitem_cost_entry_pricing_id_a654a7e3; Type: INDEX; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awscostentrylineitem_cost_entry_pricing_id_a654a7e3; Type: INDEX; Schema: testcustomer; Owner: kokuadmin
 --
 
 CREATE INDEX reporting_awscostentrylineitem_cost_entry_pricing_id_a654a7e3 ON testcustomer.reporting_awscostentrylineitem USING btree (cost_entry_pricing_id);
 
 
 --
--- Name: reporting_awscostentrylineitem_cost_entry_product_id_29c80210; Type: INDEX; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awscostentrylineitem_cost_entry_product_id_29c80210; Type: INDEX; Schema: testcustomer; Owner: kokuadmin
 --
 
 CREATE INDEX reporting_awscostentrylineitem_cost_entry_product_id_29c80210 ON testcustomer.reporting_awscostentrylineitem USING btree (cost_entry_product_id);
 
 
 --
--- Name: reporting_awscostentryreservation_reservation_arn_e387aa5b_like; Type: INDEX; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awscostentryreservation_reservation_arn_e387aa5b_like; Type: INDEX; Schema: testcustomer; Owner: kokuadmin
 --
 
 CREATE INDEX reporting_awscostentryreservation_reservation_arn_e387aa5b_like ON testcustomer.reporting_awscostentryreservation USING btree (reservation_arn text_pattern_ops);
 
 
 --
--- Name: summary_product_code_idx; Type: INDEX; Schema: testcustomer; Owner: postgres
+-- Name: summary_product_code_idx; Type: INDEX; Schema: testcustomer; Owner: kokuadmin
 --
 
 CREATE INDEX summary_product_code_idx ON testcustomer.reporting_awscostentrylineitem_daily_summary USING btree (product_code);
 
 
 --
--- Name: summary_usage_account_id_idx; Type: INDEX; Schema: testcustomer; Owner: postgres
+-- Name: summary_usage_account_id_idx; Type: INDEX; Schema: testcustomer; Owner: kokuadmin
 --
 
 CREATE INDEX summary_usage_account_id_idx ON testcustomer.reporting_awscostentrylineitem_daily_summary USING btree (usage_account_id);
 
 
 --
--- Name: summary_usage_start_idx; Type: INDEX; Schema: testcustomer; Owner: postgres
+-- Name: summary_usage_start_idx; Type: INDEX; Schema: testcustomer; Owner: kokuadmin
 --
 
 CREATE INDEX summary_usage_start_idx ON testcustomer.reporting_awscostentrylineitem_daily_summary USING btree (usage_start);
 
 
 --
--- Name: usage_account_id_idx; Type: INDEX; Schema: testcustomer; Owner: postgres
+-- Name: usage_account_id_idx; Type: INDEX; Schema: testcustomer; Owner: kokuadmin
 --
 
 CREATE INDEX usage_account_id_idx ON testcustomer.reporting_awscostentrylineitem_daily USING btree (usage_account_id);
 
 
 --
--- Name: usage_start_idx; Type: INDEX; Schema: testcustomer; Owner: postgres
+-- Name: usage_start_idx; Type: INDEX; Schema: testcustomer; Owner: kokuadmin
 --
 
 CREATE INDEX usage_start_idx ON testcustomer.reporting_awscostentrylineitem_daily USING btree (usage_start);
 
 
 --
--- Name: api_customer api_customer_group_ptr_id_fe96eec5_fk_auth_group_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: api_customer api_customer_group_ptr_id_fe96eec5_fk_auth_group_id; Type: FK CONSTRAINT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.api_customer
@@ -3132,7 +3136,7 @@ ALTER TABLE ONLY public.api_customer
 
 
 --
--- Name: api_customer api_customer_owner_id_c1534767_fk_api_user_user_ptr_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: api_customer api_customer_owner_id_c1534767_fk_api_user_user_ptr_id; Type: FK CONSTRAINT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.api_customer
@@ -3140,7 +3144,7 @@ ALTER TABLE ONLY public.api_customer
 
 
 --
--- Name: api_provider api_provider_authentication_id_201fd4b9_fk_api_provi; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: api_provider api_provider_authentication_id_201fd4b9_fk_api_provi; Type: FK CONSTRAINT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.api_provider
@@ -3148,7 +3152,7 @@ ALTER TABLE ONLY public.api_provider
 
 
 --
--- Name: api_provider api_provider_billing_source_id_cb6b5a6f_fk_api_provi; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: api_provider api_provider_billing_source_id_cb6b5a6f_fk_api_provi; Type: FK CONSTRAINT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.api_provider
@@ -3156,7 +3160,7 @@ ALTER TABLE ONLY public.api_provider
 
 
 --
--- Name: api_provider api_provider_created_by_id_e740fc35_fk_api_user_user_ptr_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: api_provider api_provider_created_by_id_e740fc35_fk_api_user_user_ptr_id; Type: FK CONSTRAINT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.api_provider
@@ -3164,7 +3168,7 @@ ALTER TABLE ONLY public.api_provider
 
 
 --
--- Name: api_provider api_provider_customer_id_87062290_fk_api_customer_group_ptr_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: api_provider api_provider_customer_id_87062290_fk_api_customer_group_ptr_id; Type: FK CONSTRAINT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.api_provider
@@ -3172,7 +3176,7 @@ ALTER TABLE ONLY public.api_provider
 
 
 --
--- Name: api_resettoken api_resettoken_user_id_4b3d42c0_fk_api_user_user_ptr_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: api_resettoken api_resettoken_user_id_4b3d42c0_fk_api_user_user_ptr_id; Type: FK CONSTRAINT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.api_resettoken
@@ -3180,7 +3184,7 @@ ALTER TABLE ONLY public.api_resettoken
 
 
 --
--- Name: api_user api_user_user_ptr_id_5a766ead_fk_auth_user_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: api_user api_user_user_ptr_id_5a766ead_fk_auth_user_id; Type: FK CONSTRAINT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.api_user
@@ -3188,7 +3192,7 @@ ALTER TABLE ONLY public.api_user
 
 
 --
--- Name: api_userpreference api_userpreference_user_id_e62eaffa_fk_api_user_user_ptr_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: api_userpreference api_userpreference_user_id_e62eaffa_fk_api_user_user_ptr_id; Type: FK CONSTRAINT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.api_userpreference
@@ -3196,7 +3200,7 @@ ALTER TABLE ONLY public.api_userpreference
 
 
 --
--- Name: auth_group_permissions auth_group_permissio_permission_id_84c5c92e_fk_auth_perm; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: auth_group_permissions auth_group_permissio_permission_id_84c5c92e_fk_auth_perm; Type: FK CONSTRAINT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.auth_group_permissions
@@ -3204,7 +3208,7 @@ ALTER TABLE ONLY public.auth_group_permissions
 
 
 --
--- Name: auth_group_permissions auth_group_permissions_group_id_b120cbf9_fk_auth_group_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: auth_group_permissions auth_group_permissions_group_id_b120cbf9_fk_auth_group_id; Type: FK CONSTRAINT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.auth_group_permissions
@@ -3212,7 +3216,7 @@ ALTER TABLE ONLY public.auth_group_permissions
 
 
 --
--- Name: auth_permission auth_permission_content_type_id_2f476e4b_fk_django_co; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: auth_permission auth_permission_content_type_id_2f476e4b_fk_django_co; Type: FK CONSTRAINT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.auth_permission
@@ -3220,7 +3224,7 @@ ALTER TABLE ONLY public.auth_permission
 
 
 --
--- Name: auth_user_groups auth_user_groups_group_id_97559544_fk_auth_group_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: auth_user_groups auth_user_groups_group_id_97559544_fk_auth_group_id; Type: FK CONSTRAINT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.auth_user_groups
@@ -3228,7 +3232,7 @@ ALTER TABLE ONLY public.auth_user_groups
 
 
 --
--- Name: auth_user_groups auth_user_groups_user_id_6a12ed8b_fk_auth_user_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: auth_user_groups auth_user_groups_user_id_6a12ed8b_fk_auth_user_id; Type: FK CONSTRAINT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.auth_user_groups
@@ -3236,7 +3240,7 @@ ALTER TABLE ONLY public.auth_user_groups
 
 
 --
--- Name: auth_user_user_permissions auth_user_user_permi_permission_id_1fbb5f2c_fk_auth_perm; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: auth_user_user_permissions auth_user_user_permi_permission_id_1fbb5f2c_fk_auth_perm; Type: FK CONSTRAINT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.auth_user_user_permissions
@@ -3244,7 +3248,7 @@ ALTER TABLE ONLY public.auth_user_user_permissions
 
 
 --
--- Name: auth_user_user_permissions auth_user_user_permissions_user_id_a95ead1b_fk_auth_user_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: auth_user_user_permissions auth_user_user_permissions_user_id_a95ead1b_fk_auth_user_id; Type: FK CONSTRAINT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.auth_user_user_permissions
@@ -3252,7 +3256,7 @@ ALTER TABLE ONLY public.auth_user_user_permissions
 
 
 --
--- Name: authtoken_token authtoken_token_user_id_35299eff_fk_auth_user_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: authtoken_token authtoken_token_user_id_35299eff_fk_auth_user_id; Type: FK CONSTRAINT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.authtoken_token
@@ -3260,7 +3264,7 @@ ALTER TABLE ONLY public.authtoken_token
 
 
 --
--- Name: django_admin_log django_admin_log_content_type_id_c4bce8eb_fk_django_co; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: django_admin_log django_admin_log_content_type_id_c4bce8eb_fk_django_co; Type: FK CONSTRAINT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.django_admin_log
@@ -3268,7 +3272,7 @@ ALTER TABLE ONLY public.django_admin_log
 
 
 --
--- Name: django_admin_log django_admin_log_user_id_c564eba6_fk_auth_user_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: django_admin_log django_admin_log_user_id_c564eba6_fk_auth_user_id; Type: FK CONSTRAINT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.django_admin_log
@@ -3276,7 +3280,7 @@ ALTER TABLE ONLY public.django_admin_log
 
 
 --
--- Name: reporting_common_costusagereportstatus reporting_common_cos_provider_id_f012c75a_fk_api_provi; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: reporting_common_costusagereportstatus reporting_common_cos_provider_id_f012c75a_fk_api_provi; Type: FK CONSTRAINT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.reporting_common_costusagereportstatus
@@ -3284,7 +3288,15 @@ ALTER TABLE ONLY public.reporting_common_costusagereportstatus
 
 
 --
--- Name: reporting_awscostentry reporting_awscostent_bill_id_017f27a3_fk_reporting; Type: FK CONSTRAINT; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awscostentrylineitem_daily_summary reporting_awscostent_account_alias_id_684d6c01_fk_reporting; Type: FK CONSTRAINT; Schema: testcustomer; Owner: kokuadmin
+--
+
+ALTER TABLE ONLY testcustomer.reporting_awscostentrylineitem_daily_summary
+    ADD CONSTRAINT reporting_awscostent_account_alias_id_684d6c01_fk_reporting FOREIGN KEY (account_alias_id) REFERENCES testcustomer.reporting_awsaccountalias(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: reporting_awscostentry reporting_awscostent_bill_id_017f27a3_fk_reporting; Type: FK CONSTRAINT; Schema: testcustomer; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY testcustomer.reporting_awscostentry
@@ -3292,7 +3304,7 @@ ALTER TABLE ONLY testcustomer.reporting_awscostentry
 
 
 --
--- Name: reporting_awscostentrylineitem reporting_awscostent_cost_entry_bill_id_5ae74e09_fk_reporting; Type: FK CONSTRAINT; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awscostentrylineitem reporting_awscostent_cost_entry_bill_id_5ae74e09_fk_reporting; Type: FK CONSTRAINT; Schema: testcustomer; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY testcustomer.reporting_awscostentrylineitem
@@ -3300,7 +3312,7 @@ ALTER TABLE ONLY testcustomer.reporting_awscostentrylineitem
 
 
 --
--- Name: reporting_awscostentrylineitem reporting_awscostent_cost_entry_id_4d1a7fc4_fk_reporting; Type: FK CONSTRAINT; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awscostentrylineitem reporting_awscostent_cost_entry_id_4d1a7fc4_fk_reporting; Type: FK CONSTRAINT; Schema: testcustomer; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY testcustomer.reporting_awscostentrylineitem
@@ -3308,7 +3320,7 @@ ALTER TABLE ONLY testcustomer.reporting_awscostentrylineitem
 
 
 --
--- Name: reporting_awscostentrylineitem_daily reporting_awscostent_cost_entry_pricing_i_5a6a9b38_fk_reporting; Type: FK CONSTRAINT; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awscostentrylineitem_daily reporting_awscostent_cost_entry_pricing_i_5a6a9b38_fk_reporting; Type: FK CONSTRAINT; Schema: testcustomer; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY testcustomer.reporting_awscostentrylineitem_daily
@@ -3316,7 +3328,7 @@ ALTER TABLE ONLY testcustomer.reporting_awscostentrylineitem_daily
 
 
 --
--- Name: reporting_awscostentrylineitem reporting_awscostent_cost_entry_pricing_i_a654a7e3_fk_reporting; Type: FK CONSTRAINT; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awscostentrylineitem reporting_awscostent_cost_entry_pricing_i_a654a7e3_fk_reporting; Type: FK CONSTRAINT; Schema: testcustomer; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY testcustomer.reporting_awscostentrylineitem
@@ -3324,7 +3336,7 @@ ALTER TABLE ONLY testcustomer.reporting_awscostentrylineitem
 
 
 --
--- Name: reporting_awscostentrylineitem reporting_awscostent_cost_entry_product_i_29c80210_fk_reporting; Type: FK CONSTRAINT; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awscostentrylineitem reporting_awscostent_cost_entry_product_i_29c80210_fk_reporting; Type: FK CONSTRAINT; Schema: testcustomer; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY testcustomer.reporting_awscostentrylineitem
@@ -3332,7 +3344,7 @@ ALTER TABLE ONLY testcustomer.reporting_awscostentrylineitem
 
 
 --
--- Name: reporting_awscostentrylineitem_daily reporting_awscostent_cost_entry_product_i_4d8ef2fd_fk_reporting; Type: FK CONSTRAINT; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awscostentrylineitem_daily reporting_awscostent_cost_entry_product_i_4d8ef2fd_fk_reporting; Type: FK CONSTRAINT; Schema: testcustomer; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY testcustomer.reporting_awscostentrylineitem_daily
@@ -3340,7 +3352,7 @@ ALTER TABLE ONLY testcustomer.reporting_awscostentrylineitem_daily
 
 
 --
--- Name: reporting_awscostentrylineitem_daily reporting_awscostent_cost_entry_reservati_13b1cb08_fk_reporting; Type: FK CONSTRAINT; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awscostentrylineitem_daily reporting_awscostent_cost_entry_reservati_13b1cb08_fk_reporting; Type: FK CONSTRAINT; Schema: testcustomer; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY testcustomer.reporting_awscostentrylineitem_daily
@@ -3348,7 +3360,7 @@ ALTER TABLE ONLY testcustomer.reporting_awscostentrylineitem_daily
 
 
 --
--- Name: reporting_awscostentrylineitem reporting_awscostent_cost_entry_reservati_9332b371_fk_reporting; Type: FK CONSTRAINT; Schema: testcustomer; Owner: postgres
+-- Name: reporting_awscostentrylineitem reporting_awscostent_cost_entry_reservati_9332b371_fk_reporting; Type: FK CONSTRAINT; Schema: testcustomer; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY testcustomer.reporting_awscostentrylineitem

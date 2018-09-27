@@ -71,7 +71,7 @@ class OrchestratorTest(MasuTestCase):
         account = orchestrator._accounts.pop()
         self.assertEqual(account.get('authentication'), 'arn:aws:iam::111111111111:role/CostManagement')
         self.assertEqual(account.get('billing_source'), 'test-bucket')
-        self.assertEqual(account.get('customer_name'), 'Test Customer')
+        self.assertEqual(account.get('customer_name'), 'acct10001org20002')
         self.assertEqual(account.get('provider_type'), AMAZON_WEB_SERVICES)
 
     @patch('masu.external.account_label.AccountLabel._set_labler', return_value=None)
@@ -133,7 +133,7 @@ class OrchestratorTest(MasuTestCase):
                              'billing_period_start': '2018-06-24 15:47:33.052509'}]
         mock_remover.return_value = expected_results
 
-        expected = 'INFO:masu.processor.orchestrator:Expired data removal queued - customer: Test Customer, Task ID: {}'
+        expected = 'INFO:masu.processor.orchestrator:Expired data removal queued - customer: acct10001org20002, Task ID: {}'
         logging.disable(logging.NOTSET) # We are currently disabling all logging below CRITICAL in masu/__init__.py
         with self.assertLogs('masu.processor.orchestrator', level='INFO') as logger:
             orchestrator = Orchestrator()

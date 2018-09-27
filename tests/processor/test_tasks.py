@@ -171,7 +171,7 @@ class ProcessReportFileTests(MasuTestCase):
         path = '{}/{}'.format(report_dir, 'file1.csv')
         request = {'report_path': path,
                    'compression': 'gzip',
-                   'schema_name': 'testcustomer',
+                   'schema_name': 'acct10001org20002',
                    'provider': 'AWS',
                    'provider_uuid': '6e212746-484a-40cd-bba0-09a19d132d64',
                    'start_date': str(datetime.today())}
@@ -446,5 +446,5 @@ class TestRemoveExpiredDataTasks(MasuTestCase):
 
         logging.disable(logging.NOTSET) # We are currently disabling all logging below CRITICAL in masu/__init__.py
         with self.assertLogs('masu.processor._tasks.remove_expired') as logger:
-            remove_expired_data(schema_name='testcustomer', provider='AWS', simulate=True)
+            remove_expired_data(schema_name='acct10001org20002', provider='AWS', simulate=True)
             self.assertIn(expected.format(str(expected_results)), logger.output)

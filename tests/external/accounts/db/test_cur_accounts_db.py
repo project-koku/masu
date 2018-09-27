@@ -38,6 +38,6 @@ class CURAccountsDBTest(MasuTestCase):
 
         self.assertEqual(account.get('authentication'), 'arn:aws:iam::111111111111:role/CostManagement')
         self.assertEqual(account.get('billing_source'), 'test-bucket')
-        self.assertEqual(account.get('customer_name'), 'Test Customer')
+        self.assertEqual(account.get('customer_name'), 'acct10001org20002')
         self.assertEqual(account.get('provider_type'), AMAZON_WEB_SERVICES)
         self.assertEqual(account.get('provider_uuid'), '6e212746-484a-40cd-bba0-09a19d132d64')

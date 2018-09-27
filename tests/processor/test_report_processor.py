@@ -35,7 +35,7 @@ class ReportProcessorTest(MasuTestCase):
 
     def test_initializer_aws(self):
         """Test to initializer for AWS"""
-        processor = ReportProcessor(schema_name='testcustomer',
+        processor = ReportProcessor(schema_name='acct10001org20002',
                                      report_path='/my/report/file',
                                      compression='GZIP',
                                      provider=AMAZON_WEB_SERVICES)
@@ -43,7 +43,7 @@ class ReportProcessorTest(MasuTestCase):
 
     def test_initializer_aws_local(self):
         """Test to initializer for AWS-local"""
-        processor = ReportProcessor(schema_name='testcustomer',
+        processor = ReportProcessor(schema_name='acct10001org20002',
                                      report_path='/my/report/file',
                                      compression='GZIP',
                                      provider=AWS_LOCAL_SERVICE_PROVIDER)
@@ -51,7 +51,7 @@ class ReportProcessorTest(MasuTestCase):
 
     def test_initializer_ocp(self):
         """Test to initializer for OCP"""
-        processor = ReportProcessor(schema_name='testcustomer',
+        processor = ReportProcessor(schema_name='acct10001org20002',
                                      report_path='/my/report/file',
                                      compression='PLAIN',
                                      provider=OPENSHIFT_CONTAINER_PLATFORM)
@@ -59,7 +59,7 @@ class ReportProcessorTest(MasuTestCase):
 
     def test_initializer_ocp_local(self):
         """Test to initializer for OCP-local"""
-        processor = ReportProcessor(schema_name='testcustomer',
+        processor = ReportProcessor(schema_name='acct10001org20002',
                                      report_path='/my/report/file',
                                      compression='PLAIN',
                                      provider=OCP_LOCAL_SERVICE_PROVIDER)
@@ -69,7 +69,7 @@ class ReportProcessorTest(MasuTestCase):
     def test_initializer_error(self, fake_processor):
         """Test to initializer with error."""
         with self.assertRaises(ReportProcessorError):
-            ReportProcessor(schema_name='testcustomer',
+            ReportProcessor(schema_name='acct10001org20002',
                             report_path='/my/report/file',
                             compression='GZIP',
                             provider=AMAZON_WEB_SERVICES)
@@ -77,7 +77,7 @@ class ReportProcessorTest(MasuTestCase):
     def test_initializer_invalid_provider(self):
         """Test to initializer with invalid provider"""
         with self.assertRaises(ReportProcessorError):
-            ReportProcessor(schema_name='testcustomer',
+            ReportProcessor(schema_name='acct10001org20002',
                             report_path='/my/report/file',
                             compression='GZIP',
                             provider='unknown')
@@ -85,7 +85,7 @@ class ReportProcessorTest(MasuTestCase):
     @patch('masu.processor.aws.aws_report_processor.AWSReportProcessor.process', return_value=None)
     def test_aws_process(self, fake_process):
         """Test to process for AWS"""
-        processor = ReportProcessor(schema_name='testcustomer',
+        processor = ReportProcessor(schema_name='acct10001org20002',
                                      report_path='/my/report/file',
                                      compression='GZIP',
                                      provider=AMAZON_WEB_SERVICES)
@@ -98,7 +98,7 @@ class ReportProcessorTest(MasuTestCase):
     def test_aws_process_error(self, fake_process):
         """Test to process for AWS with processing error"""
 
-        processor = ReportProcessor(schema_name='testcustomer',
+        processor = ReportProcessor(schema_name='acct10001org20002',
                                      report_path='/my/report/file',
                                      compression='GZIP',
                                      provider=AMAZON_WEB_SERVICES)
@@ -108,7 +108,7 @@ class ReportProcessorTest(MasuTestCase):
     @patch('masu.processor.aws.aws_report_processor.AWSReportProcessor.remove_temp_cur_files', return_value=None)
     def test_aws_remove_processed_files(self, fake_process):
         """Test to remove_processed_files for AWS"""
-        processor = ReportProcessor(schema_name='testcustomer',
+        processor = ReportProcessor(schema_name='acct10001org20002',
                                      report_path='/my/report/file',
                                      compression='GZIP',
                                      provider=AMAZON_WEB_SERVICES)
@@ -121,7 +121,7 @@ class ReportProcessorTest(MasuTestCase):
     def test_aws_remove_processed_files_error(self, fake_process):
         """Test to remove_processed_files for AWS with processing error"""
 
-        processor = ReportProcessor(schema_name='testcustomer',
+        processor = ReportProcessor(schema_name='acct10001org20002',
                                      report_path='/my/report/file',
                                      compression='GZIP',
                                      provider=AMAZON_WEB_SERVICES)
@@ -131,7 +131,7 @@ class ReportProcessorTest(MasuTestCase):
     @patch('masu.processor.aws.aws_report_processor.AWSReportProcessor.update_summary_tables', return_value=None)
     def test_aws_summarize_report_data(self, fake_process):
         """Test to summarize_report_data for AWS"""
-        processor = ReportProcessor(schema_name='testcustomer',
+        processor = ReportProcessor(schema_name='acct10001org20002',
                                      report_path='/my/report/file',
                                      compression='GZIP',
                                      provider=AMAZON_WEB_SERVICES)
@@ -144,7 +144,7 @@ class ReportProcessorTest(MasuTestCase):
     def test_aws_summarize_report_data_error(self, fake_process):
         """Test to summarize_report_data for AWS with processing error"""
 
-        processor = ReportProcessor(schema_name='testcustomer',
+        processor = ReportProcessor(schema_name='acct10001org20002',
                                      report_path='/my/report/file',
                                      compression='GZIP',
                                      provider=AMAZON_WEB_SERVICES)

@@ -33,7 +33,7 @@ class ReportDataTests(MasuTestCase):
     def test_get_report_data(self, mock_update):
         """Test the GET report_data endpoint."""
         start_date = datetime.date.today()
-        params = {'schema': 'testcustomer', 'start_date': start_date}
+        params = {'schema': 'acct10001org20002', 'start_date': start_date}
         query_string = urlencode(params)
         expected_key = 'Report Data Task ID'
 
@@ -71,7 +71,7 @@ class ReportDataTests(MasuTestCase):
     @patch('masu.processor.report_processor.ReportProcessor.summarize_report_data')
     def test_get_report_data_date_missing(self, mock_update):
         """Test GET report_data endpoint returns a 400 for missing date."""
-        params = {'schema': 'testcustomer'}
+        params = {'schema': 'acct10001org20002'}
         query_string = urlencode(params)
         expected_key = 'Error'
         expected_message = 'start_date is a required parameter.'
@@ -92,7 +92,7 @@ class ReportDataTests(MasuTestCase):
         start_date = datetime.date.today()
         end_date = start_date + datetime.timedelta(days=1)
         params = {
-            'schema': 'testcustomer',
+            'schema': 'acct10001org20002',
             'start_date': start_date,
             'end_date': end_date
         }

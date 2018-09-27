@@ -39,9 +39,9 @@ class AccountsAccessorTest(MasuTestCase):
         for account in account_objects:
             self.assertEqual(account.get('access_credential'), 'arn:aws:iam::111111111111:role/CostManagement')
             self.assertEqual(account.get('billing_source'), 'test-bucket')
-            self.assertEqual(account.get('customer_name'), 'Test Customer')
+            self.assertEqual(account.get('customer_name'), 'acct10001org20002')
             self.assertEqual(account.get('provider_type'), 'Test Provider')
-            self.assertEqual(account.get('schema_name'), 'testcustomer')
+            self.assertEqual(account.get('schema_name'), 'acct10001org20002')
 
     def test_invalid_source_specification(self):
         """Test that error is thrown with invalid account source."""

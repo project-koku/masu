@@ -111,9 +111,9 @@ class CURAccountsNetworkTest(MasuTestCase):
                       status=200)
         mock_authentication = "arn:aws:iam::999999999999:role/CostManagement"
         mock_billing_source = "cost-usage-bucket"
-        mock_customer_name = "Test Customer"
+        mock_customer_name = "acct10001org20002"
         mock_provider_type = "AWS"
-        mock_schema_name = "testcustomer"
+        mock_schema_name = "acct10001org20002"
 
         mock_response = {
             "count": 1,
@@ -180,9 +180,9 @@ class CURAccountsNetworkTest(MasuTestCase):
                       status=200)
         mock_authentication = "arn:aws:iam::999999999999:role/CostManagement"
         mock_billing_source = "cost-usage-bucket"
-        mock_customer_name = "Test Customer"
+        mock_customer_name = "acct10001org20002"
         mock_provider_type = "AWS"
-        mock_schema_name = "testcustomer"
+        mock_schema_name = "acct10001org20002"
 
         mock_response = {
             "count": 1,

@@ -16,13 +16,13 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
--- Name: testcustomer; Type: SCHEMA; Schema: -; Owner: kokuadmin
+-- Name: acct10001org20002; Type: SCHEMA; Schema: -; Owner: kokuadmin
 --
 
-CREATE SCHEMA testcustomer;
+CREATE SCHEMA acct10001org20002;
 
 
-ALTER SCHEMA testcustomer OWNER TO kokuadmin;
+ALTER SCHEMA acct10001org20002 OWNER TO kokuadmin;
 
 --
 -- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: 
@@ -43,19 +43,512 @@ SET default_tablespace = '';
 SET default_with_oids = false;
 
 --
+-- Name: django_migrations; Type: TABLE; Schema: acct10001org20002; Owner: kokuadmin
+--
+
+CREATE TABLE acct10001org20002.django_migrations (
+    id integer NOT NULL,
+    app character varying(255) NOT NULL,
+    name character varying(255) NOT NULL,
+    applied timestamp with time zone NOT NULL
+);
+
+
+ALTER TABLE acct10001org20002.django_migrations OWNER TO kokuadmin;
+
+--
+-- Name: django_migrations_id_seq; Type: SEQUENCE; Schema: acct10001org20002; Owner: kokuadmin
+--
+
+CREATE SEQUENCE acct10001org20002.django_migrations_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE acct10001org20002.django_migrations_id_seq OWNER TO kokuadmin;
+
+--
+-- Name: django_migrations_id_seq; Type: SEQUENCE OWNED BY; Schema: acct10001org20002; Owner: kokuadmin
+--
+
+ALTER SEQUENCE acct10001org20002.django_migrations_id_seq OWNED BY acct10001org20002.django_migrations.id;
+
+
+--
+-- Name: reporting_awsaccountalias; Type: TABLE; Schema: acct10001org20002; Owner: kokuadmin
+--
+
+CREATE TABLE acct10001org20002.reporting_awsaccountalias (
+    id integer NOT NULL,
+    account_id character varying(50) NOT NULL,
+    account_alias character varying(63)
+);
+
+
+ALTER TABLE acct10001org20002.reporting_awsaccountalias OWNER TO kokuadmin;
+
+--
+-- Name: reporting_awsaccountalias_id_seq; Type: SEQUENCE; Schema: acct10001org20002; Owner: kokuadmin
+--
+
+CREATE SEQUENCE acct10001org20002.reporting_awsaccountalias_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE acct10001org20002.reporting_awsaccountalias_id_seq OWNER TO kokuadmin;
+
+--
+-- Name: reporting_awsaccountalias_id_seq; Type: SEQUENCE OWNED BY; Schema: acct10001org20002; Owner: kokuadmin
+--
+
+ALTER SEQUENCE acct10001org20002.reporting_awsaccountalias_id_seq OWNED BY acct10001org20002.reporting_awsaccountalias.id;
+
+
+--
+-- Name: reporting_awscostentry; Type: TABLE; Schema: acct10001org20002; Owner: kokuadmin
+--
+
+CREATE TABLE acct10001org20002.reporting_awscostentry (
+    id integer NOT NULL,
+    interval_start timestamp with time zone NOT NULL,
+    interval_end timestamp with time zone NOT NULL,
+    bill_id integer NOT NULL
+);
+
+
+ALTER TABLE acct10001org20002.reporting_awscostentry OWNER TO kokuadmin;
+
+--
+-- Name: reporting_awscostentry_id_seq; Type: SEQUENCE; Schema: acct10001org20002; Owner: kokuadmin
+--
+
+CREATE SEQUENCE acct10001org20002.reporting_awscostentry_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE acct10001org20002.reporting_awscostentry_id_seq OWNER TO kokuadmin;
+
+--
+-- Name: reporting_awscostentry_id_seq; Type: SEQUENCE OWNED BY; Schema: acct10001org20002; Owner: kokuadmin
+--
+
+ALTER SEQUENCE acct10001org20002.reporting_awscostentry_id_seq OWNED BY acct10001org20002.reporting_awscostentry.id;
+
+
+--
+-- Name: reporting_awscostentrybill; Type: TABLE; Schema: acct10001org20002; Owner: kokuadmin
+--
+
+CREATE TABLE acct10001org20002.reporting_awscostentrybill (
+    id integer NOT NULL,
+    billing_resource character varying(50) NOT NULL,
+    bill_type character varying(50) NOT NULL,
+    payer_account_id character varying(50) NOT NULL,
+    billing_period_start timestamp with time zone NOT NULL,
+    billing_period_end timestamp with time zone NOT NULL
+);
+
+
+ALTER TABLE acct10001org20002.reporting_awscostentrybill OWNER TO kokuadmin;
+
+--
+-- Name: reporting_awscostentrybill_id_seq; Type: SEQUENCE; Schema: acct10001org20002; Owner: kokuadmin
+--
+
+CREATE SEQUENCE acct10001org20002.reporting_awscostentrybill_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE acct10001org20002.reporting_awscostentrybill_id_seq OWNER TO kokuadmin;
+
+--
+-- Name: reporting_awscostentrybill_id_seq; Type: SEQUENCE OWNED BY; Schema: acct10001org20002; Owner: kokuadmin
+--
+
+ALTER SEQUENCE acct10001org20002.reporting_awscostentrybill_id_seq OWNED BY acct10001org20002.reporting_awscostentrybill.id;
+
+
+--
+-- Name: reporting_awscostentrylineitem; Type: TABLE; Schema: acct10001org20002; Owner: kokuadmin
+--
+
+CREATE TABLE acct10001org20002.reporting_awscostentrylineitem (
+    id bigint NOT NULL,
+    hash text,
+    tags jsonb,
+    invoice_id character varying(63),
+    line_item_type character varying(50) NOT NULL,
+    usage_account_id character varying(50) NOT NULL,
+    usage_start timestamp with time zone NOT NULL,
+    usage_end timestamp with time zone NOT NULL,
+    product_code character varying(50) NOT NULL,
+    usage_type character varying(50),
+    operation character varying(50),
+    availability_zone character varying(50),
+    resource_id character varying(256),
+    usage_amount numeric(17,9),
+    normalization_factor double precision,
+    normalized_usage_amount numeric(17,9),
+    currency_code character varying(10) NOT NULL,
+    unblended_rate numeric(17,9),
+    unblended_cost numeric(17,9),
+    blended_rate numeric(17,9),
+    blended_cost numeric(17,9),
+    public_on_demand_cost numeric(17,9),
+    public_on_demand_rate numeric(17,9),
+    reservation_amortized_upfront_fee numeric(17,9),
+    reservation_amortized_upfront_cost_for_usage numeric(17,9),
+    reservation_recurring_fee_for_usage numeric(17,9),
+    reservation_unused_quantity numeric(17,9),
+    reservation_unused_recurring_fee numeric(17,9),
+    tax_type text,
+    cost_entry_id integer NOT NULL,
+    cost_entry_bill_id integer NOT NULL,
+    cost_entry_pricing_id integer,
+    cost_entry_product_id integer,
+    cost_entry_reservation_id integer
+);
+
+
+ALTER TABLE acct10001org20002.reporting_awscostentrylineitem OWNER TO kokuadmin;
+
+--
+-- Name: reporting_awscostentrylineitem_aggregates; Type: TABLE; Schema: acct10001org20002; Owner: kokuadmin
+--
+
+CREATE TABLE acct10001org20002.reporting_awscostentrylineitem_aggregates (
+    id integer NOT NULL,
+    time_scope_value integer NOT NULL,
+    report_type character varying(50) NOT NULL,
+    usage_account_id character varying(50),
+    product_code character varying(50) NOT NULL,
+    region character varying(50),
+    availability_zone character varying(50),
+    usage_amount numeric(17,9),
+    unblended_cost numeric(17,9),
+    resource_count integer
+);
+
+
+ALTER TABLE acct10001org20002.reporting_awscostentrylineitem_aggregates OWNER TO kokuadmin;
+
+--
+-- Name: reporting_awscostentrylineitem_aggregates_id_seq; Type: SEQUENCE; Schema: acct10001org20002; Owner: kokuadmin
+--
+
+CREATE SEQUENCE acct10001org20002.reporting_awscostentrylineitem_aggregates_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE acct10001org20002.reporting_awscostentrylineitem_aggregates_id_seq OWNER TO kokuadmin;
+
+--
+-- Name: reporting_awscostentrylineitem_aggregates_id_seq; Type: SEQUENCE OWNED BY; Schema: acct10001org20002; Owner: kokuadmin
+--
+
+ALTER SEQUENCE acct10001org20002.reporting_awscostentrylineitem_aggregates_id_seq OWNED BY acct10001org20002.reporting_awscostentrylineitem_aggregates.id;
+
+
+--
+-- Name: reporting_awscostentrylineitem_daily; Type: TABLE; Schema: acct10001org20002; Owner: kokuadmin
+--
+
+CREATE TABLE acct10001org20002.reporting_awscostentrylineitem_daily (
+    id bigint NOT NULL,
+    line_item_type character varying(50) NOT NULL,
+    usage_account_id character varying(50) NOT NULL,
+    usage_start timestamp with time zone NOT NULL,
+    usage_end timestamp with time zone,
+    product_code character varying(50) NOT NULL,
+    usage_type character varying(50),
+    operation character varying(50),
+    availability_zone character varying(50),
+    resource_id character varying(256),
+    usage_amount double precision,
+    normalization_factor double precision,
+    normalized_usage_amount double precision,
+    currency_code character varying(10) NOT NULL,
+    unblended_rate numeric(17,9),
+    unblended_cost numeric(17,9),
+    blended_rate numeric(17,9),
+    blended_cost numeric(17,9),
+    public_on_demand_cost numeric(17,9),
+    public_on_demand_rate numeric(17,9),
+    tax_type text,
+    tags jsonb,
+    cost_entry_pricing_id integer,
+    cost_entry_product_id integer,
+    cost_entry_reservation_id integer
+);
+
+
+ALTER TABLE acct10001org20002.reporting_awscostentrylineitem_daily OWNER TO kokuadmin;
+
+--
+-- Name: reporting_awscostentrylineitem_daily_id_seq; Type: SEQUENCE; Schema: acct10001org20002; Owner: kokuadmin
+--
+
+CREATE SEQUENCE acct10001org20002.reporting_awscostentrylineitem_daily_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE acct10001org20002.reporting_awscostentrylineitem_daily_id_seq OWNER TO kokuadmin;
+
+--
+-- Name: reporting_awscostentrylineitem_daily_id_seq; Type: SEQUENCE OWNED BY; Schema: acct10001org20002; Owner: kokuadmin
+--
+
+ALTER SEQUENCE acct10001org20002.reporting_awscostentrylineitem_daily_id_seq OWNED BY acct10001org20002.reporting_awscostentrylineitem_daily.id;
+
+
+--
+-- Name: reporting_awscostentrylineitem_daily_summary; Type: TABLE; Schema: acct10001org20002; Owner: kokuadmin
+--
+
+CREATE TABLE acct10001org20002.reporting_awscostentrylineitem_daily_summary (
+    id bigint NOT NULL,
+    usage_start timestamp with time zone NOT NULL,
+    usage_end timestamp with time zone,
+    usage_account_id character varying(50) NOT NULL,
+    product_code character varying(50) NOT NULL,
+    product_family character varying(150),
+    availability_zone character varying(50),
+    region character varying(50),
+    instance_type character varying(50),
+    unit character varying(63),
+    resource_count integer,
+    usage_amount double precision,
+    normalization_factor double precision,
+    normalized_usage_amount double precision,
+    currency_code character varying(10) NOT NULL,
+    unblended_rate numeric(17,9),
+    unblended_cost numeric(17,9),
+    blended_rate numeric(17,9),
+    blended_cost numeric(17,9),
+    public_on_demand_cost numeric(17,9),
+    public_on_demand_rate numeric(17,9),
+    tax_type text,
+    account_alias_id integer
+);
+
+
+ALTER TABLE acct10001org20002.reporting_awscostentrylineitem_daily_summary OWNER TO kokuadmin;
+
+--
+-- Name: reporting_awscostentrylineitem_daily_summary_id_seq; Type: SEQUENCE; Schema: acct10001org20002; Owner: kokuadmin
+--
+
+CREATE SEQUENCE acct10001org20002.reporting_awscostentrylineitem_daily_summary_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE acct10001org20002.reporting_awscostentrylineitem_daily_summary_id_seq OWNER TO kokuadmin;
+
+--
+-- Name: reporting_awscostentrylineitem_daily_summary_id_seq; Type: SEQUENCE OWNED BY; Schema: acct10001org20002; Owner: kokuadmin
+--
+
+ALTER SEQUENCE acct10001org20002.reporting_awscostentrylineitem_daily_summary_id_seq OWNED BY acct10001org20002.reporting_awscostentrylineitem_daily_summary.id;
+
+
+--
+-- Name: reporting_awscostentrylineitem_id_seq; Type: SEQUENCE; Schema: acct10001org20002; Owner: kokuadmin
+--
+
+CREATE SEQUENCE acct10001org20002.reporting_awscostentrylineitem_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE acct10001org20002.reporting_awscostentrylineitem_id_seq OWNER TO kokuadmin;
+
+--
+-- Name: reporting_awscostentrylineitem_id_seq; Type: SEQUENCE OWNED BY; Schema: acct10001org20002; Owner: kokuadmin
+--
+
+ALTER SEQUENCE acct10001org20002.reporting_awscostentrylineitem_id_seq OWNED BY acct10001org20002.reporting_awscostentrylineitem.id;
+
+
+--
+-- Name: reporting_awscostentrypricing; Type: TABLE; Schema: acct10001org20002; Owner: kokuadmin
+--
+
+CREATE TABLE acct10001org20002.reporting_awscostentrypricing (
+    id integer NOT NULL,
+    term character varying(63),
+    unit character varying(63)
+);
+
+
+ALTER TABLE acct10001org20002.reporting_awscostentrypricing OWNER TO kokuadmin;
+
+--
+-- Name: reporting_awscostentrypricing_id_seq; Type: SEQUENCE; Schema: acct10001org20002; Owner: kokuadmin
+--
+
+CREATE SEQUENCE acct10001org20002.reporting_awscostentrypricing_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE acct10001org20002.reporting_awscostentrypricing_id_seq OWNER TO kokuadmin;
+
+--
+-- Name: reporting_awscostentrypricing_id_seq; Type: SEQUENCE OWNED BY; Schema: acct10001org20002; Owner: kokuadmin
+--
+
+ALTER SEQUENCE acct10001org20002.reporting_awscostentrypricing_id_seq OWNED BY acct10001org20002.reporting_awscostentrypricing.id;
+
+
+--
+-- Name: reporting_awscostentryproduct; Type: TABLE; Schema: acct10001org20002; Owner: kokuadmin
+--
+
+CREATE TABLE acct10001org20002.reporting_awscostentryproduct (
+    id integer NOT NULL,
+    sku character varying(128),
+    product_name character varying(63),
+    product_family character varying(150),
+    service_code character varying(50),
+    region character varying(50),
+    instance_type character varying(50),
+    memory double precision,
+    memory_unit character varying(24),
+    vcpu integer,
+    CONSTRAINT reporting_awscostentryproduct_vcpu_check CHECK ((vcpu >= 0))
+);
+
+
+ALTER TABLE acct10001org20002.reporting_awscostentryproduct OWNER TO kokuadmin;
+
+--
+-- Name: reporting_awscostentryproduct_id_seq; Type: SEQUENCE; Schema: acct10001org20002; Owner: kokuadmin
+--
+
+CREATE SEQUENCE acct10001org20002.reporting_awscostentryproduct_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE acct10001org20002.reporting_awscostentryproduct_id_seq OWNER TO kokuadmin;
+
+--
+-- Name: reporting_awscostentryproduct_id_seq; Type: SEQUENCE OWNED BY; Schema: acct10001org20002; Owner: kokuadmin
+--
+
+ALTER SEQUENCE acct10001org20002.reporting_awscostentryproduct_id_seq OWNED BY acct10001org20002.reporting_awscostentryproduct.id;
+
+
+--
+-- Name: reporting_awscostentryreservation; Type: TABLE; Schema: acct10001org20002; Owner: kokuadmin
+--
+
+CREATE TABLE acct10001org20002.reporting_awscostentryreservation (
+    id integer NOT NULL,
+    reservation_arn text NOT NULL,
+    number_of_reservations integer,
+    units_per_reservation numeric(17,9),
+    start_time timestamp with time zone,
+    end_time timestamp with time zone,
+    CONSTRAINT reporting_awscostentryreservation_number_of_reservations_check CHECK ((number_of_reservations >= 0))
+);
+
+
+ALTER TABLE acct10001org20002.reporting_awscostentryreservation OWNER TO kokuadmin;
+
+--
+-- Name: reporting_awscostentryreservation_id_seq; Type: SEQUENCE; Schema: acct10001org20002; Owner: kokuadmin
+--
+
+CREATE SEQUENCE acct10001org20002.reporting_awscostentryreservation_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE acct10001org20002.reporting_awscostentryreservation_id_seq OWNER TO kokuadmin;
+
+--
+-- Name: reporting_awscostentryreservation_id_seq; Type: SEQUENCE OWNED BY; Schema: acct10001org20002; Owner: kokuadmin
+--
+
+ALTER SEQUENCE acct10001org20002.reporting_awscostentryreservation_id_seq OWNED BY acct10001org20002.reporting_awscostentryreservation.id;
+
+
+--
 -- Name: api_customer; Type: TABLE; Schema: public; Owner: kokuadmin
 --
 
 CREATE TABLE public.api_customer (
-    group_ptr_id integer NOT NULL,
+    id integer NOT NULL,
     date_created timestamp with time zone NOT NULL,
-    owner_id integer,
     uuid uuid NOT NULL,
+    account_id character varying(150),
+    org_id character varying(150),
     schema_name text NOT NULL
 );
 
 
 ALTER TABLE public.api_customer OWNER TO kokuadmin;
+
+--
+-- Name: api_customer_id_seq; Type: SEQUENCE; Schema: public; Owner: kokuadmin
+--
+
+CREATE SEQUENCE public.api_customer_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.api_customer_id_seq OWNER TO kokuadmin;
+
+--
+-- Name: api_customer_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: kokuadmin
+--
+
+ALTER SEQUENCE public.api_customer_id_seq OWNED BY public.api_customer.id;
+
 
 --
 -- Name: api_provider; Type: TABLE; Schema: public; Owner: kokuadmin
@@ -66,11 +559,11 @@ CREATE TABLE public.api_provider (
     uuid uuid NOT NULL,
     name character varying(256) NOT NULL,
     type character varying(50) NOT NULL,
+    setup_complete boolean NOT NULL,
     authentication_id integer,
     billing_source_id integer,
     created_by_id integer,
-    customer_id integer,
-    setup_complete boolean NOT NULL
+    customer_id integer
 );
 
 
@@ -166,42 +659,6 @@ ALTER SEQUENCE public.api_providerbillingsource_id_seq OWNED BY public.api_provi
 
 
 --
--- Name: api_resettoken; Type: TABLE; Schema: public; Owner: kokuadmin
---
-
-CREATE TABLE public.api_resettoken (
-    id integer NOT NULL,
-    token uuid NOT NULL,
-    expiration_date timestamp with time zone NOT NULL,
-    used boolean NOT NULL,
-    user_id integer NOT NULL
-);
-
-
-ALTER TABLE public.api_resettoken OWNER TO kokuadmin;
-
---
--- Name: api_resettoken_id_seq; Type: SEQUENCE; Schema: public; Owner: kokuadmin
---
-
-CREATE SEQUENCE public.api_resettoken_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.api_resettoken_id_seq OWNER TO kokuadmin;
-
---
--- Name: api_resettoken_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: kokuadmin
---
-
-ALTER SEQUENCE public.api_resettoken_id_seq OWNED BY public.api_resettoken.id;
-
-
---
 -- Name: api_tenant; Type: TABLE; Schema: public; Owner: kokuadmin
 --
 
@@ -239,12 +696,38 @@ ALTER SEQUENCE public.api_tenant_id_seq OWNED BY public.api_tenant.id;
 --
 
 CREATE TABLE public.api_user (
-    user_ptr_id integer NOT NULL,
-    uuid uuid NOT NULL
+    id integer NOT NULL,
+    uuid uuid NOT NULL,
+    username character varying(150) NOT NULL,
+    email character varying(254) NOT NULL,
+    date_created timestamp with time zone NOT NULL,
+    is_active boolean,
+    customer_id integer
 );
 
 
 ALTER TABLE public.api_user OWNER TO kokuadmin;
+
+--
+-- Name: api_user_id_seq; Type: SEQUENCE; Schema: public; Owner: kokuadmin
+--
+
+CREATE SEQUENCE public.api_user_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.api_user_id_seq OWNER TO kokuadmin;
+
+--
+-- Name: api_user_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: kokuadmin
+--
+
+ALTER SEQUENCE public.api_user_id_seq OWNED BY public.api_user.id;
+
 
 --
 -- Name: api_userpreference; Type: TABLE; Schema: public; Owner: kokuadmin
@@ -254,9 +737,9 @@ CREATE TABLE public.api_userpreference (
     id integer NOT NULL,
     uuid uuid NOT NULL,
     preference jsonb NOT NULL,
-    user_id integer NOT NULL,
+    name character varying(255) NOT NULL,
     description character varying(255),
-    name character varying(255) NOT NULL
+    user_id integer NOT NULL
 );
 
 
@@ -494,19 +977,6 @@ ALTER TABLE public.auth_user_user_permissions_id_seq OWNER TO kokuadmin;
 
 ALTER SEQUENCE public.auth_user_user_permissions_id_seq OWNED BY public.auth_user_user_permissions.id;
 
-
---
--- Name: authtoken_token; Type: TABLE; Schema: public; Owner: kokuadmin
---
-
-CREATE TABLE public.authtoken_token (
-    key character varying(40) NOT NULL,
-    created timestamp with time zone NOT NULL,
-    user_id integer NOT NULL
-);
-
-
-ALTER TABLE public.authtoken_token OWNER TO kokuadmin;
 
 --
 -- Name: django_admin_log; Type: TABLE; Schema: public; Owner: kokuadmin
@@ -775,474 +1245,87 @@ ALTER SEQUENCE public.si_unit_scale_id_seq OWNED BY public.si_unit_scale.id;
 
 
 --
--- Name: django_migrations; Type: TABLE; Schema: testcustomer; Owner: kokuadmin
+-- Name: django_migrations id; Type: DEFAULT; Schema: acct10001org20002; Owner: kokuadmin
 --
 
-CREATE TABLE testcustomer.django_migrations (
-    id integer NOT NULL,
-    app character varying(255) NOT NULL,
-    name character varying(255) NOT NULL,
-    applied timestamp with time zone NOT NULL
-);
+ALTER TABLE ONLY acct10001org20002.django_migrations ALTER COLUMN id SET DEFAULT nextval('acct10001org20002.django_migrations_id_seq'::regclass);
 
 
-ALTER TABLE testcustomer.django_migrations OWNER TO kokuadmin;
-
---
--- Name: django_migrations_id_seq; Type: SEQUENCE; Schema: testcustomer; Owner: kokuadmin
---
-
-CREATE SEQUENCE testcustomer.django_migrations_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE testcustomer.django_migrations_id_seq OWNER TO kokuadmin;
-
---
--- Name: django_migrations_id_seq; Type: SEQUENCE OWNED BY; Schema: testcustomer; Owner: kokuadmin
---
-
-ALTER SEQUENCE testcustomer.django_migrations_id_seq OWNED BY testcustomer.django_migrations.id;
-
-
---
--- Name: reporting_awsaccountalias; Type: TABLE; Schema: testcustomer; Owner: kokuadmin
---
-
-CREATE TABLE testcustomer.reporting_awsaccountalias (
-    id integer NOT NULL,
-    account_id character varying(50) NOT NULL,
-    account_alias character varying(63)
-);
-
-
-ALTER TABLE testcustomer.reporting_awsaccountalias OWNER TO kokuadmin;
-
---
--- Name: reporting_awsaccountalias_id_seq; Type: SEQUENCE; Schema: testcustomer; Owner: kokuadmin
---
-
-CREATE SEQUENCE testcustomer.reporting_awsaccountalias_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE testcustomer.reporting_awsaccountalias_id_seq OWNER TO kokuadmin;
-
---
--- Name: reporting_awsaccountalias_id_seq; Type: SEQUENCE OWNED BY; Schema: testcustomer; Owner: kokuadmin
---
-
-ALTER SEQUENCE testcustomer.reporting_awsaccountalias_id_seq OWNED BY testcustomer.reporting_awsaccountalias.id;
-
-
---
--- Name: reporting_awscostentry; Type: TABLE; Schema: testcustomer; Owner: kokuadmin
---
-
-CREATE TABLE testcustomer.reporting_awscostentry (
-    id integer NOT NULL,
-    interval_start timestamp with time zone NOT NULL,
-    interval_end timestamp with time zone NOT NULL,
-    bill_id integer NOT NULL
-);
-
-
-ALTER TABLE testcustomer.reporting_awscostentry OWNER TO kokuadmin;
-
---
--- Name: reporting_awscostentry_id_seq; Type: SEQUENCE; Schema: testcustomer; Owner: kokuadmin
---
-
-CREATE SEQUENCE testcustomer.reporting_awscostentry_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE testcustomer.reporting_awscostentry_id_seq OWNER TO kokuadmin;
-
---
--- Name: reporting_awscostentry_id_seq; Type: SEQUENCE OWNED BY; Schema: testcustomer; Owner: kokuadmin
---
-
-ALTER SEQUENCE testcustomer.reporting_awscostentry_id_seq OWNED BY testcustomer.reporting_awscostentry.id;
-
-
---
--- Name: reporting_awscostentrybill; Type: TABLE; Schema: testcustomer; Owner: kokuadmin
---
-
-CREATE TABLE testcustomer.reporting_awscostentrybill (
-    id integer NOT NULL,
-    billing_resource character varying(50) NOT NULL,
-    bill_type character varying(50) NOT NULL,
-    payer_account_id character varying(50) NOT NULL,
-    billing_period_start timestamp with time zone NOT NULL,
-    billing_period_end timestamp with time zone NOT NULL
-);
-
-
-ALTER TABLE testcustomer.reporting_awscostentrybill OWNER TO kokuadmin;
-
---
--- Name: reporting_awscostentrybill_id_seq; Type: SEQUENCE; Schema: testcustomer; Owner: kokuadmin
---
-
-CREATE SEQUENCE testcustomer.reporting_awscostentrybill_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE testcustomer.reporting_awscostentrybill_id_seq OWNER TO kokuadmin;
-
---
--- Name: reporting_awscostentrybill_id_seq; Type: SEQUENCE OWNED BY; Schema: testcustomer; Owner: kokuadmin
---
-
-ALTER SEQUENCE testcustomer.reporting_awscostentrybill_id_seq OWNED BY testcustomer.reporting_awscostentrybill.id;
-
-
 --
--- Name: reporting_awscostentrylineitem; Type: TABLE; Schema: testcustomer; Owner: kokuadmin
+-- Name: reporting_awsaccountalias id; Type: DEFAULT; Schema: acct10001org20002; Owner: kokuadmin
 --
 
-CREATE TABLE testcustomer.reporting_awscostentrylineitem (
-    id bigint NOT NULL,
-    tags jsonb,
-    invoice_id character varying(63),
-    line_item_type character varying(50) NOT NULL,
-    usage_account_id character varying(50) NOT NULL,
-    usage_start timestamp with time zone NOT NULL,
-    usage_end timestamp with time zone NOT NULL,
-    product_code character varying(50) NOT NULL,
-    usage_type character varying(50),
-    operation character varying(50),
-    availability_zone character varying(50),
-    resource_id character varying(256),
-    usage_amount numeric(17,9),
-    normalization_factor double precision,
-    normalized_usage_amount numeric(17,9),
-    currency_code character varying(10) NOT NULL,
-    unblended_rate numeric(17,9),
-    unblended_cost numeric(17,9),
-    blended_rate numeric(17,9),
-    blended_cost numeric(17,9),
-    tax_type text,
-    cost_entry_id integer NOT NULL,
-    cost_entry_bill_id integer NOT NULL,
-    cost_entry_pricing_id integer,
-    cost_entry_product_id integer,
-    cost_entry_reservation_id integer,
-    hash text,
-    public_on_demand_cost numeric(17,9),
-    public_on_demand_rate numeric(17,9),
-    reservation_amortized_upfront_cost_for_usage numeric(17,9),
-    reservation_amortized_upfront_fee numeric(17,9),
-    reservation_recurring_fee_for_usage numeric(17,9),
-    reservation_unused_quantity numeric(17,9),
-    reservation_unused_recurring_fee numeric(17,9)
-);
+ALTER TABLE ONLY acct10001org20002.reporting_awsaccountalias ALTER COLUMN id SET DEFAULT nextval('acct10001org20002.reporting_awsaccountalias_id_seq'::regclass);
 
 
-ALTER TABLE testcustomer.reporting_awscostentrylineitem OWNER TO kokuadmin;
-
---
--- Name: reporting_awscostentrylineitem_aggregates; Type: TABLE; Schema: testcustomer; Owner: kokuadmin
---
-
-CREATE TABLE testcustomer.reporting_awscostentrylineitem_aggregates (
-    id integer NOT NULL,
-    time_scope_value integer NOT NULL,
-    report_type character varying(50) NOT NULL,
-    usage_account_id character varying(50),
-    product_code character varying(50) NOT NULL,
-    region character varying(50),
-    availability_zone character varying(50),
-    usage_amount numeric(17,9),
-    unblended_cost numeric(17,9),
-    resource_count integer
-);
-
-
-ALTER TABLE testcustomer.reporting_awscostentrylineitem_aggregates OWNER TO kokuadmin;
-
---
--- Name: reporting_awscostentrylineitem_aggregates_id_seq; Type: SEQUENCE; Schema: testcustomer; Owner: kokuadmin
---
-
-CREATE SEQUENCE testcustomer.reporting_awscostentrylineitem_aggregates_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE testcustomer.reporting_awscostentrylineitem_aggregates_id_seq OWNER TO kokuadmin;
-
---
--- Name: reporting_awscostentrylineitem_aggregates_id_seq; Type: SEQUENCE OWNED BY; Schema: testcustomer; Owner: kokuadmin
---
-
-ALTER SEQUENCE testcustomer.reporting_awscostentrylineitem_aggregates_id_seq OWNED BY testcustomer.reporting_awscostentrylineitem_aggregates.id;
-
-
---
--- Name: reporting_awscostentrylineitem_daily; Type: TABLE; Schema: testcustomer; Owner: kokuadmin
---
-
-CREATE TABLE testcustomer.reporting_awscostentrylineitem_daily (
-    id bigint NOT NULL,
-    line_item_type character varying(50) NOT NULL,
-    usage_account_id character varying(50) NOT NULL,
-    usage_start timestamp with time zone NOT NULL,
-    product_code character varying(50) NOT NULL,
-    usage_type character varying(50),
-    operation character varying(50),
-    availability_zone character varying(50),
-    resource_id character varying(256),
-    usage_amount double precision,
-    normalization_factor double precision,
-    normalized_usage_amount double precision,
-    currency_code character varying(10) NOT NULL,
-    unblended_rate numeric(17,9),
-    unblended_cost numeric(17,9),
-    blended_rate numeric(17,9),
-    blended_cost numeric(17,9),
-    public_on_demand_cost numeric(17,9),
-    public_on_demand_rate numeric(17,9),
-    tax_type text,
-    tags jsonb,
-    cost_entry_pricing_id integer,
-    cost_entry_product_id integer,
-    cost_entry_reservation_id integer,
-    usage_end timestamp with time zone
-);
-
-
-ALTER TABLE testcustomer.reporting_awscostentrylineitem_daily OWNER TO kokuadmin;
-
---
--- Name: reporting_awscostentrylineitem_daily_id_seq; Type: SEQUENCE; Schema: testcustomer; Owner: kokuadmin
---
-
-CREATE SEQUENCE testcustomer.reporting_awscostentrylineitem_daily_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE testcustomer.reporting_awscostentrylineitem_daily_id_seq OWNER TO kokuadmin;
-
---
--- Name: reporting_awscostentrylineitem_daily_id_seq; Type: SEQUENCE OWNED BY; Schema: testcustomer; Owner: kokuadmin
---
-
-ALTER SEQUENCE testcustomer.reporting_awscostentrylineitem_daily_id_seq OWNED BY testcustomer.reporting_awscostentrylineitem_daily.id;
-
-
---
--- Name: reporting_awscostentrylineitem_daily_summary; Type: TABLE; Schema: testcustomer; Owner: kokuadmin
---
-
-CREATE TABLE testcustomer.reporting_awscostentrylineitem_daily_summary (
-    id bigint NOT NULL,
-    usage_start timestamp with time zone NOT NULL,
-    usage_account_id character varying(50) NOT NULL,
-    product_code character varying(50) NOT NULL,
-    product_family character varying(150),
-    availability_zone character varying(50),
-    region character varying(50),
-    instance_type character varying(50),
-    unit character varying(63),
-    resource_count integer,
-    usage_amount double precision,
-    normalization_factor double precision,
-    normalized_usage_amount double precision,
-    currency_code character varying(10) NOT NULL,
-    unblended_rate numeric(17,9),
-    unblended_cost numeric(17,9),
-    blended_rate numeric(17,9),
-    blended_cost numeric(17,9),
-    public_on_demand_cost numeric(17,9),
-    public_on_demand_rate numeric(17,9),
-    tax_type text,
-    usage_end timestamp with time zone,
-    account_alias_id integer
-);
-
-
-ALTER TABLE testcustomer.reporting_awscostentrylineitem_daily_summary OWNER TO kokuadmin;
-
---
--- Name: reporting_awscostentrylineitem_daily_summary_id_seq; Type: SEQUENCE; Schema: testcustomer; Owner: kokuadmin
---
-
-CREATE SEQUENCE testcustomer.reporting_awscostentrylineitem_daily_summary_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE testcustomer.reporting_awscostentrylineitem_daily_summary_id_seq OWNER TO kokuadmin;
-
---
--- Name: reporting_awscostentrylineitem_daily_summary_id_seq; Type: SEQUENCE OWNED BY; Schema: testcustomer; Owner: kokuadmin
 --
-
-ALTER SEQUENCE testcustomer.reporting_awscostentrylineitem_daily_summary_id_seq OWNED BY testcustomer.reporting_awscostentrylineitem_daily_summary.id;
-
-
---
--- Name: reporting_awscostentrylineitem_id_seq; Type: SEQUENCE; Schema: testcustomer; Owner: kokuadmin
---
-
-CREATE SEQUENCE testcustomer.reporting_awscostentrylineitem_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE testcustomer.reporting_awscostentrylineitem_id_seq OWNER TO kokuadmin;
-
---
--- Name: reporting_awscostentrylineitem_id_seq; Type: SEQUENCE OWNED BY; Schema: testcustomer; Owner: kokuadmin
+-- Name: reporting_awscostentry id; Type: DEFAULT; Schema: acct10001org20002; Owner: kokuadmin
 --
 
-ALTER SEQUENCE testcustomer.reporting_awscostentrylineitem_id_seq OWNED BY testcustomer.reporting_awscostentrylineitem.id;
+ALTER TABLE ONLY acct10001org20002.reporting_awscostentry ALTER COLUMN id SET DEFAULT nextval('acct10001org20002.reporting_awscostentry_id_seq'::regclass);
 
 
 --
--- Name: reporting_awscostentrypricing; Type: TABLE; Schema: testcustomer; Owner: kokuadmin
+-- Name: reporting_awscostentrybill id; Type: DEFAULT; Schema: acct10001org20002; Owner: kokuadmin
 --
 
-CREATE TABLE testcustomer.reporting_awscostentrypricing (
-    id integer NOT NULL,
-    term character varying(63),
-    unit character varying(63)
-);
+ALTER TABLE ONLY acct10001org20002.reporting_awscostentrybill ALTER COLUMN id SET DEFAULT nextval('acct10001org20002.reporting_awscostentrybill_id_seq'::regclass);
 
 
-ALTER TABLE testcustomer.reporting_awscostentrypricing OWNER TO kokuadmin;
-
 --
--- Name: reporting_awscostentrypricing_id_seq; Type: SEQUENCE; Schema: testcustomer; Owner: kokuadmin
+-- Name: reporting_awscostentrylineitem id; Type: DEFAULT; Schema: acct10001org20002; Owner: kokuadmin
 --
-
-CREATE SEQUENCE testcustomer.reporting_awscostentrypricing_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
 
+ALTER TABLE ONLY acct10001org20002.reporting_awscostentrylineitem ALTER COLUMN id SET DEFAULT nextval('acct10001org20002.reporting_awscostentrylineitem_id_seq'::regclass);
 
-ALTER TABLE testcustomer.reporting_awscostentrypricing_id_seq OWNER TO kokuadmin;
 
 --
--- Name: reporting_awscostentrypricing_id_seq; Type: SEQUENCE OWNED BY; Schema: testcustomer; Owner: kokuadmin
+-- Name: reporting_awscostentrylineitem_aggregates id; Type: DEFAULT; Schema: acct10001org20002; Owner: kokuadmin
 --
 
-ALTER SEQUENCE testcustomer.reporting_awscostentrypricing_id_seq OWNED BY testcustomer.reporting_awscostentrypricing.id;
+ALTER TABLE ONLY acct10001org20002.reporting_awscostentrylineitem_aggregates ALTER COLUMN id SET DEFAULT nextval('acct10001org20002.reporting_awscostentrylineitem_aggregates_id_seq'::regclass);
 
 
 --
--- Name: reporting_awscostentryproduct; Type: TABLE; Schema: testcustomer; Owner: kokuadmin
+-- Name: reporting_awscostentrylineitem_daily id; Type: DEFAULT; Schema: acct10001org20002; Owner: kokuadmin
 --
 
-CREATE TABLE testcustomer.reporting_awscostentryproduct (
-    id integer NOT NULL,
-    sku character varying(128),
-    product_name character varying(63),
-    product_family character varying(150),
-    service_code character varying(50),
-    region character varying(50),
-    instance_type character varying(50),
-    memory double precision,
-    vcpu integer,
-    memory_unit character varying(24),
-    CONSTRAINT reporting_awscostentryproduct_vcpu_check CHECK ((vcpu >= 0))
-);
+ALTER TABLE ONLY acct10001org20002.reporting_awscostentrylineitem_daily ALTER COLUMN id SET DEFAULT nextval('acct10001org20002.reporting_awscostentrylineitem_daily_id_seq'::regclass);
 
 
-ALTER TABLE testcustomer.reporting_awscostentryproduct OWNER TO kokuadmin;
-
 --
--- Name: reporting_awscostentryproduct_id_seq; Type: SEQUENCE; Schema: testcustomer; Owner: kokuadmin
+-- Name: reporting_awscostentrylineitem_daily_summary id; Type: DEFAULT; Schema: acct10001org20002; Owner: kokuadmin
 --
-
-CREATE SEQUENCE testcustomer.reporting_awscostentryproduct_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
 
+ALTER TABLE ONLY acct10001org20002.reporting_awscostentrylineitem_daily_summary ALTER COLUMN id SET DEFAULT nextval('acct10001org20002.reporting_awscostentrylineitem_daily_summary_id_seq'::regclass);
 
-ALTER TABLE testcustomer.reporting_awscostentryproduct_id_seq OWNER TO kokuadmin;
 
 --
--- Name: reporting_awscostentryproduct_id_seq; Type: SEQUENCE OWNED BY; Schema: testcustomer; Owner: kokuadmin
+-- Name: reporting_awscostentrypricing id; Type: DEFAULT; Schema: acct10001org20002; Owner: kokuadmin
 --
 
-ALTER SEQUENCE testcustomer.reporting_awscostentryproduct_id_seq OWNED BY testcustomer.reporting_awscostentryproduct.id;
+ALTER TABLE ONLY acct10001org20002.reporting_awscostentrypricing ALTER COLUMN id SET DEFAULT nextval('acct10001org20002.reporting_awscostentrypricing_id_seq'::regclass);
 
 
 --
--- Name: reporting_awscostentryreservation; Type: TABLE; Schema: testcustomer; Owner: kokuadmin
+-- Name: reporting_awscostentryproduct id; Type: DEFAULT; Schema: acct10001org20002; Owner: kokuadmin
 --
 
-CREATE TABLE testcustomer.reporting_awscostentryreservation (
-    id integer NOT NULL,
-    reservation_arn text NOT NULL,
-    number_of_reservations integer,
-    units_per_reservation numeric(17,9),
-    start_time timestamp with time zone,
-    end_time timestamp with time zone,
-    CONSTRAINT reporting_awscostentryreservation_number_of_reservations_check CHECK ((number_of_reservations >= 0))
-);
+ALTER TABLE ONLY acct10001org20002.reporting_awscostentryproduct ALTER COLUMN id SET DEFAULT nextval('acct10001org20002.reporting_awscostentryproduct_id_seq'::regclass);
 
 
-ALTER TABLE testcustomer.reporting_awscostentryreservation OWNER TO kokuadmin;
-
 --
--- Name: reporting_awscostentryreservation_id_seq; Type: SEQUENCE; Schema: testcustomer; Owner: kokuadmin
+-- Name: reporting_awscostentryreservation id; Type: DEFAULT; Schema: acct10001org20002; Owner: kokuadmin
 --
-
-CREATE SEQUENCE testcustomer.reporting_awscostentryreservation_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
 
+ALTER TABLE ONLY acct10001org20002.reporting_awscostentryreservation ALTER COLUMN id SET DEFAULT nextval('acct10001org20002.reporting_awscostentryreservation_id_seq'::regclass);
 
-ALTER TABLE testcustomer.reporting_awscostentryreservation_id_seq OWNER TO kokuadmin;
 
 --
--- Name: reporting_awscostentryreservation_id_seq; Type: SEQUENCE OWNED BY; Schema: testcustomer; Owner: kokuadmin
+-- Name: api_customer id; Type: DEFAULT; Schema: public; Owner: kokuadmin
 --
 
-ALTER SEQUENCE testcustomer.reporting_awscostentryreservation_id_seq OWNED BY testcustomer.reporting_awscostentryreservation.id;
+ALTER TABLE ONLY public.api_customer ALTER COLUMN id SET DEFAULT nextval('public.api_customer_id_seq'::regclass);
 
 
 --
@@ -1267,17 +1350,17 @@ ALTER TABLE ONLY public.api_providerbillingsource ALTER COLUMN id SET DEFAULT ne
 
 
 --
--- Name: api_resettoken id; Type: DEFAULT; Schema: public; Owner: kokuadmin
---
-
-ALTER TABLE ONLY public.api_resettoken ALTER COLUMN id SET DEFAULT nextval('public.api_resettoken_id_seq'::regclass);
-
-
---
 -- Name: api_tenant id; Type: DEFAULT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.api_tenant ALTER COLUMN id SET DEFAULT nextval('public.api_tenant_id_seq'::regclass);
+
+
+--
+-- Name: api_user id; Type: DEFAULT; Schema: public; Owner: kokuadmin
+--
+
+ALTER TABLE ONLY public.api_user ALTER COLUMN id SET DEFAULT nextval('public.api_user_id_seq'::regclass);
 
 
 --
@@ -1379,88 +1462,119 @@ ALTER TABLE ONLY public.si_unit_scale ALTER COLUMN id SET DEFAULT nextval('publi
 
 
 --
--- Name: django_migrations id; Type: DEFAULT; Schema: testcustomer; Owner: kokuadmin
+-- Data for Name: django_migrations; Type: TABLE DATA; Schema: acct10001org20002; Owner: kokuadmin
 --
 
-ALTER TABLE ONLY testcustomer.django_migrations ALTER COLUMN id SET DEFAULT nextval('testcustomer.django_migrations_id_seq'::regclass);
-
-
---
--- Name: reporting_awsaccountalias id; Type: DEFAULT; Schema: testcustomer; Owner: kokuadmin
---
-
-ALTER TABLE ONLY testcustomer.reporting_awsaccountalias ALTER COLUMN id SET DEFAULT nextval('testcustomer.reporting_awsaccountalias_id_seq'::regclass);
-
-
---
--- Name: reporting_awscostentry id; Type: DEFAULT; Schema: testcustomer; Owner: kokuadmin
---
-
-ALTER TABLE ONLY testcustomer.reporting_awscostentry ALTER COLUMN id SET DEFAULT nextval('testcustomer.reporting_awscostentry_id_seq'::regclass);
-
-
---
--- Name: reporting_awscostentrybill id; Type: DEFAULT; Schema: testcustomer; Owner: kokuadmin
---
-
-ALTER TABLE ONLY testcustomer.reporting_awscostentrybill ALTER COLUMN id SET DEFAULT nextval('testcustomer.reporting_awscostentrybill_id_seq'::regclass);
-
-
---
--- Name: reporting_awscostentrylineitem id; Type: DEFAULT; Schema: testcustomer; Owner: kokuadmin
---
-
-ALTER TABLE ONLY testcustomer.reporting_awscostentrylineitem ALTER COLUMN id SET DEFAULT nextval('testcustomer.reporting_awscostentrylineitem_id_seq'::regclass);
+COPY acct10001org20002.django_migrations (id, app, name, applied) FROM stdin;
+1	contenttypes	0001_initial	2018-09-27 16:19:01.935398+00
+2	auth	0001_initial	2018-09-27 16:19:01.954285+00
+3	admin	0001_initial	2018-09-27 16:19:01.973186+00
+4	admin	0002_logentry_remove_auto_add	2018-09-27 16:19:02.013303+00
+5	admin	0003_logentry_add_action_flag_choices	2018-09-27 16:19:02.031371+00
+6	api	0001_initial	2018-09-27 16:19:02.073641+00
+7	api	0002_auto_20180926_1905	2018-09-27 16:19:02.088518+00
+8	contenttypes	0002_remove_content_type_name	2018-09-27 16:19:02.108292+00
+9	auth	0002_alter_permission_name_max_length	2018-09-27 16:19:02.119514+00
+10	auth	0003_alter_user_email_max_length	2018-09-27 16:19:02.134655+00
+11	auth	0004_alter_user_username_opts	2018-09-27 16:19:02.149254+00
+12	auth	0005_alter_user_last_login_null	2018-09-27 16:19:02.164204+00
+13	auth	0006_require_contenttypes_0002	2018-09-27 16:19:02.171819+00
+14	auth	0007_alter_validators_add_error_messages	2018-09-27 16:19:02.187679+00
+15	auth	0008_alter_user_username_max_length	2018-09-27 16:19:02.202289+00
+16	auth	0009_alter_user_last_name_max_length	2018-09-27 16:19:02.217239+00
+17	reporting	0001_initial	2018-09-27 16:19:02.566868+00
+18	reporting_common	0001_initial	2018-09-27 16:19:02.58634+00
+19	reporting_common	0002_auto_20180926_1905	2018-09-27 16:19:02.59782+00
+20	sessions	0001_initial	2018-09-27 16:19:02.607209+00
+\.
 
 
 --
--- Name: reporting_awscostentrylineitem_aggregates id; Type: DEFAULT; Schema: testcustomer; Owner: kokuadmin
+-- Data for Name: reporting_awsaccountalias; Type: TABLE DATA; Schema: acct10001org20002; Owner: kokuadmin
 --
 
-ALTER TABLE ONLY testcustomer.reporting_awscostentrylineitem_aggregates ALTER COLUMN id SET DEFAULT nextval('testcustomer.reporting_awscostentrylineitem_aggregates_id_seq'::regclass);
-
-
---
--- Name: reporting_awscostentrylineitem_daily id; Type: DEFAULT; Schema: testcustomer; Owner: kokuadmin
---
-
-ALTER TABLE ONLY testcustomer.reporting_awscostentrylineitem_daily ALTER COLUMN id SET DEFAULT nextval('testcustomer.reporting_awscostentrylineitem_daily_id_seq'::regclass);
+COPY acct10001org20002.reporting_awsaccountalias (id, account_id, account_alias) FROM stdin;
+\.
 
 
 --
--- Name: reporting_awscostentrylineitem_daily_summary id; Type: DEFAULT; Schema: testcustomer; Owner: kokuadmin
+-- Data for Name: reporting_awscostentry; Type: TABLE DATA; Schema: acct10001org20002; Owner: kokuadmin
 --
 
-ALTER TABLE ONLY testcustomer.reporting_awscostentrylineitem_daily_summary ALTER COLUMN id SET DEFAULT nextval('testcustomer.reporting_awscostentrylineitem_daily_summary_id_seq'::regclass);
-
-
---
--- Name: reporting_awscostentrypricing id; Type: DEFAULT; Schema: testcustomer; Owner: kokuadmin
---
-
-ALTER TABLE ONLY testcustomer.reporting_awscostentrypricing ALTER COLUMN id SET DEFAULT nextval('testcustomer.reporting_awscostentrypricing_id_seq'::regclass);
+COPY acct10001org20002.reporting_awscostentry (id, interval_start, interval_end, bill_id) FROM stdin;
+\.
 
 
 --
--- Name: reporting_awscostentryproduct id; Type: DEFAULT; Schema: testcustomer; Owner: kokuadmin
+-- Data for Name: reporting_awscostentrybill; Type: TABLE DATA; Schema: acct10001org20002; Owner: kokuadmin
 --
 
-ALTER TABLE ONLY testcustomer.reporting_awscostentryproduct ALTER COLUMN id SET DEFAULT nextval('testcustomer.reporting_awscostentryproduct_id_seq'::regclass);
+COPY acct10001org20002.reporting_awscostentrybill (id, billing_resource, bill_type, payer_account_id, billing_period_start, billing_period_end) FROM stdin;
+\.
 
 
 --
--- Name: reporting_awscostentryreservation id; Type: DEFAULT; Schema: testcustomer; Owner: kokuadmin
+-- Data for Name: reporting_awscostentrylineitem; Type: TABLE DATA; Schema: acct10001org20002; Owner: kokuadmin
 --
 
-ALTER TABLE ONLY testcustomer.reporting_awscostentryreservation ALTER COLUMN id SET DEFAULT nextval('testcustomer.reporting_awscostentryreservation_id_seq'::regclass);
+COPY acct10001org20002.reporting_awscostentrylineitem (id, hash, tags, invoice_id, line_item_type, usage_account_id, usage_start, usage_end, product_code, usage_type, operation, availability_zone, resource_id, usage_amount, normalization_factor, normalized_usage_amount, currency_code, unblended_rate, unblended_cost, blended_rate, blended_cost, public_on_demand_cost, public_on_demand_rate, reservation_amortized_upfront_fee, reservation_amortized_upfront_cost_for_usage, reservation_recurring_fee_for_usage, reservation_unused_quantity, reservation_unused_recurring_fee, tax_type, cost_entry_id, cost_entry_bill_id, cost_entry_pricing_id, cost_entry_product_id, cost_entry_reservation_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: reporting_awscostentrylineitem_aggregates; Type: TABLE DATA; Schema: acct10001org20002; Owner: kokuadmin
+--
+
+COPY acct10001org20002.reporting_awscostentrylineitem_aggregates (id, time_scope_value, report_type, usage_account_id, product_code, region, availability_zone, usage_amount, unblended_cost, resource_count) FROM stdin;
+\.
+
+
+--
+-- Data for Name: reporting_awscostentrylineitem_daily; Type: TABLE DATA; Schema: acct10001org20002; Owner: kokuadmin
+--
+
+COPY acct10001org20002.reporting_awscostentrylineitem_daily (id, line_item_type, usage_account_id, usage_start, usage_end, product_code, usage_type, operation, availability_zone, resource_id, usage_amount, normalization_factor, normalized_usage_amount, currency_code, unblended_rate, unblended_cost, blended_rate, blended_cost, public_on_demand_cost, public_on_demand_rate, tax_type, tags, cost_entry_pricing_id, cost_entry_product_id, cost_entry_reservation_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: reporting_awscostentrylineitem_daily_summary; Type: TABLE DATA; Schema: acct10001org20002; Owner: kokuadmin
+--
+
+COPY acct10001org20002.reporting_awscostentrylineitem_daily_summary (id, usage_start, usage_end, usage_account_id, product_code, product_family, availability_zone, region, instance_type, unit, resource_count, usage_amount, normalization_factor, normalized_usage_amount, currency_code, unblended_rate, unblended_cost, blended_rate, blended_cost, public_on_demand_cost, public_on_demand_rate, tax_type, account_alias_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: reporting_awscostentrypricing; Type: TABLE DATA; Schema: acct10001org20002; Owner: kokuadmin
+--
+
+COPY acct10001org20002.reporting_awscostentrypricing (id, term, unit) FROM stdin;
+\.
+
+
+--
+-- Data for Name: reporting_awscostentryproduct; Type: TABLE DATA; Schema: acct10001org20002; Owner: kokuadmin
+--
+
+COPY acct10001org20002.reporting_awscostentryproduct (id, sku, product_name, product_family, service_code, region, instance_type, memory, memory_unit, vcpu) FROM stdin;
+\.
+
+
+--
+-- Data for Name: reporting_awscostentryreservation; Type: TABLE DATA; Schema: acct10001org20002; Owner: kokuadmin
+--
+
+COPY acct10001org20002.reporting_awscostentryreservation (id, reservation_arn, number_of_reservations, units_per_reservation, start_time, end_time) FROM stdin;
+\.
 
 
 --
 -- Data for Name: api_customer; Type: TABLE DATA; Schema: public; Owner: kokuadmin
 --
 
-COPY public.api_customer (group_ptr_id, date_created, owner_id, uuid, schema_name) FROM stdin;
-1	2018-09-25 16:41:47.540431+00	2	a38890ca-f53c-4732-9f44-4f94f6e6277d	testcustomer
+COPY public.api_customer (id, date_created, uuid, account_id, org_id, schema_name) FROM stdin;
+1	2018-09-27 16:19:01.880738+00	2c55009d-37c1-44be-9756-5596311c0236	10001	20002	acct10001org20002
 \.
 
 
@@ -1468,8 +1582,8 @@ COPY public.api_customer (group_ptr_id, date_created, owner_id, uuid, schema_nam
 -- Data for Name: api_provider; Type: TABLE DATA; Schema: public; Owner: kokuadmin
 --
 
-COPY public.api_provider (id, uuid, name, type, authentication_id, billing_source_id, created_by_id, customer_id, setup_complete) FROM stdin;
-1	6e212746-484a-40cd-bba0-09a19d132d64	Test Provider	AWS	1	1	2	1	f
+COPY public.api_provider (id, uuid, name, type, setup_complete, authentication_id, billing_source_id, created_by_id, customer_id) FROM stdin;
+1	6e212746-484a-40cd-bba0-09a19d132d64	Test Provider	AWS	f	1	1	1	1
 \.
 
 
@@ -1492,21 +1606,11 @@ COPY public.api_providerbillingsource (id, uuid, bucket) FROM stdin;
 
 
 --
--- Data for Name: api_resettoken; Type: TABLE DATA; Schema: public; Owner: kokuadmin
---
-
-COPY public.api_resettoken (id, token, expiration_date, used, user_id) FROM stdin;
-1	810d0bd7-4e20-49d9-be97-c41dc71d5fdb	2018-09-26 16:41:47.4196+00	f	2
-\.
-
-
---
 -- Data for Name: api_tenant; Type: TABLE DATA; Schema: public; Owner: kokuadmin
 --
 
 COPY public.api_tenant (id, schema_name) FROM stdin;
-1	public
-2	testcustomer
+1	acct10001org20002
 \.
 
 
@@ -1514,9 +1618,8 @@ COPY public.api_tenant (id, schema_name) FROM stdin;
 -- Data for Name: api_user; Type: TABLE DATA; Schema: public; Owner: kokuadmin
 --
 
-COPY public.api_user (user_ptr_id, uuid) FROM stdin;
-1	defe3f08-101a-434f-8b98-97c77978112d
-2	ed068a5c-200f-4b42-9a83-a82108dbbba1
+COPY public.api_user (id, uuid, username, email, date_created, is_active, customer_id) FROM stdin;
+1	865a8d9c-dd43-44b7-8560-608b064cf296	user_dev	user_dev@foo.com	2018-09-27 16:19:02.712152+00	t	1
 \.
 
 
@@ -1524,10 +1627,10 @@ COPY public.api_user (user_ptr_id, uuid) FROM stdin;
 -- Data for Name: api_userpreference; Type: TABLE DATA; Schema: public; Owner: kokuadmin
 --
 
-COPY public.api_userpreference (id, uuid, preference, user_id, description, name) FROM stdin;
-1	2cf8b244-4460-4567-a4d9-061313c20000	{"currency": "USD"}	2	default preference	currency
-2	29add574-d9ab-4e6b-b7b1-84025de0ca74	{"timezone": "UTC"}	2	default preference	timezone
-3	76d9ed59-3a90-4600-bb99-7065ce12d99f	{"locale": "en_US.UTF-8"}	2	default preference	locale
+COPY public.api_userpreference (id, uuid, preference, name, description, user_id) FROM stdin;
+1	3c2c01dc-c398-42db-bd77-318d0744ad7f	{"currency": "USD"}	currency	default preference	1
+2	b9c69632-91a7-403b-a998-46cdaac586cf	{"timezone": "UTC"}	timezone	default preference	1
+3	ee8593ed-9543-4db1-98c0-83909161f049	{"locale": "en_US.UTF-8"}	locale	default preference	1
 \.
 
 
@@ -1536,7 +1639,6 @@ COPY public.api_userpreference (id, uuid, preference, user_id, description, name
 --
 
 COPY public.auth_group (id, name) FROM stdin;
-1	Test Customer
 \.
 
 
@@ -1577,98 +1679,90 @@ COPY public.auth_permission (id, name, content_type_id, codename) FROM stdin;
 22	Can change session	6	change_session
 23	Can delete session	6	delete_session
 24	Can view session	6	view_session
-25	Can add Token	7	add_token
-26	Can change Token	7	change_token
-27	Can delete Token	7	delete_token
-28	Can view Token	7	view_token
-29	Can add customer	8	add_customer
-30	Can change customer	8	change_customer
-31	Can delete customer	8	delete_customer
-32	Can view customer	8	view_customer
-33	Can add user	9	add_user
-34	Can change user	9	change_user
-35	Can delete user	9	delete_user
-36	Can view user	9	view_user
-37	Can add reset token	10	add_resettoken
-38	Can change reset token	10	change_resettoken
-39	Can delete reset token	10	delete_resettoken
-40	Can view reset token	10	view_resettoken
-41	Can add user preference	11	add_userpreference
-42	Can change user preference	11	change_userpreference
-43	Can delete user preference	11	delete_userpreference
-44	Can view user preference	11	view_userpreference
-45	Can add provider	12	add_provider
-46	Can change provider	12	change_provider
-47	Can delete provider	12	delete_provider
-48	Can view provider	12	view_provider
-49	Can add provider authentication	13	add_providerauthentication
-50	Can change provider authentication	13	change_providerauthentication
-51	Can delete provider authentication	13	delete_providerauthentication
-52	Can view provider authentication	13	view_providerauthentication
-53	Can add provider billing source	14	add_providerbillingsource
-54	Can change provider billing source	14	change_providerbillingsource
-55	Can delete provider billing source	14	delete_providerbillingsource
-56	Can view provider billing source	14	view_providerbillingsource
-57	Can add tenant	15	add_tenant
-58	Can change tenant	15	change_tenant
-59	Can delete tenant	15	delete_tenant
-60	Can view tenant	15	view_tenant
-61	Can add aws cost entry	16	add_awscostentry
-62	Can change aws cost entry	16	change_awscostentry
-63	Can delete aws cost entry	16	delete_awscostentry
-64	Can view aws cost entry	16	view_awscostentry
-65	Can add aws cost entry bill	17	add_awscostentrybill
-66	Can change aws cost entry bill	17	change_awscostentrybill
-67	Can delete aws cost entry bill	17	delete_awscostentrybill
-68	Can view aws cost entry bill	17	view_awscostentrybill
-69	Can add aws cost entry line item	18	add_awscostentrylineitem
-70	Can change aws cost entry line item	18	change_awscostentrylineitem
-71	Can delete aws cost entry line item	18	delete_awscostentrylineitem
-72	Can view aws cost entry line item	18	view_awscostentrylineitem
-73	Can add aws cost entry pricing	19	add_awscostentrypricing
-74	Can change aws cost entry pricing	19	change_awscostentrypricing
-75	Can delete aws cost entry pricing	19	delete_awscostentrypricing
-76	Can view aws cost entry pricing	19	view_awscostentrypricing
-77	Can add aws cost entry product	20	add_awscostentryproduct
-78	Can change aws cost entry product	20	change_awscostentryproduct
-79	Can delete aws cost entry product	20	delete_awscostentryproduct
-80	Can view aws cost entry product	20	view_awscostentryproduct
-81	Can add aws cost entry reservation	21	add_awscostentryreservation
-82	Can change aws cost entry reservation	21	change_awscostentryreservation
-83	Can delete aws cost entry reservation	21	delete_awscostentryreservation
-84	Can view aws cost entry reservation	21	view_awscostentryreservation
-85	Can add aws cost entry line item aggregates	22	add_awscostentrylineitemaggregates
-86	Can change aws cost entry line item aggregates	22	change_awscostentrylineitemaggregates
-87	Can delete aws cost entry line item aggregates	22	delete_awscostentrylineitemaggregates
-88	Can view aws cost entry line item aggregates	22	view_awscostentrylineitemaggregates
-89	Can add aws cost entry line item daily	23	add_awscostentrylineitemdaily
-90	Can change aws cost entry line item daily	23	change_awscostentrylineitemdaily
-91	Can delete aws cost entry line item daily	23	delete_awscostentrylineitemdaily
-92	Can view aws cost entry line item daily	23	view_awscostentrylineitemdaily
-93	Can add aws cost entry line item daily summary	24	add_awscostentrylineitemdailysummary
-94	Can change aws cost entry line item daily summary	24	change_awscostentrylineitemdailysummary
-95	Can delete aws cost entry line item daily summary	24	delete_awscostentrylineitemdailysummary
-96	Can view aws cost entry line item daily summary	24	view_awscostentrylineitemdailysummary
-97	Can add aws account alias	25	add_awsaccountalias
-98	Can change aws account alias	25	change_awsaccountalias
-99	Can delete aws account alias	25	delete_awsaccountalias
-100	Can view aws account alias	25	view_awsaccountalias
+25	Can add customer	7	add_customer
+26	Can change customer	7	change_customer
+27	Can delete customer	7	delete_customer
+28	Can view customer	7	view_customer
+29	Can add provider	8	add_provider
+30	Can change provider	8	change_provider
+31	Can delete provider	8	delete_provider
+32	Can view provider	8	view_provider
+33	Can add provider authentication	9	add_providerauthentication
+34	Can change provider authentication	9	change_providerauthentication
+35	Can delete provider authentication	9	delete_providerauthentication
+36	Can view provider authentication	9	view_providerauthentication
+37	Can add provider billing source	10	add_providerbillingsource
+38	Can change provider billing source	10	change_providerbillingsource
+39	Can delete provider billing source	10	delete_providerbillingsource
+40	Can view provider billing source	10	view_providerbillingsource
+41	Can add tenant	11	add_tenant
+42	Can change tenant	11	change_tenant
+43	Can delete tenant	11	delete_tenant
+44	Can view tenant	11	view_tenant
+45	Can add user	12	add_user
+46	Can change user	12	change_user
+47	Can delete user	12	delete_user
+48	Can view user	12	view_user
+49	Can add user preference	13	add_userpreference
+50	Can change user preference	13	change_userpreference
+51	Can delete user preference	13	delete_userpreference
+52	Can view user preference	13	view_userpreference
+53	Can add aws account alias	14	add_awsaccountalias
+54	Can change aws account alias	14	change_awsaccountalias
+55	Can delete aws account alias	14	delete_awsaccountalias
+56	Can view aws account alias	14	view_awsaccountalias
+57	Can add aws cost entry	15	add_awscostentry
+58	Can change aws cost entry	15	change_awscostentry
+59	Can delete aws cost entry	15	delete_awscostentry
+60	Can view aws cost entry	15	view_awscostentry
+61	Can add aws cost entry bill	16	add_awscostentrybill
+62	Can change aws cost entry bill	16	change_awscostentrybill
+63	Can delete aws cost entry bill	16	delete_awscostentrybill
+64	Can view aws cost entry bill	16	view_awscostentrybill
+65	Can add aws cost entry line item	17	add_awscostentrylineitem
+66	Can change aws cost entry line item	17	change_awscostentrylineitem
+67	Can delete aws cost entry line item	17	delete_awscostentrylineitem
+68	Can view aws cost entry line item	17	view_awscostentrylineitem
+69	Can add aws cost entry line item aggregates	18	add_awscostentrylineitemaggregates
+70	Can change aws cost entry line item aggregates	18	change_awscostentrylineitemaggregates
+71	Can delete aws cost entry line item aggregates	18	delete_awscostentrylineitemaggregates
+72	Can view aws cost entry line item aggregates	18	view_awscostentrylineitemaggregates
+73	Can add aws cost entry line item daily	19	add_awscostentrylineitemdaily
+74	Can change aws cost entry line item daily	19	change_awscostentrylineitemdaily
+75	Can delete aws cost entry line item daily	19	delete_awscostentrylineitemdaily
+76	Can view aws cost entry line item daily	19	view_awscostentrylineitemdaily
+77	Can add aws cost entry line item daily summary	20	add_awscostentrylineitemdailysummary
+78	Can change aws cost entry line item daily summary	20	change_awscostentrylineitemdailysummary
+79	Can delete aws cost entry line item daily summary	20	delete_awscostentrylineitemdailysummary
+80	Can view aws cost entry line item daily summary	20	view_awscostentrylineitemdailysummary
+81	Can add aws cost entry pricing	21	add_awscostentrypricing
+82	Can change aws cost entry pricing	21	change_awscostentrypricing
+83	Can delete aws cost entry pricing	21	delete_awscostentrypricing
+84	Can view aws cost entry pricing	21	view_awscostentrypricing
+85	Can add aws cost entry product	22	add_awscostentryproduct
+86	Can change aws cost entry product	22	change_awscostentryproduct
+87	Can delete aws cost entry product	22	delete_awscostentryproduct
+88	Can view aws cost entry product	22	view_awscostentryproduct
+89	Can add aws cost entry reservation	23	add_awscostentryreservation
+90	Can change aws cost entry reservation	23	change_awscostentryreservation
+91	Can delete aws cost entry reservation	23	delete_awscostentryreservation
+92	Can view aws cost entry reservation	23	view_awscostentryreservation
+93	Can add cost usage report status	24	add_costusagereportstatus
+94	Can change cost usage report status	24	change_costusagereportstatus
+95	Can delete cost usage report status	24	delete_costusagereportstatus
+96	Can view cost usage report status	24	view_costusagereportstatus
+97	Can add region mapping	25	add_regionmapping
+98	Can change region mapping	25	change_regionmapping
+99	Can delete region mapping	25	delete_regionmapping
+100	Can view region mapping	25	view_regionmapping
 101	Can add report column map	26	add_reportcolumnmap
 102	Can change report column map	26	change_reportcolumnmap
 103	Can delete report column map	26	delete_reportcolumnmap
 104	Can view report column map	26	view_reportcolumnmap
-105	Can add cost usage report status	27	add_costusagereportstatus
-106	Can change cost usage report status	27	change_costusagereportstatus
-107	Can delete cost usage report status	27	delete_costusagereportstatus
-108	Can view cost usage report status	27	view_costusagereportstatus
-109	Can add si unit scale	28	add_siunitscale
-110	Can change si unit scale	28	change_siunitscale
-111	Can delete si unit scale	28	delete_siunitscale
-112	Can view si unit scale	28	view_siunitscale
-113	Can add region mapping	29	add_regionmapping
-114	Can change region mapping	29	change_regionmapping
-115	Can delete region mapping	29	delete_regionmapping
-116	Can view region mapping	29	view_regionmapping
+105	Can add si unit scale	27	add_siunitscale
+106	Can change si unit scale	27	change_siunitscale
+107	Can delete si unit scale	27	delete_siunitscale
+108	Can view si unit scale	27	view_siunitscale
 \.
 
 
@@ -1677,8 +1771,6 @@ COPY public.auth_permission (id, name, content_type_id, codename) FROM stdin;
 --
 
 COPY public.auth_user (id, password, last_login, is_superuser, username, first_name, last_name, email, is_staff, is_active, date_joined) FROM stdin;
-1	pbkdf2_sha256$120000$2MEmjDZK8Cyb$QGokifHCkqQlunA35jmz2dBmciLiVhmDvicCTtO0eI8=	\N	t	admin			admin@example.com	t	t	2018-09-25 16:41:37.307149+00
-2	pbkdf2_sha256$120000$0clvVrdHXU7r$LTLeO2D8j2jH642i2gtI95NH+w+tlOEu8DghPtk9Q2s=	\N	f	test_customer			test@example.com	f	t	2018-09-25 16:41:47.024917+00
 \.
 
 
@@ -1687,7 +1779,6 @@ COPY public.auth_user (id, password, last_login, is_superuser, username, first_n
 --
 
 COPY public.auth_user_groups (id, user_id, group_id) FROM stdin;
-1	2	1
 \.
 
 
@@ -1696,15 +1787,6 @@ COPY public.auth_user_groups (id, user_id, group_id) FROM stdin;
 --
 
 COPY public.auth_user_user_permissions (id, user_id, permission_id) FROM stdin;
-\.
-
-
---
--- Data for Name: authtoken_token; Type: TABLE DATA; Schema: public; Owner: kokuadmin
---
-
-COPY public.authtoken_token (key, created, user_id) FROM stdin;
-398f435634c7ac82e16e9bef7328c311a9bfbca6	2018-09-25 16:41:46.976332+00	1
 \.
 
 
@@ -1727,29 +1809,27 @@ COPY public.django_content_type (id, app_label, model) FROM stdin;
 4	auth	user
 5	contenttypes	contenttype
 6	sessions	session
-7	authtoken	token
-8	api	customer
-9	api	user
-10	api	resettoken
-11	api	userpreference
-12	api	provider
-13	api	providerauthentication
-14	api	providerbillingsource
-15	api	tenant
-16	reporting	awscostentry
-17	reporting	awscostentrybill
-18	reporting	awscostentrylineitem
-19	reporting	awscostentrypricing
-20	reporting	awscostentryproduct
-21	reporting	awscostentryreservation
-22	reporting	awscostentrylineitemaggregates
-23	reporting	awscostentrylineitemdaily
-24	reporting	awscostentrylineitemdailysummary
-25	reporting	awsaccountalias
+7	api	customer
+8	api	provider
+9	api	providerauthentication
+10	api	providerbillingsource
+11	api	tenant
+12	api	user
+13	api	userpreference
+14	reporting	awsaccountalias
+15	reporting	awscostentry
+16	reporting	awscostentrybill
+17	reporting	awscostentrylineitem
+18	reporting	awscostentrylineitemaggregates
+19	reporting	awscostentrylineitemdaily
+20	reporting	awscostentrylineitemdailysummary
+21	reporting	awscostentrypricing
+22	reporting	awscostentryproduct
+23	reporting	awscostentryreservation
+24	reporting_common	costusagereportstatus
+25	reporting_common	regionmapping
 26	reporting_common	reportcolumnmap
-27	reporting_common	costusagereportstatus
-28	reporting_common	siunitscale
-29	reporting_common	regionmapping
+27	reporting_common	siunitscale
 \.
 
 
@@ -1758,61 +1838,26 @@ COPY public.django_content_type (id, app_label, model) FROM stdin;
 --
 
 COPY public.django_migrations (id, app, name, applied) FROM stdin;
-1	contenttypes	0001_initial	2018-09-25 16:41:36.042965+00
-2	auth	0001_initial	2018-09-25 16:41:36.189257+00
-3	admin	0001_initial	2018-09-25 16:41:36.234302+00
-4	admin	0002_logentry_remove_auto_add	2018-09-25 16:41:36.254041+00
-5	admin	0003_logentry_add_action_flag_choices	2018-09-25 16:41:36.269431+00
-6	contenttypes	0002_remove_content_type_name	2018-09-25 16:41:36.307985+00
-7	auth	0002_alter_permission_name_max_length	2018-09-25 16:41:36.325681+00
-8	auth	0003_alter_user_email_max_length	2018-09-25 16:41:36.403923+00
-9	auth	0004_alter_user_username_opts	2018-09-25 16:41:36.419323+00
-10	auth	0005_alter_user_last_login_null	2018-09-25 16:41:36.443231+00
-11	auth	0006_require_contenttypes_0002	2018-09-25 16:41:36.451061+00
-12	auth	0007_alter_validators_add_error_messages	2018-09-25 16:41:36.468316+00
-13	auth	0008_alter_user_username_max_length	2018-09-25 16:41:36.492839+00
-14	auth	0009_alter_user_last_name_max_length	2018-09-25 16:41:36.513281+00
-15	api	0001_initial	2018-09-25 16:41:36.532718+00
-16	api	0002_auto_20180509_1400	2018-09-25 16:41:36.648124+00
-17	api	0003_auto_20180509_1849	2018-09-25 16:41:36.727095+00
-18	api	0004_auto_20180510_1824	2018-09-25 16:41:36.805629+00
-19	api	0005_auto_20180511_1445	2018-09-25 16:41:36.832577+00
-20	api	0006_resettoken	2018-09-25 16:41:36.867489+00
-21	api	0007_userpreference	2018-09-25 16:41:36.905098+00
-22	api	0008_provider	2018-09-25 16:41:37.016821+00
-23	api	0009_auto_20180523_0045	2018-09-25 16:41:37.059745+00
-24	api	0010_auto_20180523_1540	2018-09-25 16:41:37.118671+00
-25	api	0011_auto_20180524_1838	2018-09-25 16:41:37.177305+00
-26	api	0012_auto_20180529_1526	2018-09-25 16:41:37.34788+00
-27	api	0013_auto_20180531_1921	2018-09-25 16:41:37.371966+00
-28	api	0014_costusagereportstatus	2018-09-25 16:41:37.419819+00
-29	api	0015_auto_20180614_1343	2018-09-25 16:41:37.466603+00
-30	api	0016_auto_20180802_1911	2018-09-25 16:41:37.487239+00
-31	api	0017_auto_20180815_1716	2018-09-25 16:41:37.517717+00
-32	api	0018_delete_status	2018-09-25 16:41:37.533772+00
-33	api	0019_provider_setup_complete	2018-09-25 16:41:37.572784+00
-34	api	0020_auto_20180920_1917	2018-09-25 16:41:37.621918+00
-35	authtoken	0001_initial	2018-09-25 16:41:37.658847+00
-36	authtoken	0002_auto_20160226_1747	2018-09-25 16:41:37.717473+00
-37	reporting	0001_initial	2018-09-25 16:41:37.770049+00
-38	reporting	0002_auto_20180615_1725	2018-09-25 16:41:38.009506+00
-39	reporting	0003_auto_20180619_1833	2018-09-25 16:41:38.095878+00
-40	reporting	0004_auto_20180803_1926	2018-09-25 16:41:38.121074+00
-41	reporting	0005_auto_20180807_1819	2018-09-25 16:41:38.17807+00
-42	reporting	0006_auto_20180821_1654	2018-09-25 16:41:38.287396+00
-43	reporting	0007_auto_20180824_0035	2018-09-25 16:41:38.373684+00
-44	reporting	0008_awsaccountalias	2018-09-25 16:41:38.385873+00
-45	reporting	0009_auto_20180918_1915	2018-09-25 16:41:38.41732+00
-46	reporting	0010_awscostentrylineitemdailysummary_account_alias	2018-09-25 16:41:38.429415+00
-47	reporting_common	0001_initial	2018-09-25 16:41:38.455507+00
-48	reporting_common	0002_auto_20180608_1647	2018-09-25 16:41:38.611888+00
-49	reporting_common	0003_costusagereportstatus	2018-09-25 16:41:38.657192+00
-50	reporting_common	0004_siunitscale	2018-09-25 16:41:38.681859+00
-51	reporting_common	0005_auto_20180725_1523	2018-09-25 16:41:38.7613+00
-52	reporting_common	0006_auto_20180802_1911	2018-09-25 16:41:38.773901+00
-53	reporting_common	0007_auto_20180808_2134	2018-09-25 16:41:38.808187+00
-54	reporting_common	0008_auto_20180920_1917	2018-09-25 16:41:38.820913+00
-55	sessions	0001_initial	2018-09-25 16:41:38.847506+00
+1	contenttypes	0001_initial	2018-09-27 16:18:52.734864+00
+2	auth	0001_initial	2018-09-27 16:18:52.864749+00
+3	admin	0001_initial	2018-09-27 16:18:52.932625+00
+4	admin	0002_logentry_remove_auto_add	2018-09-27 16:18:52.973199+00
+5	admin	0003_logentry_add_action_flag_choices	2018-09-27 16:18:52.990249+00
+6	api	0001_initial	2018-09-27 16:18:53.204527+00
+7	api	0002_auto_20180926_1905	2018-09-27 16:18:53.219053+00
+8	contenttypes	0002_remove_content_type_name	2018-09-27 16:18:53.257614+00
+9	auth	0002_alter_permission_name_max_length	2018-09-27 16:18:53.273834+00
+10	auth	0003_alter_user_email_max_length	2018-09-27 16:18:53.295508+00
+11	auth	0004_alter_user_username_opts	2018-09-27 16:18:53.311457+00
+12	auth	0005_alter_user_last_login_null	2018-09-27 16:18:53.336699+00
+13	auth	0006_require_contenttypes_0002	2018-09-27 16:18:53.344058+00
+14	auth	0007_alter_validators_add_error_messages	2018-09-27 16:18:53.359886+00
+15	auth	0008_alter_user_username_max_length	2018-09-27 16:18:53.386013+00
+16	auth	0009_alter_user_last_name_max_length	2018-09-27 16:18:53.406869+00
+17	reporting	0001_initial	2018-09-27 16:18:53.546012+00
+18	reporting_common	0001_initial	2018-09-27 16:18:53.622184+00
+19	reporting_common	0002_auto_20180926_1905	2018-09-27 16:18:53.840454+00
+20	sessions	0001_initial	2018-09-27 16:18:53.867568+00
 \.
 
 
@@ -1900,167 +1945,91 @@ COPY public.reporting_common_reportcolumnmap (id, provider_type, provider_column
 --
 
 COPY public.si_unit_scale (id, prefix, prefix_symbol, multiplying_factor) FROM stdin;
-1	yotta	Y	1000000000000000000000000.000000000000000000000000
-2	zetta	Z	1000000000000000000000.000000000000000000000000
-3	exa	E	1000000000000000000.000000000000000000000000
-4	peta	P	1000000000000000.000000000000000000000000
-5	tera	T	1000000000000.000000000000000000000000
-6	giga	G	1000000000.000000000000000000000000
-7	mega	M	1000000.000000000000000000000000
-8	kilo	k	1000.000000000000000000000000
-9			1.000000000000000000000000
-10	milli	m	0.001000000000000000000000
-11	micro	µ	0.000001000000000000000000
-12	nano	n	0.000000001000000000000000
-13	pico	p	0.000000000001000000000000
-14	femto	f	0.000000000000001000000000
-15	atto	a	0.000000000000000001000000
-16	zepto	z	0.000000000000000000001000
-17	yocto	y	0.000000000000000000000001
 \.
 
 
 --
--- Data for Name: django_migrations; Type: TABLE DATA; Schema: testcustomer; Owner: kokuadmin
+-- Name: django_migrations_id_seq; Type: SEQUENCE SET; Schema: acct10001org20002; Owner: kokuadmin
 --
 
-COPY testcustomer.django_migrations (id, app, name, applied) FROM stdin;
-1	contenttypes	0001_initial	2018-09-25 16:41:47.62078+00
-2	auth	0001_initial	2018-09-25 16:41:47.638352+00
-3	admin	0001_initial	2018-09-25 16:41:47.655704+00
-4	admin	0002_logentry_remove_auto_add	2018-09-25 16:41:47.671686+00
-5	admin	0003_logentry_add_action_flag_choices	2018-09-25 16:41:47.686422+00
-6	contenttypes	0002_remove_content_type_name	2018-09-25 16:41:47.7081+00
-7	auth	0002_alter_permission_name_max_length	2018-09-25 16:41:47.720063+00
-8	auth	0003_alter_user_email_max_length	2018-09-25 16:41:47.735065+00
-9	auth	0004_alter_user_username_opts	2018-09-25 16:41:47.75036+00
-10	auth	0005_alter_user_last_login_null	2018-09-25 16:41:47.765329+00
-11	auth	0006_require_contenttypes_0002	2018-09-25 16:41:47.773762+00
-12	auth	0007_alter_validators_add_error_messages	2018-09-25 16:41:47.788746+00
-13	auth	0008_alter_user_username_max_length	2018-09-25 16:41:47.803561+00
-14	auth	0009_alter_user_last_name_max_length	2018-09-25 16:41:47.818815+00
-15	api	0001_initial	2018-09-25 16:41:47.828694+00
-16	api	0002_auto_20180509_1400	2018-09-25 16:41:47.860296+00
-17	api	0003_auto_20180509_1849	2018-09-25 16:41:47.894962+00
-18	api	0004_auto_20180510_1824	2018-09-25 16:41:47.935231+00
-19	api	0005_auto_20180511_1445	2018-09-25 16:41:47.959119+00
-20	api	0006_resettoken	2018-09-25 16:41:47.976384+00
-21	api	0007_userpreference	2018-09-25 16:41:47.995817+00
-22	api	0008_provider	2018-09-25 16:41:48.035594+00
-23	api	0009_auto_20180523_0045	2018-09-25 16:41:48.055785+00
-24	api	0010_auto_20180523_1540	2018-09-25 16:41:48.097345+00
-25	api	0011_auto_20180524_1838	2018-09-25 16:41:48.117072+00
-26	api	0012_auto_20180529_1526	2018-09-25 16:41:48.131566+00
-27	api	0013_auto_20180531_1921	2018-09-25 16:41:48.142631+00
-28	api	0014_costusagereportstatus	2018-09-25 16:41:48.164478+00
-29	api	0015_auto_20180614_1343	2018-09-25 16:41:48.188828+00
-30	api	0016_auto_20180802_1911	2018-09-25 16:41:48.208395+00
-31	api	0017_auto_20180815_1716	2018-09-25 16:41:48.22776+00
-32	api	0018_delete_status	2018-09-25 16:41:48.238632+00
-33	api	0019_provider_setup_complete	2018-09-25 16:41:48.258157+00
-34	api	0020_auto_20180920_1917	2018-09-25 16:41:48.290265+00
-35	authtoken	0001_initial	2018-09-25 16:41:48.31079+00
-36	authtoken	0002_auto_20160226_1747	2018-09-25 16:41:48.348154+00
-37	reporting	0001_initial	2018-09-25 16:41:48.515421+00
-38	reporting	0002_auto_20180615_1725	2018-09-25 16:41:48.928888+00
-39	reporting	0003_auto_20180619_1833	2018-09-25 16:41:49.219025+00
-40	reporting	0004_auto_20180803_1926	2018-09-25 16:41:49.253822+00
-41	reporting	0005_auto_20180807_1819	2018-09-25 16:41:49.310331+00
-42	reporting	0006_auto_20180821_1654	2018-09-25 16:41:49.528083+00
-43	reporting	0007_auto_20180824_0035	2018-09-25 16:41:49.702853+00
-44	reporting	0008_awsaccountalias	2018-09-25 16:41:49.72659+00
-45	reporting	0009_auto_20180918_1915	2018-09-25 16:41:49.804076+00
-46	reporting	0010_awscostentrylineitemdailysummary_account_alias	2018-09-25 16:41:49.827517+00
-47	reporting_common	0001_initial	2018-09-25 16:41:49.836818+00
-48	reporting_common	0002_auto_20180608_1647	2018-09-25 16:41:49.845528+00
-49	reporting_common	0003_costusagereportstatus	2018-09-25 16:41:49.866493+00
-50	reporting_common	0004_siunitscale	2018-09-25 16:41:49.876973+00
-51	reporting_common	0005_auto_20180725_1523	2018-09-25 16:41:49.885623+00
-52	reporting_common	0006_auto_20180802_1911	2018-09-25 16:41:49.896464+00
-53	reporting_common	0007_auto_20180808_2134	2018-09-25 16:41:49.907415+00
-54	reporting_common	0008_auto_20180920_1917	2018-09-25 16:41:49.918376+00
-55	sessions	0001_initial	2018-09-25 16:41:49.928466+00
-\.
+SELECT pg_catalog.setval('acct10001org20002.django_migrations_id_seq', 20, true);
 
 
 --
--- Data for Name: reporting_awsaccountalias; Type: TABLE DATA; Schema: testcustomer; Owner: kokuadmin
+-- Name: reporting_awsaccountalias_id_seq; Type: SEQUENCE SET; Schema: acct10001org20002; Owner: kokuadmin
 --
 
-COPY testcustomer.reporting_awsaccountalias (id, account_id, account_alias) FROM stdin;
-\.
-
-
---
--- Data for Name: reporting_awscostentry; Type: TABLE DATA; Schema: testcustomer; Owner: kokuadmin
---
-
-COPY testcustomer.reporting_awscostentry (id, interval_start, interval_end, bill_id) FROM stdin;
-\.
+SELECT pg_catalog.setval('acct10001org20002.reporting_awsaccountalias_id_seq', 1, false);
 
 
 --
--- Data for Name: reporting_awscostentrybill; Type: TABLE DATA; Schema: testcustomer; Owner: kokuadmin
+-- Name: reporting_awscostentry_id_seq; Type: SEQUENCE SET; Schema: acct10001org20002; Owner: kokuadmin
 --
 
-COPY testcustomer.reporting_awscostentrybill (id, billing_resource, bill_type, payer_account_id, billing_period_start, billing_period_end) FROM stdin;
-\.
-
-
---
--- Data for Name: reporting_awscostentrylineitem; Type: TABLE DATA; Schema: testcustomer; Owner: kokuadmin
---
-
-COPY testcustomer.reporting_awscostentrylineitem (id, tags, invoice_id, line_item_type, usage_account_id, usage_start, usage_end, product_code, usage_type, operation, availability_zone, resource_id, usage_amount, normalization_factor, normalized_usage_amount, currency_code, unblended_rate, unblended_cost, blended_rate, blended_cost, tax_type, cost_entry_id, cost_entry_bill_id, cost_entry_pricing_id, cost_entry_product_id, cost_entry_reservation_id, hash, public_on_demand_cost, public_on_demand_rate, reservation_amortized_upfront_cost_for_usage, reservation_amortized_upfront_fee, reservation_recurring_fee_for_usage, reservation_unused_quantity, reservation_unused_recurring_fee) FROM stdin;
-\.
+SELECT pg_catalog.setval('acct10001org20002.reporting_awscostentry_id_seq', 1, false);
 
 
 --
--- Data for Name: reporting_awscostentrylineitem_aggregates; Type: TABLE DATA; Schema: testcustomer; Owner: kokuadmin
+-- Name: reporting_awscostentrybill_id_seq; Type: SEQUENCE SET; Schema: acct10001org20002; Owner: kokuadmin
 --
 
-COPY testcustomer.reporting_awscostentrylineitem_aggregates (id, time_scope_value, report_type, usage_account_id, product_code, region, availability_zone, usage_amount, unblended_cost, resource_count) FROM stdin;
-\.
-
-
---
--- Data for Name: reporting_awscostentrylineitem_daily; Type: TABLE DATA; Schema: testcustomer; Owner: kokuadmin
---
-
-COPY testcustomer.reporting_awscostentrylineitem_daily (id, line_item_type, usage_account_id, usage_start, product_code, usage_type, operation, availability_zone, resource_id, usage_amount, normalization_factor, normalized_usage_amount, currency_code, unblended_rate, unblended_cost, blended_rate, blended_cost, public_on_demand_cost, public_on_demand_rate, tax_type, tags, cost_entry_pricing_id, cost_entry_product_id, cost_entry_reservation_id, usage_end) FROM stdin;
-\.
+SELECT pg_catalog.setval('acct10001org20002.reporting_awscostentrybill_id_seq', 1, false);
 
 
 --
--- Data for Name: reporting_awscostentrylineitem_daily_summary; Type: TABLE DATA; Schema: testcustomer; Owner: kokuadmin
+-- Name: reporting_awscostentrylineitem_aggregates_id_seq; Type: SEQUENCE SET; Schema: acct10001org20002; Owner: kokuadmin
 --
 
-COPY testcustomer.reporting_awscostentrylineitem_daily_summary (id, usage_start, usage_account_id, product_code, product_family, availability_zone, region, instance_type, unit, resource_count, usage_amount, normalization_factor, normalized_usage_amount, currency_code, unblended_rate, unblended_cost, blended_rate, blended_cost, public_on_demand_cost, public_on_demand_rate, tax_type, usage_end, account_alias_id) FROM stdin;
-\.
-
-
---
--- Data for Name: reporting_awscostentrypricing; Type: TABLE DATA; Schema: testcustomer; Owner: kokuadmin
---
-
-COPY testcustomer.reporting_awscostentrypricing (id, term, unit) FROM stdin;
-\.
+SELECT pg_catalog.setval('acct10001org20002.reporting_awscostentrylineitem_aggregates_id_seq', 1, false);
 
 
 --
--- Data for Name: reporting_awscostentryproduct; Type: TABLE DATA; Schema: testcustomer; Owner: kokuadmin
+-- Name: reporting_awscostentrylineitem_daily_id_seq; Type: SEQUENCE SET; Schema: acct10001org20002; Owner: kokuadmin
 --
 
-COPY testcustomer.reporting_awscostentryproduct (id, sku, product_name, product_family, service_code, region, instance_type, memory, vcpu, memory_unit) FROM stdin;
-\.
+SELECT pg_catalog.setval('acct10001org20002.reporting_awscostentrylineitem_daily_id_seq', 1, false);
 
 
 --
--- Data for Name: reporting_awscostentryreservation; Type: TABLE DATA; Schema: testcustomer; Owner: kokuadmin
+-- Name: reporting_awscostentrylineitem_daily_summary_id_seq; Type: SEQUENCE SET; Schema: acct10001org20002; Owner: kokuadmin
 --
 
-COPY testcustomer.reporting_awscostentryreservation (id, reservation_arn, number_of_reservations, units_per_reservation, start_time, end_time) FROM stdin;
-\.
+SELECT pg_catalog.setval('acct10001org20002.reporting_awscostentrylineitem_daily_summary_id_seq', 1, false);
+
+
+--
+-- Name: reporting_awscostentrylineitem_id_seq; Type: SEQUENCE SET; Schema: acct10001org20002; Owner: kokuadmin
+--
+
+SELECT pg_catalog.setval('acct10001org20002.reporting_awscostentrylineitem_id_seq', 1, false);
+
+
+--
+-- Name: reporting_awscostentrypricing_id_seq; Type: SEQUENCE SET; Schema: acct10001org20002; Owner: kokuadmin
+--
+
+SELECT pg_catalog.setval('acct10001org20002.reporting_awscostentrypricing_id_seq', 1, false);
+
+
+--
+-- Name: reporting_awscostentryproduct_id_seq; Type: SEQUENCE SET; Schema: acct10001org20002; Owner: kokuadmin
+--
+
+SELECT pg_catalog.setval('acct10001org20002.reporting_awscostentryproduct_id_seq', 1, false);
+
+
+--
+-- Name: reporting_awscostentryreservation_id_seq; Type: SEQUENCE SET; Schema: acct10001org20002; Owner: kokuadmin
+--
+
+SELECT pg_catalog.setval('acct10001org20002.reporting_awscostentryreservation_id_seq', 1, false);
+
+
+--
+-- Name: api_customer_id_seq; Type: SEQUENCE SET; Schema: public; Owner: kokuadmin
+--
+
+SELECT pg_catalog.setval('public.api_customer_id_seq', 1, true);
 
 
 --
@@ -2085,17 +2054,17 @@ SELECT pg_catalog.setval('public.api_providerbillingsource_id_seq', 1, true);
 
 
 --
--- Name: api_resettoken_id_seq; Type: SEQUENCE SET; Schema: public; Owner: kokuadmin
---
-
-SELECT pg_catalog.setval('public.api_resettoken_id_seq', 1, true);
-
-
---
 -- Name: api_tenant_id_seq; Type: SEQUENCE SET; Schema: public; Owner: kokuadmin
 --
 
-SELECT pg_catalog.setval('public.api_tenant_id_seq', 2, true);
+SELECT pg_catalog.setval('public.api_tenant_id_seq', 1, true);
+
+
+--
+-- Name: api_user_id_seq; Type: SEQUENCE SET; Schema: public; Owner: kokuadmin
+--
+
+SELECT pg_catalog.setval('public.api_user_id_seq', 1, true);
 
 
 --
@@ -2109,7 +2078,7 @@ SELECT pg_catalog.setval('public.api_userpreference_id_seq', 3, true);
 -- Name: auth_group_id_seq; Type: SEQUENCE SET; Schema: public; Owner: kokuadmin
 --
 
-SELECT pg_catalog.setval('public.auth_group_id_seq', 1, true);
+SELECT pg_catalog.setval('public.auth_group_id_seq', 1, false);
 
 
 --
@@ -2123,21 +2092,21 @@ SELECT pg_catalog.setval('public.auth_group_permissions_id_seq', 1, false);
 -- Name: auth_permission_id_seq; Type: SEQUENCE SET; Schema: public; Owner: kokuadmin
 --
 
-SELECT pg_catalog.setval('public.auth_permission_id_seq', 116, true);
+SELECT pg_catalog.setval('public.auth_permission_id_seq', 108, true);
 
 
 --
 -- Name: auth_user_groups_id_seq; Type: SEQUENCE SET; Schema: public; Owner: kokuadmin
 --
 
-SELECT pg_catalog.setval('public.auth_user_groups_id_seq', 1, true);
+SELECT pg_catalog.setval('public.auth_user_groups_id_seq', 1, false);
 
 
 --
 -- Name: auth_user_id_seq; Type: SEQUENCE SET; Schema: public; Owner: kokuadmin
 --
 
-SELECT pg_catalog.setval('public.auth_user_id_seq', 2, true);
+SELECT pg_catalog.setval('public.auth_user_id_seq', 1, false);
 
 
 --
@@ -2158,14 +2127,14 @@ SELECT pg_catalog.setval('public.django_admin_log_id_seq', 1, false);
 -- Name: django_content_type_id_seq; Type: SEQUENCE SET; Schema: public; Owner: kokuadmin
 --
 
-SELECT pg_catalog.setval('public.django_content_type_id_seq', 29, true);
+SELECT pg_catalog.setval('public.django_content_type_id_seq', 27, true);
 
 
 --
 -- Name: django_migrations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: kokuadmin
 --
 
-SELECT pg_catalog.setval('public.django_migrations_id_seq', 55, true);
+SELECT pg_catalog.setval('public.django_migrations_id_seq', 20, true);
 
 
 --
@@ -2193,84 +2162,143 @@ SELECT pg_catalog.setval('public.reporting_common_reportcolumnmap_id_seq', 47, t
 -- Name: si_unit_scale_id_seq; Type: SEQUENCE SET; Schema: public; Owner: kokuadmin
 --
 
-SELECT pg_catalog.setval('public.si_unit_scale_id_seq', 17, true);
+SELECT pg_catalog.setval('public.si_unit_scale_id_seq', 1, false);
 
 
 --
--- Name: django_migrations_id_seq; Type: SEQUENCE SET; Schema: testcustomer; Owner: kokuadmin
+-- Name: django_migrations django_migrations_pkey; Type: CONSTRAINT; Schema: acct10001org20002; Owner: kokuadmin
 --
 
-SELECT pg_catalog.setval('testcustomer.django_migrations_id_seq', 55, true);
-
-
---
--- Name: reporting_awsaccountalias_id_seq; Type: SEQUENCE SET; Schema: testcustomer; Owner: kokuadmin
---
-
-SELECT pg_catalog.setval('testcustomer.reporting_awsaccountalias_id_seq', 1, false);
+ALTER TABLE ONLY acct10001org20002.django_migrations
+    ADD CONSTRAINT django_migrations_pkey PRIMARY KEY (id);
 
 
 --
--- Name: reporting_awscostentry_id_seq; Type: SEQUENCE SET; Schema: testcustomer; Owner: kokuadmin
+-- Name: reporting_awsaccountalias reporting_awsaccountalias_account_id_key; Type: CONSTRAINT; Schema: acct10001org20002; Owner: kokuadmin
 --
 
-SELECT pg_catalog.setval('testcustomer.reporting_awscostentry_id_seq', 1, false);
-
-
---
--- Name: reporting_awscostentrybill_id_seq; Type: SEQUENCE SET; Schema: testcustomer; Owner: kokuadmin
---
-
-SELECT pg_catalog.setval('testcustomer.reporting_awscostentrybill_id_seq', 1, false);
+ALTER TABLE ONLY acct10001org20002.reporting_awsaccountalias
+    ADD CONSTRAINT reporting_awsaccountalias_account_id_key UNIQUE (account_id);
 
 
 --
--- Name: reporting_awscostentrylineitem_aggregates_id_seq; Type: SEQUENCE SET; Schema: testcustomer; Owner: kokuadmin
+-- Name: reporting_awsaccountalias reporting_awsaccountalias_pkey; Type: CONSTRAINT; Schema: acct10001org20002; Owner: kokuadmin
 --
 
-SELECT pg_catalog.setval('testcustomer.reporting_awscostentrylineitem_aggregates_id_seq', 1, false);
-
-
---
--- Name: reporting_awscostentrylineitem_daily_id_seq; Type: SEQUENCE SET; Schema: testcustomer; Owner: kokuadmin
---
-
-SELECT pg_catalog.setval('testcustomer.reporting_awscostentrylineitem_daily_id_seq', 1, false);
+ALTER TABLE ONLY acct10001org20002.reporting_awsaccountalias
+    ADD CONSTRAINT reporting_awsaccountalias_pkey PRIMARY KEY (id);
 
 
 --
--- Name: reporting_awscostentrylineitem_daily_summary_id_seq; Type: SEQUENCE SET; Schema: testcustomer; Owner: kokuadmin
+-- Name: reporting_awscostentry reporting_awscostentry_pkey; Type: CONSTRAINT; Schema: acct10001org20002; Owner: kokuadmin
 --
 
-SELECT pg_catalog.setval('testcustomer.reporting_awscostentrylineitem_daily_summary_id_seq', 1, false);
-
-
---
--- Name: reporting_awscostentrylineitem_id_seq; Type: SEQUENCE SET; Schema: testcustomer; Owner: kokuadmin
---
-
-SELECT pg_catalog.setval('testcustomer.reporting_awscostentrylineitem_id_seq', 1, false);
+ALTER TABLE ONLY acct10001org20002.reporting_awscostentry
+    ADD CONSTRAINT reporting_awscostentry_pkey PRIMARY KEY (id);
 
 
 --
--- Name: reporting_awscostentrypricing_id_seq; Type: SEQUENCE SET; Schema: testcustomer; Owner: kokuadmin
+-- Name: reporting_awscostentrybill reporting_awscostentrybill_pkey; Type: CONSTRAINT; Schema: acct10001org20002; Owner: kokuadmin
 --
 
-SELECT pg_catalog.setval('testcustomer.reporting_awscostentrypricing_id_seq', 1, false);
-
-
---
--- Name: reporting_awscostentryproduct_id_seq; Type: SEQUENCE SET; Schema: testcustomer; Owner: kokuadmin
---
-
-SELECT pg_catalog.setval('testcustomer.reporting_awscostentryproduct_id_seq', 1, false);
+ALTER TABLE ONLY acct10001org20002.reporting_awscostentrybill
+    ADD CONSTRAINT reporting_awscostentrybill_pkey PRIMARY KEY (id);
 
 
 --
--- Name: reporting_awscostentryreservation_id_seq; Type: SEQUENCE SET; Schema: testcustomer; Owner: kokuadmin
+-- Name: reporting_awscostentrylineitem_aggregates reporting_awscostentrylineitem_aggregates_pkey; Type: CONSTRAINT; Schema: acct10001org20002; Owner: kokuadmin
 --
 
-SELECT pg_catalog.setval('testcustomer.reporting_awscostentryreservation_id_seq', 1, false);
+ALTER TABLE ONLY acct10001org20002.reporting_awscostentrylineitem_aggregates
+    ADD CONSTRAINT reporting_awscostentrylineitem_aggregates_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: reporting_awscostentrylineitem_daily reporting_awscostentrylineitem_daily_pkey; Type: CONSTRAINT; Schema: acct10001org20002; Owner: kokuadmin
+--
+
+ALTER TABLE ONLY acct10001org20002.reporting_awscostentrylineitem_daily
+    ADD CONSTRAINT reporting_awscostentrylineitem_daily_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: reporting_awscostentrylineitem_daily_summary reporting_awscostentrylineitem_daily_summary_pkey; Type: CONSTRAINT; Schema: acct10001org20002; Owner: kokuadmin
+--
+
+ALTER TABLE ONLY acct10001org20002.reporting_awscostentrylineitem_daily_summary
+    ADD CONSTRAINT reporting_awscostentrylineitem_daily_summary_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: reporting_awscostentrylineitem reporting_awscostentrylineitem_hash_cost_entry_id_f3893306_uniq; Type: CONSTRAINT; Schema: acct10001org20002; Owner: kokuadmin
+--
+
+ALTER TABLE ONLY acct10001org20002.reporting_awscostentrylineitem
+    ADD CONSTRAINT reporting_awscostentrylineitem_hash_cost_entry_id_f3893306_uniq UNIQUE (hash, cost_entry_id);
+
+
+--
+-- Name: reporting_awscostentrylineitem reporting_awscostentrylineitem_pkey; Type: CONSTRAINT; Schema: acct10001org20002; Owner: kokuadmin
+--
+
+ALTER TABLE ONLY acct10001org20002.reporting_awscostentrylineitem
+    ADD CONSTRAINT reporting_awscostentrylineitem_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: reporting_awscostentryproduct reporting_awscostentrypr_sku_product_name_region_fea902ae_uniq; Type: CONSTRAINT; Schema: acct10001org20002; Owner: kokuadmin
+--
+
+ALTER TABLE ONLY acct10001org20002.reporting_awscostentryproduct
+    ADD CONSTRAINT reporting_awscostentrypr_sku_product_name_region_fea902ae_uniq UNIQUE (sku, product_name, region);
+
+
+--
+-- Name: reporting_awscostentrypricing reporting_awscostentrypricing_pkey; Type: CONSTRAINT; Schema: acct10001org20002; Owner: kokuadmin
+--
+
+ALTER TABLE ONLY acct10001org20002.reporting_awscostentrypricing
+    ADD CONSTRAINT reporting_awscostentrypricing_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: reporting_awscostentrypricing reporting_awscostentrypricing_term_unit_c3978af3_uniq; Type: CONSTRAINT; Schema: acct10001org20002; Owner: kokuadmin
+--
+
+ALTER TABLE ONLY acct10001org20002.reporting_awscostentrypricing
+    ADD CONSTRAINT reporting_awscostentrypricing_term_unit_c3978af3_uniq UNIQUE (term, unit);
+
+
+--
+-- Name: reporting_awscostentryproduct reporting_awscostentryproduct_pkey; Type: CONSTRAINT; Schema: acct10001org20002; Owner: kokuadmin
+--
+
+ALTER TABLE ONLY acct10001org20002.reporting_awscostentryproduct
+    ADD CONSTRAINT reporting_awscostentryproduct_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: reporting_awscostentryreservation reporting_awscostentryreservation_pkey; Type: CONSTRAINT; Schema: acct10001org20002; Owner: kokuadmin
+--
+
+ALTER TABLE ONLY acct10001org20002.reporting_awscostentryreservation
+    ADD CONSTRAINT reporting_awscostentryreservation_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: reporting_awscostentryreservation reporting_awscostentryreservation_reservation_arn_key; Type: CONSTRAINT; Schema: acct10001org20002; Owner: kokuadmin
+--
+
+ALTER TABLE ONLY acct10001org20002.reporting_awscostentryreservation
+    ADD CONSTRAINT reporting_awscostentryreservation_reservation_arn_key UNIQUE (reservation_arn);
+
+
+--
+-- Name: api_customer api_customer_account_id_org_id_40a33616_uniq; Type: CONSTRAINT; Schema: public; Owner: kokuadmin
+--
+
+ALTER TABLE ONLY public.api_customer
+    ADD CONSTRAINT api_customer_account_id_org_id_40a33616_uniq UNIQUE (account_id, org_id);
 
 
 --
@@ -2278,7 +2306,7 @@ SELECT pg_catalog.setval('testcustomer.reporting_awscostentryreservation_id_seq'
 --
 
 ALTER TABLE ONLY public.api_customer
-    ADD CONSTRAINT api_customer_pkey PRIMARY KEY (group_ptr_id);
+    ADD CONSTRAINT api_customer_pkey PRIMARY KEY (id);
 
 
 --
@@ -2322,11 +2350,11 @@ ALTER TABLE ONLY public.api_providerauthentication
 
 
 --
--- Name: api_providerauthentication api_providerauthentication_provider_resource_name_fa7deecb_uniq; Type: CONSTRAINT; Schema: public; Owner: kokuadmin
+-- Name: api_providerauthentication api_providerauthentication_provider_resource_name_key; Type: CONSTRAINT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.api_providerauthentication
-    ADD CONSTRAINT api_providerauthentication_provider_resource_name_fa7deecb_uniq UNIQUE (provider_resource_name);
+    ADD CONSTRAINT api_providerauthentication_provider_resource_name_key UNIQUE (provider_resource_name);
 
 
 --
@@ -2354,22 +2382,6 @@ ALTER TABLE ONLY public.api_providerbillingsource
 
 
 --
--- Name: api_resettoken api_resettoken_pkey; Type: CONSTRAINT; Schema: public; Owner: kokuadmin
---
-
-ALTER TABLE ONLY public.api_resettoken
-    ADD CONSTRAINT api_resettoken_pkey PRIMARY KEY (id);
-
-
---
--- Name: api_resettoken api_resettoken_token_key; Type: CONSTRAINT; Schema: public; Owner: kokuadmin
---
-
-ALTER TABLE ONLY public.api_resettoken
-    ADD CONSTRAINT api_resettoken_token_key UNIQUE (token);
-
-
---
 -- Name: api_tenant api_tenant_pkey; Type: CONSTRAINT; Schema: public; Owner: kokuadmin
 --
 
@@ -2390,7 +2402,15 @@ ALTER TABLE ONLY public.api_tenant
 --
 
 ALTER TABLE ONLY public.api_user
-    ADD CONSTRAINT api_user_pkey PRIMARY KEY (user_ptr_id);
+    ADD CONSTRAINT api_user_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: api_user api_user_username_key; Type: CONSTRAINT; Schema: public; Owner: kokuadmin
+--
+
+ALTER TABLE ONLY public.api_user
+    ADD CONSTRAINT api_user_username_key UNIQUE (username);
 
 
 --
@@ -2522,22 +2542,6 @@ ALTER TABLE ONLY public.auth_user
 
 
 --
--- Name: authtoken_token authtoken_token_pkey; Type: CONSTRAINT; Schema: public; Owner: kokuadmin
---
-
-ALTER TABLE ONLY public.authtoken_token
-    ADD CONSTRAINT authtoken_token_pkey PRIMARY KEY (key);
-
-
---
--- Name: authtoken_token authtoken_token_user_id_key; Type: CONSTRAINT; Schema: public; Owner: kokuadmin
---
-
-ALTER TABLE ONLY public.authtoken_token
-    ADD CONSTRAINT authtoken_token_user_id_key UNIQUE (user_id);
-
-
---
 -- Name: django_admin_log django_admin_log_pkey; Type: CONSTRAINT; Schema: public; Owner: kokuadmin
 --
 
@@ -2650,138 +2654,143 @@ ALTER TABLE ONLY public.si_unit_scale
 
 
 --
--- Name: django_migrations django_migrations_pkey; Type: CONSTRAINT; Schema: testcustomer; Owner: kokuadmin
+-- Name: interval_start_idx; Type: INDEX; Schema: acct10001org20002; Owner: kokuadmin
 --
 
-ALTER TABLE ONLY testcustomer.django_migrations
-    ADD CONSTRAINT django_migrations_pkey PRIMARY KEY (id);
-
-
---
--- Name: reporting_awsaccountalias reporting_awsaccountalias_account_id_key; Type: CONSTRAINT; Schema: testcustomer; Owner: kokuadmin
---
-
-ALTER TABLE ONLY testcustomer.reporting_awsaccountalias
-    ADD CONSTRAINT reporting_awsaccountalias_account_id_key UNIQUE (account_id);
+CREATE INDEX interval_start_idx ON acct10001org20002.reporting_awscostentry USING btree (interval_start);
 
 
 --
--- Name: reporting_awsaccountalias reporting_awsaccountalias_pkey; Type: CONSTRAINT; Schema: testcustomer; Owner: kokuadmin
+-- Name: product_code_idx; Type: INDEX; Schema: acct10001org20002; Owner: kokuadmin
 --
 
-ALTER TABLE ONLY testcustomer.reporting_awsaccountalias
-    ADD CONSTRAINT reporting_awsaccountalias_pkey PRIMARY KEY (id);
-
-
---
--- Name: reporting_awscostentry reporting_awscostentry_pkey; Type: CONSTRAINT; Schema: testcustomer; Owner: kokuadmin
---
-
-ALTER TABLE ONLY testcustomer.reporting_awscostentry
-    ADD CONSTRAINT reporting_awscostentry_pkey PRIMARY KEY (id);
+CREATE INDEX product_code_idx ON acct10001org20002.reporting_awscostentrylineitem_daily USING btree (product_code);
 
 
 --
--- Name: reporting_awscostentrybill reporting_awscostentrybill_pkey; Type: CONSTRAINT; Schema: testcustomer; Owner: kokuadmin
+-- Name: region_idx; Type: INDEX; Schema: acct10001org20002; Owner: kokuadmin
 --
 
-ALTER TABLE ONLY testcustomer.reporting_awscostentrybill
-    ADD CONSTRAINT reporting_awscostentrybill_pkey PRIMARY KEY (id);
-
-
---
--- Name: reporting_awscostentrylineitem_aggregates reporting_awscostentrylineitem_aggregates_pkey; Type: CONSTRAINT; Schema: testcustomer; Owner: kokuadmin
---
-
-ALTER TABLE ONLY testcustomer.reporting_awscostentrylineitem_aggregates
-    ADD CONSTRAINT reporting_awscostentrylineitem_aggregates_pkey PRIMARY KEY (id);
+CREATE INDEX region_idx ON acct10001org20002.reporting_awscostentryproduct USING btree (region);
 
 
 --
--- Name: reporting_awscostentrylineitem_daily reporting_awscostentrylineitem_daily_pkey; Type: CONSTRAINT; Schema: testcustomer; Owner: kokuadmin
+-- Name: reporting_awsaccountalias_account_id_85724b8c_like; Type: INDEX; Schema: acct10001org20002; Owner: kokuadmin
 --
 
-ALTER TABLE ONLY testcustomer.reporting_awscostentrylineitem_daily
-    ADD CONSTRAINT reporting_awscostentrylineitem_daily_pkey PRIMARY KEY (id);
-
-
---
--- Name: reporting_awscostentrylineitem_daily_summary reporting_awscostentrylineitem_daily_summary_pkey; Type: CONSTRAINT; Schema: testcustomer; Owner: kokuadmin
---
-
-ALTER TABLE ONLY testcustomer.reporting_awscostentrylineitem_daily_summary
-    ADD CONSTRAINT reporting_awscostentrylineitem_daily_summary_pkey PRIMARY KEY (id);
+CREATE INDEX reporting_awsaccountalias_account_id_85724b8c_like ON acct10001org20002.reporting_awsaccountalias USING btree (account_id varchar_pattern_ops);
 
 
 --
--- Name: reporting_awscostentrylineitem reporting_awscostentrylineitem_hash_cost_entry_id_f3893306_uniq; Type: CONSTRAINT; Schema: testcustomer; Owner: kokuadmin
+-- Name: reporting_awscostentry_bill_id_017f27a3; Type: INDEX; Schema: acct10001org20002; Owner: kokuadmin
 --
 
-ALTER TABLE ONLY testcustomer.reporting_awscostentrylineitem
-    ADD CONSTRAINT reporting_awscostentrylineitem_hash_cost_entry_id_f3893306_uniq UNIQUE (hash, cost_entry_id);
-
-
---
--- Name: reporting_awscostentrylineitem reporting_awscostentrylineitem_pkey; Type: CONSTRAINT; Schema: testcustomer; Owner: kokuadmin
---
-
-ALTER TABLE ONLY testcustomer.reporting_awscostentrylineitem
-    ADD CONSTRAINT reporting_awscostentrylineitem_pkey PRIMARY KEY (id);
+CREATE INDEX reporting_awscostentry_bill_id_017f27a3 ON acct10001org20002.reporting_awscostentry USING btree (bill_id);
 
 
 --
--- Name: reporting_awscostentryproduct reporting_awscostentrypr_sku_product_name_region_fea902ae_uniq; Type: CONSTRAINT; Schema: testcustomer; Owner: kokuadmin
+-- Name: reporting_awscostentryline_account_alias_id_684d6c01; Type: INDEX; Schema: acct10001org20002; Owner: kokuadmin
 --
 
-ALTER TABLE ONLY testcustomer.reporting_awscostentryproduct
-    ADD CONSTRAINT reporting_awscostentrypr_sku_product_name_region_fea902ae_uniq UNIQUE (sku, product_name, region);
-
-
---
--- Name: reporting_awscostentrypricing reporting_awscostentrypricing_pkey; Type: CONSTRAINT; Schema: testcustomer; Owner: kokuadmin
---
-
-ALTER TABLE ONLY testcustomer.reporting_awscostentrypricing
-    ADD CONSTRAINT reporting_awscostentrypricing_pkey PRIMARY KEY (id);
+CREATE INDEX reporting_awscostentryline_account_alias_id_684d6c01 ON acct10001org20002.reporting_awscostentrylineitem_daily_summary USING btree (account_alias_id);
 
 
 --
--- Name: reporting_awscostentrypricing reporting_awscostentrypricing_term_unit_c3978af3_uniq; Type: CONSTRAINT; Schema: testcustomer; Owner: kokuadmin
+-- Name: reporting_awscostentryline_cost_entry_pricing_id_5a6a9b38; Type: INDEX; Schema: acct10001org20002; Owner: kokuadmin
 --
 
-ALTER TABLE ONLY testcustomer.reporting_awscostentrypricing
-    ADD CONSTRAINT reporting_awscostentrypricing_term_unit_c3978af3_uniq UNIQUE (term, unit);
-
-
---
--- Name: reporting_awscostentryproduct reporting_awscostentryproduct_pkey; Type: CONSTRAINT; Schema: testcustomer; Owner: kokuadmin
---
-
-ALTER TABLE ONLY testcustomer.reporting_awscostentryproduct
-    ADD CONSTRAINT reporting_awscostentryproduct_pkey PRIMARY KEY (id);
+CREATE INDEX reporting_awscostentryline_cost_entry_pricing_id_5a6a9b38 ON acct10001org20002.reporting_awscostentrylineitem_daily USING btree (cost_entry_pricing_id);
 
 
 --
--- Name: reporting_awscostentryreservation reporting_awscostentryreservation_pkey; Type: CONSTRAINT; Schema: testcustomer; Owner: kokuadmin
+-- Name: reporting_awscostentryline_cost_entry_product_id_4d8ef2fd; Type: INDEX; Schema: acct10001org20002; Owner: kokuadmin
 --
 
-ALTER TABLE ONLY testcustomer.reporting_awscostentryreservation
-    ADD CONSTRAINT reporting_awscostentryreservation_pkey PRIMARY KEY (id);
-
-
---
--- Name: reporting_awscostentryreservation reporting_awscostentryreservation_reservation_arn_key; Type: CONSTRAINT; Schema: testcustomer; Owner: kokuadmin
---
-
-ALTER TABLE ONLY testcustomer.reporting_awscostentryreservation
-    ADD CONSTRAINT reporting_awscostentryreservation_reservation_arn_key UNIQUE (reservation_arn);
+CREATE INDEX reporting_awscostentryline_cost_entry_product_id_4d8ef2fd ON acct10001org20002.reporting_awscostentrylineitem_daily USING btree (cost_entry_product_id);
 
 
 --
--- Name: api_customer_owner_id_c1534767; Type: INDEX; Schema: public; Owner: kokuadmin
+-- Name: reporting_awscostentryline_cost_entry_reservation_id_13b1cb08; Type: INDEX; Schema: acct10001org20002; Owner: kokuadmin
 --
 
-CREATE INDEX api_customer_owner_id_c1534767 ON public.api_customer USING btree (owner_id);
+CREATE INDEX reporting_awscostentryline_cost_entry_reservation_id_13b1cb08 ON acct10001org20002.reporting_awscostentrylineitem_daily USING btree (cost_entry_reservation_id);
+
+
+--
+-- Name: reporting_awscostentryline_cost_entry_reservation_id_9332b371; Type: INDEX; Schema: acct10001org20002; Owner: kokuadmin
+--
+
+CREATE INDEX reporting_awscostentryline_cost_entry_reservation_id_9332b371 ON acct10001org20002.reporting_awscostentrylineitem USING btree (cost_entry_reservation_id);
+
+
+--
+-- Name: reporting_awscostentrylineitem_cost_entry_bill_id_5ae74e09; Type: INDEX; Schema: acct10001org20002; Owner: kokuadmin
+--
+
+CREATE INDEX reporting_awscostentrylineitem_cost_entry_bill_id_5ae74e09 ON acct10001org20002.reporting_awscostentrylineitem USING btree (cost_entry_bill_id);
+
+
+--
+-- Name: reporting_awscostentrylineitem_cost_entry_id_4d1a7fc4; Type: INDEX; Schema: acct10001org20002; Owner: kokuadmin
+--
+
+CREATE INDEX reporting_awscostentrylineitem_cost_entry_id_4d1a7fc4 ON acct10001org20002.reporting_awscostentrylineitem USING btree (cost_entry_id);
+
+
+--
+-- Name: reporting_awscostentrylineitem_cost_entry_pricing_id_a654a7e3; Type: INDEX; Schema: acct10001org20002; Owner: kokuadmin
+--
+
+CREATE INDEX reporting_awscostentrylineitem_cost_entry_pricing_id_a654a7e3 ON acct10001org20002.reporting_awscostentrylineitem USING btree (cost_entry_pricing_id);
+
+
+--
+-- Name: reporting_awscostentrylineitem_cost_entry_product_id_29c80210; Type: INDEX; Schema: acct10001org20002; Owner: kokuadmin
+--
+
+CREATE INDEX reporting_awscostentrylineitem_cost_entry_product_id_29c80210 ON acct10001org20002.reporting_awscostentrylineitem USING btree (cost_entry_product_id);
+
+
+--
+-- Name: reporting_awscostentryreservation_reservation_arn_e387aa5b_like; Type: INDEX; Schema: acct10001org20002; Owner: kokuadmin
+--
+
+CREATE INDEX reporting_awscostentryreservation_reservation_arn_e387aa5b_like ON acct10001org20002.reporting_awscostentryreservation USING btree (reservation_arn text_pattern_ops);
+
+
+--
+-- Name: summary_product_code_idx; Type: INDEX; Schema: acct10001org20002; Owner: kokuadmin
+--
+
+CREATE INDEX summary_product_code_idx ON acct10001org20002.reporting_awscostentrylineitem_daily_summary USING btree (product_code);
+
+
+--
+-- Name: summary_usage_account_id_idx; Type: INDEX; Schema: acct10001org20002; Owner: kokuadmin
+--
+
+CREATE INDEX summary_usage_account_id_idx ON acct10001org20002.reporting_awscostentrylineitem_daily_summary USING btree (usage_account_id);
+
+
+--
+-- Name: summary_usage_start_idx; Type: INDEX; Schema: acct10001org20002; Owner: kokuadmin
+--
+
+CREATE INDEX summary_usage_start_idx ON acct10001org20002.reporting_awscostentrylineitem_daily_summary USING btree (usage_start);
+
+
+--
+-- Name: usage_account_id_idx; Type: INDEX; Schema: acct10001org20002; Owner: kokuadmin
+--
+
+CREATE INDEX usage_account_id_idx ON acct10001org20002.reporting_awscostentrylineitem_daily USING btree (usage_account_id);
+
+
+--
+-- Name: usage_start_idx; Type: INDEX; Schema: acct10001org20002; Owner: kokuadmin
+--
+
+CREATE INDEX usage_start_idx ON acct10001org20002.reporting_awscostentrylineitem_daily USING btree (usage_start);
 
 
 --
@@ -2827,17 +2836,24 @@ CREATE INDEX api_providerauthentication_provider_resource_name_fa7deecb_like ON 
 
 
 --
--- Name: api_resettoken_user_id_4b3d42c0; Type: INDEX; Schema: public; Owner: kokuadmin
---
-
-CREATE INDEX api_resettoken_user_id_4b3d42c0 ON public.api_resettoken USING btree (user_id);
-
-
---
 -- Name: api_tenant_schema_name_733d339b_like; Type: INDEX; Schema: public; Owner: kokuadmin
 --
 
 CREATE INDEX api_tenant_schema_name_733d339b_like ON public.api_tenant USING btree (schema_name varchar_pattern_ops);
+
+
+--
+-- Name: api_user_customer_id_90bd21ef; Type: INDEX; Schema: public; Owner: kokuadmin
+--
+
+CREATE INDEX api_user_customer_id_90bd21ef ON public.api_user USING btree (customer_id);
+
+
+--
+-- Name: api_user_username_cf4e88d2_like; Type: INDEX; Schema: public; Owner: kokuadmin
+--
+
+CREATE INDEX api_user_username_cf4e88d2_like ON public.api_user USING btree (username varchar_pattern_ops);
 
 
 --
@@ -2911,13 +2927,6 @@ CREATE INDEX auth_user_username_6821ab7c_like ON public.auth_user USING btree (u
 
 
 --
--- Name: authtoken_token_key_10f0b77e_like; Type: INDEX; Schema: public; Owner: kokuadmin
---
-
-CREATE INDEX authtoken_token_key_10f0b77e_like ON public.authtoken_token USING btree (key varchar_pattern_ops);
-
-
---
 -- Name: django_admin_log_content_type_id_c4bce8eb; Type: INDEX; Schema: public; Owner: kokuadmin
 --
 
@@ -2988,159 +2997,83 @@ CREATE INDEX si_unit_scale_prefix_eb9daade_like ON public.si_unit_scale USING bt
 
 
 --
--- Name: interval_start_idx; Type: INDEX; Schema: testcustomer; Owner: kokuadmin
+-- Name: reporting_awscostentrylineitem_daily_summary reporting_awscostent_account_alias_id_684d6c01_fk_reporting; Type: FK CONSTRAINT; Schema: acct10001org20002; Owner: kokuadmin
 --
 
-CREATE INDEX interval_start_idx ON testcustomer.reporting_awscostentry USING btree (interval_start);
-
-
---
--- Name: product_code_idx; Type: INDEX; Schema: testcustomer; Owner: kokuadmin
---
-
-CREATE INDEX product_code_idx ON testcustomer.reporting_awscostentrylineitem_daily USING btree (product_code);
+ALTER TABLE ONLY acct10001org20002.reporting_awscostentrylineitem_daily_summary
+    ADD CONSTRAINT reporting_awscostent_account_alias_id_684d6c01_fk_reporting FOREIGN KEY (account_alias_id) REFERENCES acct10001org20002.reporting_awsaccountalias(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
--- Name: region_idx; Type: INDEX; Schema: testcustomer; Owner: kokuadmin
+-- Name: reporting_awscostentry reporting_awscostent_bill_id_017f27a3_fk_reporting; Type: FK CONSTRAINT; Schema: acct10001org20002; Owner: kokuadmin
 --
 
-CREATE INDEX region_idx ON testcustomer.reporting_awscostentryproduct USING btree (region);
-
-
---
--- Name: reporting_awsaccountalias_account_id_85724b8c_like; Type: INDEX; Schema: testcustomer; Owner: kokuadmin
---
-
-CREATE INDEX reporting_awsaccountalias_account_id_85724b8c_like ON testcustomer.reporting_awsaccountalias USING btree (account_id varchar_pattern_ops);
+ALTER TABLE ONLY acct10001org20002.reporting_awscostentry
+    ADD CONSTRAINT reporting_awscostent_bill_id_017f27a3_fk_reporting FOREIGN KEY (bill_id) REFERENCES acct10001org20002.reporting_awscostentrybill(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
--- Name: reporting_awscostentry_bill_id_017f27a3; Type: INDEX; Schema: testcustomer; Owner: kokuadmin
+-- Name: reporting_awscostentrylineitem reporting_awscostent_cost_entry_bill_id_5ae74e09_fk_reporting; Type: FK CONSTRAINT; Schema: acct10001org20002; Owner: kokuadmin
 --
 
-CREATE INDEX reporting_awscostentry_bill_id_017f27a3 ON testcustomer.reporting_awscostentry USING btree (bill_id);
-
-
---
--- Name: reporting_awscostentryline_account_alias_id_684d6c01; Type: INDEX; Schema: testcustomer; Owner: kokuadmin
---
-
-CREATE INDEX reporting_awscostentryline_account_alias_id_684d6c01 ON testcustomer.reporting_awscostentrylineitem_daily_summary USING btree (account_alias_id);
+ALTER TABLE ONLY acct10001org20002.reporting_awscostentrylineitem
+    ADD CONSTRAINT reporting_awscostent_cost_entry_bill_id_5ae74e09_fk_reporting FOREIGN KEY (cost_entry_bill_id) REFERENCES acct10001org20002.reporting_awscostentrybill(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
--- Name: reporting_awscostentryline_cost_entry_pricing_id_5a6a9b38; Type: INDEX; Schema: testcustomer; Owner: kokuadmin
+-- Name: reporting_awscostentrylineitem reporting_awscostent_cost_entry_id_4d1a7fc4_fk_reporting; Type: FK CONSTRAINT; Schema: acct10001org20002; Owner: kokuadmin
 --
 
-CREATE INDEX reporting_awscostentryline_cost_entry_pricing_id_5a6a9b38 ON testcustomer.reporting_awscostentrylineitem_daily USING btree (cost_entry_pricing_id);
-
-
---
--- Name: reporting_awscostentryline_cost_entry_product_id_4d8ef2fd; Type: INDEX; Schema: testcustomer; Owner: kokuadmin
---
-
-CREATE INDEX reporting_awscostentryline_cost_entry_product_id_4d8ef2fd ON testcustomer.reporting_awscostentrylineitem_daily USING btree (cost_entry_product_id);
+ALTER TABLE ONLY acct10001org20002.reporting_awscostentrylineitem
+    ADD CONSTRAINT reporting_awscostent_cost_entry_id_4d1a7fc4_fk_reporting FOREIGN KEY (cost_entry_id) REFERENCES acct10001org20002.reporting_awscostentry(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
--- Name: reporting_awscostentryline_cost_entry_reservation_id_13b1cb08; Type: INDEX; Schema: testcustomer; Owner: kokuadmin
+-- Name: reporting_awscostentrylineitem_daily reporting_awscostent_cost_entry_pricing_i_5a6a9b38_fk_reporting; Type: FK CONSTRAINT; Schema: acct10001org20002; Owner: kokuadmin
 --
 
-CREATE INDEX reporting_awscostentryline_cost_entry_reservation_id_13b1cb08 ON testcustomer.reporting_awscostentrylineitem_daily USING btree (cost_entry_reservation_id);
-
-
---
--- Name: reporting_awscostentryline_cost_entry_reservation_id_9332b371; Type: INDEX; Schema: testcustomer; Owner: kokuadmin
---
-
-CREATE INDEX reporting_awscostentryline_cost_entry_reservation_id_9332b371 ON testcustomer.reporting_awscostentrylineitem USING btree (cost_entry_reservation_id);
+ALTER TABLE ONLY acct10001org20002.reporting_awscostentrylineitem_daily
+    ADD CONSTRAINT reporting_awscostent_cost_entry_pricing_i_5a6a9b38_fk_reporting FOREIGN KEY (cost_entry_pricing_id) REFERENCES acct10001org20002.reporting_awscostentrypricing(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
--- Name: reporting_awscostentrylineitem_cost_entry_bill_id_5ae74e09; Type: INDEX; Schema: testcustomer; Owner: kokuadmin
+-- Name: reporting_awscostentrylineitem reporting_awscostent_cost_entry_pricing_i_a654a7e3_fk_reporting; Type: FK CONSTRAINT; Schema: acct10001org20002; Owner: kokuadmin
 --
 
-CREATE INDEX reporting_awscostentrylineitem_cost_entry_bill_id_5ae74e09 ON testcustomer.reporting_awscostentrylineitem USING btree (cost_entry_bill_id);
-
-
---
--- Name: reporting_awscostentrylineitem_cost_entry_id_4d1a7fc4; Type: INDEX; Schema: testcustomer; Owner: kokuadmin
---
-
-CREATE INDEX reporting_awscostentrylineitem_cost_entry_id_4d1a7fc4 ON testcustomer.reporting_awscostentrylineitem USING btree (cost_entry_id);
+ALTER TABLE ONLY acct10001org20002.reporting_awscostentrylineitem
+    ADD CONSTRAINT reporting_awscostent_cost_entry_pricing_i_a654a7e3_fk_reporting FOREIGN KEY (cost_entry_pricing_id) REFERENCES acct10001org20002.reporting_awscostentrypricing(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
--- Name: reporting_awscostentrylineitem_cost_entry_pricing_id_a654a7e3; Type: INDEX; Schema: testcustomer; Owner: kokuadmin
+-- Name: reporting_awscostentrylineitem reporting_awscostent_cost_entry_product_i_29c80210_fk_reporting; Type: FK CONSTRAINT; Schema: acct10001org20002; Owner: kokuadmin
 --
 
-CREATE INDEX reporting_awscostentrylineitem_cost_entry_pricing_id_a654a7e3 ON testcustomer.reporting_awscostentrylineitem USING btree (cost_entry_pricing_id);
-
-
---
--- Name: reporting_awscostentrylineitem_cost_entry_product_id_29c80210; Type: INDEX; Schema: testcustomer; Owner: kokuadmin
---
-
-CREATE INDEX reporting_awscostentrylineitem_cost_entry_product_id_29c80210 ON testcustomer.reporting_awscostentrylineitem USING btree (cost_entry_product_id);
+ALTER TABLE ONLY acct10001org20002.reporting_awscostentrylineitem
+    ADD CONSTRAINT reporting_awscostent_cost_entry_product_i_29c80210_fk_reporting FOREIGN KEY (cost_entry_product_id) REFERENCES acct10001org20002.reporting_awscostentryproduct(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
--- Name: reporting_awscostentryreservation_reservation_arn_e387aa5b_like; Type: INDEX; Schema: testcustomer; Owner: kokuadmin
+-- Name: reporting_awscostentrylineitem_daily reporting_awscostent_cost_entry_product_i_4d8ef2fd_fk_reporting; Type: FK CONSTRAINT; Schema: acct10001org20002; Owner: kokuadmin
 --
 
-CREATE INDEX reporting_awscostentryreservation_reservation_arn_e387aa5b_like ON testcustomer.reporting_awscostentryreservation USING btree (reservation_arn text_pattern_ops);
-
-
---
--- Name: summary_product_code_idx; Type: INDEX; Schema: testcustomer; Owner: kokuadmin
---
-
-CREATE INDEX summary_product_code_idx ON testcustomer.reporting_awscostentrylineitem_daily_summary USING btree (product_code);
+ALTER TABLE ONLY acct10001org20002.reporting_awscostentrylineitem_daily
+    ADD CONSTRAINT reporting_awscostent_cost_entry_product_i_4d8ef2fd_fk_reporting FOREIGN KEY (cost_entry_product_id) REFERENCES acct10001org20002.reporting_awscostentryproduct(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
--- Name: summary_usage_account_id_idx; Type: INDEX; Schema: testcustomer; Owner: kokuadmin
+-- Name: reporting_awscostentrylineitem_daily reporting_awscostent_cost_entry_reservati_13b1cb08_fk_reporting; Type: FK CONSTRAINT; Schema: acct10001org20002; Owner: kokuadmin
 --
 
-CREATE INDEX summary_usage_account_id_idx ON testcustomer.reporting_awscostentrylineitem_daily_summary USING btree (usage_account_id);
-
-
---
--- Name: summary_usage_start_idx; Type: INDEX; Schema: testcustomer; Owner: kokuadmin
---
-
-CREATE INDEX summary_usage_start_idx ON testcustomer.reporting_awscostentrylineitem_daily_summary USING btree (usage_start);
+ALTER TABLE ONLY acct10001org20002.reporting_awscostentrylineitem_daily
+    ADD CONSTRAINT reporting_awscostent_cost_entry_reservati_13b1cb08_fk_reporting FOREIGN KEY (cost_entry_reservation_id) REFERENCES acct10001org20002.reporting_awscostentryreservation(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
--- Name: usage_account_id_idx; Type: INDEX; Schema: testcustomer; Owner: kokuadmin
+-- Name: reporting_awscostentrylineitem reporting_awscostent_cost_entry_reservati_9332b371_fk_reporting; Type: FK CONSTRAINT; Schema: acct10001org20002; Owner: kokuadmin
 --
 
-CREATE INDEX usage_account_id_idx ON testcustomer.reporting_awscostentrylineitem_daily USING btree (usage_account_id);
-
-
---
--- Name: usage_start_idx; Type: INDEX; Schema: testcustomer; Owner: kokuadmin
---
-
-CREATE INDEX usage_start_idx ON testcustomer.reporting_awscostentrylineitem_daily USING btree (usage_start);
-
-
---
--- Name: api_customer api_customer_group_ptr_id_fe96eec5_fk_auth_group_id; Type: FK CONSTRAINT; Schema: public; Owner: kokuadmin
---
-
-ALTER TABLE ONLY public.api_customer
-    ADD CONSTRAINT api_customer_group_ptr_id_fe96eec5_fk_auth_group_id FOREIGN KEY (group_ptr_id) REFERENCES public.auth_group(id) DEFERRABLE INITIALLY DEFERRED;
-
-
---
--- Name: api_customer api_customer_owner_id_c1534767_fk_api_user_user_ptr_id; Type: FK CONSTRAINT; Schema: public; Owner: kokuadmin
---
-
-ALTER TABLE ONLY public.api_customer
-    ADD CONSTRAINT api_customer_owner_id_c1534767_fk_api_user_user_ptr_id FOREIGN KEY (owner_id) REFERENCES public.api_user(user_ptr_id) DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE ONLY acct10001org20002.reporting_awscostentrylineitem
+    ADD CONSTRAINT reporting_awscostent_cost_entry_reservati_9332b371_fk_reporting FOREIGN KEY (cost_entry_reservation_id) REFERENCES acct10001org20002.reporting_awscostentryreservation(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
@@ -3160,43 +3093,35 @@ ALTER TABLE ONLY public.api_provider
 
 
 --
--- Name: api_provider api_provider_created_by_id_e740fc35_fk_api_user_user_ptr_id; Type: FK CONSTRAINT; Schema: public; Owner: kokuadmin
+-- Name: api_provider api_provider_created_by_id_e740fc35_fk_api_user_id; Type: FK CONSTRAINT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.api_provider
-    ADD CONSTRAINT api_provider_created_by_id_e740fc35_fk_api_user_user_ptr_id FOREIGN KEY (created_by_id) REFERENCES public.api_user(user_ptr_id) DEFERRABLE INITIALLY DEFERRED;
+    ADD CONSTRAINT api_provider_created_by_id_e740fc35_fk_api_user_id FOREIGN KEY (created_by_id) REFERENCES public.api_user(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
--- Name: api_provider api_provider_customer_id_87062290_fk_api_customer_group_ptr_id; Type: FK CONSTRAINT; Schema: public; Owner: kokuadmin
+-- Name: api_provider api_provider_customer_id_87062290_fk_api_customer_id; Type: FK CONSTRAINT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.api_provider
-    ADD CONSTRAINT api_provider_customer_id_87062290_fk_api_customer_group_ptr_id FOREIGN KEY (customer_id) REFERENCES public.api_customer(group_ptr_id) DEFERRABLE INITIALLY DEFERRED;
+    ADD CONSTRAINT api_provider_customer_id_87062290_fk_api_customer_id FOREIGN KEY (customer_id) REFERENCES public.api_customer(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
--- Name: api_resettoken api_resettoken_user_id_4b3d42c0_fk_api_user_user_ptr_id; Type: FK CONSTRAINT; Schema: public; Owner: kokuadmin
---
-
-ALTER TABLE ONLY public.api_resettoken
-    ADD CONSTRAINT api_resettoken_user_id_4b3d42c0_fk_api_user_user_ptr_id FOREIGN KEY (user_id) REFERENCES public.api_user(user_ptr_id) DEFERRABLE INITIALLY DEFERRED;
-
-
---
--- Name: api_user api_user_user_ptr_id_5a766ead_fk_auth_user_id; Type: FK CONSTRAINT; Schema: public; Owner: kokuadmin
+-- Name: api_user api_user_customer_id_90bd21ef_fk_api_customer_id; Type: FK CONSTRAINT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.api_user
-    ADD CONSTRAINT api_user_user_ptr_id_5a766ead_fk_auth_user_id FOREIGN KEY (user_ptr_id) REFERENCES public.auth_user(id) DEFERRABLE INITIALLY DEFERRED;
+    ADD CONSTRAINT api_user_customer_id_90bd21ef_fk_api_customer_id FOREIGN KEY (customer_id) REFERENCES public.api_customer(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
--- Name: api_userpreference api_userpreference_user_id_e62eaffa_fk_api_user_user_ptr_id; Type: FK CONSTRAINT; Schema: public; Owner: kokuadmin
+-- Name: api_userpreference api_userpreference_user_id_e62eaffa_fk_api_user_id; Type: FK CONSTRAINT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.api_userpreference
-    ADD CONSTRAINT api_userpreference_user_id_e62eaffa_fk_api_user_user_ptr_id FOREIGN KEY (user_id) REFERENCES public.api_user(user_ptr_id) DEFERRABLE INITIALLY DEFERRED;
+    ADD CONSTRAINT api_userpreference_user_id_e62eaffa_fk_api_user_id FOREIGN KEY (user_id) REFERENCES public.api_user(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
@@ -3256,14 +3181,6 @@ ALTER TABLE ONLY public.auth_user_user_permissions
 
 
 --
--- Name: authtoken_token authtoken_token_user_id_35299eff_fk_auth_user_id; Type: FK CONSTRAINT; Schema: public; Owner: kokuadmin
---
-
-ALTER TABLE ONLY public.authtoken_token
-    ADD CONSTRAINT authtoken_token_user_id_35299eff_fk_auth_user_id FOREIGN KEY (user_id) REFERENCES public.auth_user(id) DEFERRABLE INITIALLY DEFERRED;
-
-
---
 -- Name: django_admin_log django_admin_log_content_type_id_c4bce8eb_fk_django_co; Type: FK CONSTRAINT; Schema: public; Owner: kokuadmin
 --
 
@@ -3285,86 +3202,6 @@ ALTER TABLE ONLY public.django_admin_log
 
 ALTER TABLE ONLY public.reporting_common_costusagereportstatus
     ADD CONSTRAINT reporting_common_cos_provider_id_f012c75a_fk_api_provi FOREIGN KEY (provider_id) REFERENCES public.api_provider(id) DEFERRABLE INITIALLY DEFERRED;
-
-
---
--- Name: reporting_awscostentrylineitem_daily_summary reporting_awscostent_account_alias_id_684d6c01_fk_reporting; Type: FK CONSTRAINT; Schema: testcustomer; Owner: kokuadmin
---
-
-ALTER TABLE ONLY testcustomer.reporting_awscostentrylineitem_daily_summary
-    ADD CONSTRAINT reporting_awscostent_account_alias_id_684d6c01_fk_reporting FOREIGN KEY (account_alias_id) REFERENCES testcustomer.reporting_awsaccountalias(id) DEFERRABLE INITIALLY DEFERRED;
-
-
---
--- Name: reporting_awscostentry reporting_awscostent_bill_id_017f27a3_fk_reporting; Type: FK CONSTRAINT; Schema: testcustomer; Owner: kokuadmin
---
-
-ALTER TABLE ONLY testcustomer.reporting_awscostentry
-    ADD CONSTRAINT reporting_awscostent_bill_id_017f27a3_fk_reporting FOREIGN KEY (bill_id) REFERENCES testcustomer.reporting_awscostentrybill(id) DEFERRABLE INITIALLY DEFERRED;
-
-
---
--- Name: reporting_awscostentrylineitem reporting_awscostent_cost_entry_bill_id_5ae74e09_fk_reporting; Type: FK CONSTRAINT; Schema: testcustomer; Owner: kokuadmin
---
-
-ALTER TABLE ONLY testcustomer.reporting_awscostentrylineitem
-    ADD CONSTRAINT reporting_awscostent_cost_entry_bill_id_5ae74e09_fk_reporting FOREIGN KEY (cost_entry_bill_id) REFERENCES testcustomer.reporting_awscostentrybill(id) DEFERRABLE INITIALLY DEFERRED;
-
-
---
--- Name: reporting_awscostentrylineitem reporting_awscostent_cost_entry_id_4d1a7fc4_fk_reporting; Type: FK CONSTRAINT; Schema: testcustomer; Owner: kokuadmin
---
-
-ALTER TABLE ONLY testcustomer.reporting_awscostentrylineitem
-    ADD CONSTRAINT reporting_awscostent_cost_entry_id_4d1a7fc4_fk_reporting FOREIGN KEY (cost_entry_id) REFERENCES testcustomer.reporting_awscostentry(id) DEFERRABLE INITIALLY DEFERRED;
-
-
---
--- Name: reporting_awscostentrylineitem_daily reporting_awscostent_cost_entry_pricing_i_5a6a9b38_fk_reporting; Type: FK CONSTRAINT; Schema: testcustomer; Owner: kokuadmin
---
-
-ALTER TABLE ONLY testcustomer.reporting_awscostentrylineitem_daily
-    ADD CONSTRAINT reporting_awscostent_cost_entry_pricing_i_5a6a9b38_fk_reporting FOREIGN KEY (cost_entry_pricing_id) REFERENCES testcustomer.reporting_awscostentrypricing(id) DEFERRABLE INITIALLY DEFERRED;
-
-
---
--- Name: reporting_awscostentrylineitem reporting_awscostent_cost_entry_pricing_i_a654a7e3_fk_reporting; Type: FK CONSTRAINT; Schema: testcustomer; Owner: kokuadmin
---
-
-ALTER TABLE ONLY testcustomer.reporting_awscostentrylineitem
-    ADD CONSTRAINT reporting_awscostent_cost_entry_pricing_i_a654a7e3_fk_reporting FOREIGN KEY (cost_entry_pricing_id) REFERENCES testcustomer.reporting_awscostentrypricing(id) DEFERRABLE INITIALLY DEFERRED;
-
-
---
--- Name: reporting_awscostentrylineitem reporting_awscostent_cost_entry_product_i_29c80210_fk_reporting; Type: FK CONSTRAINT; Schema: testcustomer; Owner: kokuadmin
---
-
-ALTER TABLE ONLY testcustomer.reporting_awscostentrylineitem
-    ADD CONSTRAINT reporting_awscostent_cost_entry_product_i_29c80210_fk_reporting FOREIGN KEY (cost_entry_product_id) REFERENCES testcustomer.reporting_awscostentryproduct(id) DEFERRABLE INITIALLY DEFERRED;
-
-
---
--- Name: reporting_awscostentrylineitem_daily reporting_awscostent_cost_entry_product_i_4d8ef2fd_fk_reporting; Type: FK CONSTRAINT; Schema: testcustomer; Owner: kokuadmin
---
-
-ALTER TABLE ONLY testcustomer.reporting_awscostentrylineitem_daily
-    ADD CONSTRAINT reporting_awscostent_cost_entry_product_i_4d8ef2fd_fk_reporting FOREIGN KEY (cost_entry_product_id) REFERENCES testcustomer.reporting_awscostentryproduct(id) DEFERRABLE INITIALLY DEFERRED;
-
-
---
--- Name: reporting_awscostentrylineitem_daily reporting_awscostent_cost_entry_reservati_13b1cb08_fk_reporting; Type: FK CONSTRAINT; Schema: testcustomer; Owner: kokuadmin
---
-
-ALTER TABLE ONLY testcustomer.reporting_awscostentrylineitem_daily
-    ADD CONSTRAINT reporting_awscostent_cost_entry_reservati_13b1cb08_fk_reporting FOREIGN KEY (cost_entry_reservation_id) REFERENCES testcustomer.reporting_awscostentryreservation(id) DEFERRABLE INITIALLY DEFERRED;
-
-
---
--- Name: reporting_awscostentrylineitem reporting_awscostent_cost_entry_reservati_9332b371_fk_reporting; Type: FK CONSTRAINT; Schema: testcustomer; Owner: kokuadmin
---
-
-ALTER TABLE ONLY testcustomer.reporting_awscostentrylineitem
-    ADD CONSTRAINT reporting_awscostent_cost_entry_reservati_9332b371_fk_reporting FOREIGN KEY (cost_entry_reservation_id) REFERENCES testcustomer.reporting_awscostentryreservation(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --

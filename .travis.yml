@@ -18,6 +18,8 @@ env:
   DATABASE_PORT=5432
   DATABASE_PASSWORD=''
 
+before_install:
+  - export BOTO_CONFIG=/dev/null
 install:
     - pip install tox codecov
 

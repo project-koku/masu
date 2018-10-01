@@ -127,6 +127,18 @@ class TestAWSUtils(TestCase):
         self.assertEqual(mock_account_id, account_id)
         self.assertEqual(mock_alias, account_alias)
 
+    @patch('masu.util.aws.common.get_assume_role_session')
+    def test_get_account_alias_from_role_arn_no_policy(self, mock_get_role_session):
+        mock_session = mock_get_role_session.return_value
+        mock_client = mock_session.client
+        mock_client.return_value.list_account_aliases.side_effect = ClientError({}, 'Error')
+
+        mock_account_id = '111111111111'
+        role_arn = 'arn:aws:iam::{}:role/CostManagement'.format(mock_account_id)
+
+        account_id, account_alias = utils.get_account_alias_from_role_arn(role_arn, mock_session)
+        self.assertEqual(mock_account_id, account_id)
+        self.assertEqual(mock_account_id, account_alias)
 
 class AwsArnTest(TestCase):
     """AwnArn class test case."""

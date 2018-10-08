@@ -8,105 +8,126 @@ Masu
 About
 ~~~~~
 
-Data ingestion engine for project-koku responsible for gathering cost and usage.
+Data ingestion engine for project-koku. Masu is responsible for gathering data about cost and resource usage.
+
+The Masu application contains several components - a web service, message bus, and workers. Masu also uses the Koku database. Configuration and management of the database are controlled from the Koku API application.
 
 Getting Started
 ===============
 
-This is a Python project developed using Python 3.6. Make sure you have at least this version installed.
+A basic deployment configuration is contained within the `openshift template files <https://github.com/project-koku/masu/blob/master/openshift>`__. These templates should be acceptable for most use cases.
+
+Parameterized values for most configuration options can be set using the provided example files. Copy the example file, removing the ``.example`` suffix. Then, update the parameter values as needed.
+
+Once the parameter files have been configured, the provided ``Makefile`` can be used to deploy the Masu components, either individually or all at once.
+
+To deploy all Masu components at once into an existing OpenShift cluster. ::
+
+    make oc-create-all
+
+``make help`` will show you a complete list of the available commands.
 
 Development
 ===========
 
-To get started developing against Masu first clone a local copy of the git repository. ::
+Prerequisites
+-------------
+
+* Python 3.6+
+* virtualenvwrapper
+* pipenv
+
+Setting up the development environment
+--------------------------------------
+
+To get started developing Masu, first clone a local copy of the git repository. ::
 
     git clone https://github.com/project-koku/masu
 
-Developing inside a virtual environment is recommended. A Pipfile is provided. Pipenv is recommended for combining virtual environment (virtualenv) and dependency management (pip). To install pipenv, use pip ::
+Create your virtualenv. ::
+
+    mkvirtualenv -p python3.6 masu
+
+    # optionally, associate the virtualenv with the masu git repo
+    cd /path/to/masu.git
+    setvirtualenvproject
+
+Activate the virtual environment. ::
+
+    workon masu
+
+Install pipenv. ::
 
     pip3 install pipenv
 
-Then project dependencies and a virtual environment can be created using ::
+Install the Masu dependencies, including development dependencies. ::
 
     pipenv install --dev
 
-To activate the virtual environment run ::
-
-    pipenv shell
-
 Running on OpenShift
 --------------------
-We are currently developing using OpenShift version 3.7. There are different setup requirements for Mac OS and Linux (instructions are provided for Fedora).
+Our development and deployment targets center around running Masu on `OpenShift <https://www.okd.io/>`__. OpenShift has different setup requirements for Mac OS and Linux. Instructions are provided for Fedora/CentOS/RHEL.
 
-Run `oc cluster up` once before running the make commands to generate the referenced config file.
+Run ``oc cluster up`` once before running the ``make`` commands to generate the referenced config file.
 
-Openshift does offer shell/tab completion. It can be generated for either bash/zsh and is available by running `oc completion bash|zsh` The following example generates a shell script for completion and sources the file.  ::
+Tab Completion
+**************
+The Openshift CLI does offer shell/tab completion. It can be generated for either bash/zsh and is available by running `oc completion bash|zsh` The following example generates a shell script for completion and sources the file.  ::
 
     oc completion zsh > $HOME/.oc/oc_completion.sh
     source $HOME/.oc/oc_completion.sh
 
-Local Development Cluster
--------------------------
-The following make commands can be used to create an OpenShift cluster with the necessary components to run Masu. ::
+Access to the Koku DB
+*********************
+To gain direct access to the Koku database running on OpenShift, port forwarding must be used. ::
 
-  # Start the OpenShift cluster
-  make oc-up
-
-  # Terminate the OpenShift cluster
-  make oc-down
-
-  # Clean out local data
-  make oc-clean
-
-There are a few ways to use OpenShift while developing Masu. It is possible to spin up the entire application and its dependent services, or just the dependent services can be spun up while using the local  dev server. ::
-
-  # Run everything through OpenShift
-  make oc-dev-all
-
-  # Run *just* a database and rabbitmq in Openshift, while running the server locally
-  make oc-dev-db
-  make oc-create-rabbitmq
-
-  # Run the Flask server locally with access to the OpenShift database
-  make oc-serve
-
-  # Run the celery worker locally with access to the OpenShift rabbitmq
-  celery -A masu.celery.worker --broker=amqp://localhost:5672// worker
-
-  # To clean up your development enviornment
-  make oc-rm-dev
-
-
-To gain temporary access to the database within OpenShift, port forwarding is used. ::
-
-  # Port forward to 15432
+  # Forward port 5432 on the database pod to localhost:15432
   make oc-forward-ports
 
+  # Access the DB
   psql koku -U kokuadmin -p 15432 -h localhost
 
-  # Stop port forwarding
+  # Stop forwarding
   make oc-stop-forwarding-ports
 
+Local and Mixed Development
+---------------------------
+There are several ways to run Masu components. Depending on your development needs, it may be useful to run some or all of Masu's components locally, outside of an OpenShift environment. This section will provide some examples of possible ways to deploy Masu for development purposes. This is intended to provide ideas. It is not an exhaustive or complete list of possibilities.
+
+1. Run everything inside OpenShift. ::
+   oc-create-all
+
+2. Run the Koku database and RabbitMQ in Openshift, but run the Masu API server locally. ::
+   make oc-create-db         # deploy the DB
+   make oc-create-rabbitmq   # deploy RabbitMQ
+   make oc-forward-ports     # set up port forwarding for the DB & RabbitMQ
+   make serve                # run the Flask API server locally
+
+3. Run RabbitMQ in OpenShift, but run the Celery task worker locally. ::
+   make oc-create-rabbitmq   # deploy RabbitMQ
+   make oc-forward-ports     # set up port forwarding for the DB & RabbitMQ
+
+   # run a local Celery worker
+   celery -A masu.celery.worker --broker=amqp://localhost:5672// worker
 
 Testing and Linting
 -------------------
 
-Masu uses tox to standardize the environment used when running tests. Essentially, tox manages its own virtual environment and a copy of required dependencies to run tests. To ensure a clean tox environment run ::
+Masu uses ``tox`` to run unit tests. The simplest use case is to run ``tox`` from the top-most directory of the git repository with no additional arguments.
 
-    tox -r
-
-This will rebuild the tox virtual env and then run all tests.
-
-To run unit tests specifically::
+To run only the unit tests ::
 
     tox -e py36
 
-To lint the code base ::
+To run only the linters ::
 
     tox -e lint
 
-During development it can sometimes be useful to unittest a specific module or test class. Running tox can become burdensome when rapidly iterating on tests. An `.env.test` file in the base of the masu repository can be used to quickly modify database environment variables for testing. An example .env.test file::
+During development it can sometimes be useful to unittest a specific module or test class. To do this, create an `.env.test` file in the base of the masu repository. This can be used to modify database environment variables for development or testing.
 
+An example .env.test file::
+
+    MASU_SECRET_KEY='t0ta!!yr4nd0m'
     DATABASE_ENGINE=postgresql
     DATABASE_NAME=test
     DATABASE_HOST=localhost
@@ -114,7 +135,7 @@ During development it can sometimes be useful to unittest a specific module or t
     DATABASE_USER=kokuadmin
     DATABASE_PASSWORD=''
 
-An example workflow for isolated testing might look like the following ::
+An example workflow for isolated testing ::
 
     ./tests/create_db.sh
     source .env.test

@@ -75,6 +75,8 @@ objects:
             value: ${PIPENV_PYPI_MIRROR}
           - name: ENABLE_PIPENV
             value: "true"
+          - name: UPGRADE_PIP_TO_LATEST
+            value: ""
           - name: APP_CONFIG
             valueFrom:
               configMapKeyRef:

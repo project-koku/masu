@@ -20,8 +20,10 @@
 from datetime import datetime
 from unittest.mock import patch
 from masu.config import Config
-from masu.external.date_accessor import DateAccessor
+from masu.external.date_accessor import DateAccessor, DateAccessorError
 from tests import MasuTestCase
+
+import pytz
 
 
 class DateAccessorTest(MasuTestCase):
@@ -92,3 +94,40 @@ class DateAccessorTest(MasuTestCase):
         self.assertEqual(today.year, expected_date.year)
         self.assertEqual(today.month, expected_date.month)
         self.assertEqual(today.day, expected_date.day)
+
+    def test_today_with_timezone_string(self):
+        """Test that a timezone string works as expected."""
+        string_tz = 'UTC'
+
+        current_utc_time = datetime.utcnow()
+
+        accessor = DateAccessor()
+        result_time = accessor.today_with_timezone(string_tz)
+
+        self.assertEqual(current_utc_time.date(), result_time.date())
+        self.assertEqual(current_utc_time.hour, result_time.hour)
+        self.assertEqual(current_utc_time.minute, result_time.minute)
+
+    def test_today_with_timezone_object(self):
+        """Test that a timezone string works as expected."""
+        string_tz = 'US/Eastern'
+
+        timezone = pytz.timezone(string_tz)
+
+        current_eastern_time = datetime.now(timezone)
+
+        accessor = DateAccessor()
+        result_time = accessor.today_with_timezone(timezone)
+
+        self.assertEqual(current_eastern_time.date(), result_time.date())
+        self.assertEqual(current_eastern_time.hour, result_time.hour)
+        self.assertEqual(current_eastern_time.minute, result_time.minute)
+
+    def test_today_with_timezone_error_raised(self):
+        """Test that an error is raised with an invalid timezone."""
+
+        string_tz = 'Moon/Mare Tranquillitatis'
+        accessor = DateAccessor()
+
+        with self.assertRaises(DateAccessorError):
+            accessor.today_with_timezone(string_tz)

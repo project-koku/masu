@@ -19,15 +19,41 @@
 
 from datetime import datetime
 
+from masu.database.report_manifest_db_accessor import ReportManifestDBAccessor
 from masu.database.report_stats_db_accessor import ReportStatsDBAccessor
 from tests import MasuTestCase
 
 class ReportStatsDBAccessorTest(MasuTestCase):
     """Test Cases for the ReportStatsDBAccessor object."""
 
+    @classmethod
+    def setUpClass(cls):
+        """Set up the test class."""
+        billing_start = datetime.utcnow().replace(day=1)
+        manifest_dict = {
+            'assembly_id': '1234',
+            'billing_period_start_datetime': billing_start,
+            'num_total_files': 2,
+            'provider_id': 1
+        }
+        cls.manifest_accessor = ReportManifestDBAccessor()
+
+        manifest = cls.manifest_accessor.add(manifest_dict)
+        cls.manifest_accessor.commit()
+        cls.manifest_id = manifest.id
+
+    @classmethod
+    def tearDownClass(cls):
+        """Tear down the test class."""
+        manifests = cls.manifest_accessor._get_db_obj_query().all()
+        for manifest in manifests:
+            cls.manifest_accessor.delete(manifest)
+        cls.manifest_accessor.commit()
+        cls.manifest_accessor.close_session()
+
     def test_initializer(self):
         """Test Initializer"""
-        saver = ReportStatsDBAccessor('myreport')
+        saver = ReportStatsDBAccessor('myreport', self.manifest_id)
         self.assertIsNotNone(saver._session)
 
         saver.remove()
@@ -36,7 +62,7 @@ class ReportStatsDBAccessorTest(MasuTestCase):
 
     def test_initializer_preexisting_report(self):
         """Test getting a new accessor stats on a preexisting report."""
-        saver = ReportStatsDBAccessor('myreport')
+        saver = ReportStatsDBAccessor('myreport', self.manifest_id)
         saver.update(cursor_position=33,
                      last_completed_datetime='1/1/2011 11:11:11',
                      last_started_datetime='2/2/22 22:22:22',
@@ -46,7 +72,7 @@ class ReportStatsDBAccessorTest(MasuTestCase):
         self.assertIsNotNone(saver._session)
 
         # Get another accessor for the same report and verify we get back the right information.
-        saver2 = ReportStatsDBAccessor('myreport')
+        saver2 = ReportStatsDBAccessor('myreport', self.manifest_id)
         last_completed = saver2.get_last_completed_datetime()
 
         self.assertEqual(last_completed.year, 2011)
@@ -65,7 +91,7 @@ class ReportStatsDBAccessorTest(MasuTestCase):
 
     def test_add_remove(self):
         """Test basic add/remove logic."""
-        saver = ReportStatsDBAccessor('myreport')
+        saver = ReportStatsDBAccessor('myreport', self.manifest_id)
         saver.commit()
 
         self.assertTrue(saver.does_db_entry_exist())
@@ -80,7 +106,7 @@ class ReportStatsDBAccessorTest(MasuTestCase):
 
     def test_update(self):
         """Test updating an existing row."""
-        saver = ReportStatsDBAccessor('myreport')
+        saver = ReportStatsDBAccessor('myreport', self.manifest_id)
         saver.commit()
 
         returned_obj = saver._get_db_obj_query()
@@ -127,7 +153,7 @@ class ReportStatsDBAccessorTest(MasuTestCase):
 
     def test_log_last_started_datetime(self):
         """Test convience function for last started processing time."""
-        saver = ReportStatsDBAccessor('myreport')
+        saver = ReportStatsDBAccessor('myreport', self.manifest_id)
         saver.commit()
         saver.log_last_started_datetime()
         saver.commit()
@@ -138,7 +164,7 @@ class ReportStatsDBAccessorTest(MasuTestCase):
 
     def test_log_last_completed_datetime(self):
         """Test convience function for last completed processing time."""
-        saver = ReportStatsDBAccessor('myreport')
+        saver = ReportStatsDBAccessor('myreport', self.manifest_id)
         saver.commit()
         saver.log_last_completed_datetime()
         saver.commit()

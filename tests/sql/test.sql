@@ -25,14 +25,14 @@ CREATE SCHEMA acct10001org20002;
 ALTER SCHEMA acct10001org20002 OWNER TO kokuadmin;
 
 --
--- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: 
+-- Name: plpgsql; Type: EXTENSION; Schema: -; Owner:
 --
 
 CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
 
 
 --
--- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: 
+-- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner:
 --
 
 COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
@@ -156,7 +156,10 @@ CREATE TABLE acct10001org20002.reporting_awscostentrybill (
     bill_type character varying(50) NOT NULL,
     payer_account_id character varying(50) NOT NULL,
     billing_period_start timestamp with time zone NOT NULL,
-    billing_period_end timestamp with time zone NOT NULL
+    billing_period_end timestamp with time zone NOT NULL,
+    finalized_datetime timestamp with time zone,
+    summary_data_creation_datetime timestamp with time zone,
+    summary_data_updated_datetime timestamp with time zone
 );
 
 
@@ -1334,18 +1337,55 @@ ALTER SEQUENCE public.region_mapping_id_seq OWNED BY public.region_mapping.id;
 
 
 --
+-- Name: reporting_common_costusagereportmanifest; Type: TABLE; Schema: public; Owner: kokuadmin
+--
+
+CREATE TABLE public.reporting_common_costusagereportmanifest (
+    id integer NOT NULL,
+    assembly_id text NOT NULL,
+    manifest_creation_datetime timestamp with time zone,
+    manifest_updated_datetime timestamp with time zone,
+    billing_period_start_datetime timestamp with time zone NOT NULL,
+    num_processed_files integer NOT NULL,
+    num_total_files integer NOT NULL,
+    provider_id integer NOT NULL
+);
+
+
+ALTER TABLE public.reporting_common_costusagereportmanifest OWNER TO kokuadmin;
+
+--
+-- Name: reporting_common_costusagereportmanifest_id_seq; Type: SEQUENCE; Schema: public; Owner: kokuadmin
+--
+
+CREATE SEQUENCE public.reporting_common_costusagereportmanifest_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.reporting_common_costusagereportmanifest_id_seq OWNER TO kokuadmin;
+
+--
+-- Name: reporting_common_costusagereportmanifest_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: kokuadmin
+--
+
+ALTER SEQUENCE public.reporting_common_costusagereportmanifest_id_seq OWNED BY public.reporting_common_costusagereportmanifest.id;
+
+
+--
 -- Name: reporting_common_costusagereportstatus; Type: TABLE; Schema: public; Owner: kokuadmin
 --
 
 CREATE TABLE public.reporting_common_costusagereportstatus (
     id integer NOT NULL,
     report_name character varying(128) NOT NULL,
-    cursor_position integer NOT NULL,
     last_completed_datetime timestamp with time zone,
     last_started_datetime timestamp with time zone,
     etag character varying(64),
-    provider_id integer,
-    CONSTRAINT reporting_common_costusagereportstatus_cursor_position_check CHECK ((cursor_position >= 0))
+    manifest_id integer
 );
 
 
@@ -1675,6 +1715,13 @@ ALTER TABLE ONLY public.region_mapping ALTER COLUMN id SET DEFAULT nextval('publ
 
 
 --
+-- Name: reporting_common_costusagereportmanifest id; Type: DEFAULT; Schema: public; Owner: kokuadmin
+--
+
+ALTER TABLE ONLY public.reporting_common_costusagereportmanifest ALTER COLUMN id SET DEFAULT nextval('public.reporting_common_costusagereportmanifest_id_seq'::regclass);
+
+
+--
 -- Name: reporting_common_costusagereportstatus id; Type: DEFAULT; Schema: public; Owner: kokuadmin
 --
 
@@ -1700,30 +1747,31 @@ ALTER TABLE ONLY public.si_unit_scale ALTER COLUMN id SET DEFAULT nextval('publi
 --
 
 COPY acct10001org20002.django_migrations (id, app, name, applied) FROM stdin;
-1	contenttypes	0001_initial	2018-10-03 16:37:08.53151+00
-2	auth	0001_initial	2018-10-03 16:37:08.574118+00
-3	admin	0001_initial	2018-10-03 16:37:08.591822+00
-4	admin	0002_logentry_remove_auto_add	2018-10-03 16:37:08.607149+00
-5	admin	0003_logentry_add_action_flag_choices	2018-10-03 16:37:08.621331+00
-6	api	0001_initial	2018-10-03 16:37:08.664217+00
-7	api	0002_auto_20180926_1905	2018-10-03 16:37:08.678241+00
-8	contenttypes	0002_remove_content_type_name	2018-10-03 16:37:08.696049+00
-9	auth	0002_alter_permission_name_max_length	2018-10-03 16:37:08.707298+00
-10	auth	0003_alter_user_email_max_length	2018-10-03 16:37:08.722203+00
-11	auth	0004_alter_user_username_opts	2018-10-03 16:37:08.737043+00
-12	auth	0005_alter_user_last_login_null	2018-10-03 16:37:08.752232+00
-13	auth	0006_require_contenttypes_0002	2018-10-03 16:37:08.760094+00
-14	auth	0007_alter_validators_add_error_messages	2018-10-03 16:37:08.7757+00
-15	auth	0008_alter_user_username_max_length	2018-10-03 16:37:08.792909+00
-16	auth	0009_alter_user_last_name_max_length	2018-10-03 16:37:08.80831+00
-17	reporting	0001_initial	2018-10-03 16:37:09.157172+00
-18	reporting	0002_auto_20180926_1818	2018-10-03 16:37:09.313846+00
-19	reporting	0003_auto_20180928_1840	2018-10-03 16:37:09.417757+00
-20	reporting	0004_auto_20181003_1633	2018-10-03 16:37:09.533514+00
-21	reporting_common	0001_initial	2018-10-03 16:37:09.555988+00
-22	reporting_common	0002_auto_20180926_1905	2018-10-03 16:37:09.567367+00
-23	reporting_common	0003_auto_20180928_1732	2018-10-03 16:37:09.575973+00
-24	sessions	0001_initial	2018-10-03 16:37:09.585419+00
+1	contenttypes	0001_initial	2018-10-03 18:59:51.089489+00
+2	auth	0001_initial	2018-10-03 18:59:51.108996+00
+3	admin	0001_initial	2018-10-03 18:59:51.126301+00
+4	admin	0002_logentry_remove_auto_add	2018-10-03 18:59:51.14259+00
+5	admin	0003_logentry_add_action_flag_choices	2018-10-03 18:59:51.158599+00
+6	api	0001_initial	2018-10-03 18:59:51.199494+00
+7	api	0002_auto_20180926_1905	2018-10-03 18:59:51.214882+00
+8	contenttypes	0002_remove_content_type_name	2018-10-03 18:59:51.233028+00
+9	auth	0002_alter_permission_name_max_length	2018-10-03 18:59:51.244456+00
+10	auth	0003_alter_user_email_max_length	2018-10-03 18:59:51.261649+00
+11	auth	0004_alter_user_username_opts	2018-10-03 18:59:51.27731+00
+12	auth	0005_alter_user_last_login_null	2018-10-03 18:59:51.292243+00
+13	auth	0006_require_contenttypes_0002	2018-10-03 18:59:51.300887+00
+14	auth	0007_alter_validators_add_error_messages	2018-10-03 18:59:51.318918+00
+15	auth	0008_alter_user_username_max_length	2018-10-03 18:59:51.336029+00
+16	auth	0009_alter_user_last_name_max_length	2018-10-03 18:59:51.351489+00
+17	reporting	0001_initial	2018-10-03 18:59:51.734612+00
+18	reporting	0002_auto_20180926_1818	2018-10-03 18:59:51.907535+00
+19	reporting	0003_auto_20180928_1840	2018-10-03 18:59:52.007954+00
+20	reporting	0004_auto_20181003_1416	2018-10-03 18:59:52.042947+00
+21	reporting_common	0001_initial	2018-10-03 18:59:52.064672+00
+22	reporting_common	0002_auto_20180926_1905	2018-10-03 18:59:52.076732+00
+23	reporting_common	0003_auto_20180928_1732	2018-10-03 18:59:52.085659+00
+24	reporting_common	0004_auto_20181003_1859	2018-10-03 18:59:52.121452+00
+25	sessions	0001_initial	2018-10-03 18:59:52.132846+00
 \.
 
 
@@ -1747,7 +1795,7 @@ COPY acct10001org20002.reporting_awscostentry (id, interval_start, interval_end,
 -- Data for Name: reporting_awscostentrybill; Type: TABLE DATA; Schema: acct10001org20002; Owner: kokuadmin
 --
 
-COPY acct10001org20002.reporting_awscostentrybill (id, billing_resource, bill_type, payer_account_id, billing_period_start, billing_period_end) FROM stdin;
+COPY acct10001org20002.reporting_awscostentrybill (id, billing_resource, bill_type, payer_account_id, billing_period_start, billing_period_end, finalized_datetime, summary_data_creation_datetime, summary_data_updated_datetime) FROM stdin;
 \.
 
 
@@ -1852,7 +1900,7 @@ COPY acct10001org20002.reporting_ocpusagereportperiod (id, cluster_id, report_pe
 --
 
 COPY public.api_customer (id, date_created, uuid, account_id, org_id, schema_name) FROM stdin;
-1	2018-10-03 16:37:08.480593+00	4f0629d4-77ba-4d59-8cff-3dcac802ea3e	10001	20002	acct10001org20002
+1	2018-10-03 18:59:51.03247+00	f874764d-ff70-4b31-9c4d-c17bdc878c5a	10001	20002	acct10001org20002
 \.
 
 
@@ -1897,7 +1945,7 @@ COPY public.api_tenant (id, schema_name) FROM stdin;
 --
 
 COPY public.api_user (id, uuid, username, email, date_created, is_active, customer_id) FROM stdin;
-1	678fb8e2-dd2b-4281-b8ac-c12d64e08f25	user_dev	user_dev@foo.com	2018-10-03 16:37:09.648874+00	t	1
+1	ecc08559-a148-467e-934c-e11338e4eac5	test_customer	test@example.com	2018-10-03 18:59:52.205717+00	t	1
 \.
 
 
@@ -1906,9 +1954,9 @@ COPY public.api_user (id, uuid, username, email, date_created, is_active, custom
 --
 
 COPY public.api_userpreference (id, uuid, preference, name, description, user_id) FROM stdin;
-1	66303287-b68a-4d3d-8b5b-e2e02d633b6e	{"currency": "USD"}	currency	default preference	1
-2	49b8095e-92fd-49aa-bb17-a091f7b686c9	{"timezone": "UTC"}	timezone	default preference	1
-3	2435ff03-f7af-44a5-a9b8-2d1531d16aa4	{"locale": "en_US.UTF-8"}	locale	default preference	1
+1	7126b613-24a0-4bd2-af64-4f2f2704bbfb	{"currency": "USD"}	currency	default preference	1
+2	677127b3-01e2-465d-99b1-eadf73cd5239	{"timezone": "UTC"}	timezone	default preference	1
+3	d968269c-8c5f-4fe5-b515-4308aca4e536	{"locale": "en_US.UTF-8"}	locale	default preference	1
 \.
 
 
@@ -2061,6 +2109,10 @@ COPY public.auth_permission (id, name, content_type_id, codename) FROM stdin;
 126	Can change si unit scale	32	change_siunitscale
 127	Can delete si unit scale	32	delete_siunitscale
 128	Can view si unit scale	32	view_siunitscale
+129	Can add cost usage report manifest	33	add_costusagereportmanifest
+130	Can change cost usage report manifest	33	change_costusagereportmanifest
+131	Can delete cost usage report manifest	33	delete_costusagereportmanifest
+132	Can view cost usage report manifest	33	view_costusagereportmanifest
 \.
 
 
@@ -2133,6 +2185,7 @@ COPY public.django_content_type (id, app_label, model) FROM stdin;
 30	reporting_common	regionmapping
 31	reporting_common	reportcolumnmap
 32	reporting_common	siunitscale
+33	reporting_common	costusagereportmanifest
 \.
 
 
@@ -2141,30 +2194,31 @@ COPY public.django_content_type (id, app_label, model) FROM stdin;
 --
 
 COPY public.django_migrations (id, app, name, applied) FROM stdin;
-1	contenttypes	0001_initial	2018-10-03 16:36:59.175343+00
-2	auth	0001_initial	2018-10-03 16:36:59.348766+00
-3	admin	0001_initial	2018-10-03 16:36:59.393412+00
-4	admin	0002_logentry_remove_auto_add	2018-10-03 16:36:59.431722+00
-5	admin	0003_logentry_add_action_flag_choices	2018-10-03 16:36:59.447626+00
-6	api	0001_initial	2018-10-03 16:36:59.627424+00
-7	api	0002_auto_20180926_1905	2018-10-03 16:36:59.645317+00
-8	contenttypes	0002_remove_content_type_name	2018-10-03 16:36:59.682808+00
-9	auth	0002_alter_permission_name_max_length	2018-10-03 16:36:59.702043+00
-10	auth	0003_alter_user_email_max_length	2018-10-03 16:36:59.724326+00
-11	auth	0004_alter_user_username_opts	2018-10-03 16:36:59.740557+00
-12	auth	0005_alter_user_last_login_null	2018-10-03 16:36:59.770253+00
-13	auth	0006_require_contenttypes_0002	2018-10-03 16:36:59.778291+00
-14	auth	0007_alter_validators_add_error_messages	2018-10-03 16:36:59.794016+00
-15	auth	0008_alter_user_username_max_length	2018-10-03 16:36:59.822191+00
-16	auth	0009_alter_user_last_name_max_length	2018-10-03 16:36:59.84202+00
-17	reporting	0001_initial	2018-10-03 16:36:59.98664+00
-18	reporting	0002_auto_20180926_1818	2018-10-03 16:37:00.048179+00
-19	reporting	0003_auto_20180928_1840	2018-10-03 16:37:00.10959+00
-20	reporting	0004_auto_20181003_1633	2018-10-03 16:37:00.151934+00
-21	reporting_common	0001_initial	2018-10-03 16:37:00.229486+00
-22	reporting_common	0002_auto_20180926_1905	2018-10-03 16:37:00.385199+00
-23	reporting_common	0003_auto_20180928_1732	2018-10-03 16:37:00.461609+00
-24	sessions	0001_initial	2018-10-03 16:37:00.488666+00
+1	contenttypes	0001_initial	2018-10-03 18:59:40.723725+00
+2	auth	0001_initial	2018-10-03 18:59:41.116747+00
+3	admin	0001_initial	2018-10-03 18:59:41.20533+00
+4	admin	0002_logentry_remove_auto_add	2018-10-03 18:59:41.226366+00
+5	admin	0003_logentry_add_action_flag_choices	2018-10-03 18:59:41.258887+00
+6	api	0001_initial	2018-10-03 18:59:41.67356+00
+7	api	0002_auto_20180926_1905	2018-10-03 18:59:41.687586+00
+8	contenttypes	0002_remove_content_type_name	2018-10-03 18:59:41.737218+00
+9	auth	0002_alter_permission_name_max_length	2018-10-03 18:59:41.757434+00
+10	auth	0003_alter_user_email_max_length	2018-10-03 18:59:41.782135+00
+11	auth	0004_alter_user_username_opts	2018-10-03 18:59:41.802915+00
+12	auth	0005_alter_user_last_login_null	2018-10-03 18:59:41.834063+00
+13	auth	0006_require_contenttypes_0002	2018-10-03 18:59:41.841911+00
+14	auth	0007_alter_validators_add_error_messages	2018-10-03 18:59:41.858309+00
+15	auth	0008_alter_user_username_max_length	2018-10-03 18:59:41.887342+00
+16	auth	0009_alter_user_last_name_max_length	2018-10-03 18:59:41.914434+00
+17	reporting	0001_initial	2018-10-03 18:59:42.059944+00
+18	reporting	0002_auto_20180926_1818	2018-10-03 18:59:42.12045+00
+19	reporting	0003_auto_20180928_1840	2018-10-03 18:59:42.182977+00
+20	reporting	0004_auto_20181003_1416	2018-10-03 18:59:42.210758+00
+21	reporting_common	0001_initial	2018-10-03 18:59:42.303816+00
+22	reporting_common	0002_auto_20180926_1905	2018-10-03 18:59:42.461152+00
+23	reporting_common	0003_auto_20180928_1732	2018-10-03 18:59:42.531767+00
+24	reporting_common	0004_auto_20181003_1859	2018-10-03 18:59:42.625823+00
+25	sessions	0001_initial	2018-10-03 18:59:42.707195+00
 \.
 
 
@@ -2185,10 +2239,18 @@ COPY public.region_mapping (id, region, region_name) FROM stdin;
 
 
 --
+-- Data for Name: reporting_common_costusagereportmanifest; Type: TABLE DATA; Schema: public; Owner: kokuadmin
+--
+
+COPY public.reporting_common_costusagereportmanifest (id, assembly_id, manifest_creation_datetime, manifest_updated_datetime, billing_period_start_datetime, num_processed_files, num_total_files, provider_id) FROM stdin;
+\.
+
+
+--
 -- Data for Name: reporting_common_costusagereportstatus; Type: TABLE DATA; Schema: public; Owner: kokuadmin
 --
 
-COPY public.reporting_common_costusagereportstatus (id, report_name, cursor_position, last_completed_datetime, last_started_datetime, etag, provider_id) FROM stdin;
+COPY public.reporting_common_costusagereportstatus (id, report_name, last_completed_datetime, last_started_datetime, etag, manifest_id) FROM stdin;
 \.
 
 
@@ -2273,7 +2335,7 @@ COPY public.si_unit_scale (id, prefix, prefix_symbol, multiplying_factor) FROM s
 -- Name: django_migrations_id_seq; Type: SEQUENCE SET; Schema: acct10001org20002; Owner: kokuadmin
 --
 
-SELECT pg_catalog.setval('acct10001org20002.django_migrations_id_seq', 24, true);
+SELECT pg_catalog.setval('acct10001org20002.django_migrations_id_seq', 25, true);
 
 
 --
@@ -2448,7 +2510,7 @@ SELECT pg_catalog.setval('public.auth_group_permissions_id_seq', 1, false);
 -- Name: auth_permission_id_seq; Type: SEQUENCE SET; Schema: public; Owner: kokuadmin
 --
 
-SELECT pg_catalog.setval('public.auth_permission_id_seq', 128, true);
+SELECT pg_catalog.setval('public.auth_permission_id_seq', 132, true);
 
 
 --
@@ -2483,14 +2545,14 @@ SELECT pg_catalog.setval('public.django_admin_log_id_seq', 1, false);
 -- Name: django_content_type_id_seq; Type: SEQUENCE SET; Schema: public; Owner: kokuadmin
 --
 
-SELECT pg_catalog.setval('public.django_content_type_id_seq', 32, true);
+SELECT pg_catalog.setval('public.django_content_type_id_seq', 33, true);
 
 
 --
 -- Name: django_migrations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: kokuadmin
 --
 
-SELECT pg_catalog.setval('public.django_migrations_id_seq', 24, true);
+SELECT pg_catalog.setval('public.django_migrations_id_seq', 25, true);
 
 
 --
@@ -2498,6 +2560,13 @@ SELECT pg_catalog.setval('public.django_migrations_id_seq', 24, true);
 --
 
 SELECT pg_catalog.setval('public.region_mapping_id_seq', 1, false);
+
+
+--
+-- Name: reporting_common_costusagereportmanifest_id_seq; Type: SEQUENCE SET; Schema: public; Owner: kokuadmin
+--
+
+SELECT pg_catalog.setval('public.reporting_common_costusagereportmanifest_id_seq', 1, false);
 
 
 --
@@ -3010,6 +3079,22 @@ ALTER TABLE ONLY public.region_mapping
 
 
 --
+-- Name: reporting_common_costusagereportmanifest reporting_common_costusagereportmanifest_assembly_id_key; Type: CONSTRAINT; Schema: public; Owner: kokuadmin
+--
+
+ALTER TABLE ONLY public.reporting_common_costusagereportmanifest
+    ADD CONSTRAINT reporting_common_costusagereportmanifest_assembly_id_key UNIQUE (assembly_id);
+
+
+--
+-- Name: reporting_common_costusagereportmanifest reporting_common_costusagereportmanifest_pkey; Type: CONSTRAINT; Schema: public; Owner: kokuadmin
+--
+
+ALTER TABLE ONLY public.reporting_common_costusagereportmanifest
+    ADD CONSTRAINT reporting_common_costusagereportmanifest_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: reporting_common_costusagereportstatus reporting_common_costusagereportstatus_pkey; Type: CONSTRAINT; Schema: public; Owner: kokuadmin
 --
 
@@ -3457,6 +3542,13 @@ CREATE INDEX region_mapping_region_name_ad295b89_like ON public.region_mapping U
 
 
 --
+-- Name: reporting_common_costusa_assembly_id_d8da4b1c_like; Type: INDEX; Schema: public; Owner: kokuadmin
+--
+
+CREATE INDEX reporting_common_costusa_assembly_id_d8da4b1c_like ON public.reporting_common_costusagereportmanifest USING btree (assembly_id text_pattern_ops);
+
+
+--
 -- Name: reporting_common_costusa_report_name_134674b5_like; Type: INDEX; Schema: public; Owner: kokuadmin
 --
 
@@ -3464,10 +3556,17 @@ CREATE INDEX reporting_common_costusa_report_name_134674b5_like ON public.report
 
 
 --
--- Name: reporting_common_costusagereportstatus_provider_id_f012c75a; Type: INDEX; Schema: public; Owner: kokuadmin
+-- Name: reporting_common_costusagereportmanifest_provider_id_6abb15de; Type: INDEX; Schema: public; Owner: kokuadmin
 --
 
-CREATE INDEX reporting_common_costusagereportstatus_provider_id_f012c75a ON public.reporting_common_costusagereportstatus USING btree (provider_id);
+CREATE INDEX reporting_common_costusagereportmanifest_provider_id_6abb15de ON public.reporting_common_costusagereportmanifest USING btree (provider_id);
+
+
+--
+-- Name: reporting_common_costusagereportstatus_manifest_id_62ef64b9; Type: INDEX; Schema: public; Owner: kokuadmin
+--
+
+CREATE INDEX reporting_common_costusagereportstatus_manifest_id_62ef64b9 ON public.reporting_common_costusagereportstatus USING btree (manifest_id);
 
 
 --
@@ -3709,14 +3808,21 @@ ALTER TABLE ONLY public.django_admin_log
 
 
 --
--- Name: reporting_common_costusagereportstatus reporting_common_cos_provider_id_f012c75a_fk_api_provi; Type: FK CONSTRAINT; Schema: public; Owner: kokuadmin
+-- Name: reporting_common_costusagereportstatus reporting_common_cos_manifest_id_62ef64b9_fk_reporting; Type: FK CONSTRAINT; Schema: public; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY public.reporting_common_costusagereportstatus
-    ADD CONSTRAINT reporting_common_cos_provider_id_f012c75a_fk_api_provi FOREIGN KEY (provider_id) REFERENCES public.api_provider(id) DEFERRABLE INITIALLY DEFERRED;
+    ADD CONSTRAINT reporting_common_cos_manifest_id_62ef64b9_fk_reporting FOREIGN KEY (manifest_id) REFERENCES public.reporting_common_costusagereportmanifest(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: reporting_common_costusagereportmanifest reporting_common_cos_provider_id_6abb15de_fk_api_provi; Type: FK CONSTRAINT; Schema: public; Owner: kokuadmin
+--
+
+ALTER TABLE ONLY public.reporting_common_costusagereportmanifest
+    ADD CONSTRAINT reporting_common_cos_provider_id_6abb15de_fk_api_provi FOREIGN KEY (provider_id) REFERENCES public.api_provider(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
 -- PostgreSQL database dump complete
 --
-

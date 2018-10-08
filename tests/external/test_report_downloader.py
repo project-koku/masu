@@ -48,7 +48,8 @@ class ReportDownloaderTest(MasuTestCase):
                                       access_credential=self.fake_creds,
                                       report_source='hereiam',
                                       report_name='bestreport',
-                                      provider_type=AMAZON_WEB_SERVICES)
+                                      provider_type=AMAZON_WEB_SERVICES,
+                                      provider_id=1)
         self.assertIsNotNone(downloader._downloader)
 
     @patch('masu.external.downloader.aws_local.aws_local_report_downloader.AWSLocalReportDownloader.__init__', return_value=None)
@@ -58,7 +59,8 @@ class ReportDownloaderTest(MasuTestCase):
                                       access_credential=self.fake_creds,
                                       report_source='hereiam',
                                       report_name='bestreport',
-                                      provider_type=AWS_LOCAL_SERVICE_PROVIDER)
+                                      provider_type=AWS_LOCAL_SERVICE_PROVIDER,
+                                      provider_id=1)
         self.assertIsNotNone(downloader._downloader)
 
     @patch('masu.external.downloader.ocp_local.ocp_local_report_downloader.OCPLocalReportDownloader.__init__', return_value=None)
@@ -68,7 +70,8 @@ class ReportDownloaderTest(MasuTestCase):
                                       access_credential=self.fake_creds,
                                       report_source='hereiam',
                                       report_name='bestreport',
-                                      provider_type=OCP_LOCAL_SERVICE_PROVIDER)
+                                      provider_type=OCP_LOCAL_SERVICE_PROVIDER,
+                                      provider_id=1)
         self.assertIsNotNone(downloader._downloader)
 
     @patch('masu.external.report_downloader.ReportDownloader._set_downloader', side_effect=AWSReportDownloaderError)
@@ -79,7 +82,8 @@ class ReportDownloaderTest(MasuTestCase):
                              access_credential=self.fake_creds,
                              report_source='hereiam',
                              report_name='bestreport',
-                             provider_type=AMAZON_WEB_SERVICES)
+                             provider_type=AMAZON_WEB_SERVICES,
+                             provider_id=1)
 
     def test_invalid_provider_type(self):
         """Test that error is thrown with invalid account source."""
@@ -89,7 +93,8 @@ class ReportDownloaderTest(MasuTestCase):
                              access_credential=self.fake_creds,
                              report_source='hereiam',
                              report_name='bestreport',
-                             provider_type='unknown')
+                             provider_type='unknown',
+                             provider_id=1)
 
     @patch('masu.external.downloader.aws.aws_report_downloader.AWSReportDownloader.__init__', return_value=None)
     def test_get_reports_error(self, fake_downloader):
@@ -98,7 +103,8 @@ class ReportDownloaderTest(MasuTestCase):
                                       access_credential=self.fake_creds,
                                       report_source='hereiam',
                                       report_name='bestreport',
-                                      provider_type=AMAZON_WEB_SERVICES)
+                                      provider_type=AMAZON_WEB_SERVICES,
+                                      provider_id=1)
         with patch.object(AWSReportDownloader, 'download_report', side_effect=Exception('some error')):
             with self.assertRaises(ReportDownloaderError):
                 downloader.get_reports()

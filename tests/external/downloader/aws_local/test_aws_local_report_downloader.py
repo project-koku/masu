@@ -29,6 +29,7 @@ from faker import Faker
 from datetime import datetime
 from unittest.mock import patch
 from masu.config import Config
+from masu.database.report_manifest_db_accessor import ReportManifestDBAccessor
 from masu.external.date_accessor import DateAccessor
 from masu.external.downloader.aws_local.aws_local_report_downloader import AWSLocalReportDownloader
 from masu.external import AWS_REGIONS
@@ -51,26 +52,42 @@ class AWSLocalReportDownloaderTest(MasuTestCase):
 
     fake = Faker()
 
+    @classmethod
+    def setUpClass(cls):
+        cls.fake_customer_name = CUSTOMER_NAME
+        cls.fake_report_name = 'koku-local'
+
+        cls.fake_bucket_prefix = PREFIX
+        cls.selected_region = REGION
+        cls.fake_auth_credential = fake_arn(service='iam', generate_account_id=True)
+
+        cls.manifest_accessor = ReportManifestDBAccessor()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.manifest_accessor.close_session()
+
     def setUp(self):
-        os.makedirs(DATA_DIR, exist_ok=True)
-
-        self.fake_customer_name = CUSTOMER_NAME
-        self.fake_report_name = 'koku-local'
+        """Set up each test."""
         self.fake_bucket_name = tempfile.mkdtemp()
-        self.fake_bucket_prefix = PREFIX
-        self.selected_region = REGION
-        self.fake_auth_credential = fake_arn(service='iam', generate_account_id=True)
-
         mytar = TarFile.open('./tests/data/test_local_bucket.tar.gz')
         mytar.extractall(path=self.fake_bucket_name)
-
-        self.report_downloader = AWSLocalReportDownloader(**{'customer_name': self.fake_customer_name,
-                                                          'auth_credential': self.fake_auth_credential,
-                                                          'bucket': self.fake_bucket_name})
+        os.makedirs(DATA_DIR, exist_ok=True)
+        self.report_downloader = AWSLocalReportDownloader(
+            **{'customer_name': self.fake_customer_name,
+               'auth_credential': self.fake_auth_credential,
+               'bucket': self.fake_bucket_name,
+               'provider_id': 1}
+        )
 
     def tearDown(self):
         shutil.rmtree(DATA_DIR, ignore_errors=True)
         shutil.rmtree(self.fake_bucket_name)
+
+        manifests = self.manifest_accessor._get_db_obj_query().all()
+        for manifest in manifests:
+            self.manifest_accessor.delete(manifest)
+        self.manifest_accessor.commit()
 
     def test_download_bucket(self):
         """Test to verify that basic report downloading works."""
@@ -79,7 +96,7 @@ class AWSLocalReportDownloaderTest(MasuTestCase):
             self.report_downloader.download_report(test_report_date)
         expected_path = '{}/{}/{}'.format(DATA_DIR, self.fake_customer_name, 'aws-local')
         self.assertTrue(os.path.isdir(expected_path))
- 
+
     def test_report_name_provided(self):
         """Test initializer when report_name is  provided."""
         report_downloader = AWSLocalReportDownloader(**{'customer_name': self.fake_customer_name,
@@ -105,7 +122,8 @@ class AWSLocalReportDownloaderTest(MasuTestCase):
         with patch.object(DateAccessor, 'today', return_value=test_report_date):
             report_downloader = AWSLocalReportDownloader(**{'customer_name': self.fake_customer_name,
                                                         'auth_credential': self.fake_auth_credential,
-                                                        'bucket': fake_bucket})
+                                                        'bucket': fake_bucket,
+                                                        'provider_id': 1})
             # Names from test report .gz file
             self.assertEqual(report_downloader.report_name, 'my-report')
             self.assertEqual(report_downloader.report_prefix, 'my-prefix')

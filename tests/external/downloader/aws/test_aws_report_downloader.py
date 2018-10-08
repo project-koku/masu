@@ -33,6 +33,7 @@ from faker import Faker
 from moto import mock_s3
 
 from masu.config import Config
+from masu.database.report_manifest_db_accessor import ReportManifestDBAccessor
 from masu.database.report_stats_db_accessor import ReportStatsDBAccessor
 from masu.exceptions import MasuProviderError
 from masu.external.downloader.aws.aws_report_downloader import (AWSReportDownloader,
@@ -108,31 +109,45 @@ class AWSReportDownloaderTest(MasuTestCase):
 
     fake = Faker()
 
+    @classmethod
+    def setUpClass(cls):
+        cls.fake_customer_name = CUSTOMER_NAME
+        cls.fake_report_name = REPORT
+        cls.fake_bucket_prefix = PREFIX
+        cls.fake_bucket_name = BUCKET
+        cls.selected_region = REGION
+        cls.auth_credential = fake_arn(service='iam', generate_account_id=True)
+
+        cls.manifest_accessor = ReportManifestDBAccessor()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.manifest_accessor.close_session()
+
     @patch('masu.util.aws.common.get_assume_role_session',
            return_value=FakeSession)
     def setUp(self, fake_session):
         os.makedirs(DATA_DIR, exist_ok=True)
 
-        self.fake_customer_name = CUSTOMER_NAME
-        self.fake_report_name = REPORT
-        self.fake_bucket_name = BUCKET
-        self.fake_bucket_prefix = PREFIX
-        self.selected_region = REGION
-
-        self.auth_credential = fake_arn(service='iam', generate_account_id=True)
-
         self.report_downloader = ReportDownloader(self.fake_customer_name,
                                                   self.auth_credential,
                                                   self.fake_bucket_name,
-                                                  'AWS')
+                                                  'AWS',
+                                                  1)
 
         self.aws_report_downloader = AWSReportDownloader(**{'customer_name': self.fake_customer_name,
                                                         'auth_credential': self.auth_credential,
                                                         'bucket': self.fake_bucket_name,
-                                                        'report_name': self.fake_report_name})
+                                                        'report_name': self.fake_report_name,
+                                                        'provider_id': 1})
 
     def tearDown(self):
         shutil.rmtree(DATA_DIR, ignore_errors=True)
+
+        manifests = self.manifest_accessor._get_db_obj_query().all()
+        for manifest in manifests:
+            self.manifest_accessor.delete(manifest)
+        self.manifest_accessor.commit()
 
     @mock_s3
     def test_download_bucket(self):
@@ -244,7 +259,11 @@ class AWSReportDownloaderTest(MasuTestCase):
                 self.fake_report_name,
                 report_range,
                 self.fake_report_name)
-            fake_object_body = {'reportKeys': [fake_csv_files[selected_csv]]}
+            fake_object_body = {
+                'assemblyId': '1234',
+                'reportKeys': [fake_csv_files[selected_csv]],
+                'billingPeriod': {'start': '20180901T000000.000Z'}
+            }
 
             # push mocked manifest into Moto env
             conn.Object(self.fake_bucket_name,
@@ -274,14 +293,14 @@ class AWSReportDownloaderTest(MasuTestCase):
         for cur_dict in out:
             cur_file = cur_dict['file']
             file_name = cur_file.split('/')[-1]
-            stats_recorder = ReportStatsDBAccessor(file_name)
+            stats_recorder = ReportStatsDBAccessor(file_name, 1)
             self.assertIsNotNone(stats_recorder.get_etag())
 
             # Cleanup
             stats_recorder.remove()
             stats_recorder.commit()
 
-            stats_recorder2 = ReportStatsDBAccessor(file_name)
+            stats_recorder2 = ReportStatsDBAccessor(file_name, 1)
             self.assertIsNone(stats_recorder2.get_etag())
             stats_recorder.close_session()
             stats_recorder2.close_session()
@@ -346,7 +365,11 @@ class AWSReportDownloaderTest(MasuTestCase):
             self.fake_report_name,
             report_range,
             self.fake_report_name)
-        fake_object_body = {'reportKeys':[fake_report_file, fake_report_file2]}
+        fake_object_body = {
+            'assemblyId': '1234',
+            'reportKeys':[fake_report_file, fake_report_file2],
+            'billingPeriod': {'start': '20180901T000000.000Z'}
+        }
 
         # Moto setup
         conn = boto3.resource('s3', region_name=self.selected_region)
@@ -445,7 +468,7 @@ class AWSReportDownloaderTest(MasuTestCase):
             self.fake_report_name,
             report_range,
             self.fake_report_name)
-        fake_object_body = {'reportKeys':[fake_report_file]}
+        fake_object_body = {'assemblyId': '1234', 'reportKeys':[fake_report_file]}
 
         # Moto setup
         conn = boto3.resource('s3', region_name=self.selected_region)

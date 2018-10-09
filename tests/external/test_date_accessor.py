@@ -23,11 +23,15 @@ from masu.config import Config
 from masu.external.date_accessor import DateAccessor, DateAccessorError
 from tests import MasuTestCase
 
+import dateutil
 import pytz
+from faker import Faker
 
 
 class DateAccessorTest(MasuTestCase):
     """Test Cases for the DateAccessor object."""
+
+    fake = Faker()
 
     @classmethod
     def setUpClass(cls):
@@ -43,31 +47,38 @@ class DateAccessorTest(MasuTestCase):
 
     def setUp(self):
         DateAccessor.mock_date_time = None
+        Config.DEBUG = False
+        Config.MASU_DATE_OVERRIDE = None
 
     def test_today_override(self):
         """Test today() with override."""
+        fake_dt = self.fake.date_time(tzinfo=pytz.UTC)
         Config.DEBUG = True
-        Config.MASU_DATE_OVERRIDE = '2018-01-01 15:47:33'
+        Config.MASU_DATE_OVERRIDE = fake_dt.strftime('%Y-%m-%d %H:%M:%S')
 
         accessor = DateAccessor()
-
         today = accessor.today()
-        self.assertEqual(today.year, 2018)
-        self.assertEqual(today.month, 1)
-        self.assertEqual(today.day, 1)
+
+        self.assertEqual(today.year, fake_dt.year)
+        self.assertEqual(today.month, fake_dt.month)
+        self.assertEqual(today.day, fake_dt.day)
+        self.assertEqual(today.tzinfo.tzname(today), str(pytz.UTC))
 
     def test_today_override_debug_false(self):
         """Test today() with override when debug is false."""
+        fake_tz = pytz.timezone(self.fake.timezone())
+        fake_dt = self.fake.date_time(tzinfo=fake_tz)
         Config.DEBUG = False
-        Config.MASU_DATE_OVERRIDE = '2018-01-01 15:47:33'
+        Config.MASU_DATE_OVERRIDE = fake_dt
 
         accessor = DateAccessor()
-
         today = accessor.today()
         expected_date = datetime.today()
+
         self.assertEqual(today.year, expected_date.year)
         self.assertEqual(today.month, expected_date.month)
         self.assertEqual(today.day, expected_date.day)
+        self.assertEqual(today.tzinfo, pytz.UTC)
 
     def test_today_override_override_not_set(self):
         """Test today() with override set when debug is true."""
@@ -76,11 +87,12 @@ class DateAccessorTest(MasuTestCase):
 
         accessor = DateAccessor()
         today = accessor.today()
-
         expected_date = datetime.today()
+
         self.assertEqual(today.year, expected_date.year)
         self.assertEqual(today.month, expected_date.month)
         self.assertEqual(today.day, expected_date.day)
+        self.assertEqual(today.tzinfo, pytz.UTC)
 
     def test_today_override_override_not_set_debug_false(self):
         """Test today() with override not set when debug is false."""
@@ -89,39 +101,58 @@ class DateAccessorTest(MasuTestCase):
 
         accessor = DateAccessor()
         today = accessor.today()
-
         expected_date = datetime.today()
+
         self.assertEqual(today.year, expected_date.year)
         self.assertEqual(today.month, expected_date.month)
         self.assertEqual(today.day, expected_date.day)
+        self.assertEqual(today.tzinfo, pytz.UTC)
+
+    def test_today_override_with_iso8601(self):
+        """Test today() with override and using ISO8601 format."""
+        fake_tz_name = self.fake.timezone()
+        fake_tz = pytz.timezone(fake_tz_name)
+        fake_dt = self.fake.date_time(tzinfo=fake_tz)
+
+        Config.DEBUG = True
+        Config.MASU_DATE_OVERRIDE = fake_dt.isoformat()
+        accessor = DateAccessor()
+        today = accessor.today()
+
+        self.assertEqual(today.year, fake_dt.year)
+        self.assertEqual(today.month, fake_dt.month)
+        self.assertEqual(today.day, fake_dt.day)
+
+        expected_offset = dateutil.tz.tzoffset(fake_tz_name,
+                                               fake_tz.utcoffset(fake_dt,
+                                                                 is_dst=False))
+        self.assertEqual(today.tzinfo, expected_offset)
 
     def test_today_with_timezone_string(self):
         """Test that a timezone string works as expected."""
         string_tz = 'UTC'
-
         current_utc_time = datetime.utcnow()
-
         accessor = DateAccessor()
         result_time = accessor.today_with_timezone(string_tz)
 
         self.assertEqual(current_utc_time.date(), result_time.date())
         self.assertEqual(current_utc_time.hour, result_time.hour)
         self.assertEqual(current_utc_time.minute, result_time.minute)
+        self.assertEqual(result_time.tzinfo, pytz.UTC)
 
     def test_today_with_timezone_object(self):
         """Test that a timezone string works as expected."""
-        string_tz = 'US/Eastern'
+        fake_tz_name = self.fake.timezone()
+        fake_tz = pytz.timezone(fake_tz_name)
 
-        timezone = pytz.timezone(string_tz)
-
-        current_eastern_time = datetime.now(timezone)
-
+        current_time = datetime.now(fake_tz)
         accessor = DateAccessor()
-        result_time = accessor.today_with_timezone(timezone)
+        result_time = accessor.today_with_timezone(fake_tz)
 
-        self.assertEqual(current_eastern_time.date(), result_time.date())
-        self.assertEqual(current_eastern_time.hour, result_time.hour)
-        self.assertEqual(current_eastern_time.minute, result_time.minute)
+        self.assertEqual(current_time.date(), result_time.date())
+        self.assertEqual(current_time.hour, result_time.hour)
+        self.assertEqual(current_time.minute, result_time.minute)
+        self.assertEqual(str(result_time.tzinfo), fake_tz_name)
 
     def test_today_with_timezone_error_raised(self):
         """Test that an error is raised with an invalid timezone."""

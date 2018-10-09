@@ -33,7 +33,11 @@ class ReportDataTests(MasuTestCase):
     def test_get_report_data(self, mock_update):
         """Test the GET report_data endpoint."""
         start_date = datetime.date.today()
-        params = {'schema': 'acct10001org20002', 'start_date': start_date}
+        params = {
+            'schema': 'acct10001org20002',
+            'start_date': start_date,
+            'provider': 'AWS'
+        }
         query_string = urlencode(params)
         expected_key = 'Report Data Task ID'
 
@@ -47,6 +51,7 @@ class ReportDataTests(MasuTestCase):
         self.assertIn(expected_key, body)
         mock_update.delay.assert_called_with(
             params['schema'],
+            params['provider'],
             str(params['start_date'])
         )
 
@@ -54,7 +59,7 @@ class ReportDataTests(MasuTestCase):
     def test_get_report_data_schema_missing(self, mock_update):
         """Test GET report_data endpoint returns a 400 for missing schema."""
         start_date = datetime.date.today()
-        params = {'start_date': start_date}
+        params = {'start_date': start_date, 'provider': 'AWS'}
         query_string = urlencode(params)
         expected_key = 'Error'
         expected_message = 'schema is a required parameter.'
@@ -70,9 +75,28 @@ class ReportDataTests(MasuTestCase):
         self.assertEqual(body[expected_key], expected_message)
 
     @patch('masu.api.report_data.update_summary_tables')
+    def test_get_report_data_provider_missing(self, mock_update):
+        """Test GET report_data endpoint returns a 400 for missing schema."""
+        start_date = datetime.date.today()
+        params = {'start_date': start_date, 'schema': 'acct10001org20002'}
+        query_string = urlencode(params)
+        expected_key = 'Error'
+        expected_message = 'provider is a required parameter.'
+
+        # self.client.get()
+        response = self.client.get('/api/v1/report_data/',
+                                   query_string=query_string)
+        body = response.json
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        self.assertIn(expected_key, body)
+        self.assertEqual(body[expected_key], expected_message)
+
+    @patch('masu.api.report_data.update_summary_tables')
     def test_get_report_data_date_missing(self, mock_update):
         """Test GET report_data endpoint returns a 400 for missing date."""
-        params = {'schema': 'acct10001org20002'}
+        params = {'schema': 'acct10001org20002', 'provider': 'AWS'}
         query_string = urlencode(params)
         expected_key = 'Error'
         expected_message = 'start_date is a required parameter.'
@@ -94,6 +118,7 @@ class ReportDataTests(MasuTestCase):
         end_date = start_date + datetime.timedelta(days=1)
         params = {
             'schema': 'acct10001org20002',
+            'provider': 'AWS',
             'start_date': start_date,
             'end_date': end_date
         }
@@ -110,6 +135,7 @@ class ReportDataTests(MasuTestCase):
         self.assertIn(expected_key, body)
         mock_update.delay.assert_called_with(
             params['schema'],
+            params['provider'],
             str(params['start_date']),
             str(params['end_date'])
         )

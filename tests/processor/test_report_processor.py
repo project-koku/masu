@@ -39,6 +39,7 @@ class ReportProcessorTest(MasuTestCase):
                                      report_path='/my/report/file',
                                      compression='GZIP',
                                      provider=AMAZON_WEB_SERVICES,
+                                     provider_id=1,
                                      manifest_id=None)
         self.assertIsNotNone(processor._processor)
 
@@ -48,6 +49,7 @@ class ReportProcessorTest(MasuTestCase):
                                      report_path='/my/report/file',
                                      compression='GZIP',
                                      provider=AWS_LOCAL_SERVICE_PROVIDER,
+                                     provider_id=1,
                                      manifest_id=None)
         self.assertIsNotNone(processor._processor)
 
@@ -57,6 +59,7 @@ class ReportProcessorTest(MasuTestCase):
                                      report_path='/my/report/file',
                                      compression='PLAIN',
                                      provider=OPENSHIFT_CONTAINER_PLATFORM,
+                                     provider_id=1,
                                      manifest_id=None)
         self.assertIsNotNone(processor._processor)
 
@@ -66,6 +69,7 @@ class ReportProcessorTest(MasuTestCase):
                                      report_path='/my/report/file',
                                      compression='PLAIN',
                                      provider=OCP_LOCAL_SERVICE_PROVIDER,
+                                     provider_id=1,
                                      manifest_id=None)
         self.assertIsNotNone(processor._processor)
 
@@ -77,6 +81,7 @@ class ReportProcessorTest(MasuTestCase):
                             report_path='/my/report/file',
                             compression='GZIP',
                             provider=AMAZON_WEB_SERVICES,
+                            provider_id=1,
                             manifest_id=None)
 
     def test_initializer_invalid_provider(self):
@@ -86,6 +91,7 @@ class ReportProcessorTest(MasuTestCase):
                             report_path='/my/report/file',
                             compression='GZIP',
                             provider='unknown',
+                            provider_id=1,
                             manifest_id=None)
 
     @patch('masu.processor.aws.aws_report_processor.AWSReportProcessor.process', return_value=None)
@@ -95,6 +101,7 @@ class ReportProcessorTest(MasuTestCase):
                                      report_path='/my/report/file',
                                      compression='GZIP',
                                      provider=AMAZON_WEB_SERVICES,
+                                     provider_id=1,
                                      manifest_id=None)
         try:
             processor.process()
@@ -109,6 +116,7 @@ class ReportProcessorTest(MasuTestCase):
                                      report_path='/my/report/file',
                                      compression='GZIP',
                                      provider=AMAZON_WEB_SERVICES,
+                                     provider_id=1,
                                      manifest_id=None)
         with self.assertRaises(ReportProcessorError):
             processor.process()
@@ -120,6 +128,7 @@ class ReportProcessorTest(MasuTestCase):
                                      report_path='/my/report/file',
                                      compression='GZIP',
                                      provider=AMAZON_WEB_SERVICES,
+                                     provider_id=1,
                                      manifest_id=None)
         try:
             processor.remove_processed_files('/my/report/file')
@@ -134,6 +143,7 @@ class ReportProcessorTest(MasuTestCase):
                                      report_path='/my/report/file',
                                      compression='GZIP',
                                      provider=AMAZON_WEB_SERVICES,
+                                     provider_id=1,
                                      manifest_id=None)
         with self.assertRaises(ReportProcessorError):
             processor.remove_processed_files('/my/report/file')

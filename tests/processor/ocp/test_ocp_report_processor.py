@@ -64,6 +64,7 @@ class OCPReportProcessorTest(MasuTestCase):
             schema_name='acct10001org20002',
             report_path=cls.test_report,
             compression=UNCOMPRESSED,
+            provider_id=1
         )
 
         cls.accessor = cls.processor.report_db
@@ -106,7 +107,8 @@ class OCPReportProcessorTest(MasuTestCase):
         with self.assertRaises(MasuProcessingError):
             OCPReportProcessor(schema_name='acct10001org20002',
                                report_path=self.test_report,
-                               compression='unsupported')
+                               compression='unsupported',
+                               provider_id=1)
 
     def test_process_default(self):
         """Test the processing of an uncompressed file."""
@@ -115,6 +117,7 @@ class OCPReportProcessorTest(MasuTestCase):
             schema_name='acct10001org20002',
             report_path=self.test_report,
             compression=UNCOMPRESSED,
+            provider_id=1
         )
         report_db = processor.report_db
         report_schema = report_db.report_schema
@@ -139,7 +142,8 @@ class OCPReportProcessorTest(MasuTestCase):
         processor = OCPReportProcessor(
             schema_name='acct10001org20002',
             report_path=self.test_report,
-            compression=UNCOMPRESSED
+            compression=UNCOMPRESSED,
+            provider_id=1
         )
 
         # Process for the first time
@@ -156,7 +160,8 @@ class OCPReportProcessorTest(MasuTestCase):
         processor = OCPReportProcessor(
             schema_name='acct10001org20002',
             report_path=self.test_report,
-            compression=UNCOMPRESSED
+            compression=UNCOMPRESSED,
+            provider_id=1
         )
         # Process for the second time
         processor.process()

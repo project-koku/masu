@@ -81,12 +81,12 @@ class AWSReportProcessorTest(MasuTestCase):
             schema_name='acct10001org20002',
             report_path=cls.test_report,
             compression=UNCOMPRESSED,
+            provider_id=1
         )
 
         cls.accessor = cls.processor.report_db
         cls.report_schema = cls.accessor.report_schema
         cls.session = cls.accessor._session
-
 
         _report_tables = copy.deepcopy(AWS_CUR_TABLE_MAP)
         _report_tables.pop('line_item_daily', None)
@@ -135,7 +135,8 @@ class AWSReportProcessorTest(MasuTestCase):
         with self.assertRaises(MasuProcessingError):
             AWSReportProcessor(schema_name='acct10001org20002',
                                report_path=self.test_report,
-                               compression='unsupported')
+                               compression='unsupported',
+                               provider_id=1)
 
     def test_process_default(self):
         """Test the processing of an uncompressed file."""
@@ -144,6 +145,7 @@ class AWSReportProcessorTest(MasuTestCase):
             schema_name='acct10001org20002',
             report_path=self.test_report,
             compression=UNCOMPRESSED,
+            provider_id=1
         )
         report_db = processor.report_db
         report_schema = report_db.report_schema
@@ -172,7 +174,8 @@ class AWSReportProcessorTest(MasuTestCase):
         processor = AWSReportProcessor(
             schema_name='acct10001org20002',
             report_path=self.test_report_gzip,
-            compression=GZIP_COMPRESSED
+            compression=GZIP_COMPRESSED,
+            provider_id=1
         )
         report_db = processor.report_db
         report_schema = report_db.report_schema
@@ -201,7 +204,8 @@ class AWSReportProcessorTest(MasuTestCase):
         processor = AWSReportProcessor(
             schema_name='acct10001org20002',
             report_path=self.test_report,
-            compression=UNCOMPRESSED
+            compression=UNCOMPRESSED,
+            provider_id=1
         )
 
         # Process for the first time
@@ -217,7 +221,8 @@ class AWSReportProcessorTest(MasuTestCase):
         processor = AWSReportProcessor(
             schema_name='acct10001org20002',
             report_path=self.test_report,
-            compression=UNCOMPRESSED
+            compression=UNCOMPRESSED,
+            provider_id=1
         )
         # Process for the second time
         processor.process()
@@ -348,8 +353,10 @@ class AWSReportProcessorTest(MasuTestCase):
 
         query = self.accessor._get_db_obj_query(table_name)
         id_in_db = query.order_by(id_column.desc()).first().id
+        provider_id = query.order_by(id_column.desc()).first().provider_id
 
         self.assertEqual(bill_id, id_in_db)
+        self.assertIsNotNone(provider_id)
 
     def test_create_cost_entry_bill_existing(self):
         """Test that a cost entry bill id is returned from an existing bill."""

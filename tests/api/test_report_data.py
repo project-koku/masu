@@ -139,3 +139,146 @@ class ReportDataTests(MasuTestCase):
             str(params['start_date']),
             str(params['end_date'])
         )
+
+    @patch('masu.api.report_data.remove_expired_data')
+    def test_remove_report_data(self, mock_remove):
+        """Test that the DELETE call to report_data works."""
+        params = {
+            'schema': 'acct10001org20002',
+            'provider': 'AWS',
+            'provider_id': 1,
+            'simulate': False
+        }
+        query_string = urlencode(params)
+        expected_key = 'Report Data Task ID'
+
+        # self.client.get()
+        response = self.client.delete('/api/v1/report_data/',
+                                   query_string=query_string)
+        body = response.json
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        self.assertIn(expected_key, body)
+        mock_remove.delay.assert_called_with(
+            params['schema'],
+            params['provider'],
+            params['simulate'],
+            str(params['provider_id'])
+        )
+
+    @patch('masu.api.report_data.remove_expired_data')
+    def test_remove_report_data_simulate(self, mock_remove):
+        """Test that the DELETE call to report_data works."""
+        params = {
+            'schema': 'acct10001org20002',
+            'provider': 'AWS',
+            'provider_id': 1,
+            'simulate': True
+        }
+        query_string = urlencode(params)
+        expected_key = 'Report Data Task ID'
+
+        # self.client.get()
+        response = self.client.delete('/api/v1/report_data/',
+                                   query_string=query_string)
+        body = response.json
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        self.assertIn(expected_key, body)
+        mock_remove.delay.assert_called_with(
+            params['schema'],
+            params['provider'],
+            params['simulate'],
+            str(params['provider_id'])
+        )
+
+    @patch('masu.api.report_data.remove_expired_data')
+    def test_remove_report_data_simulate_missing(self, mock_remove):
+        """Test that the DELETE call to report_data works."""
+        params = {
+            'schema': 'acct10001org20002',
+            'provider': 'AWS',
+            'provider_id': 1
+        }
+        query_string = urlencode(params)
+        expected_key = 'Report Data Task ID'
+
+        # self.client.get()
+        response = self.client.delete('/api/v1/report_data/',
+                                   query_string=query_string)
+        body = response.json
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        self.assertIn(expected_key, body)
+        mock_remove.delay.assert_called_with(
+            params['schema'],
+            params['provider'],
+            False,
+            str(params['provider_id'])
+        )
+
+    @patch('masu.api.report_data.remove_expired_data')
+    def test_remove_report_data_schema_missing(self, mock_remove):
+        """Test that the DELETE call to report_data works."""
+        params = {
+            'provider': 'AWS',
+            'provider_id': 1,
+            'simulate': True
+        }
+        query_string = urlencode(params)
+        expected_key = 'Error'
+        expected_message = 'schema is a required parameter.'
+
+        response = self.client.delete('/api/v1/report_data/',
+                                   query_string=query_string)
+        body = response.json
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        self.assertIn(expected_key, body)
+        self.assertEqual(body[expected_key], expected_message)
+
+    @patch('masu.api.report_data.remove_expired_data')
+    def test_remove_report_data_provider_missing(self, mock_remove):
+        """Test that the DELETE call to report_data works."""
+        params = {
+            'schema': 'acct10001org20002',
+            'provider_id': 1,
+            'simulate': True
+        }
+        query_string = urlencode(params)
+        expected_key = 'Error'
+        expected_message = 'provider is a required parameter.'
+
+        response = self.client.delete('/api/v1/report_data/',
+                                   query_string=query_string)
+        body = response.json
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        self.assertIn(expected_key, body)
+        self.assertEqual(body[expected_key], expected_message)
+
+    @patch('masu.api.report_data.remove_expired_data')
+    def test_remove_report_data_provider_id_missing(self, mock_remove):
+        """Test that the DELETE call to report_data works."""
+        params = {
+            'schema': 'acct10001org20002',
+            'provider': 'AWS',
+            'simulate': True
+        }
+        query_string = urlencode(params)
+        expected_key = 'Error'
+        expected_message = 'provider_id is a required parameter.'
+
+        response = self.client.delete('/api/v1/report_data/',
+                                   query_string=query_string)
+        body = response.json
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        self.assertIn(expected_key, body)
+        self.assertEqual(body[expected_key], expected_message)

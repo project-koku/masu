@@ -4,6 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+aiokafka = "==0.4.2"
 boto3 = "==1.7.35"
 flask = "==1.0.2"
 psycopg2-binary = ">=2.7.0"
@@ -18,6 +19,7 @@ sqlalchemy = "==1.2.11"
 pylint = "===2.0.1"
 coverage = "==4.5.1"
 codecov = "==2.0.15"
+requests-mock = "==1.5.2"
 tox = "==3.0.0"
 faker = "==0.8.15"
 moto = "==1.3.4"

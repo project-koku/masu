@@ -21,7 +21,7 @@ from unittest.mock import patch
 
 from masu.external import AWS_LOCAL_SERVICE_PROVIDER, AMAZON_WEB_SERVICES, OCP_LOCAL_SERVICE_PROVIDER
 from masu.external.downloader.aws.aws_report_downloader import AWSReportDownloader, AWSReportDownloaderError
-from masu.external.downloader.ocp_local.ocp_local_report_downloader import OCPLocalReportDownloader
+from masu.external.downloader.ocp.ocp_report_downloader import OCPReportDownloader
 from masu.external.report_downloader import ReportDownloader, ReportDownloaderError
 
 from tests import MasuTestCase
@@ -63,9 +63,9 @@ class ReportDownloaderTest(MasuTestCase):
                                       provider_id=1)
         self.assertIsNotNone(downloader._downloader)
 
-    @patch('masu.external.downloader.ocp_local.ocp_local_report_downloader.OCPLocalReportDownloader.__init__', return_value=None)
+    @patch('masu.external.downloader.ocp.ocp_report_downloader.OCPReportDownloader.__init__', return_value=None)
     def test_initializer_ocp(self, fake_downloader):
-        """Test to initializer for OCP-local downloader"""
+        """Test to initializer for OCP downloader"""
         downloader = ReportDownloader(customer_name='customer name',
                                       access_credential=self.fake_creds,
                                       report_source='hereiam',

@@ -15,11 +15,13 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-"""Test the Local Report Downloader."""
+"""Test the Report Downloader."""
 
+import os
 import os.path
 import shutil
 from shutil import copyfile
+import tempfile
 
 from faker import Faker
 
@@ -27,7 +29,7 @@ from datetime import datetime
 from unittest.mock import patch
 from masu.config import Config
 from masu.external.date_accessor import DateAccessor
-from masu.external.downloader.ocp_local.ocp_local_report_downloader import OCPLocalReportDownloader
+from masu.external.downloader.ocp.ocp_report_downloader import OCPReportDownloader
 from tests import MasuTestCase
 
 DATA_DIR = Config.TMP_DIR
@@ -37,25 +39,31 @@ FAKE = Faker()
 CUSTOMER_NAME = FAKE.word()
 
 
-class OCPLocalReportDownloaderTest(MasuTestCase):
-    """Test Cases for the OCP-local Report Downloader."""
+class OCPReportDownloaderTest(MasuTestCase):
+    """Test Cases for the OCP Report Downloader."""
 
     fake = Faker()
 
     def setUp(self):
         self.fake_customer_name = CUSTOMER_NAME
-        self.fake_report_name = 'ocp-local'
+        self.fake_report_name = 'ocp-report'
         self.cluster_id = 'my-ocp-cluster-1'
 
         report_path = '{}/{}/{}'.format(REPORTS_DIR, self.cluster_id, '20180901-20181001')
         os.makedirs(report_path, exist_ok=True)
-        test_file_path = './tests/data/pod-cpu-usage-ocp.csv'
+
+        test_file_path = './tests/data/ocp/1a6e1405-d964-4749-aa5b-104f8d280a3b_pod-cpu-usage-ocp.csv'
         self.test_file_path = os.path.join(report_path, os.path.basename(test_file_path))
         shutil.copyfile(test_file_path, os.path.join(report_path, self.test_file_path))
 
-        self.report_downloader = OCPLocalReportDownloader(**{'customer_name': self.fake_customer_name,
+        test_manifest_path = './tests/data/ocp/manifest.json'
+        self.test_manifest_path = os.path.join(report_path, os.path.basename(test_manifest_path))
+        shutil.copyfile(test_manifest_path, os.path.join(report_path, self.test_manifest_path))
+
+        self.report_downloader = OCPReportDownloader(**{'customer_name': self.fake_customer_name,
                                                           'auth_credential': self.cluster_id,
-                                                          'bucket': None})
+                                                          'bucket': None,
+                                                          'provider_id': 1})
 
     def tearDown(self):
         shutil.rmtree(REPORTS_DIR, ignore_errors=True)
@@ -65,7 +73,7 @@ class OCPLocalReportDownloaderTest(MasuTestCase):
         test_report_date = datetime(year=2018, month=9, day=7)
         with patch.object(DateAccessor, 'today', return_value=test_report_date):
             self.report_downloader.download_report(test_report_date)
-        expected_path = '{}/{}/{}'.format(DATA_DIR, self.fake_customer_name, 'ocp-local')
+        expected_path = '{}/{}/{}'.format(Config.TMP_DIR, self.fake_customer_name, 'ocp')
         self.assertTrue(os.path.isdir(expected_path))
  
     def test_download_bucket_no_csv_found(self):

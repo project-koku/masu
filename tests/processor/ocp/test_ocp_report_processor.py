@@ -57,7 +57,7 @@ class OCPReportProcessorTest(MasuTestCase):
     def setUpClass(cls):
         """Set up the test class with required objects."""
         # These test reports should be replaced with OCP reports once processor is impelmented.
-        cls.test_report = './tests/data/pod-cpu-usage-ocp.csv'
+        cls.test_report = './tests/data/ocp/1a6e1405-d964-4749-aa5b-104f8d280a3b_pod-cpu-usage-ocp.csv'
         cls.test_report_gzip = './tests/data/test_cur.csv.gz'
 
         cls.processor = OCPReportProcessor(
@@ -292,9 +292,10 @@ class OCPReportProcessorTest(MasuTestCase):
         """Test to remove temporary usage report files."""
         # Update once temporary file logic is implemented.
         cur_dir = tempfile.mkdtemp()
+        manifest_id = 1
         expected_delete_list = []
 
-        removed_files = self.processor.remove_temp_cur_files(cur_dir)
+        removed_files = self.processor.remove_temp_cur_files(cur_dir, manifest_id)
         self.assertEqual(sorted(removed_files), sorted(expected_delete_list))
 
         shutil.rmtree(cur_dir)

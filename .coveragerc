@@ -5,6 +5,7 @@ source = masu
 omit =
   *config.py
   *tests/*
+  *scripts/*
   */test_*.py
   masu/gunicorn.py
   masu/celery/worker.py

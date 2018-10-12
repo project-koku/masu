@@ -181,7 +181,7 @@ class ProcessReportFileTests(MasuTestCase):
         provider_uuid = '6e212746-484a-40cd-bba0-09a19d132d64'
         report_dict = {'file': path,
                    'compression': 'gzip',
-                   'start_date': str(datetime.today())}
+                   'start_date': str(DateAccessor().today())}
 
         mock_proc = mock_processor()
         mock_stats_acc = mock_stats_accessor()
@@ -218,9 +218,8 @@ class TestProcessorTasks(MasuTestCase):
         ]
 
         cls.fake_account = fake_arn(service='iam', generate_account_id=True)
-        cls.today = datetime.today()
-        cls.yesterday = datetime.today() - timedelta(days=1)
-
+        cls.today = DateAccessor().today_with_timezone('UTC')
+        cls.yesterday = cls.today - timedelta(days=1)
 
     def setUp(self):
         super().setUp()
@@ -352,7 +351,7 @@ class TestProcessorTasks(MasuTestCase):
     @patch('masu.processor.tasks.ReportStatsDBAccessor.get_last_started_datetime')
     @patch('masu.processor.tasks._get_report_files')
     @patch('masu.processor.tasks.process_report_file')
-    @patch('masu.external.date_accessor.DateAccessor.today')
+    @patch('masu.external.date_accessor.DateAccessor.today_with_timezone')
     def test_get_report_files_timestamps_empty_end_timeout(self,
                                                mock_date,
                                                mock_process_files,
@@ -370,7 +369,6 @@ class TestProcessorTasks(MasuTestCase):
         mock_completed.return_value = None
 
         mock_date.return_value = self.today + timedelta(hours=3)
-
         get_report_files(**self.fake_get_report_args)
         mock_process_files.delay.assert_called()
 
@@ -378,7 +376,7 @@ class TestProcessorTasks(MasuTestCase):
     @patch('masu.processor.tasks.ReportStatsDBAccessor.get_last_started_datetime')
     @patch('masu.processor.tasks._get_report_files')
     @patch('masu.processor.tasks.process_report_file')
-    @patch('masu.external.date_accessor.DateAccessor.today')
+    @patch('masu.external.date_accessor.DateAccessor.today_with_timezone')
     def test_get_report_files_timestamps_empty_end_no_timeout(self,
                                                mock_date,
                                                mock_process_files,

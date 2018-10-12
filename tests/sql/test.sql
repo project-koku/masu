@@ -1749,35 +1749,37 @@ ALTER TABLE ONLY public.si_unit_scale ALTER COLUMN id SET DEFAULT nextval('publi
 --
 
 COPY acct10001org20002.django_migrations (id, app, name, applied) FROM stdin;
-1	contenttypes	0001_initial	2018-10-09 19:04:38.407581+00
-2	auth	0001_initial	2018-10-09 19:04:38.429436+00
-3	admin	0001_initial	2018-10-09 19:04:38.446878+00
-4	admin	0002_logentry_remove_auto_add	2018-10-09 19:04:38.46383+00
-5	admin	0003_logentry_add_action_flag_choices	2018-10-09 19:04:38.478321+00
-6	api	0001_initial	2018-10-09 19:04:38.522284+00
-7	api	0002_auto_20180926_1905	2018-10-09 19:04:38.537018+00
-8	api	0003_auto_20181008_1819	2018-10-09 19:04:38.56307+00
-9	contenttypes	0002_remove_content_type_name	2018-10-09 19:04:38.581779+00
-10	auth	0002_alter_permission_name_max_length	2018-10-09 19:04:38.595274+00
-11	auth	0003_alter_user_email_max_length	2018-10-09 19:04:38.611416+00
-12	auth	0004_alter_user_username_opts	2018-10-09 19:04:38.628015+00
-13	auth	0005_alter_user_last_login_null	2018-10-09 19:04:38.644429+00
-14	auth	0006_require_contenttypes_0002	2018-10-09 19:04:38.653022+00
-15	auth	0007_alter_validators_add_error_messages	2018-10-09 19:04:38.669331+00
-16	auth	0008_alter_user_username_max_length	2018-10-09 19:04:38.686533+00
-17	auth	0009_alter_user_last_name_max_length	2018-10-09 19:04:38.704213+00
-18	reporting	0001_initial	2018-10-09 19:04:39.168037+00
-19	reporting	0002_auto_20180926_1818	2018-10-09 19:04:39.343467+00
-20	reporting	0003_auto_20180928_1840	2018-10-09 19:04:39.453825+00
-21	reporting	0004_auto_20181003_1633	2018-10-09 19:04:39.590284+00
-22	reporting	0005_auto_20181003_1416	2018-10-09 19:04:39.631187+00
-23	reporting	0006_awscostentrylineitemaggregates_account_alias	2018-10-09 19:04:39.660461+00
-24	reporting	0007_awscostentrybill_provider_id	2018-10-09 19:04:39.685483+00
-25	reporting_common	0001_initial	2018-10-09 19:04:39.708887+00
-26	reporting_common	0002_auto_20180926_1905	2018-10-09 19:04:39.731624+00
-27	reporting_common	0003_auto_20180928_1732	2018-10-09 19:04:39.756883+00
-28	reporting_common	0004_auto_20181003_1859	2018-10-09 19:04:39.799859+00
-29	sessions	0001_initial	2018-10-09 19:04:39.814048+00
+1	contenttypes	0001_initial	2018-10-12 17:41:10.06938+00
+2	auth	0001_initial	2018-10-12 17:41:10.089064+00
+3	admin	0001_initial	2018-10-12 17:41:10.106709+00
+4	admin	0002_logentry_remove_auto_add	2018-10-12 17:41:10.123056+00
+5	admin	0003_logentry_add_action_flag_choices	2018-10-12 17:41:10.138376+00
+6	api	0001_initial	2018-10-12 17:41:10.180304+00
+7	api	0002_auto_20180926_1905	2018-10-12 17:41:10.195522+00
+8	api	0003_auto_20181008_1819	2018-10-12 17:41:10.222818+00
+9	api	0004_auto_20181012_1507	2018-10-12 17:41:10.238715+00
+10	contenttypes	0002_remove_content_type_name	2018-10-12 17:41:10.259644+00
+11	auth	0002_alter_permission_name_max_length	2018-10-12 17:41:10.272151+00
+12	auth	0003_alter_user_email_max_length	2018-10-12 17:41:10.288947+00
+13	auth	0004_alter_user_username_opts	2018-10-12 17:41:10.304972+00
+14	auth	0005_alter_user_last_login_null	2018-10-12 17:41:10.321694+00
+15	auth	0006_require_contenttypes_0002	2018-10-12 17:41:10.331306+00
+16	auth	0007_alter_validators_add_error_messages	2018-10-12 17:41:10.349397+00
+17	auth	0008_alter_user_username_max_length	2018-10-12 17:41:10.367474+00
+18	auth	0009_alter_user_last_name_max_length	2018-10-12 17:41:10.383718+00
+19	reporting	0001_initial	2018-10-12 17:41:10.783469+00
+20	reporting	0002_auto_20180926_1818	2018-10-12 17:41:10.967898+00
+21	reporting	0003_auto_20180928_1840	2018-10-12 17:41:11.074985+00
+22	reporting	0004_auto_20181003_1633	2018-10-12 17:41:11.201955+00
+23	reporting	0005_auto_20181003_1416	2018-10-12 17:41:11.241319+00
+24	reporting	0006_awscostentrylineitemaggregates_account_alias	2018-10-12 17:41:11.271304+00
+25	reporting	0007_awscostentrybill_provider_id	2018-10-12 17:41:11.291728+00
+26	reporting	0008_auto_20181012_1724	2018-10-12 17:41:11.312679+00
+27	reporting_common	0001_initial	2018-10-12 17:41:11.334761+00
+28	reporting_common	0002_auto_20180926_1905	2018-10-12 17:41:11.347521+00
+29	reporting_common	0003_auto_20180928_1732	2018-10-12 17:41:11.356729+00
+30	reporting_common	0004_auto_20181003_1859	2018-10-12 17:41:11.394153+00
+31	sessions	0001_initial	2018-10-12 17:41:11.406767+00
 \.
 
 
@@ -1906,7 +1908,7 @@ COPY acct10001org20002.reporting_ocpusagereportperiod (id, cluster_id, report_pe
 --
 
 COPY public.api_customer (id, date_created, uuid, account_id, org_id, schema_name) FROM stdin;
-1	2018-10-09 19:04:38.332469+00	00a5429b-356c-4902-a2a5-8bac10f89b36	10001	20001	acct10001org20002
+1	2018-10-12 17:41:10.012249+00	44bd3f97-dc92-4aa4-b167-20bfea913e50	10001	20001	acct10001org20002
 \.
 
 
@@ -1951,7 +1953,7 @@ COPY public.api_tenant (id, schema_name) FROM stdin;
 --
 
 COPY public.api_user (id, uuid, username, email, date_created, is_active, customer_id) FROM stdin;
-1	d173b786-ed99-4319-b409-d349dfb45613	user_dev	user_dev@foo.com	2018-10-09 19:04:39.901184+00	t	1
+1	e1127eab-d0fe-4dd6-9bd4-211d782dd970	user_dev	user_dev@foo.com	2018-10-12 17:41:11.480114+00	t	1
 \.
 
 
@@ -1960,9 +1962,9 @@ COPY public.api_user (id, uuid, username, email, date_created, is_active, custom
 --
 
 COPY public.api_userpreference (id, uuid, preference, name, description, user_id) FROM stdin;
-1	2f2229b3-ecd7-442f-b5ac-204f285339d6	{"currency": "USD"}	currency	default preference	1
-2	348f14a6-5f87-4a9b-9bab-74833895a838	{"timezone": "UTC"}	timezone	default preference	1
-3	24e0431b-68af-4d07-b83f-30c4ef6a88b1	{"locale": "en_US.UTF-8"}	locale	default preference	1
+1	bade278f-86ce-495a-86a2-17e7d51fe773	{"currency": "USD"}	currency	default preference	1
+2	401346e8-9360-441f-8bf8-995290a07563	{"timezone": "UTC"}	timezone	default preference	1
+3	8772f79d-4256-4b03-ae34-986f855f1997	{"locale": "en_US.UTF-8"}	locale	default preference	1
 \.
 
 
@@ -2200,35 +2202,37 @@ COPY public.django_content_type (id, app_label, model) FROM stdin;
 --
 
 COPY public.django_migrations (id, app, name, applied) FROM stdin;
-1	contenttypes	0001_initial	2018-10-09 19:04:28.611419+00
-2	auth	0001_initial	2018-10-09 19:04:28.759669+00
-3	admin	0001_initial	2018-10-09 19:04:28.806753+00
-4	admin	0002_logentry_remove_auto_add	2018-10-09 19:04:28.825514+00
-5	admin	0003_logentry_add_action_flag_choices	2018-10-09 19:04:28.846689+00
-6	api	0001_initial	2018-10-09 19:04:29.05367+00
-7	api	0002_auto_20180926_1905	2018-10-09 19:04:29.068368+00
-8	api	0003_auto_20181008_1819	2018-10-09 19:04:29.139378+00
-9	contenttypes	0002_remove_content_type_name	2018-10-09 19:04:29.177661+00
-10	auth	0002_alter_permission_name_max_length	2018-10-09 19:04:29.193883+00
-11	auth	0003_alter_user_email_max_length	2018-10-09 19:04:29.229578+00
-12	auth	0004_alter_user_username_opts	2018-10-09 19:04:29.250004+00
-13	auth	0005_alter_user_last_login_null	2018-10-09 19:04:29.278911+00
-14	auth	0006_require_contenttypes_0002	2018-10-09 19:04:29.287383+00
-15	auth	0007_alter_validators_add_error_messages	2018-10-09 19:04:29.306529+00
-16	auth	0008_alter_user_username_max_length	2018-10-09 19:04:29.341671+00
-17	auth	0009_alter_user_last_name_max_length	2018-10-09 19:04:29.36582+00
-18	reporting	0001_initial	2018-10-09 19:04:29.513671+00
-19	reporting	0002_auto_20180926_1818	2018-10-09 19:04:29.575369+00
-20	reporting	0003_auto_20180928_1840	2018-10-09 19:04:29.637415+00
-21	reporting	0004_auto_20181003_1633	2018-10-09 19:04:29.681715+00
-22	reporting	0005_auto_20181003_1416	2018-10-09 19:04:29.711114+00
-23	reporting	0006_awscostentrylineitemaggregates_account_alias	2018-10-09 19:04:29.729992+00
-24	reporting	0007_awscostentrybill_provider_id	2018-10-09 19:04:29.758016+00
-25	reporting_common	0001_initial	2018-10-09 19:04:29.87583+00
-26	reporting_common	0002_auto_20180926_1905	2018-10-09 19:04:30.047439+00
-27	reporting_common	0003_auto_20180928_1732	2018-10-09 19:04:30.124392+00
-28	reporting_common	0004_auto_20181003_1859	2018-10-09 19:04:30.212151+00
-29	sessions	0001_initial	2018-10-09 19:04:30.242704+00
+1	contenttypes	0001_initial	2018-10-12 17:41:00.031466+00
+2	auth	0001_initial	2018-10-12 17:41:00.226297+00
+3	admin	0001_initial	2018-10-12 17:41:00.291718+00
+4	admin	0002_logentry_remove_auto_add	2018-10-12 17:41:00.30887+00
+5	admin	0003_logentry_add_action_flag_choices	2018-10-12 17:41:00.326751+00
+6	api	0001_initial	2018-10-12 17:41:00.530853+00
+7	api	0002_auto_20180926_1905	2018-10-12 17:41:00.545032+00
+8	api	0003_auto_20181008_1819	2018-10-12 17:41:00.618383+00
+9	api	0004_auto_20181012_1507	2018-10-12 17:41:00.642557+00
+10	contenttypes	0002_remove_content_type_name	2018-10-12 17:41:00.680898+00
+11	auth	0002_alter_permission_name_max_length	2018-10-12 17:41:00.698938+00
+12	auth	0003_alter_user_email_max_length	2018-10-12 17:41:00.718796+00
+13	auth	0004_alter_user_username_opts	2018-10-12 17:41:00.734908+00
+14	auth	0005_alter_user_last_login_null	2018-10-12 17:41:00.758059+00
+15	auth	0006_require_contenttypes_0002	2018-10-12 17:41:00.76728+00
+16	auth	0007_alter_validators_add_error_messages	2018-10-12 17:41:00.790766+00
+17	auth	0008_alter_user_username_max_length	2018-10-12 17:41:00.817997+00
+18	auth	0009_alter_user_last_name_max_length	2018-10-12 17:41:00.851445+00
+19	reporting	0001_initial	2018-10-12 17:41:01.009073+00
+20	reporting	0002_auto_20180926_1818	2018-10-12 17:41:01.076869+00
+21	reporting	0003_auto_20180928_1840	2018-10-12 17:41:01.145278+00
+22	reporting	0004_auto_20181003_1633	2018-10-12 17:41:01.196228+00
+23	reporting	0005_auto_20181003_1416	2018-10-12 17:41:01.228603+00
+24	reporting	0006_awscostentrylineitemaggregates_account_alias	2018-10-12 17:41:01.250236+00
+25	reporting	0007_awscostentrybill_provider_id	2018-10-12 17:41:01.267162+00
+26	reporting	0008_auto_20181012_1724	2018-10-12 17:41:01.285381+00
+27	reporting_common	0001_initial	2018-10-12 17:41:01.376039+00
+28	reporting_common	0002_auto_20180926_1905	2018-10-12 17:41:01.552977+00
+29	reporting_common	0003_auto_20180928_1732	2018-10-12 17:41:01.634494+00
+30	reporting_common	0004_auto_20181003_1859	2018-10-12 17:41:01.743182+00
+31	sessions	0001_initial	2018-10-12 17:41:01.772372+00
 \.
 
 
@@ -2345,7 +2349,7 @@ COPY public.si_unit_scale (id, prefix, prefix_symbol, multiplying_factor) FROM s
 -- Name: django_migrations_id_seq; Type: SEQUENCE SET; Schema: acct10001org20002; Owner: kokuadmin
 --
 
-SELECT pg_catalog.setval('acct10001org20002.django_migrations_id_seq', 29, true);
+SELECT pg_catalog.setval('acct10001org20002.django_migrations_id_seq', 31, true);
 
 
 --
@@ -2562,7 +2566,7 @@ SELECT pg_catalog.setval('public.django_content_type_id_seq', 33, true);
 -- Name: django_migrations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: kokuadmin
 --
 
-SELECT pg_catalog.setval('public.django_migrations_id_seq', 29, true);
+SELECT pg_catalog.setval('public.django_migrations_id_seq', 31, true);
 
 
 --
@@ -2630,6 +2634,14 @@ ALTER TABLE ONLY acct10001org20002.reporting_awsaccountalias
 
 ALTER TABLE ONLY acct10001org20002.reporting_awscostentry
     ADD CONSTRAINT reporting_awscostentry_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: reporting_awscostentrybill reporting_awscostentrybi_bill_type_payer_account__2d62ede9_uniq; Type: CONSTRAINT; Schema: acct10001org20002; Owner: kokuadmin
+--
+
+ALTER TABLE ONLY acct10001org20002.reporting_awscostentrybill
+    ADD CONSTRAINT reporting_awscostentrybi_bill_type_payer_account__2d62ede9_uniq UNIQUE (bill_type, payer_account_id, billing_period_start);
 
 
 --
@@ -2806,6 +2818,14 @@ ALTER TABLE ONLY public.api_customer
 
 ALTER TABLE ONLY public.api_customer
     ADD CONSTRAINT api_customer_uuid_key UNIQUE (uuid);
+
+
+--
+-- Name: api_provider api_provider_authentication_id_billing_source_id_8f2af497_uniq; Type: CONSTRAINT; Schema: public; Owner: kokuadmin
+--
+
+ALTER TABLE ONLY public.api_provider
+    ADD CONSTRAINT api_provider_authentication_id_billing_source_id_8f2af497_uniq UNIQUE (authentication_id, billing_source_id);
 
 
 --

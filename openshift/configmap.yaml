@@ -30,6 +30,8 @@ objects:
     app-home: /opt/app-root/src/masu
     app-module: masu.__init__:create_app()
     rabbitmq-host: rabbitmq.${NAMESPACE}.svc
+    insights-kafka-server-host: ${KAFKA_HOST}.${NAMESPACE}.svc
+    insights-kafka-server-port: ${KAFKA_PORT}
     log-level: INFO
     worker-queues: 'celery,download,process,remove_expired,reporting'
     schedule-check-interval: "60"
@@ -51,3 +53,14 @@ parameters:
   name: DATABASE_SERVICE_NAME
   required: true
   value: koku-pgsql
+- description: Insights Upload Server address 
+  displayName: Kafka server address
+  name: KAFKA_HOST
+  required: true
+  value: localhost
+- description: Insights Upload Server port 
+  displayName: Kafka server port
+  name: KAFKA_PORT
+  required: true
+  value: "29092"
+

@@ -163,6 +163,18 @@ objects:
                   name: ${NAME}
                   key: rabbitmq-host
                   optional: false
+            - name: INSIGHTS_KAFKA_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: ${NAME}
+                  key: insights-kafka-server-host
+                  optional: false
+            - name: INSIGHTS_KAFKA_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: ${NAME}
+                  key: insights-kafka-server-port
+                  optional: false
             - name: LOG_LEVEL
               valueFrom:
                 configMapKeyRef:

@@ -105,6 +105,6 @@ class ReportDownloaderTest(MasuTestCase):
                                       report_name='bestreport',
                                       provider_type=AMAZON_WEB_SERVICES,
                                       provider_id=1)
-        with patch.object(AWSReportDownloader, 'download_report', side_effect=Exception('some error')):
+        with patch.object(AWSReportDownloader, 'get_report_context_for_date', side_effect=Exception('some error')):
             with self.assertRaises(ReportDownloaderError):
                 downloader.get_reports()

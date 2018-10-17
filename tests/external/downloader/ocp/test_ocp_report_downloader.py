@@ -29,6 +29,7 @@ from datetime import datetime
 from unittest.mock import patch
 from masu.config import Config
 from masu.external.date_accessor import DateAccessor
+from masu.external.report_downloader import ReportDownloader
 from masu.external.downloader.ocp.ocp_report_downloader import OCPReportDownloader
 from tests import MasuTestCase
 
@@ -60,10 +61,16 @@ class OCPReportDownloaderTest(MasuTestCase):
         self.test_manifest_path = os.path.join(report_path, os.path.basename(test_manifest_path))
         shutil.copyfile(test_manifest_path, os.path.join(report_path, self.test_manifest_path))
 
-        self.report_downloader = OCPReportDownloader(**{'customer_name': self.fake_customer_name,
-                                                          'auth_credential': self.cluster_id,
-                                                          'bucket': None,
-                                                          'provider_id': 1})
+        self.report_downloader = ReportDownloader(self.fake_customer_name,
+                                                  self.cluster_id,
+                                                  None,
+                                                  'OCP',
+                                                  1)
+
+        self.ocp_report_downloader = OCPReportDownloader(**{'customer_name': self.fake_customer_name,
+                                                            'auth_credential': self.cluster_id,
+                                                            'bucket': None,
+                                                            'provider_id': 1})
 
     def tearDown(self):
         shutil.rmtree(REPORTS_DIR, ignore_errors=True)

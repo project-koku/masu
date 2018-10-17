@@ -23,6 +23,7 @@ import shutil
 import tempfile
 import logging
 import os
+import uuid
 from datetime import date, datetime, timedelta
 from unittest.mock import call, patch, Mock
 
@@ -37,6 +38,7 @@ from masu.database.report_db_accessor import ReportDBAccessor
 from masu.database.reporting_common_db_accessor import ReportingCommonDBAccessor
 from masu.database.report_stats_db_accessor import ReportStatsDBAccessor
 from masu.external.report_downloader import ReportDownloader, ReportDownloaderError
+
 from masu.processor.expired_data_remover import ExpiredDataRemover
 from masu.processor._tasks.download import _get_report_files
 from masu.processor._tasks.process import _process_report_file
@@ -45,31 +47,23 @@ from masu.processor.tasks import (get_report_files,
                                   remove_expired_data,
                                   update_summary_tables)
 from masu.external.date_accessor import DateAccessor
+from masu.util.aws import common as utils
 from tests import MasuTestCase
 from tests.database.helpers import ReportObjectCreator
 from tests.external.downloader.aws import fake_arn
 
 class FakeDownloader(Mock):
-    def download_report(date_time):
-        fake = faker.Faker()
-        path = '/var/tmp/masu'
-        fake_files = []
-        for _ in range(1,random.randint(5,50)):
-            fake_files.append({'file': '{}/{}/aws/{}-{}.csv'.format(path,
-                                                                    fake.word(),
-                                                                    fake.word(),
-                                                                    fake.word()),
-                               'compression': random.choice(['GZIP', 'PLAIN'])})
-        return fake_files
-
+    def get_reports(self):
+        fake_file_list = ['/var/tmp/masu/my-report-name/aws/my-report-file.csv',
+                          '/var/tmp/masu/other-report-name/aws/other-report-file.csv']
+        return fake_file_list
 
 class GetReportFileTests(MasuTestCase):
     """Test Cases for the celery task."""
 
     fake = faker.Faker()
 
-    @patch('masu.processor._tasks.download.ReportDownloader._set_downloader',
-           return_value=FakeDownloader)
+    @patch('masu.processor._tasks.download.ReportDownloader', return_value=FakeDownloader)
     def test_get_report(self, fake_downloader):
         """Test task"""
         account = fake_arn(service='iam', generate_account_id=True)
@@ -83,12 +77,10 @@ class GetReportFileTests(MasuTestCase):
         self.assertIsInstance(report, list)
         self.assertGreater(len(report), 0)
 
-    @patch('masu.processor._tasks.download.ReportDownloader._set_downloader',
-           return_value=FakeDownloader)
+    @patch('masu.processor._tasks.download.ReportDownloader', return_value=FakeDownloader)
     def test_disk_status_logging(self, fake_downloader):
         """Test task for logging when temp directory exists."""
         logging.disable(logging.NOTSET)
-
         os.makedirs(Config.TMP_DIR, exist_ok=True)
 
         account = fake_arn(service='iam', generate_account_id=True)
@@ -108,8 +100,7 @@ class GetReportFileTests(MasuTestCase):
 
         shutil.rmtree(Config.TMP_DIR, ignore_errors=True)
 
-    @patch('masu.processor._tasks.download.ReportDownloader._set_downloader',
-           return_value=FakeDownloader)
+    @patch('masu.processor._tasks.download.ReportDownloader', return_value=FakeDownloader)
     def test_disk_status_logging_no_dir(self, fake_downloader):
         """Test task for logging when temp directory does not exist."""
         logging.disable(logging.NOTSET)
@@ -141,11 +132,10 @@ class GetReportFileTests(MasuTestCase):
                               provider_uuid='6e212746-484a-40cd-bba0-09a19d132d64',
                               billing_source=self.fake.word())
 
-    @patch('masu.processor._tasks.download.ReportDownloader._set_downloader',
-           return_value=FakeDownloader)
+    @patch('masu.processor._tasks.download.ReportDownloader._set_downloader', return_value=FakeDownloader)
     @patch('masu.database.provider_db_accessor.ProviderDBAccessor.get_setup_complete',
            return_value=True)
-    def test_get_report_with_override(self, fake_accessor, fake_downloader):
+    def test_get_report_with_override(self, fake_accessor, fake_report_files):
         """Test _get_report_files on non-initial load with override set."""
         Config.INGEST_OVERRIDE = True
         Config.INITIAL_INGEST_NUM_MONTHS = 5

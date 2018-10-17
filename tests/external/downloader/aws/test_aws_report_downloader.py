@@ -134,7 +134,6 @@ class AWSReportDownloaderTest(MasuTestCase):
                                                   self.fake_bucket_name,
                                                   'AWS',
                                                   1)
-
         self.aws_report_downloader = AWSReportDownloader(**{'customer_name': self.fake_customer_name,
                                                         'auth_credential': self.auth_credential,
                                                         'bucket': self.fake_bucket_name,
@@ -392,7 +391,7 @@ class AWSReportDownloaderTest(MasuTestCase):
 
         # actual test. Run twice
         for _ in range(2):
-            out = self.aws_report_downloader.download_report(fake_report_date)
+            out = self.report_downloader.download_report(fake_report_date)
             files_list = []
             for cur_dict in out:
                 files_list.append(cur_dict['file'])
@@ -421,7 +420,7 @@ class AWSReportDownloaderTest(MasuTestCase):
         conn = boto3.resource('s3', region_name=self.selected_region)
         conn.create_bucket(Bucket=self.fake_bucket_name)
 
-        out = self.aws_report_downloader.download_report(fake_report_date)
+        out = self.report_downloader.download_report(fake_report_date)
         self.assertEqual(out, [])
 
     @mock_s3
@@ -429,7 +428,7 @@ class AWSReportDownloaderTest(MasuTestCase):
         fake_report_date = self.fake.date_time().replace(day=1)
 
         with self.assertRaises(AWSReportDownloaderError) as error:
-            self.aws_report_downloader.download_report(fake_report_date)
+            self.report_downloader.download_report(fake_report_date)
 
     @mock_s3
     @patch('masu.util.aws.common.get_assume_role_session',

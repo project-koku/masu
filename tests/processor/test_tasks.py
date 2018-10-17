@@ -33,10 +33,12 @@ from dateutil import relativedelta
 from sqlalchemy.sql import func
 
 from masu.config import Config
-from masu.database import AWS_CUR_TABLE_MAP
-from masu.database.report_db_accessor import ReportDBAccessor
+from masu.database import AWS_CUR_TABLE_MAP, OCP_REPORT_TABLE_MAP
+from masu.database.aws_report_db_accessor import AWSReportDBAccessor
+from masu.database.ocp_report_db_accessor import OCPReportDBAccessor
 from masu.database.reporting_common_db_accessor import ReportingCommonDBAccessor
 from masu.database.report_stats_db_accessor import ReportStatsDBAccessor
+from masu.external import AMAZON_WEB_SERVICES, OPENSHIFT_CONTAINER_PLATFORM
 from masu.external.report_downloader import ReportDownloader, ReportDownloaderError
 
 from masu.processor.expired_data_remover import ExpiredDataRemover
@@ -463,47 +465,62 @@ class TestRemoveExpiredDataTasks(MasuTestCase):
 
 
 
-class TestUpdateSummaryTablesTasks(MasuTestCase):
+class TestUpdateSummaryTablesTask(MasuTestCase):
     """Test cases for Processor summary table Celery tasks."""
 
     @classmethod
     def setUpClass(cls):
         """Setup for the class."""
-        cls.all_tables = list(AWS_CUR_TABLE_MAP.values())
+        super().setUpClass()
+        cls.all_tables = list(AWS_CUR_TABLE_MAP.values()) +\
+                              list(OCP_REPORT_TABLE_MAP.values())
         report_common_db = ReportingCommonDBAccessor()
         column_map = report_common_db.column_map
         report_common_db.close_session()
         cls.schema_name = 'acct10001org20002'
-        cls.accessor = ReportDBAccessor(schema=cls.schema_name,
-                                     column_map=column_map)
+        cls.aws_accessor = AWSReportDBAccessor(schema=cls.schema_name,
+                                               column_map=column_map)
+        cls.ocp_accessor = OCPReportDBAccessor(schema=cls.schema_name,
+                                               column_map=column_map)
 
         cls.creator = ReportObjectCreator(
-            cls.accessor,
+            cls.aws_accessor,
             column_map,
-            cls.accessor.report_schema.column_types
+            cls.aws_accessor.report_schema.column_types
         )
 
     @classmethod
     def tearDownClass(cls):
-        cls.accessor.close_connections()
-        cls.accessor.close_session()
+        """Tear down the test class."""
+        cls.aws_accessor.close_connections()
+        cls.aws_accessor.close_session()
+        cls.ocp_accessor.close_connections()
+        cls.ocp_accessor.close_session()
+        super().tearDownClass()
 
     def setUp(self):
         """Set up each test."""
         super().setUp()
-        if self.accessor._conn.closed:
-            self.accessor._conn = self.accessor._db.connect()
-        if self.accessor._pg2_conn.closed:
-            self.accessor._pg2_conn = self.accessor._get_psycopg2_connection()
-        if self.accessor._cursor.closed:
-            self.accessor._cursor = self.accessor._get_psycopg2_cursor()
+        if self.aws_accessor._conn.closed:
+            self.aws_accessor._conn = self.aws_accessor._db.connect()
+        if self.aws_accessor._pg2_conn.closed:
+            self.aws_accessor._pg2_conn = self.aws_accessor._get_psycopg2_connection()
+        if self.aws_accessor._cursor.closed:
+            self.aws_accessor._cursor = self.aws_accessor._get_psycopg2_cursor()
+
+        if self.ocp_accessor._conn.closed:
+            self.ocp_accessor._conn = self.ocp_accessor._db.connect()
+        if self.ocp_accessor._pg2_conn.closed:
+            self.ocp_accessor._pg2_conn = self.ocp_accessor._get_psycopg2_connection()
+        if self.ocp_accessor._cursor.closed:
+            self.ocp_accessor._cursor = self.ocp_accessor._get_psycopg2_cursor()
 
         # Populate some line item data so that the summary tables
         # have something to pull from
-        start_date = datetime.utcnow().replace(day=1)
-        last_month = start_date - relativedelta.relativedelta(months=1)
+        self.start_date = DateAccessor().today_with_timezone('UTC').replace(day=1)
+        last_month = self.start_date - relativedelta.relativedelta(months=1)
 
-        for cost_entry_date in (start_date, last_month):
+        for cost_entry_date in (self.start_date, last_month):
             bill = self.creator.create_cost_entry_bill(cost_entry_date)
             cost_entry = self.creator.create_cost_entry(bill, cost_entry_date)
             for family in ['Storage', 'Compute Instance', 'Database Storage',
@@ -519,29 +536,34 @@ class TestUpdateSummaryTablesTasks(MasuTestCase):
                     reservation
                 )
 
+        for period_date in (self.start_date, last_month):
+            period = self.creator.create_ocp_report_period(period_date)
+            report = self.creator.create_ocp_report(period, period_date)
+            for _ in range(25):
+                self.creator.create_ocp_usage_line_item(period, report)
+
     def tearDown(self):
         """Return the database to a pre-test state."""
-        self.accessor._session.rollback()
+        self.aws_accessor._session.rollback()
 
         for table_name in self.all_tables:
-            tables = self.accessor._get_db_obj_query(table_name).all()
+            tables = self.aws_accessor._get_db_obj_query(table_name).all()
             for table in tables:
-                self.accessor._session.delete(table)
-        self.accessor.commit()
+                self.aws_accessor._session.delete(table)
+        self.aws_accessor.commit()
+        super().tearDown()
 
-    @patch('masu.processor.tasks.ReportDBAccessor.get_cost_entry_bill_by_date')
-    def test_update_summary_tables(self, mock_get_bill):
+    def test_update_summary_tables_aws(self):
         """Test that the summary table task runs."""
-        provider = 'AWS'
+        provider = AMAZON_WEB_SERVICES
         daily_table_name = AWS_CUR_TABLE_MAP['line_item_daily']
         summary_table_name = AWS_CUR_TABLE_MAP['line_item_daily_summary']
         agg_table_name = AWS_CUR_TABLE_MAP['line_item_aggregates']
-        start_date = datetime.utcnow()
-        start_date = start_date.replace(day=1, month=(start_date.month - 1))
+        start_date = self.start_date.replace(day=1, month=(self.start_date.month - 1))
 
-        daily_query = self.accessor._get_db_obj_query(daily_table_name)
-        summary_query = self.accessor._get_db_obj_query(summary_table_name)
-        agg_query = self.accessor._get_db_obj_query(agg_table_name)
+        daily_query = self.aws_accessor._get_db_obj_query(daily_table_name)
+        summary_query = self.aws_accessor._get_db_obj_query(summary_table_name)
+        agg_query = self.aws_accessor._get_db_obj_query(agg_table_name)
 
         initial_daily_count = daily_query.count()
         initial_summary_count = summary_query.count()
@@ -557,33 +579,28 @@ class TestUpdateSummaryTablesTasks(MasuTestCase):
         self.assertNotEqual(summary_query.count(), initial_summary_count)
         self.assertNotEqual(agg_query.count(), initial_agg_count)
 
-    @patch('masu.processor.tasks.ReportDBAccessor.get_cost_entry_bill_by_date')
-    def test_update_summary_tables_end_date(self, mock_get_bill):
+    def test_update_summary_tables_aws_end_date(self):
         """Test that the summary table task respects a date range."""
-        provider = 'AWS'
+        provider = AMAZON_WEB_SERVICES
         ce_table_name = AWS_CUR_TABLE_MAP['cost_entry']
         daily_table_name = AWS_CUR_TABLE_MAP['line_item_daily']
         summary_table_name = AWS_CUR_TABLE_MAP['line_item_daily_summary']
 
-        start_date = datetime.utcnow()
-        start_date = start_date.replace(day=1, month=(start_date.month - 1),
-                                        hour=0, minute=0, second=0,
-                                        microsecond=0)
-        start_date = start_date.replace(
-            tzinfo=psycopg2.tz.FixedOffsetTimezone(offset=0, name=None)
-        )
+        start_date = self.start_date.replace(day=1, month=(self.start_date.month - 1),
+                                             hour=0, minute=0, second=0,
+                                             microsecond=0)
         end_date = start_date + timedelta(days=10)
         end_date = end_date.replace(hour=23, minute=59, second=59)
 
-        daily_table = getattr(self.accessor.report_schema, daily_table_name)
-        summary_table = getattr(self.accessor.report_schema, summary_table_name)
-        ce_table = getattr(self.accessor.report_schema, ce_table_name)
+        daily_table = getattr(self.aws_accessor.report_schema, daily_table_name)
+        summary_table = getattr(self.aws_accessor.report_schema, summary_table_name)
+        ce_table = getattr(self.aws_accessor.report_schema, ce_table_name)
 
-        ce_start_date = self.accessor._session\
+        ce_start_date = self.aws_accessor._session\
             .query(func.min(ce_table.interval_start))\
             .filter(ce_table.interval_start >= start_date).first()[0]
 
-        ce_end_date = self.accessor._session\
+        ce_end_date = self.aws_accessor._session\
             .query(func.max(ce_table.interval_start))\
             .filter(ce_table.interval_start <= end_date).first()[0]
 
@@ -598,7 +615,7 @@ class TestUpdateSummaryTablesTasks(MasuTestCase):
 
         update_summary_tables(self.schema_name, provider, start_date, end_date)
 
-        result_start_date, result_end_date = self.accessor._session.query(
+        result_start_date, result_end_date = self.aws_accessor._session.query(
             func.min(daily_table.usage_start),
             func.max(daily_table.usage_end)
         ).first()
@@ -606,9 +623,72 @@ class TestUpdateSummaryTablesTasks(MasuTestCase):
         self.assertEqual(result_start_date, expected_start_date)
         self.assertEqual(result_end_date, expected_end_date)
 
-        result_start_date, result_end_date = self.accessor._session.query(
+        result_start_date, result_end_date = self.aws_accessor._session.query(
             func.min(summary_table.usage_start),
             func.max(summary_table.usage_end)
+        ).first()
+
+        self.assertEqual(result_start_date, expected_start_date)
+        self.assertEqual(result_end_date, expected_end_date)
+
+    def test_update_summary_tables_ocp(self):
+        """Test that the summary table task runs."""
+        provider = OPENSHIFT_CONTAINER_PLATFORM
+        daily_table_name = OCP_REPORT_TABLE_MAP['line_item_daily']
+        agg_table_name = OCP_REPORT_TABLE_MAP['line_item_aggregates']
+        start_date = self.start_date.replace(day=1, month=(self.start_date.month - 1))
+
+        daily_query = self.ocp_accessor._get_db_obj_query(daily_table_name)
+        agg_query = self.ocp_accessor._get_db_obj_query(agg_table_name)
+
+        initial_daily_count = daily_query.count()
+        initial_agg_count = agg_query.count()
+
+        self.assertEqual(initial_daily_count, 0)
+        self.assertEqual(initial_agg_count, 0)
+
+        update_summary_tables(self.schema_name, provider, start_date)
+
+        self.assertNotEqual(daily_query.count(), initial_daily_count)
+        self.assertNotEqual(agg_query.count(), initial_agg_count)
+
+    def test_update_summary_tables_ocp_end_date(self):
+        """Test that the summary table task respects a date range."""
+        provider = OPENSHIFT_CONTAINER_PLATFORM
+        ce_table_name = OCP_REPORT_TABLE_MAP['report']
+        daily_table_name = OCP_REPORT_TABLE_MAP['line_item_daily']
+
+        start_date = self.start_date.replace(day=1, month=(self.start_date.month - 1),
+                                             hour=0, minute=0, second=0,
+                                             microsecond=0)
+
+        end_date = start_date + timedelta(days=10)
+        end_date = end_date.replace(hour=23, minute=59, second=59)
+
+        daily_table = getattr(self.ocp_accessor.report_schema, daily_table_name)
+        ce_table = getattr(self.ocp_accessor.report_schema, ce_table_name)
+
+        ce_start_date = self.ocp_accessor._session\
+            .query(func.min(ce_table.interval_start))\
+            .filter(ce_table.interval_start >= start_date).first()[0]
+
+        ce_end_date = self.ocp_accessor._session\
+            .query(func.max(ce_table.interval_start))\
+            .filter(ce_table.interval_start <= end_date).first()[0]
+
+        # The summary tables will only include dates where there is data
+        expected_start_date = max(start_date, ce_start_date)
+        expected_start_date = expected_start_date.replace(hour=0, minute=0,
+                                                          second=0,
+                                                          microsecond=0)
+        expected_end_date = min(end_date, ce_end_date)
+        expected_end_date = expected_end_date.replace(hour=0, minute=0,
+                                                      second=0, microsecond=0)
+
+        update_summary_tables(self.schema_name, provider, start_date, end_date)
+        result_start_date, result_end_date = self.ocp_accessor._session.query(
+            func.min(daily_table.usage_start),
+            func.max(daily_table.usage_end)
         ).first()
 
         self.assertEqual(result_start_date, expected_start_date)

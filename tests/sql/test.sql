@@ -541,6 +541,49 @@ CREATE TABLE acct10001org20002.reporting_ocpusagelineitem (
 ALTER TABLE acct10001org20002.reporting_ocpusagelineitem OWNER TO kokuadmin;
 
 --
+-- Name: reporting_ocpusagelineitem_aggregates; Type: TABLE; Schema: acct10001org20002; Owner: kokuadmin
+--
+
+CREATE TABLE acct10001org20002.reporting_ocpusagelineitem_aggregates (
+    id integer NOT NULL,
+    time_scope_value integer NOT NULL,
+    cluster_id character varying(50),
+    namespace character varying(253) NOT NULL,
+    pod character varying(253) NOT NULL,
+    node character varying(253) NOT NULL,
+    pod_usage_cpu_core_seconds numeric(24,6),
+    pod_request_cpu_core_seconds numeric(24,6),
+    pod_limit_cpu_cores numeric(24,6),
+    pod_usage_memory_byte_seconds numeric(24,6),
+    pod_request_memory_byte_seconds numeric(24,6),
+    pod_limit_memory_bytes numeric(24,6)
+);
+
+
+ALTER TABLE acct10001org20002.reporting_ocpusagelineitem_aggregates OWNER TO kokuadmin;
+
+--
+-- Name: reporting_ocpusagelineitem_aggregates_id_seq; Type: SEQUENCE; Schema: acct10001org20002; Owner: kokuadmin
+--
+
+CREATE SEQUENCE acct10001org20002.reporting_ocpusagelineitem_aggregates_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE acct10001org20002.reporting_ocpusagelineitem_aggregates_id_seq OWNER TO kokuadmin;
+
+--
+-- Name: reporting_ocpusagelineitem_aggregates_id_seq; Type: SEQUENCE OWNED BY; Schema: acct10001org20002; Owner: kokuadmin
+--
+
+ALTER SEQUENCE acct10001org20002.reporting_ocpusagelineitem_aggregates_id_seq OWNED BY acct10001org20002.reporting_ocpusagelineitem_aggregates.id;
+
+
+--
 -- Name: reporting_ocpusagelineitem_daily; Type: TABLE; Schema: acct10001org20002; Owner: kokuadmin
 --
 
@@ -551,12 +594,13 @@ CREATE TABLE acct10001org20002.reporting_ocpusagelineitem_daily (
     node character varying(253) NOT NULL,
     usage_start timestamp with time zone NOT NULL,
     usage_end timestamp with time zone NOT NULL,
-    pod_usage_cpu_core_seconds numeric(17,5),
-    pod_limit_cpu_cores numeric(17,5),
-    pod_limit_memory_bytes numeric(17,5),
-    pod_request_cpu_core_seconds numeric(17,5),
-    pod_request_memory_byte_seconds numeric(17,5),
-    pod_usage_memory_byte_seconds numeric(17,5)
+    pod_usage_cpu_core_seconds numeric(24,6),
+    pod_limit_cpu_cores numeric(24,6),
+    pod_limit_memory_bytes numeric(24,6),
+    pod_request_cpu_core_seconds numeric(24,6),
+    pod_request_memory_byte_seconds numeric(24,6),
+    pod_usage_memory_byte_seconds numeric(24,6),
+    cluster_id character varying(50)
 );
 
 
@@ -581,49 +625,6 @@ ALTER TABLE acct10001org20002.reporting_ocpusagelineitem_daily_id_seq OWNER TO k
 --
 
 ALTER SEQUENCE acct10001org20002.reporting_ocpusagelineitem_daily_id_seq OWNED BY acct10001org20002.reporting_ocpusagelineitem_daily.id;
-
-
---
--- Name: reporting_ocpusagelineitem_daily_summary; Type: TABLE; Schema: acct10001org20002; Owner: kokuadmin
---
-
-CREATE TABLE acct10001org20002.reporting_ocpusagelineitem_daily_summary (
-    id bigint NOT NULL,
-    namespace character varying(253) NOT NULL,
-    pod character varying(253) NOT NULL,
-    node character varying(253) NOT NULL,
-    usage_start timestamp with time zone NOT NULL,
-    usage_end timestamp with time zone NOT NULL,
-    pod_usage_cpu_core_seconds numeric(17,5),
-    pod_limit_cpu_cores numeric(17,5),
-    pod_limit_memory_bytes numeric(17,5),
-    pod_request_cpu_core_seconds numeric(17,5),
-    pod_request_memory_byte_seconds numeric(17,5),
-    pod_usage_memory_byte_seconds numeric(17,5)
-);
-
-
-ALTER TABLE acct10001org20002.reporting_ocpusagelineitem_daily_summary OWNER TO kokuadmin;
-
---
--- Name: reporting_ocpusagelineitem_daily_summary_id_seq; Type: SEQUENCE; Schema: acct10001org20002; Owner: kokuadmin
---
-
-CREATE SEQUENCE acct10001org20002.reporting_ocpusagelineitem_daily_summary_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE acct10001org20002.reporting_ocpusagelineitem_daily_summary_id_seq OWNER TO kokuadmin;
-
---
--- Name: reporting_ocpusagelineitem_daily_summary_id_seq; Type: SEQUENCE OWNED BY; Schema: acct10001org20002; Owner: kokuadmin
---
-
-ALTER SEQUENCE acct10001org20002.reporting_ocpusagelineitem_daily_summary_id_seq OWNED BY acct10001org20002.reporting_ocpusagelineitem_daily_summary.id;
 
 
 --
@@ -690,7 +691,10 @@ CREATE TABLE acct10001org20002.reporting_ocpusagereportperiod (
     id integer NOT NULL,
     cluster_id character varying(50) NOT NULL,
     report_period_start timestamp with time zone NOT NULL,
-    report_period_end timestamp with time zone NOT NULL
+    report_period_end timestamp with time zone NOT NULL,
+    provider_id integer,
+    summary_data_creation_datetime timestamp with time zone,
+    summary_data_updated_datetime timestamp with time zone
 );
 
 
@@ -1570,17 +1574,17 @@ ALTER TABLE ONLY acct10001org20002.reporting_ocpusagelineitem ALTER COLUMN id SE
 
 
 --
+-- Name: reporting_ocpusagelineitem_aggregates id; Type: DEFAULT; Schema: acct10001org20002; Owner: kokuadmin
+--
+
+ALTER TABLE ONLY acct10001org20002.reporting_ocpusagelineitem_aggregates ALTER COLUMN id SET DEFAULT nextval('acct10001org20002.reporting_ocpusagelineitem_aggregates_id_seq'::regclass);
+
+
+--
 -- Name: reporting_ocpusagelineitem_daily id; Type: DEFAULT; Schema: acct10001org20002; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY acct10001org20002.reporting_ocpusagelineitem_daily ALTER COLUMN id SET DEFAULT nextval('acct10001org20002.reporting_ocpusagelineitem_daily_id_seq'::regclass);
-
-
---
--- Name: reporting_ocpusagelineitem_daily_summary id; Type: DEFAULT; Schema: acct10001org20002; Owner: kokuadmin
---
-
-ALTER TABLE ONLY acct10001org20002.reporting_ocpusagelineitem_daily_summary ALTER COLUMN id SET DEFAULT nextval('acct10001org20002.reporting_ocpusagelineitem_daily_summary_id_seq'::regclass);
 
 
 --
@@ -1749,37 +1753,39 @@ ALTER TABLE ONLY public.si_unit_scale ALTER COLUMN id SET DEFAULT nextval('publi
 --
 
 COPY acct10001org20002.django_migrations (id, app, name, applied) FROM stdin;
-1	contenttypes	0001_initial	2018-10-12 17:41:10.06938+00
-2	auth	0001_initial	2018-10-12 17:41:10.089064+00
-3	admin	0001_initial	2018-10-12 17:41:10.106709+00
-4	admin	0002_logentry_remove_auto_add	2018-10-12 17:41:10.123056+00
-5	admin	0003_logentry_add_action_flag_choices	2018-10-12 17:41:10.138376+00
-6	api	0001_initial	2018-10-12 17:41:10.180304+00
-7	api	0002_auto_20180926_1905	2018-10-12 17:41:10.195522+00
-8	api	0003_auto_20181008_1819	2018-10-12 17:41:10.222818+00
-9	api	0004_auto_20181012_1507	2018-10-12 17:41:10.238715+00
-10	contenttypes	0002_remove_content_type_name	2018-10-12 17:41:10.259644+00
-11	auth	0002_alter_permission_name_max_length	2018-10-12 17:41:10.272151+00
-12	auth	0003_alter_user_email_max_length	2018-10-12 17:41:10.288947+00
-13	auth	0004_alter_user_username_opts	2018-10-12 17:41:10.304972+00
-14	auth	0005_alter_user_last_login_null	2018-10-12 17:41:10.321694+00
-15	auth	0006_require_contenttypes_0002	2018-10-12 17:41:10.331306+00
-16	auth	0007_alter_validators_add_error_messages	2018-10-12 17:41:10.349397+00
-17	auth	0008_alter_user_username_max_length	2018-10-12 17:41:10.367474+00
-18	auth	0009_alter_user_last_name_max_length	2018-10-12 17:41:10.383718+00
-19	reporting	0001_initial	2018-10-12 17:41:10.783469+00
-20	reporting	0002_auto_20180926_1818	2018-10-12 17:41:10.967898+00
-21	reporting	0003_auto_20180928_1840	2018-10-12 17:41:11.074985+00
-22	reporting	0004_auto_20181003_1633	2018-10-12 17:41:11.201955+00
-23	reporting	0005_auto_20181003_1416	2018-10-12 17:41:11.241319+00
-24	reporting	0006_awscostentrylineitemaggregates_account_alias	2018-10-12 17:41:11.271304+00
-25	reporting	0007_awscostentrybill_provider_id	2018-10-12 17:41:11.291728+00
-26	reporting	0008_auto_20181012_1724	2018-10-12 17:41:11.312679+00
-27	reporting_common	0001_initial	2018-10-12 17:41:11.334761+00
-28	reporting_common	0002_auto_20180926_1905	2018-10-12 17:41:11.347521+00
-29	reporting_common	0003_auto_20180928_1732	2018-10-12 17:41:11.356729+00
-30	reporting_common	0004_auto_20181003_1859	2018-10-12 17:41:11.394153+00
-31	sessions	0001_initial	2018-10-12 17:41:11.406767+00
+1	contenttypes	0001_initial	2018-10-17 17:11:42.545671+00
+2	auth	0001_initial	2018-10-17 17:11:42.566437+00
+3	admin	0001_initial	2018-10-17 17:11:42.584457+00
+4	admin	0002_logentry_remove_auto_add	2018-10-17 17:11:42.602111+00
+5	admin	0003_logentry_add_action_flag_choices	2018-10-17 17:11:42.618803+00
+6	api	0001_initial	2018-10-17 17:11:42.66904+00
+7	api	0002_auto_20180926_1905	2018-10-17 17:11:42.684449+00
+8	api	0003_auto_20181008_1819	2018-10-17 17:11:42.709844+00
+9	api	0004_auto_20181012_1507	2018-10-17 17:11:42.724164+00
+10	contenttypes	0002_remove_content_type_name	2018-10-17 17:11:42.742469+00
+11	auth	0002_alter_permission_name_max_length	2018-10-17 17:11:42.760803+00
+12	auth	0003_alter_user_email_max_length	2018-10-17 17:11:42.779607+00
+13	auth	0004_alter_user_username_opts	2018-10-17 17:11:42.797068+00
+14	auth	0005_alter_user_last_login_null	2018-10-17 17:11:42.814578+00
+15	auth	0006_require_contenttypes_0002	2018-10-17 17:11:42.823271+00
+16	auth	0007_alter_validators_add_error_messages	2018-10-17 17:11:42.839788+00
+17	auth	0008_alter_user_username_max_length	2018-10-17 17:11:42.858126+00
+18	auth	0009_alter_user_last_name_max_length	2018-10-17 17:11:42.873346+00
+19	reporting	0001_initial	2018-10-17 17:11:43.275695+00
+20	reporting	0002_auto_20180926_1818	2018-10-17 17:11:43.464969+00
+21	reporting	0003_auto_20180928_1840	2018-10-17 17:11:43.648206+00
+22	reporting	0004_auto_20181003_1633	2018-10-17 17:11:44.104053+00
+23	reporting	0005_auto_20181003_1416	2018-10-17 17:11:44.239079+00
+24	reporting	0006_awscostentrylineitemaggregates_account_alias	2018-10-17 17:11:44.339802+00
+25	reporting	0007_awscostentrybill_provider_id	2018-10-17 17:11:44.36857+00
+26	reporting	0008_auto_20181012_1724	2018-10-17 17:11:44.394157+00
+27	reporting	0009_auto_20181016_1940	2018-10-17 17:11:44.476635+00
+28	reporting	0010_auto_20181017_1659	2018-10-17 17:11:44.671642+00
+29	reporting_common	0001_initial	2018-10-17 17:11:44.700244+00
+30	reporting_common	0002_auto_20180926_1905	2018-10-17 17:11:44.721549+00
+31	reporting_common	0003_auto_20180928_1732	2018-10-17 17:11:44.737729+00
+32	reporting_common	0004_auto_20181003_1859	2018-10-17 17:11:44.794512+00
+33	sessions	0001_initial	2018-10-17 17:11:44.810911+00
 \.
 
 
@@ -1872,18 +1878,18 @@ COPY acct10001org20002.reporting_ocpusagelineitem (id, namespace, pod, node, pod
 
 
 --
--- Data for Name: reporting_ocpusagelineitem_daily; Type: TABLE DATA; Schema: acct10001org20002; Owner: kokuadmin
+-- Data for Name: reporting_ocpusagelineitem_aggregates; Type: TABLE DATA; Schema: acct10001org20002; Owner: kokuadmin
 --
 
-COPY acct10001org20002.reporting_ocpusagelineitem_daily (id, namespace, pod, node, usage_start, usage_end, pod_usage_cpu_core_seconds, pod_limit_cpu_cores, pod_limit_memory_bytes, pod_request_cpu_core_seconds, pod_request_memory_byte_seconds, pod_usage_memory_byte_seconds) FROM stdin;
+COPY acct10001org20002.reporting_ocpusagelineitem_aggregates (id, time_scope_value, cluster_id, namespace, pod, node, pod_usage_cpu_core_seconds, pod_request_cpu_core_seconds, pod_limit_cpu_cores, pod_usage_memory_byte_seconds, pod_request_memory_byte_seconds, pod_limit_memory_bytes) FROM stdin;
 \.
 
 
 --
--- Data for Name: reporting_ocpusagelineitem_daily_summary; Type: TABLE DATA; Schema: acct10001org20002; Owner: kokuadmin
+-- Data for Name: reporting_ocpusagelineitem_daily; Type: TABLE DATA; Schema: acct10001org20002; Owner: kokuadmin
 --
 
-COPY acct10001org20002.reporting_ocpusagelineitem_daily_summary (id, namespace, pod, node, usage_start, usage_end, pod_usage_cpu_core_seconds, pod_limit_cpu_cores, pod_limit_memory_bytes, pod_request_cpu_core_seconds, pod_request_memory_byte_seconds, pod_usage_memory_byte_seconds) FROM stdin;
+COPY acct10001org20002.reporting_ocpusagelineitem_daily (id, namespace, pod, node, usage_start, usage_end, pod_usage_cpu_core_seconds, pod_limit_cpu_cores, pod_limit_memory_bytes, pod_request_cpu_core_seconds, pod_request_memory_byte_seconds, pod_usage_memory_byte_seconds, cluster_id) FROM stdin;
 \.
 
 
@@ -1899,7 +1905,7 @@ COPY acct10001org20002.reporting_ocpusagereport (id, interval_start, interval_en
 -- Data for Name: reporting_ocpusagereportperiod; Type: TABLE DATA; Schema: acct10001org20002; Owner: kokuadmin
 --
 
-COPY acct10001org20002.reporting_ocpusagereportperiod (id, cluster_id, report_period_start, report_period_end) FROM stdin;
+COPY acct10001org20002.reporting_ocpusagereportperiod (id, cluster_id, report_period_start, report_period_end, provider_id, summary_data_creation_datetime, summary_data_updated_datetime) FROM stdin;
 \.
 
 
@@ -1908,7 +1914,7 @@ COPY acct10001org20002.reporting_ocpusagereportperiod (id, cluster_id, report_pe
 --
 
 COPY public.api_customer (id, date_created, uuid, account_id, org_id, schema_name) FROM stdin;
-1	2018-10-12 17:41:10.012249+00	44bd3f97-dc92-4aa4-b167-20bfea913e50	10001	20001	acct10001org20002
+1	2018-10-17 17:11:42.45783+00	983868a2-ed65-492f-8749-1187dc3b9467	10001	20001	acct10001org20002
 \.
 
 
@@ -1953,7 +1959,7 @@ COPY public.api_tenant (id, schema_name) FROM stdin;
 --
 
 COPY public.api_user (id, uuid, username, email, date_created, is_active, customer_id) FROM stdin;
-1	e1127eab-d0fe-4dd6-9bd4-211d782dd970	user_dev	user_dev@foo.com	2018-10-12 17:41:11.480114+00	t	1
+1	2ff2d604-7a62-4dcb-b779-b7c9a054ca04	user_dev	user_dev@foo.com	2018-10-17 17:11:44.930093+00	t	1
 \.
 
 
@@ -1962,9 +1968,9 @@ COPY public.api_user (id, uuid, username, email, date_created, is_active, custom
 --
 
 COPY public.api_userpreference (id, uuid, preference, name, description, user_id) FROM stdin;
-1	bade278f-86ce-495a-86a2-17e7d51fe773	{"currency": "USD"}	currency	default preference	1
-2	401346e8-9360-441f-8bf8-995290a07563	{"timezone": "UTC"}	timezone	default preference	1
-3	8772f79d-4256-4b03-ae34-986f855f1997	{"locale": "en_US.UTF-8"}	locale	default preference	1
+1	cc03c4bd-51da-4c62-a284-3555386edc1e	{"currency": "USD"}	currency	default preference	1
+2	70752419-0a17-4a01-a9f1-2c7366047532	{"timezone": "UTC"}	timezone	default preference	1
+3	d7a8b191-b082-4d1d-8d9e-ce14297207ce	{"locale": "en_US.UTF-8"}	locale	default preference	1
 \.
 
 
@@ -2089,18 +2095,18 @@ COPY public.auth_permission (id, name, content_type_id, codename) FROM stdin;
 98	Can change ocp usage line item daily	25	change_ocpusagelineitemdaily
 99	Can delete ocp usage line item daily	25	delete_ocpusagelineitemdaily
 100	Can view ocp usage line item daily	25	view_ocpusagelineitemdaily
-101	Can add ocp usage line item daily summary	26	add_ocpusagelineitemdailysummary
-102	Can change ocp usage line item daily summary	26	change_ocpusagelineitemdailysummary
-103	Can delete ocp usage line item daily summary	26	delete_ocpusagelineitemdailysummary
-104	Can view ocp usage line item daily summary	26	view_ocpusagelineitemdailysummary
-105	Can add ocp usage report	27	add_ocpusagereport
-106	Can change ocp usage report	27	change_ocpusagereport
-107	Can delete ocp usage report	27	delete_ocpusagereport
-108	Can view ocp usage report	27	view_ocpusagereport
-109	Can add ocp usage report period	28	add_ocpusagereportperiod
-110	Can change ocp usage report period	28	change_ocpusagereportperiod
-111	Can delete ocp usage report period	28	delete_ocpusagereportperiod
-112	Can view ocp usage report period	28	view_ocpusagereportperiod
+101	Can add ocp usage report	26	add_ocpusagereport
+102	Can change ocp usage report	26	change_ocpusagereport
+103	Can delete ocp usage report	26	delete_ocpusagereport
+104	Can view ocp usage report	26	view_ocpusagereport
+105	Can add ocp usage report period	27	add_ocpusagereportperiod
+106	Can change ocp usage report period	27	change_ocpusagereportperiod
+107	Can delete ocp usage report period	27	delete_ocpusagereportperiod
+108	Can view ocp usage report period	27	view_ocpusagereportperiod
+109	Can add ocp usage line item aggregates	28	add_ocpusagelineitemaggregates
+110	Can change ocp usage line item aggregates	28	change_ocpusagelineitemaggregates
+111	Can delete ocp usage line item aggregates	28	delete_ocpusagelineitemaggregates
+112	Can view ocp usage line item aggregates	28	view_ocpusagelineitemaggregates
 113	Can add cost usage report status	29	add_costusagereportstatus
 114	Can change cost usage report status	29	change_costusagereportstatus
 115	Can delete cost usage report status	29	delete_costusagereportstatus
@@ -2186,9 +2192,9 @@ COPY public.django_content_type (id, app_label, model) FROM stdin;
 23	reporting	awscostentryreservation
 24	reporting	ocpusagelineitem
 25	reporting	ocpusagelineitemdaily
-26	reporting	ocpusagelineitemdailysummary
-27	reporting	ocpusagereport
-28	reporting	ocpusagereportperiod
+26	reporting	ocpusagereport
+27	reporting	ocpusagereportperiod
+28	reporting	ocpusagelineitemaggregates
 29	reporting_common	costusagereportstatus
 30	reporting_common	regionmapping
 31	reporting_common	reportcolumnmap
@@ -2202,37 +2208,39 @@ COPY public.django_content_type (id, app_label, model) FROM stdin;
 --
 
 COPY public.django_migrations (id, app, name, applied) FROM stdin;
-1	contenttypes	0001_initial	2018-10-12 17:41:00.031466+00
-2	auth	0001_initial	2018-10-12 17:41:00.226297+00
-3	admin	0001_initial	2018-10-12 17:41:00.291718+00
-4	admin	0002_logentry_remove_auto_add	2018-10-12 17:41:00.30887+00
-5	admin	0003_logentry_add_action_flag_choices	2018-10-12 17:41:00.326751+00
-6	api	0001_initial	2018-10-12 17:41:00.530853+00
-7	api	0002_auto_20180926_1905	2018-10-12 17:41:00.545032+00
-8	api	0003_auto_20181008_1819	2018-10-12 17:41:00.618383+00
-9	api	0004_auto_20181012_1507	2018-10-12 17:41:00.642557+00
-10	contenttypes	0002_remove_content_type_name	2018-10-12 17:41:00.680898+00
-11	auth	0002_alter_permission_name_max_length	2018-10-12 17:41:00.698938+00
-12	auth	0003_alter_user_email_max_length	2018-10-12 17:41:00.718796+00
-13	auth	0004_alter_user_username_opts	2018-10-12 17:41:00.734908+00
-14	auth	0005_alter_user_last_login_null	2018-10-12 17:41:00.758059+00
-15	auth	0006_require_contenttypes_0002	2018-10-12 17:41:00.76728+00
-16	auth	0007_alter_validators_add_error_messages	2018-10-12 17:41:00.790766+00
-17	auth	0008_alter_user_username_max_length	2018-10-12 17:41:00.817997+00
-18	auth	0009_alter_user_last_name_max_length	2018-10-12 17:41:00.851445+00
-19	reporting	0001_initial	2018-10-12 17:41:01.009073+00
-20	reporting	0002_auto_20180926_1818	2018-10-12 17:41:01.076869+00
-21	reporting	0003_auto_20180928_1840	2018-10-12 17:41:01.145278+00
-22	reporting	0004_auto_20181003_1633	2018-10-12 17:41:01.196228+00
-23	reporting	0005_auto_20181003_1416	2018-10-12 17:41:01.228603+00
-24	reporting	0006_awscostentrylineitemaggregates_account_alias	2018-10-12 17:41:01.250236+00
-25	reporting	0007_awscostentrybill_provider_id	2018-10-12 17:41:01.267162+00
-26	reporting	0008_auto_20181012_1724	2018-10-12 17:41:01.285381+00
-27	reporting_common	0001_initial	2018-10-12 17:41:01.376039+00
-28	reporting_common	0002_auto_20180926_1905	2018-10-12 17:41:01.552977+00
-29	reporting_common	0003_auto_20180928_1732	2018-10-12 17:41:01.634494+00
-30	reporting_common	0004_auto_20181003_1859	2018-10-12 17:41:01.743182+00
-31	sessions	0001_initial	2018-10-12 17:41:01.772372+00
+1	contenttypes	0001_initial	2018-10-17 17:11:32.445275+00
+2	auth	0001_initial	2018-10-17 17:11:32.586914+00
+3	admin	0001_initial	2018-10-17 17:11:32.632482+00
+4	admin	0002_logentry_remove_auto_add	2018-10-17 17:11:32.649742+00
+5	admin	0003_logentry_add_action_flag_choices	2018-10-17 17:11:32.671273+00
+6	api	0001_initial	2018-10-17 17:11:32.878777+00
+7	api	0002_auto_20180926_1905	2018-10-17 17:11:32.894243+00
+8	api	0003_auto_20181008_1819	2018-10-17 17:11:32.964218+00
+9	api	0004_auto_20181012_1507	2018-10-17 17:11:32.986001+00
+10	contenttypes	0002_remove_content_type_name	2018-10-17 17:11:33.031229+00
+11	auth	0002_alter_permission_name_max_length	2018-10-17 17:11:33.051495+00
+12	auth	0003_alter_user_email_max_length	2018-10-17 17:11:33.079181+00
+13	auth	0004_alter_user_username_opts	2018-10-17 17:11:33.098363+00
+14	auth	0005_alter_user_last_login_null	2018-10-17 17:11:33.126891+00
+15	auth	0006_require_contenttypes_0002	2018-10-17 17:11:33.141386+00
+16	auth	0007_alter_validators_add_error_messages	2018-10-17 17:11:33.162169+00
+17	auth	0008_alter_user_username_max_length	2018-10-17 17:11:33.189299+00
+18	auth	0009_alter_user_last_name_max_length	2018-10-17 17:11:33.227+00
+19	reporting	0001_initial	2018-10-17 17:11:33.377961+00
+20	reporting	0002_auto_20180926_1818	2018-10-17 17:11:33.448615+00
+21	reporting	0003_auto_20180928_1840	2018-10-17 17:11:33.510153+00
+22	reporting	0004_auto_20181003_1633	2018-10-17 17:11:33.558297+00
+23	reporting	0005_auto_20181003_1416	2018-10-17 17:11:33.588908+00
+24	reporting	0006_awscostentrylineitemaggregates_account_alias	2018-10-17 17:11:33.602198+00
+25	reporting	0007_awscostentrybill_provider_id	2018-10-17 17:11:33.619463+00
+26	reporting	0008_auto_20181012_1724	2018-10-17 17:11:33.638477+00
+27	reporting	0009_auto_20181016_1940	2018-10-17 17:11:33.681833+00
+28	reporting	0010_auto_20181017_1659	2018-10-17 17:11:33.731187+00
+29	reporting_common	0001_initial	2018-10-17 17:11:33.819628+00
+30	reporting_common	0002_auto_20180926_1905	2018-10-17 17:11:34.014426+00
+31	reporting_common	0003_auto_20180928_1732	2018-10-17 17:11:34.10286+00
+32	reporting_common	0004_auto_20181003_1859	2018-10-17 17:11:34.209639+00
+33	sessions	0001_initial	2018-10-17 17:11:34.264324+00
 \.
 
 
@@ -2349,7 +2357,7 @@ COPY public.si_unit_scale (id, prefix, prefix_symbol, multiplying_factor) FROM s
 -- Name: django_migrations_id_seq; Type: SEQUENCE SET; Schema: acct10001org20002; Owner: kokuadmin
 --
 
-SELECT pg_catalog.setval('acct10001org20002.django_migrations_id_seq', 31, true);
+SELECT pg_catalog.setval('acct10001org20002.django_migrations_id_seq', 33, true);
 
 
 --
@@ -2423,17 +2431,17 @@ SELECT pg_catalog.setval('acct10001org20002.reporting_awscostentryreservation_id
 
 
 --
+-- Name: reporting_ocpusagelineitem_aggregates_id_seq; Type: SEQUENCE SET; Schema: acct10001org20002; Owner: kokuadmin
+--
+
+SELECT pg_catalog.setval('acct10001org20002.reporting_ocpusagelineitem_aggregates_id_seq', 1, false);
+
+
+--
 -- Name: reporting_ocpusagelineitem_daily_id_seq; Type: SEQUENCE SET; Schema: acct10001org20002; Owner: kokuadmin
 --
 
 SELECT pg_catalog.setval('acct10001org20002.reporting_ocpusagelineitem_daily_id_seq', 1, false);
-
-
---
--- Name: reporting_ocpusagelineitem_daily_summary_id_seq; Type: SEQUENCE SET; Schema: acct10001org20002; Owner: kokuadmin
---
-
-SELECT pg_catalog.setval('acct10001org20002.reporting_ocpusagelineitem_daily_summary_id_seq', 1, false);
 
 
 --
@@ -2566,7 +2574,7 @@ SELECT pg_catalog.setval('public.django_content_type_id_seq', 33, true);
 -- Name: django_migrations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: kokuadmin
 --
 
-SELECT pg_catalog.setval('public.django_migrations_id_seq', 31, true);
+SELECT pg_catalog.setval('public.django_migrations_id_seq', 33, true);
 
 
 --
@@ -2749,19 +2757,19 @@ ALTER TABLE ONLY acct10001org20002.reporting_ocpusagelineitem
 
 
 --
+-- Name: reporting_ocpusagelineitem_aggregates reporting_ocpusagelineitem_aggregates_pkey; Type: CONSTRAINT; Schema: acct10001org20002; Owner: kokuadmin
+--
+
+ALTER TABLE ONLY acct10001org20002.reporting_ocpusagelineitem_aggregates
+    ADD CONSTRAINT reporting_ocpusagelineitem_aggregates_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: reporting_ocpusagelineitem_daily reporting_ocpusagelineitem_daily_pkey; Type: CONSTRAINT; Schema: acct10001org20002; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY acct10001org20002.reporting_ocpusagelineitem_daily
     ADD CONSTRAINT reporting_ocpusagelineitem_daily_pkey PRIMARY KEY (id);
-
-
---
--- Name: reporting_ocpusagelineitem_daily_summary reporting_ocpusagelineitem_daily_summary_pkey; Type: CONSTRAINT; Schema: acct10001org20002; Owner: kokuadmin
---
-
-ALTER TABLE ONLY acct10001org20002.reporting_ocpusagelineitem_daily_summary
-    ADD CONSTRAINT reporting_ocpusagelineitem_daily_summary_pkey PRIMARY KEY (id);
 
 
 --
@@ -2773,11 +2781,27 @@ ALTER TABLE ONLY acct10001org20002.reporting_ocpusagelineitem
 
 
 --
+-- Name: reporting_ocpusagereportperiod reporting_ocpusagereport_cluster_id_report_period_94b94003_uniq; Type: CONSTRAINT; Schema: acct10001org20002; Owner: kokuadmin
+--
+
+ALTER TABLE ONLY acct10001org20002.reporting_ocpusagereportperiod
+    ADD CONSTRAINT reporting_ocpusagereport_cluster_id_report_period_94b94003_uniq UNIQUE (cluster_id, report_period_start);
+
+
+--
 -- Name: reporting_ocpusagereport reporting_ocpusagereport_pkey; Type: CONSTRAINT; Schema: acct10001org20002; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY acct10001org20002.reporting_ocpusagereport
     ADD CONSTRAINT reporting_ocpusagereport_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: reporting_ocpusagereport reporting_ocpusagereport_report_period_id_interva_066551f3_uniq; Type: CONSTRAINT; Schema: acct10001org20002; Owner: kokuadmin
+--
+
+ALTER TABLE ONLY acct10001org20002.reporting_ocpusagereport
+    ADD CONSTRAINT reporting_ocpusagereport_report_period_id_interva_066551f3_uniq UNIQUE (report_period_id, interval_start);
 
 
 --
@@ -3338,34 +3362,6 @@ CREATE INDEX reporting_ocpusagelineitem_report_period_id_be7fa5ad ON acct10001or
 --
 
 CREATE INDEX reporting_ocpusagereport_report_period_id_477508c6 ON acct10001org20002.reporting_ocpusagereport USING btree (report_period_id);
-
-
---
--- Name: summary_namespace_idx; Type: INDEX; Schema: acct10001org20002; Owner: kokuadmin
---
-
-CREATE INDEX summary_namespace_idx ON acct10001org20002.reporting_ocpusagelineitem_daily_summary USING btree (namespace);
-
-
---
--- Name: summary_node_idx; Type: INDEX; Schema: acct10001org20002; Owner: kokuadmin
---
-
-CREATE INDEX summary_node_idx ON acct10001org20002.reporting_ocpusagelineitem_daily_summary USING btree (node);
-
-
---
--- Name: summary_ocp_usage_idx; Type: INDEX; Schema: acct10001org20002; Owner: kokuadmin
---
-
-CREATE INDEX summary_ocp_usage_idx ON acct10001org20002.reporting_ocpusagelineitem_daily_summary USING btree (usage_start);
-
-
---
--- Name: summary_pod_idx; Type: INDEX; Schema: acct10001org20002; Owner: kokuadmin
---
-
-CREATE INDEX summary_pod_idx ON acct10001org20002.reporting_ocpusagelineitem_daily_summary USING btree (pod);
 
 
 --

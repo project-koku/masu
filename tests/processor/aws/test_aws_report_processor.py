@@ -34,7 +34,7 @@ from sqlalchemy.sql import func
 
 from masu.config import Config
 from masu.database import AWS_CUR_TABLE_MAP
-from masu.database.report_db_accessor import ReportDBAccessor
+from masu.database.aws_report_db_accessor import AWSReportDBAccessor
 from masu.database.report_stats_db_accessor import ReportStatsDBAccessor
 from tests.database.helpers import ReportObjectCreator
 from masu.database.reporting_common_db_accessor import ReportingCommonDBAccessor
@@ -399,19 +399,18 @@ class AWSReportProcessorTest(MasuTestCase):
         """Test that a cost entry id is returned from an existing entry."""
         table_name = AWS_CUR_TABLE_MAP['cost_entry']
         table = getattr(self.report_schema, table_name)
-        id_column = getattr(table, 'id')
 
         bill_id = self.processor._create_cost_entry_bill(self.row)
         self.accessor.commit()
 
         interval = self.row.get('identity/TimeInterval')
-        start, end = self.processor._get_cost_entry_time_interval(interval)
+        start, _ = self.processor._get_cost_entry_time_interval(interval)
+        key = (bill_id, start)
         expected_id = random.randint(1,9)
-        self.processor.existing_cost_entry_map[start] = expected_id
+        self.processor.existing_cost_entry_map[key] = expected_id
 
         cost_entry_id = self.processor._create_cost_entry(self.row,
                                                           bill_id)
-
         self.assertEqual(cost_entry_id, expected_id)
 
     def test_create_cost_entry_line_item(self):

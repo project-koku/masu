@@ -179,3 +179,20 @@ class AWSLocalReportDownloaderTest(MasuTestCase):
         self.assertIsNone(report_downloader.report_prefix)
 
         shutil.rmtree(bucket)
+
+    def test_download_missing_month(self):
+        """Test to verify that downloading a non-existant month throws proper exception."""
+        fake_bucket = tempfile.mkdtemp()
+        mytar = TarFile.open('./tests/data/test_local_bucket_prefix.tar.gz')
+        mytar.extractall(fake_bucket)
+        test_report_date = datetime(year=2018, month=7, day=7)
+        with patch.object(DateAccessor, 'today', return_value=test_report_date):
+            report_downloader = ReportDownloader(self.fake_customer_name,
+                                                  self.fake_auth_credential,
+                                                  fake_bucket,
+                                                  'AWS-local',
+                                                  1)
+            # Names from test report .gz file
+            report_downloader.download_report(test_report_date)
+        expected_path = '{}/{}/{}'.format(DATA_DIR, self.fake_customer_name, 'aws-local')
+        self.assertFalse(os.path.isdir(expected_path))

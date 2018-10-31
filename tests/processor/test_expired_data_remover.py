@@ -36,6 +36,12 @@ class ExpiredDataRemoverTest(MasuTestCase):
         self.assertEqual(remover._months_to_keep, 3)
         self.assertIsInstance(remover._expiration_date, datetime)
 
+    def test_initializer_ocp(self):
+        """Test to init for OCP"""
+        remover = ExpiredDataRemover('acct10001org20002', 'OCP')
+        self.assertEqual(remover._months_to_keep, 3)
+        self.assertIsInstance(remover._expiration_date, datetime)
+
     def test_initializer_invalid_provider(self):
         """Test to init with unknown provider"""
         with self.assertRaises(ExpiredDataRemoverError):

@@ -155,7 +155,7 @@ class OCPReportSummaryUpdaterTest(MasuTestCase):
         self.manifest_accessor.commit()
 
         start_date = self.date_accessor.today_with_timezone('UTC')
-        end_date = start_date + datetime.timedelta(days=1)
+        end_date = start_date
         bill_date = start_date.replace(day=1).date()
 
         period = self.accessor.get_usage_periods_by_date(bill_date)[0]

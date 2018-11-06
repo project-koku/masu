@@ -30,7 +30,7 @@ objects:
     app-home: /opt/app-root/src/masu
     app-module: masu.__init__:create_app()
     rabbitmq-host: rabbitmq.${NAMESPACE}.svc
-    insights-kafka-server-host: ${KAFKA_HOST}.${NAMESPACE}.svc
+    insights-kafka-server-host: ${KAFKA_HOST}.${KAFKA_NAMESPACE}.svc
     insights-kafka-server-port: ${KAFKA_PORT}
     log-level: INFO
     worker-queues: 'celery,download,process,remove_expired,reporting'
@@ -58,6 +58,11 @@ parameters:
   name: KAFKA_HOST
   required: true
   value: localhost
+- description: Insights Upload Server namespace 
+  displayName: Kafka server namespace
+  name: KAFKA_NAMESPACE
+  required: true
+  value: myproject
 - description: Insights Upload Server port 
   displayName: Kafka server port
   name: KAFKA_PORT

@@ -73,7 +73,7 @@ class DateAccessorTest(MasuTestCase):
 
         accessor = DateAccessor()
         today = accessor.today()
-        expected_date = datetime.today()
+        expected_date = datetime.now(tz=pytz.UTC)
 
         self.assertEqual(today.year, expected_date.year)
         self.assertEqual(today.month, expected_date.month)
@@ -87,7 +87,7 @@ class DateAccessorTest(MasuTestCase):
 
         accessor = DateAccessor()
         today = accessor.today()
-        expected_date = datetime.today()
+        expected_date = datetime.now(tz=pytz.UTC)
 
         self.assertEqual(today.year, expected_date.year)
         self.assertEqual(today.month, expected_date.month)
@@ -101,7 +101,7 @@ class DateAccessorTest(MasuTestCase):
 
         accessor = DateAccessor()
         today = accessor.today()
-        expected_date = datetime.today()
+        expected_date = datetime.now(tz=pytz.UTC)
 
         self.assertEqual(today.year, expected_date.year)
         self.assertEqual(today.month, expected_date.month)

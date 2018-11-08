@@ -42,11 +42,13 @@ from masu.external import AMAZON_WEB_SERVICES, OPENSHIFT_CONTAINER_PLATFORM
 from masu.external.report_downloader import ReportDownloader, ReportDownloaderError
 
 from masu.processor.expired_data_remover import ExpiredDataRemover
+from masu.processor.report_charge_updater import ReportChargeUpdater
 from masu.processor._tasks.download import _get_report_files
 from masu.processor._tasks.process import _process_report_file
 from masu.processor.tasks import (get_report_files,
                                   process_report_file,
                                   remove_expired_data,
+                                  update_charge_info,
                                   update_summary_tables)
 from masu.external.date_accessor import DateAccessor
 from masu.util.aws import common as utils
@@ -553,7 +555,8 @@ class TestUpdateSummaryTablesTask(MasuTestCase):
         self.aws_accessor.commit()
         super().tearDown()
 
-    def test_update_summary_tables_aws(self):
+    @patch('masu.processor.tasks.update_charge_info')
+    def test_update_summary_tables_aws(self, mock_charge_info):
         """Test that the summary table task runs."""
         provider = AMAZON_WEB_SERVICES
         daily_table_name = AWS_CUR_TABLE_MAP['line_item_daily']
@@ -579,7 +582,8 @@ class TestUpdateSummaryTablesTask(MasuTestCase):
         self.assertNotEqual(summary_query.count(), initial_summary_count)
         self.assertNotEqual(agg_query.count(), initial_agg_count)
 
-    def test_update_summary_tables_aws_end_date(self):
+    @patch('masu.processor.tasks.update_charge_info')
+    def test_update_summary_tables_aws_end_date(self, mock_charge_info):
         """Test that the summary table task respects a date range."""
         provider = AMAZON_WEB_SERVICES
         ce_table_name = AWS_CUR_TABLE_MAP['cost_entry']
@@ -631,8 +635,13 @@ class TestUpdateSummaryTablesTask(MasuTestCase):
         self.assertEqual(result_start_date, expected_start_date)
         self.assertEqual(result_end_date, expected_end_date)
 
-    def test_update_summary_tables_ocp(self):
+    @patch('masu.processor.tasks.update_charge_info')
+    @patch('masu.database.ocp_rate_db_accessor.OCPRateDBAccessor.get_memory_usage_rate')
+    @patch('masu.database.ocp_rate_db_accessor.OCPRateDBAccessor.get_cpu_usage_rate')
+    def test_update_summary_tables_ocp(self, mock_cpu_rate, mock_mem_rate, mock_charge_info):
         """Test that the summary table task runs."""
+        mock_cpu_rate.return_value = 1.5
+        mock_mem_rate.return_value = 2.5
         provider = OPENSHIFT_CONTAINER_PLATFORM
         daily_table_name = OCP_REPORT_TABLE_MAP['line_item_daily']
         agg_table_name = OCP_REPORT_TABLE_MAP['line_item_aggregates']
@@ -652,8 +661,21 @@ class TestUpdateSummaryTablesTask(MasuTestCase):
         self.assertNotEqual(daily_query.count(), initial_daily_count)
         self.assertNotEqual(agg_query.count(), initial_agg_count)
 
-    def test_update_summary_tables_ocp_end_date(self):
+        update_charge_info(schema_name='acct10001org20002', provider='OCP')
+    
+        table_name = OCP_REPORT_TABLE_MAP['line_item_daily_summary']
+        items = self.ocp_accessor._get_db_obj_query(table_name).all()
+        for item in items:
+            self.assertIsNotNone(item.pod_charge_memory_gigabytes)
+            self.assertIsNotNone(item.pod_charge_cpu_cores)
+
+    @patch('masu.processor.tasks.update_charge_info')
+    @patch('masu.database.ocp_rate_db_accessor.OCPRateDBAccessor.get_memory_usage_rate')
+    @patch('masu.database.ocp_rate_db_accessor.OCPRateDBAccessor.get_cpu_usage_rate')
+    def test_update_summary_tables_ocp_end_date(self, mock_cpu_rate, mock_mem_rate, mock_charge_info, ):
         """Test that the summary table task respects a date range."""
+        mock_cpu_rate.return_value = 1.5
+        mock_mem_rate.return_value = 2.5
         provider = OPENSHIFT_CONTAINER_PLATFORM
         ce_table_name = OCP_REPORT_TABLE_MAP['report']
         daily_table_name = OCP_REPORT_TABLE_MAP['line_item_daily']
@@ -693,3 +715,7 @@ class TestUpdateSummaryTablesTask(MasuTestCase):
 
         self.assertEqual(result_start_date, expected_start_date)
         self.assertEqual(result_end_date, expected_end_date)
+
+    def test_update_charge_info_aws(self):
+        """Test that update_charge_info is not called for AWS."""
+        update_charge_info(schema_name='acct10001org20002', provider='AWS')

@@ -52,6 +52,7 @@ class OrchestratorTest(MasuTestCase):
     fake = faker.Faker()
 
     def setUp(self):
+        super().setUp()
         self.mock_accounts = []
         for _ in range(1, random.randint(5,20)):
             self.mock_accounts.append({

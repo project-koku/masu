@@ -25,14 +25,14 @@ CREATE SCHEMA acct10001org20002;
 ALTER SCHEMA acct10001org20002 OWNER TO kokuadmin;
 
 --
--- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: 
+-- Name: plpgsql; Type: EXTENSION; Schema: -; Owner:
 --
 
 CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
 
 
 --
--- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: 
+-- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner:
 --
 
 COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
@@ -2492,6 +2492,11 @@ COPY public.reporting_common_reportcolumnmap (id, provider_type, provider_column
 59	OCP	pod_usage_memory_byte_seconds	reporting_ocpusagelineitem	pod_usage_memory_byte_seconds
 60	OCP	pod_request_memory_byte_seconds	reporting_ocpusagelineitem	pod_request_memory_byte_seconds
 61	OCP	pod_limit_memory_bytes	reporting_ocpusagelineitem	pod_limit_memory_bytes
+62	OCP	node_capacity_cpu_cores	reporting_ocpusagelineitem	node_capacity_cpu_cores
+63	OCP	node_capacity_cpu_core_seconds	reporting_ocpusagelineitem	node_capacity_cpu_core_seconds
+64	OCP	node_capacity_memory_bytes	reporting_ocpusagelineitem	node_capacity_memory_bytes
+65	OCP	node_capacity_memory_byte_seconds	reporting_ocpusagelineitem	node_capacity_memory_byte_seconds
+66	OCP	pod_labels	reporting_ocpusagelineitem	pod_labels
 \.
 
 
@@ -2766,7 +2771,7 @@ SELECT pg_catalog.setval('public.reporting_common_costusagereportstatus_id_seq',
 -- Name: reporting_common_reportcolumnmap_id_seq; Type: SEQUENCE SET; Schema: public; Owner: kokuadmin
 --
 
-SELECT pg_catalog.setval('public.reporting_common_reportcolumnmap_id_seq', 61, true);
+SELECT pg_catalog.setval('public.reporting_common_reportcolumnmap_id_seq', 66, true);
 
 
 --
@@ -4083,4 +4088,3 @@ ALTER TABLE ONLY public.reporting_common_costusagereportmanifest
 --
 -- PostgreSQL database dump complete
 --
-

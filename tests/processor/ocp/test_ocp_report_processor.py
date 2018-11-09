@@ -19,6 +19,7 @@
 import csv
 import copy
 import gzip
+import json
 import shutil
 import tempfile
 
@@ -271,9 +272,10 @@ class OCPReportProcessorTest(MasuTestCase):
         cluster_id = '12345'
         report_period_id = self.processor._create_report_period(self.row, cluster_id)
         report_id = self.processor._create_report(self.row, report_period_id)
-
+        row = copy.deepcopy(self.row)
+        row['pod_labels'] = 'label_one:mic_check|label_two:one_two'
         self.processor._create_usage_report_line_item(
-            self.row,
+            row,
             report_period_id,
             report_id
         )
@@ -285,6 +287,7 @@ class OCPReportProcessorTest(MasuTestCase):
         self.assertIsNotNone(line_item)
         self.assertEqual(line_item.get('report_period_id'), report_period_id)
         self.assertEqual(line_item.get('report_id'), report_id)
+        self.assertIsNotNone(line_item.get('pod_labels'))
 
         self.assertIsNotNone(self.processor.line_item_columns)
 
@@ -299,3 +302,27 @@ class OCPReportProcessorTest(MasuTestCase):
         self.assertEqual(sorted(removed_files), sorted(expected_delete_list))
 
         shutil.rmtree(cur_dir)
+
+    def test_process_pod_labels(self):
+        """Test that our report label string format is parsed."""
+        test_label_str = 'label_one:first|label_two:next|label_three:final'
+
+        expected = json.dumps({
+            'one': 'first',
+            'two': 'next',
+            'three': 'final'
+        })
+
+        result = self.processor._process_pod_labels(test_label_str)
+
+        self.assertEqual(result, expected)
+
+    def test_process_pod_labels_bad_label_str(self):
+        """Test that a bad string is handled."""
+        test_label_str = 'label_onefirst|label_twonext|label_threefinal'
+
+        expected = json.dumps({})
+
+        result = self.processor._process_pod_labels(test_label_str)
+
+        self.assertEqual(result, expected)

@@ -42,7 +42,8 @@ class OCPReportChargeUpdaterTest(MasuTestCase):
             column_map=cls.column_map
         )
         cls.updater = OCPReportChargeUpdater(
-            schema='acct10001org20002'
+            schema='acct10001org20002',
+            provider_uuid='6e212746-484a-40cd-bba0-09a19d132d64'
         )
         cls.report_schema = cls.accessor.report_schema
         cls.creator = ReportObjectCreator(
@@ -85,11 +86,12 @@ class OCPReportChargeUpdaterTest(MasuTestCase):
             for table in tables:
                 self.accessor._session.delete(table)
 
-    @patch('masu.database.ocp_rate_db_accessor.OCPRateDBAccessor.get_cpu_usage_rate')
-    @patch('masu.database.ocp_rate_db_accessor.OCPRateDBAccessor.get_memory_usage_rate')
+    @patch('masu.database.ocp_rate_db_accessor.OCPRateDBAccessor.get_cpu_rates')
+    @patch('masu.database.ocp_rate_db_accessor.OCPRateDBAccessor.get_memory_rates')
     def test_update_summary_charge_info_cpu(self, mock_db_mem_rate, mock_db_cpu_rate):
         """Test that OCP charge information is updated for cpu."""
-        cpu_rate = 200
+        cpu_rate = {'fixed_rate': {'value': 200, 'unit': 'USD'}}
+        cpu_rate_value = cpu_rate.get('fixed_rate').get('value')
         mock_db_cpu_rate.return_value = cpu_rate
         mock_db_mem_rate.return_value = None
 
@@ -106,14 +108,15 @@ class OCPReportChargeUpdaterTest(MasuTestCase):
         items = self.accessor._get_db_obj_query(table_name).all()
         for item in items:
             max_cpu_value = float(max(item.pod_usage_cpu_core_hours, item.pod_request_cpu_core_hours))
-            self.assertEqual(round(max_cpu_value*cpu_rate, 3),
+            self.assertEqual(round(max_cpu_value*cpu_rate_value, 3),
                              round(float(item.pod_charge_cpu_cores), 3))
 
-    @patch('masu.database.ocp_rate_db_accessor.OCPRateDBAccessor.get_cpu_usage_rate')
-    @patch('masu.database.ocp_rate_db_accessor.OCPRateDBAccessor.get_memory_usage_rate')
+    @patch('masu.database.ocp_rate_db_accessor.OCPRateDBAccessor.get_cpu_rates')
+    @patch('masu.database.ocp_rate_db_accessor.OCPRateDBAccessor.get_memory_rates')
     def test_update_summary_charge_info_mem(self, mock_db_mem_rate, mock_db_cpu_rate):
         """Test that OCP charge information is updated for memory."""
-        mem_rate = 100
+        mem_rate = {'fixed_rate': {'value': 100, 'unit': 'USD'}}
+        mem_rate_value = mem_rate.get('fixed_rate').get('value')
         mock_db_mem_rate.return_value = mem_rate
         mock_db_cpu_rate.return_value = None
 
@@ -123,6 +126,7 @@ class OCPReportChargeUpdaterTest(MasuTestCase):
 
         self.accessor.populate_line_item_daily_table(start_date, end_date)
         self.accessor.populate_line_item_daily_summary_table(start_date, end_date)
+
         self.updater.update_summary_charge_info()
 
         table_name = OCP_REPORT_TABLE_MAP['line_item_daily_summary']
@@ -130,15 +134,19 @@ class OCPReportChargeUpdaterTest(MasuTestCase):
         items = self.accessor._get_db_obj_query(table_name).all()
         for item in items:
             max_mem_value = float(max(item.pod_usage_memory_gigabytes, item.pod_request_memory_gigabytes))
-            self.assertEqual(round(max_mem_value*mem_rate, 3),
+            self.assertEqual(round(max_mem_value*mem_rate_value, 3),
                              round(float(item.pod_charge_memory_gigabytes), 3))
 
-    @patch('masu.database.ocp_rate_db_accessor.OCPRateDBAccessor.get_cpu_usage_rate')
-    @patch('masu.database.ocp_rate_db_accessor.OCPRateDBAccessor.get_memory_usage_rate')
+    @patch('masu.database.ocp_rate_db_accessor.OCPRateDBAccessor.get_cpu_rates')
+    @patch('masu.database.ocp_rate_db_accessor.OCPRateDBAccessor.get_memory_rates')
     def test_update_summary_charge_info_mem_cpu(self, mock_db_mem_rate, mock_db_cpu_rate):
         """Test that OCP charge information is updated for cpu and memory."""
-        mem_rate = 100
-        cpu_rate = 200
+        mem_rate = {'fixed_rate': {'value': 100, 'unit': 'USD'}}
+        cpu_rate = {'fixed_rate': {'value': 200, 'unit': 'USD'}}
+
+        cpu_rate_value = cpu_rate.get('fixed_rate').get('value')
+        mem_rate_value = mem_rate.get('fixed_rate').get('value')
+
         mock_db_mem_rate.return_value = mem_rate
         mock_db_cpu_rate.return_value = cpu_rate
 
@@ -156,7 +164,7 @@ class OCPReportChargeUpdaterTest(MasuTestCase):
         for item in items:
             max_cpu_value = float(max(item.pod_usage_cpu_core_hours, item.pod_request_cpu_core_hours))
             max_mem_value = float(max(item.pod_usage_memory_gigabytes, item.pod_request_memory_gigabytes))
-            self.assertEqual(round(max_mem_value*mem_rate, 3),
+            self.assertEqual(round(max_mem_value*mem_rate_value, 3),
                              round(float(item.pod_charge_memory_gigabytes), 3))
-            self.assertEqual(round(max_cpu_value*cpu_rate, 3),
+            self.assertEqual(round(max_cpu_value*cpu_rate_value, 3),
                              round(float(item.pod_charge_cpu_cores), 3))

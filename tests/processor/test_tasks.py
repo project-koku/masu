@@ -444,6 +444,7 @@ class TestProcessorTasks(MasuTestCase):
         mock_update_task.delay.assert_called_with(
             schema_name,
             provider,
+            provider_uuid,
             expected_start_date,
             manifest_id=None
         )
@@ -558,7 +559,9 @@ class TestUpdateSummaryTablesTask(MasuTestCase):
     @patch('masu.processor.tasks.update_charge_info')
     def test_update_summary_tables_aws(self, mock_charge_info):
         """Test that the summary table task runs."""
-        provider = AMAZON_WEB_SERVICES
+        provider = 'AWS'
+        provider_aws_uuid = '6e212746-484a-40cd-bba0-09a19d132d64'
+
         daily_table_name = AWS_CUR_TABLE_MAP['line_item_daily']
         summary_table_name = AWS_CUR_TABLE_MAP['line_item_daily_summary']
         agg_table_name = AWS_CUR_TABLE_MAP['line_item_aggregates']
@@ -576,7 +579,7 @@ class TestUpdateSummaryTablesTask(MasuTestCase):
         self.assertEqual(initial_summary_count, 0)
         self.assertEqual(initial_agg_count, 0)
 
-        update_summary_tables(self.schema_name, provider, start_date)
+        update_summary_tables(self.schema_name, provider, provider_aws_uuid, start_date)
 
         self.assertNotEqual(daily_query.count(), initial_daily_count)
         self.assertNotEqual(summary_query.count(), initial_summary_count)
@@ -585,7 +588,8 @@ class TestUpdateSummaryTablesTask(MasuTestCase):
     @patch('masu.processor.tasks.update_charge_info')
     def test_update_summary_tables_aws_end_date(self, mock_charge_info):
         """Test that the summary table task respects a date range."""
-        provider = AMAZON_WEB_SERVICES
+        provider = 'AWS'
+        provider_aws_uuid = '6e212746-484a-40cd-bba0-09a19d132d64'
         ce_table_name = AWS_CUR_TABLE_MAP['cost_entry']
         daily_table_name = AWS_CUR_TABLE_MAP['line_item_daily']
         summary_table_name = AWS_CUR_TABLE_MAP['line_item_daily_summary']
@@ -617,7 +621,7 @@ class TestUpdateSummaryTablesTask(MasuTestCase):
         expected_end_date = expected_end_date.replace(hour=0, minute=0,
                                                       second=0, microsecond=0)
 
-        update_summary_tables(self.schema_name, provider, start_date, end_date)
+        update_summary_tables(self.schema_name, provider, provider_aws_uuid, start_date, end_date)
 
         result_start_date, result_end_date = self.aws_accessor._session.query(
             func.min(daily_table.usage_start),
@@ -636,13 +640,19 @@ class TestUpdateSummaryTablesTask(MasuTestCase):
         self.assertEqual(result_end_date, expected_end_date)
 
     @patch('masu.processor.tasks.update_charge_info')
-    @patch('masu.database.ocp_rate_db_accessor.OCPRateDBAccessor.get_memory_usage_rate')
-    @patch('masu.database.ocp_rate_db_accessor.OCPRateDBAccessor.get_cpu_usage_rate')
+    @patch('masu.database.ocp_rate_db_accessor.OCPRateDBAccessor.get_memory_rates')
+    @patch('masu.database.ocp_rate_db_accessor.OCPRateDBAccessor.get_cpu_rates')
     def test_update_summary_tables_ocp(self, mock_cpu_rate, mock_mem_rate, mock_charge_info):
         """Test that the summary table task runs."""
-        mock_cpu_rate.return_value = 1.5
-        mock_mem_rate.return_value = 2.5
-        provider = OPENSHIFT_CONTAINER_PLATFORM
+        mem_rate = {'fixed_rate': {'value': 1.5, 'unit': 'USD'}}
+        cpu_rate = {'fixed_rate': {'value': 2.5, 'unit': 'USD'}}
+
+        mock_cpu_rate.return_value = cpu_rate
+        mock_mem_rate.return_value = mem_rate
+
+        provider = 'OCP'
+        provider_ocp_uuid = '3c6e687e-1a09-4a05-970c-2ccf44b0952e'
+
         daily_table_name = OCP_REPORT_TABLE_MAP['line_item_daily']
         agg_table_name = OCP_REPORT_TABLE_MAP['line_item_aggregates']
         start_date = self.start_date.replace(day=1, month=(self.start_date.month - 1))
@@ -656,12 +666,12 @@ class TestUpdateSummaryTablesTask(MasuTestCase):
         self.assertEqual(initial_daily_count, 0)
         self.assertEqual(initial_agg_count, 0)
 
-        update_summary_tables(self.schema_name, provider, start_date)
+        update_summary_tables(self.schema_name, provider, provider_ocp_uuid, start_date)
 
         self.assertNotEqual(daily_query.count(), initial_daily_count)
         self.assertNotEqual(agg_query.count(), initial_agg_count)
 
-        update_charge_info(schema_name='acct10001org20002', provider='OCP')
+        update_charge_info(schema_name='acct10001org20002', provider_uuid=provider_ocp_uuid)
     
         table_name = OCP_REPORT_TABLE_MAP['line_item_daily_summary']
         items = self.ocp_accessor._get_db_obj_query(table_name).all()
@@ -670,13 +680,14 @@ class TestUpdateSummaryTablesTask(MasuTestCase):
             self.assertIsNotNone(item.pod_charge_cpu_cores)
 
     @patch('masu.processor.tasks.update_charge_info')
-    @patch('masu.database.ocp_rate_db_accessor.OCPRateDBAccessor.get_memory_usage_rate')
-    @patch('masu.database.ocp_rate_db_accessor.OCPRateDBAccessor.get_cpu_usage_rate')
+    @patch('masu.database.ocp_rate_db_accessor.OCPRateDBAccessor.get_memory_rates')
+    @patch('masu.database.ocp_rate_db_accessor.OCPRateDBAccessor.get_cpu_rates')
     def test_update_summary_tables_ocp_end_date(self, mock_cpu_rate, mock_mem_rate, mock_charge_info, ):
         """Test that the summary table task respects a date range."""
         mock_cpu_rate.return_value = 1.5
         mock_mem_rate.return_value = 2.5
-        provider = OPENSHIFT_CONTAINER_PLATFORM
+        provider = 'OCP'
+        provider_ocp_uuid = '3c6e687e-1a09-4a05-970c-2ccf44b0952e'
         ce_table_name = OCP_REPORT_TABLE_MAP['report']
         daily_table_name = OCP_REPORT_TABLE_MAP['line_item_daily']
 
@@ -707,7 +718,7 @@ class TestUpdateSummaryTablesTask(MasuTestCase):
         expected_end_date = expected_end_date.replace(hour=0, minute=0,
                                                       second=0, microsecond=0)
 
-        update_summary_tables(self.schema_name, provider, start_date, end_date)
+        update_summary_tables(self.schema_name, provider, provider_ocp_uuid, start_date, end_date)
         result_start_date, result_end_date = self.ocp_accessor._session.query(
             func.min(daily_table.usage_start),
             func.max(daily_table.usage_end)
@@ -718,4 +729,5 @@ class TestUpdateSummaryTablesTask(MasuTestCase):
 
     def test_update_charge_info_aws(self):
         """Test that update_charge_info is not called for AWS."""
-        update_charge_info(schema_name='acct10001org20002', provider='AWS')
+        provider_aws_uuid = '6e212746-484a-40cd-bba0-09a19d132d64'
+        update_charge_info(schema_name='acct10001org20002', provider_uuid=provider_aws_uuid)

@@ -19,6 +19,7 @@
 
 from unittest.mock import patch
 from masu.exceptions import CURAccountsInterfaceError
+from masu.external import (AMAZON_WEB_SERVICES, OPENSHIFT_CONTAINER_PLATFORM)
 from masu.external.accounts_accessor import AccountsAccessor, AccountsAccessorError
 from masu.external.accounts.network.cur_accounts_network import CURAccountsNetwork
 from tests import MasuTestCase
@@ -31,17 +32,20 @@ class AccountsAccessorTest(MasuTestCase):
         """Test to get_access_credential"""
         account_objects = AccountsAccessor().get_accounts()
 
-        if len(account_objects) != 1:
+        if len(account_objects) != 2:
             self.fail('unexpected number of accounts')
 
-        self.assertIsInstance(account_objects.pop(), dict)
-
         for account in account_objects:
-            self.assertEqual(account.get('access_credential'), 'arn:aws:iam::111111111111:role/CostManagement')
-            self.assertEqual(account.get('billing_source'), 'test-bucket')
-            self.assertEqual(account.get('customer_name'), 'acct10001org20002')
-            self.assertEqual(account.get('provider_type'), 'Test Provider')
-            self.assertEqual(account.get('schema_name'), 'acct10001org20002')
+            if account.get('provider_type') == AMAZON_WEB_SERVICES:
+                self.assertEqual(account.get('authentication'), 'arn:aws:iam::111111111111:role/CostManagement')
+                self.assertEqual(account.get('billing_source'), 'test-bucket')
+                self.assertEqual(account.get('customer_name'), 'acct10001org20002')
+            elif account.get('provider_type') == OPENSHIFT_CONTAINER_PLATFORM:
+                self.assertEqual(account.get('authentication'), 'my-ocp-cluster-1')
+                self.assertEqual(account.get('billing_source'), None)
+                self.assertEqual(account.get('customer_name'), 'acct10001org20002')
+            else:
+                self.fail('Unexpected provider')
 
     def test_invalid_source_specification(self):
         """Test that error is thrown with invalid account source."""

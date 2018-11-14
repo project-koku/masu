@@ -25,7 +25,7 @@ from celery.result import AsyncResult
 from unittest.mock import patch
 
 
-from masu.external import AMAZON_WEB_SERVICES
+from masu.external import (AMAZON_WEB_SERVICES, OPENSHIFT_CONTAINER_PLATFORM)
 from masu.external.accounts_accessor import (AccountsAccessor, AccountsAccessorError)
 from masu.external.report_downloader import ReportDownloaderError
 from masu.processor.expired_data_remover import ExpiredDataRemover
@@ -66,14 +66,20 @@ class OrchestratorTest(MasuTestCase):
         """Test to init"""
         orchestrator = Orchestrator()
 
-        if len(orchestrator._accounts) != 1:
+        if len(orchestrator._accounts) != 2:
             self.fail("Unexpected number of test accounts")
 
-        account = orchestrator._accounts.pop()
-        self.assertEqual(account.get('authentication'), 'arn:aws:iam::111111111111:role/CostManagement')
-        self.assertEqual(account.get('billing_source'), 'test-bucket')
-        self.assertEqual(account.get('customer_name'), 'acct10001org20002')
-        self.assertEqual(account.get('provider_type'), AMAZON_WEB_SERVICES)
+        for account in orchestrator._accounts:
+            if account.get('provider_type') == AMAZON_WEB_SERVICES:
+                self.assertEqual(account.get('authentication'), 'arn:aws:iam::111111111111:role/CostManagement')
+                self.assertEqual(account.get('billing_source'), 'test-bucket')
+                self.assertEqual(account.get('customer_name'), 'acct10001org20002')
+            elif account.get('provider_type') == OPENSHIFT_CONTAINER_PLATFORM:
+                self.assertEqual(account.get('authentication'), 'my-ocp-cluster-1')
+                self.assertEqual(account.get('billing_source'), None)
+                self.assertEqual(account.get('customer_name'), 'acct10001org20002')
+            else:
+                self.fail('Unexpected provider')
 
     @patch('masu.external.account_label.AccountLabel._set_labler', return_value=None)
     @patch('masu.external.report_downloader.ReportDownloader._set_downloader', return_value=FakeDownloader)
@@ -140,7 +146,7 @@ class OrchestratorTest(MasuTestCase):
             orchestrator = Orchestrator()
             results = orchestrator.remove_expired_report_data()
             self.assertTrue(results)
-            self.assertEqual(len(results), 1)
+            self.assertEqual(len(results), 2)
             async_id = results.pop().get('async_id')
             self.assertIn(expected.format(async_id), logger.output)
 

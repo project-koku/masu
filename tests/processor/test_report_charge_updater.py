@@ -40,8 +40,8 @@ class ReportChargeUpdaterTest(MasuTestCase):
     @patch('masu.processor.report_charge_updater.OCPReportChargeUpdater.update_summary_charge_info')
     def test_ocp_route(self, mock_update):
         """Test that OCP charge updating works as expected."""
-        provider = OPENSHIFT_CONTAINER_PLATFORM
-        updater = ReportChargeUpdater(self.schema, provider)
+        provider_ocp_uuid = '3c6e687e-1a09-4a05-970c-2ccf44b0952e'
+        updater = ReportChargeUpdater(self.schema, provider_ocp_uuid)
         self.assertIsInstance(updater._updater, OCPReportChargeUpdater)
         updater.update_charge_info()
         mock_update.assert_called()
@@ -49,23 +49,23 @@ class ReportChargeUpdaterTest(MasuTestCase):
     @patch('masu.processor.report_charge_updater.OCPReportChargeUpdater.update_summary_charge_info')
     def test_ocp_local_route(self, mock_update):
         """Test that OCP-local charge updating works as expected."""
-        provider = OCP_LOCAL_SERVICE_PROVIDER
-        updater = ReportChargeUpdater(self.schema, provider)
+        provider_ocp_uuid = '3c6e687e-1a09-4a05-970c-2ccf44b0952e'
+        updater = ReportChargeUpdater(self.schema, provider_ocp_uuid)
         self.assertIsInstance(updater._updater, OCPReportChargeUpdater)
         updater.update_charge_info()
         mock_update.assert_called()
 
     def test_aws_route(self):
         """Test that AWS charge updating works as expected."""
-        provider = AMAZON_WEB_SERVICES
-        updater = ReportChargeUpdater(self.schema, provider)
+        provider_aws_uuid = '6e212746-484a-40cd-bba0-09a19d132d64'
+        updater = ReportChargeUpdater(self.schema, provider_aws_uuid)
         self.assertIsNone(updater._updater)
 
     @patch('masu.processor.report_charge_updater.OCPReportChargeUpdater.__init__')
     def test_init_fail(self, mock_updater):
         """Test that an unimplemented provider throws an error."""
         mock_updater.side_effect = Exception('general error')
-        provider = OPENSHIFT_CONTAINER_PLATFORM
+        provider_ocp_uuid = '3c6e687e-1a09-4a05-970c-2ccf44b0952e'
 
         with self.assertRaises(ReportChargeUpdaterError):
-            ReportChargeUpdater(self.schema, provider)
+            ReportChargeUpdater(self.schema, provider_ocp_uuid)

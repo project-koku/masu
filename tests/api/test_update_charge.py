@@ -34,7 +34,7 @@ class UpdateChargeTest(MasuTestCase):
         """Test the GET report_data endpoint."""
         params = {
             'schema': 'acct10001org20002',
-            'provider': 'OCP'
+            'provider_uuid': '3c6e687e-1a09-4a05-970c-2ccf44b0952e'
         }
         query_string = urlencode(params)
         expected_key = 'Update Charge Task ID'
@@ -49,16 +49,16 @@ class UpdateChargeTest(MasuTestCase):
         self.assertIn(expected_key, body)
         mock_update.delay.assert_called_with(
             params['schema'],
-            params['provider']
+            params['provider_uuid']
         )
 
     @patch('masu.api.update_charge.update_charge_info')
     def test_get_update_charge_schema_missing(self, mock_update):
         """Test GET report_data endpoint returns a 400 for missing schema."""
-        params = {'provider': 'OCP'}
+        params = {'provider_uuid': '3c6e687e-1a09-4a05-970c-2ccf44b0952e'}
         query_string = urlencode(params)
         expected_key = 'Error'
-        expected_message = 'provider and schema_name are required parameters.'
+        expected_message = 'provider_uuid and schema_name are required parameters.'
 
         response = self.client.get('/api/v1/update_charge/',
                                    query_string=query_string)
@@ -75,7 +75,7 @@ class UpdateChargeTest(MasuTestCase):
         params = {'schema': 'acct10001org20002'}
         query_string = urlencode(params)
         expected_key = 'Error'
-        expected_message = 'provider and schema_name are required parameters.'
+        expected_message = 'provider_uuid and schema_name are required parameters.'
 
         response = self.client.get('/api/v1/update_charge/',
                                    query_string=query_string)

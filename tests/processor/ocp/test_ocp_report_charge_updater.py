@@ -18,6 +18,7 @@
 """Test the OCPReportDBAccessor utility object."""
 from dateutil.relativedelta import relativedelta
 from unittest.mock import patch
+from decimal import Decimal
 
 import psycopg2
 
@@ -90,8 +91,8 @@ class OCPReportChargeUpdaterTest(MasuTestCase):
     @patch('masu.database.ocp_rate_db_accessor.OCPRateDBAccessor.get_memory_rates')
     def test_update_summary_charge_info_cpu(self, mock_db_mem_rate, mock_db_cpu_rate):
         """Test that OCP charge information is updated for cpu."""
-        cpu_rate = {'fixed_rate': {'value': 200, 'unit': 'USD'}}
-        cpu_rate_value = cpu_rate.get('fixed_rate').get('value')
+        cpu_rate = {'fixed_rate': {'value': '200', 'unit': 'USD'}}
+        cpu_rate_value = float(cpu_rate.get('fixed_rate').get('value'))
         mock_db_cpu_rate.return_value = cpu_rate
         mock_db_mem_rate.return_value = None
 
@@ -115,8 +116,8 @@ class OCPReportChargeUpdaterTest(MasuTestCase):
     @patch('masu.database.ocp_rate_db_accessor.OCPRateDBAccessor.get_memory_rates')
     def test_update_summary_charge_info_mem(self, mock_db_mem_rate, mock_db_cpu_rate):
         """Test that OCP charge information is updated for memory."""
-        mem_rate = {'fixed_rate': {'value': 100, 'unit': 'USD'}}
-        mem_rate_value = mem_rate.get('fixed_rate').get('value')
+        mem_rate = {'fixed_rate': {'value': '100', 'unit': 'USD'}}
+        mem_rate_value = float(mem_rate.get('fixed_rate').get('value'))
         mock_db_mem_rate.return_value = mem_rate
         mock_db_cpu_rate.return_value = None
 
@@ -141,11 +142,11 @@ class OCPReportChargeUpdaterTest(MasuTestCase):
     @patch('masu.database.ocp_rate_db_accessor.OCPRateDBAccessor.get_memory_rates')
     def test_update_summary_charge_info_mem_cpu(self, mock_db_mem_rate, mock_db_cpu_rate):
         """Test that OCP charge information is updated for cpu and memory."""
-        mem_rate = {'fixed_rate': {'value': 100, 'unit': 'USD'}}
-        cpu_rate = {'fixed_rate': {'value': 200, 'unit': 'USD'}}
+        mem_rate = {'fixed_rate': {'value': '100', 'unit': 'USD'}}
+        cpu_rate = {'fixed_rate': {'value': '200', 'unit': 'USD'}}
 
-        cpu_rate_value = cpu_rate.get('fixed_rate').get('value')
-        mem_rate_value = mem_rate.get('fixed_rate').get('value')
+        cpu_rate_value = float(cpu_rate.get('fixed_rate').get('value'))
+        mem_rate_value = float(mem_rate.get('fixed_rate').get('value'))
 
         mock_db_mem_rate.return_value = mem_rate
         mock_db_cpu_rate.return_value = cpu_rate
@@ -168,3 +169,100 @@ class OCPReportChargeUpdaterTest(MasuTestCase):
                              round(float(item.pod_charge_memory_gigabytes), 3))
             self.assertEqual(round(max_cpu_value*cpu_rate_value, 3),
                              round(float(item.pod_charge_cpu_cores), 3))
+
+    def test_get_tier_rate(self):
+        """Test the tier helper function."""
+        rate_json = {"tiered_rate": [{
+            "usage_start": "0E-10",
+            "usage_end": "10",
+            "value": "0.12",
+            "unit": "USD"
+        },
+        {
+            "usage_start": "11",
+            "usage_end": "20",
+            "value": "0.14",
+            "unit": "USD"
+        },
+        {
+            "usage_start": "21",
+            "usage_end": None,
+            "value": "0.18",
+            "unit": "USD"
+        }]}
+        test_matrix = [{'usage': 5, 'expected_rate': 0.12},
+                       {'usage': 15, 'expected_rate': 0.14},
+                       {'usage': 25, 'expected_rate': 0.18}]
+
+        for test in test_matrix:
+            tier_rate = self.updater._get_tier_rate(rate_json.get('tiered_rate'), test.get('usage'))
+            self.assertEqual(round(float(tier_rate), 2), test.get('expected_rate'))
+
+    def test_calculate_rate(self):
+        """Test the tier helper function to calculate total rate."""
+        rate_json = {"tiered_rate": [{
+            "usage_start": None,
+            "usage_end": "10",
+            "value": "0.12",
+            "unit": "USD"
+        },
+        {
+            "usage_start": "11",
+            "usage_end": "20",
+            "value": "0.14",
+            "unit": "USD"
+        },
+        {
+            "usage_start": '21',
+            "value": '0.18',
+            "unit": "USD"
+        }],
+        'fixed_rate': 
+        {
+            'value': '100',
+            'unit': 'USD'
+        }}
+        test_matrix = [{'usage': 5, 'expected_rate': 100.12},
+                       {'usage': 15, 'expected_rate': 100.14},
+                       {'usage': 25, 'expected_rate': 100.18}]
+
+        for test in test_matrix:
+            tier_rate = self.updater._calculate_rate(rate_json, test.get('usage'))
+            self.assertEqual(round(float(tier_rate), 2), test.get('expected_rate'))
+
+    def test_calculate_charge(self):
+        """Test the helper function to calculate charge."""
+        rate_json = {"tiered_rate": [{
+            "usage_start": None,
+            "usage_end": "10",
+            "value": "0.12",
+            "unit": "USD"
+        },
+        {
+            "usage_start": "11",
+            "usage_end": "20",
+            "value": "0.14",
+            "unit": "USD"
+        },
+        {
+            "usage_start": '21',
+            "usage_end": None,
+            "value": '0.18',
+            "unit": "USD"
+        }],
+        'fixed_rate': 
+        {
+            'value': '100',
+            'unit': 'USD'
+        }}
+        usage_dictionary = {1: Decimal(5), 2: Decimal(15), 3: Decimal(25)}
+
+        expected_results = {1: {'expected_rate': 100.12, 'expected_charge': Decimal(500.6)},
+                            2: {'expected_rate': 100.14, 'expected_charge': Decimal(1502.1)},
+                            3: {'expected_rate': 100.18, 'expected_charge': Decimal(2504.5)}}
+
+        charge_dictionary = self.updater._calculate_charge(rate_json, usage_dictionary)
+
+        for key, entry in expected_results.items():
+            calculated_charge = charge_dictionary[key].get('charge')
+            self.assertEqual(round(float(calculated_charge), 1), entry.get('expected_charge'))

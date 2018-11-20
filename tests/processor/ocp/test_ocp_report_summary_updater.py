@@ -19,7 +19,7 @@
 import calendar
 import datetime
 import logging
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 from masu.database import OCP_REPORT_TABLE_MAP
 from masu.database.ocp_report_db_accessor import OCPReportDBAccessor
@@ -305,3 +305,33 @@ class OCPReportSummaryUpdaterTest(MasuTestCase):
 
         self.assertIsNotNone(period.summary_data_creation_datetime)
         self.assertGreater(period.summary_data_updated_datetime, start_date)
+
+    @patch('masu.processor.ocp.ocp_report_summary_updater.OCPReportDBAccessor.populate_line_item_aggregate_table')
+    @patch('masu.processor.ocp.ocp_report_summary_updater.OCPReportDBAccessor.populate_line_item_daily_summary_table')
+    @patch('masu.processor.ocp.ocp_report_summary_updater.OCPReportDBAccessor.populate_line_item_daily_table')
+    @patch('masu.processor.ocp.ocp_report_summary_updater.OCPReportDBAccessor.get_usage_period_query_by_provider')
+    def test_update_summary_tables_no_period(self, mock_daily, mock_sum,
+                                              mock_agg, mock_period):
+        """Test that summary tables are run for a full month when no report period is found."""
+
+        self.manifest.num_processed_files = self.manifest.num_total_files
+        manifest_id = self.manifest.id
+        self.manifest_accessor.commit()
+
+        start_date = self.date_accessor.today_with_timezone('UTC')
+        end_date = start_date
+
+        mock_period_filter_by = Mock()
+        mock_period_filter_by.all.return_value = None
+        mock_period = Mock()
+        mock_period.filter_by.return_value = mock_period_filter_by
+
+        self.updater.update_summary_tables(
+            start_date,
+            end_date,
+            manifest_id
+        )
+
+        mock_daily.assert_called()
+        mock_sum.assert_called()
+        mock_agg.assert_called()

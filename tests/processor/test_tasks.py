@@ -42,6 +42,7 @@ from masu.external import AMAZON_WEB_SERVICES, OPENSHIFT_CONTAINER_PLATFORM
 from masu.external.report_downloader import ReportDownloader, ReportDownloaderError
 
 from masu.processor.expired_data_remover import ExpiredDataRemover
+from masu.processor.report_processor import ReportProcessorError
 from masu.processor.report_charge_updater import ReportChargeUpdater
 from masu.processor._tasks.download import _get_report_files
 from masu.processor._tasks.process import _process_report_file
@@ -190,7 +191,28 @@ class ProcessReportFileTests(MasuTestCase):
         mock_manifest_acc.mark_manifest_as_updated.assert_called()
         shutil.rmtree(report_dir)
 
+    @patch('masu.processor._tasks.process.ReportProcessor')
+    @patch('masu.processor._tasks.process.ReportStatsDBAccessor')
+    def test_process_file_exception(self, mock_stats_accessor, mock_processor):
+        """Test the process_report_file functionality when exception is thrown."""
+        report_dir = tempfile.mkdtemp()
+        path = '{}/{}'.format(report_dir, 'file1.csv')
+        schema_name = 'acct10001org20002'
+        provider = 'AWS'
+        provider_uuid = '6e212746-484a-40cd-bba0-09a19d132d64'
+        report_dict = {'file': path,
+                   'compression': 'gzip',
+                   'start_date': str(DateAccessor().today())}
 
+        mock_processor.side_effect = ReportProcessorError('mock error')
+        mock_stats_acc = mock_stats_accessor()
+
+        _process_report_file(schema_name, provider, provider_uuid, report_dict)
+
+        mock_stats_acc.log_last_started_datetime.assert_called()
+        mock_stats_acc.log_last_completed_datetime.assert_not_called()
+        mock_stats_acc.commit.assert_called()
+        shutil.rmtree(report_dir)
 
 class TestProcessorTasks(MasuTestCase):
     """Test cases for Processor Celery tasks."""

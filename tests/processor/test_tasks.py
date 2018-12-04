@@ -694,12 +694,12 @@ class TestUpdateSummaryTablesTask(MasuTestCase):
         self.assertNotEqual(agg_query.count(), initial_agg_count)
 
         update_charge_info(schema_name='acct10001org20002', provider_uuid=provider_ocp_uuid)
-    
+
         table_name = OCP_REPORT_TABLE_MAP['line_item_daily_summary']
         items = self.ocp_accessor._get_db_obj_query(table_name).all()
         for item in items:
-            self.assertIsNotNone(item.pod_charge_memory_gigabytes)
-            self.assertIsNotNone(item.pod_charge_cpu_cores)
+            self.assertIsNotNone(item.pod_charge_memory_gigabyte_hours)
+            self.assertIsNotNone(item.pod_charge_cpu_core_hours)
 
     @patch('masu.processor.tasks.update_charge_info')
     @patch('masu.database.ocp_rate_db_accessor.OCPRateDBAccessor.get_memory_rates')

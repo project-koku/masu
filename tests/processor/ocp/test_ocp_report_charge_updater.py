@@ -110,7 +110,7 @@ class OCPReportChargeUpdaterTest(MasuTestCase):
         for item in items:
             max_cpu_value = float(max(item.pod_usage_cpu_core_hours, item.pod_request_cpu_core_hours))
             self.assertEqual(round(max_cpu_value*cpu_rate_value, 3),
-                             round(float(item.pod_charge_cpu_cores), 3))
+                             round(float(item.pod_charge_cpu_core_hours), 3))
 
     @patch('masu.database.ocp_rate_db_accessor.OCPRateDBAccessor.get_cpu_rates')
     @patch('masu.database.ocp_rate_db_accessor.OCPRateDBAccessor.get_memory_rates')
@@ -134,9 +134,9 @@ class OCPReportChargeUpdaterTest(MasuTestCase):
 
         items = self.accessor._get_db_obj_query(table_name).all()
         for item in items:
-            max_mem_value = float(max(item.pod_usage_memory_gigabytes, item.pod_request_memory_gigabytes))
+            max_mem_value = float(max(item.pod_usage_memory_gigabyte_hours, item.pod_request_memory_gigabyte_hours))
             self.assertEqual(round(max_mem_value*mem_rate_value, 3),
-                             round(float(item.pod_charge_memory_gigabytes), 3))
+                             round(float(item.pod_charge_memory_gigabyte_hours), 3))
 
     @patch('masu.database.ocp_rate_db_accessor.OCPRateDBAccessor.get_cpu_rates')
     @patch('masu.database.ocp_rate_db_accessor.OCPRateDBAccessor.get_memory_rates')
@@ -164,11 +164,11 @@ class OCPReportChargeUpdaterTest(MasuTestCase):
         items = self.accessor._get_db_obj_query(table_name).all()
         for item in items:
             max_cpu_value = float(max(item.pod_usage_cpu_core_hours, item.pod_request_cpu_core_hours))
-            max_mem_value = float(max(item.pod_usage_memory_gigabytes, item.pod_request_memory_gigabytes))
+            max_mem_value = float(max(item.pod_usage_memory_gigabyte_hours, item.pod_request_memory_gigabyte_hours))
             self.assertEqual(round(max_mem_value*mem_rate_value, 3),
-                             round(float(item.pod_charge_memory_gigabytes), 3))
+                             round(float(item.pod_charge_memory_gigabyte_hours), 3))
             self.assertEqual(round(max_cpu_value*cpu_rate_value, 3),
-                             round(float(item.pod_charge_cpu_cores), 3))
+                             round(float(item.pod_charge_cpu_core_hours), 3))
 
     def test_get_tier_rate(self):
         """Test the tier helper function."""
@@ -217,7 +217,7 @@ class OCPReportChargeUpdaterTest(MasuTestCase):
             "value": '0.18',
             "unit": "USD"
         }],
-        'fixed_rate': 
+        'fixed_rate':
         {
             'value': '100',
             'unit': 'USD'
@@ -250,7 +250,7 @@ class OCPReportChargeUpdaterTest(MasuTestCase):
             "value": '0.18',
             "unit": "USD"
         }],
-        'fixed_rate': 
+        'fixed_rate':
         {
             'value': '100',
             'unit': 'USD'

@@ -87,8 +87,8 @@ class OCPReportChargeUpdaterTest(MasuTestCase):
             for table in tables:
                 self.accessor._session.delete(table)
 
-    @patch('masu.database.ocp_rate_db_accessor.OCPRateDBAccessor.get_cpu_rates')
-    @patch('masu.database.ocp_rate_db_accessor.OCPRateDBAccessor.get_memory_rates')
+    @patch('masu.database.ocp_rate_db_accessor.OCPRateDBAccessor.get_cpu_core_usage_per_hour_rates')
+    @patch('masu.database.ocp_rate_db_accessor.OCPRateDBAccessor.get_memory_gb_usage_per_hour_rates')
     def test_update_summary_charge_info_cpu(self, mock_db_mem_rate, mock_db_cpu_rate):
         """Test that OCP charge information is updated for cpu."""
         cpu_rate = {'fixed_rate': {'value': '200', 'unit': 'USD'}}
@@ -112,8 +112,8 @@ class OCPReportChargeUpdaterTest(MasuTestCase):
             self.assertEqual(round(max_cpu_value*cpu_rate_value, 3),
                              round(float(item.pod_charge_cpu_core_hours), 3))
 
-    @patch('masu.database.ocp_rate_db_accessor.OCPRateDBAccessor.get_cpu_rates')
-    @patch('masu.database.ocp_rate_db_accessor.OCPRateDBAccessor.get_memory_rates')
+    @patch('masu.database.ocp_rate_db_accessor.OCPRateDBAccessor.get_cpu_core_usage_per_hour_rates')
+    @patch('masu.database.ocp_rate_db_accessor.OCPRateDBAccessor.get_memory_gb_usage_per_hour_rates')
     def test_update_summary_charge_info_mem(self, mock_db_mem_rate, mock_db_cpu_rate):
         """Test that OCP charge information is updated for memory."""
         mem_rate = {'fixed_rate': {'value': '100', 'unit': 'USD'}}
@@ -138,8 +138,8 @@ class OCPReportChargeUpdaterTest(MasuTestCase):
             self.assertEqual(round(max_mem_value*mem_rate_value, 3),
                              round(float(item.pod_charge_memory_gigabyte_hours), 3))
 
-    @patch('masu.database.ocp_rate_db_accessor.OCPRateDBAccessor.get_cpu_rates')
-    @patch('masu.database.ocp_rate_db_accessor.OCPRateDBAccessor.get_memory_rates')
+    @patch('masu.database.ocp_rate_db_accessor.OCPRateDBAccessor.get_cpu_core_usage_per_hour_rates')
+    @patch('masu.database.ocp_rate_db_accessor.OCPRateDBAccessor.get_memory_gb_usage_per_hour_rates')
     def test_update_summary_charge_info_mem_cpu(self, mock_db_mem_rate, mock_db_cpu_rate):
         """Test that OCP charge information is updated for cpu and memory."""
         mem_rate = {'fixed_rate': {'value': '100', 'unit': 'USD'}}

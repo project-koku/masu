@@ -662,8 +662,8 @@ class TestUpdateSummaryTablesTask(MasuTestCase):
         self.assertEqual(result_end_date, expected_end_date)
 
     @patch('masu.processor.tasks.update_charge_info')
-    @patch('masu.database.ocp_rate_db_accessor.OCPRateDBAccessor.get_memory_rates')
-    @patch('masu.database.ocp_rate_db_accessor.OCPRateDBAccessor.get_cpu_rates')
+    @patch('masu.database.ocp_rate_db_accessor.OCPRateDBAccessor.get_memory_gb_usage_per_hour_rates')
+    @patch('masu.database.ocp_rate_db_accessor.OCPRateDBAccessor.get_cpu_core_usage_per_hour_rates')
     def test_update_summary_tables_ocp(self, mock_cpu_rate, mock_mem_rate, mock_charge_info):
         """Test that the summary table task runs."""
         mem_rate = {'fixed_rate': {'value': '1.5', 'unit': 'USD'}}
@@ -702,8 +702,8 @@ class TestUpdateSummaryTablesTask(MasuTestCase):
             self.assertIsNotNone(item.pod_charge_cpu_core_hours)
 
     @patch('masu.processor.tasks.update_charge_info')
-    @patch('masu.database.ocp_rate_db_accessor.OCPRateDBAccessor.get_memory_rates')
-    @patch('masu.database.ocp_rate_db_accessor.OCPRateDBAccessor.get_cpu_rates')
+    @patch('masu.database.ocp_rate_db_accessor.OCPRateDBAccessor.get_memory_gb_usage_per_hour_rates')
+    @patch('masu.database.ocp_rate_db_accessor.OCPRateDBAccessor.get_cpu_core_usage_per_hour_rates')
     def test_update_summary_tables_ocp_end_date(self, mock_cpu_rate, mock_mem_rate, mock_charge_info, ):
         """Test that the summary table task respects a date range."""
         mock_cpu_rate.return_value = 1.5

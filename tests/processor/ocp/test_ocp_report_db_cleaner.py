@@ -145,7 +145,7 @@ class OCPReportDBCleanerTest(MasuTestCase):
         first_period = self.accessor._get_db_obj_query(report_period_table_name).first()
         cutoff_date = first_period.report_period_start
         later_date = cutoff_date + relativedelta.relativedelta(months=+1)
-        later_cutoff = cutoff_date.replace(month=later_date.month, day=15)
+        later_cutoff = later_date.replace(day=15)
 
         self.assertIsNotNone(self.accessor._get_db_obj_query(report_period_table_name).first())
         self.assertIsNotNone(self.accessor._get_db_obj_query(report_table_name).first())

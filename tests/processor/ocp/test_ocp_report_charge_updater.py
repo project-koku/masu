@@ -25,7 +25,7 @@ import psycopg2
 from masu.database import OCP_REPORT_TABLE_MAP
 from masu.database.ocp_report_db_accessor import OCPReportDBAccessor
 from masu.database.reporting_common_db_accessor import ReportingCommonDBAccessor
-from masu.processor.ocp.ocp_report_charge_updater import OCPReportChargeUpdater
+from masu.processor.ocp.ocp_report_charge_updater import OCPReportChargeUpdater, OCPReportChargeUpdaterError
 from tests import MasuTestCase
 from tests.database.helpers import ReportObjectCreator
 
@@ -87,182 +87,616 @@ class OCPReportChargeUpdaterTest(MasuTestCase):
             for table in tables:
                 self.accessor._session.delete(table)
 
-    @patch('masu.database.ocp_rate_db_accessor.OCPRateDBAccessor.get_cpu_core_usage_per_hour_rates')
-    @patch('masu.database.ocp_rate_db_accessor.OCPRateDBAccessor.get_memory_gb_usage_per_hour_rates')
-    def test_update_summary_charge_info_cpu(self, mock_db_mem_rate, mock_db_cpu_rate):
-        """Test that OCP charge information is updated for cpu."""
-        cpu_rate = {'fixed_rate': {'value': '200', 'unit': 'USD'}}
-        cpu_rate_value = float(cpu_rate.get('fixed_rate').get('value'))
-        mock_db_cpu_rate.return_value = cpu_rate
-        mock_db_mem_rate.return_value = None
-
-        usage_period = self.accessor.get_current_usage_period()
-        start_date = usage_period.report_period_start.date() + relativedelta(days=-1)
-        end_date = usage_period.report_period_end.date() + relativedelta(days=+1)
-
-        self.accessor.populate_line_item_daily_table(start_date, end_date)
-        self.accessor.populate_line_item_daily_summary_table(start_date, end_date)
-
-        self.updater.update_summary_charge_info()
-
-        table_name = OCP_REPORT_TABLE_MAP['line_item_daily_summary']
-        items = self.accessor._get_db_obj_query(table_name).all()
-        for item in items:
-            max_cpu_value = float(max(item.pod_usage_cpu_core_hours, item.pod_request_cpu_core_hours))
-            self.assertEqual(round(max_cpu_value*cpu_rate_value, 3),
-                             round(float(item.pod_charge_cpu_core_hours), 3))
-
-    @patch('masu.database.ocp_rate_db_accessor.OCPRateDBAccessor.get_cpu_core_usage_per_hour_rates')
-    @patch('masu.database.ocp_rate_db_accessor.OCPRateDBAccessor.get_memory_gb_usage_per_hour_rates')
-    def test_update_summary_charge_info_mem(self, mock_db_mem_rate, mock_db_cpu_rate):
-        """Test that OCP charge information is updated for memory."""
-        mem_rate = {'fixed_rate': {'value': '100', 'unit': 'USD'}}
-        mem_rate_value = float(mem_rate.get('fixed_rate').get('value'))
-        mock_db_mem_rate.return_value = mem_rate
-        mock_db_cpu_rate.return_value = None
-
-        usage_period = self.accessor.get_current_usage_period()
-        start_date = usage_period.report_period_start.date() + relativedelta(days=-1)
-        end_date = usage_period.report_period_end.date() + relativedelta(days=+1)
-
-        self.accessor.populate_line_item_daily_table(start_date, end_date)
-        self.accessor.populate_line_item_daily_summary_table(start_date, end_date)
-
-        self.updater.update_summary_charge_info()
-
-        table_name = OCP_REPORT_TABLE_MAP['line_item_daily_summary']
-
-        items = self.accessor._get_db_obj_query(table_name).all()
-        for item in items:
-            max_mem_value = float(max(item.pod_usage_memory_gigabyte_hours, item.pod_request_memory_gigabyte_hours))
-            self.assertEqual(round(max_mem_value*mem_rate_value, 3),
-                             round(float(item.pod_charge_memory_gigabyte_hours), 3))
-
-    @patch('masu.database.ocp_rate_db_accessor.OCPRateDBAccessor.get_cpu_core_usage_per_hour_rates')
-    @patch('masu.database.ocp_rate_db_accessor.OCPRateDBAccessor.get_memory_gb_usage_per_hour_rates')
-    def test_update_summary_charge_info_mem_cpu(self, mock_db_mem_rate, mock_db_cpu_rate):
-        """Test that OCP charge information is updated for cpu and memory."""
-        mem_rate = {'fixed_rate': {'value': '100', 'unit': 'USD'}}
-        cpu_rate = {'fixed_rate': {'value': '200', 'unit': 'USD'}}
-
-        cpu_rate_value = float(cpu_rate.get('fixed_rate').get('value'))
-        mem_rate_value = float(mem_rate.get('fixed_rate').get('value'))
-
-        mock_db_mem_rate.return_value = mem_rate
-        mock_db_cpu_rate.return_value = cpu_rate
-
-        usage_period = self.accessor.get_current_usage_period()
-        start_date = usage_period.report_period_start.date() + relativedelta(days=-1)
-        end_date = usage_period.report_period_end.date() + relativedelta(days=+1)
-
-        self.accessor.populate_line_item_daily_table(start_date, end_date)
-        self.accessor.populate_line_item_daily_summary_table(start_date, end_date)
-        self.updater.update_summary_charge_info()
-
-        table_name = OCP_REPORT_TABLE_MAP['line_item_daily_summary']
-
-        items = self.accessor._get_db_obj_query(table_name).all()
-        for item in items:
-            max_cpu_value = float(max(item.pod_usage_cpu_core_hours, item.pod_request_cpu_core_hours))
-            max_mem_value = float(max(item.pod_usage_memory_gigabyte_hours, item.pod_request_memory_gigabyte_hours))
-            self.assertEqual(round(max_mem_value*mem_rate_value, 3),
-                             round(float(item.pod_charge_memory_gigabyte_hours), 3))
-            self.assertEqual(round(max_cpu_value*cpu_rate_value, 3),
-                             round(float(item.pod_charge_cpu_core_hours), 3))
-
-    def test_get_tier_rate(self):
-        """Test the tier helper function."""
-        rate_json = {"tiered_rate": [{
-            "usage_start": "0E-10",
+    def test_normalize_tier(self):
+        """Test the tier helper function to normalize rate tier."""
+        rate_json = [{
+            "usage_start": '20',
+            "usage_end": '30',
+            "value": '0.30',
+            "unit": "USD"
+        },
+        {
+            "usage_start": None,
             "usage_end": "10",
-            "value": "0.12",
+            "value": "0.10",
             "unit": "USD"
         },
         {
-            "usage_start": "11",
+            "usage_start": "10",
             "usage_end": "20",
-            "value": "0.14",
+            "value": "0.20",
             "unit": "USD"
         },
         {
-            "usage_start": "21",
+            "usage_start": '30',
             "usage_end": None,
-            "value": "0.18",
+            "value": '0.40',
             "unit": "USD"
-        }]}
-        test_matrix = [{'usage': 5, 'expected_rate': 0.12},
-                       {'usage': 15, 'expected_rate': 0.14},
-                       {'usage': 25, 'expected_rate': 0.18}]
+        }]
+        normalized_tier = self.updater._normalize_tier(rate_json)
+        self.assertEqual(len(normalized_tier), len(rate_json))
+        self.assertIsNone(normalized_tier[0].get('usage_start'))
+        self.assertGreater(normalized_tier[1].get('usage_end'), normalized_tier[0].get('usage_end'))
+        self.assertGreater(normalized_tier[2].get('usage_end'), normalized_tier[1].get('usage_end'))
+        self.assertIsNone(normalized_tier[3].get('usage_end'))
+
+    def test_normalize_tier_no_start_end_provided(self):
+        """Test the tier helper function to normalize rate tier when end points are not provided."""
+        rate_json = [{
+            "usage_start": '20',
+            "usage_end": '30',
+            "value": '0.30',
+            "unit": "USD"
+        },
+        {
+            "usage_end": "10",
+            "value": "0.10",
+            "unit": "USD"
+        },
+        {
+            "usage_start": "10",
+            "usage_end": "20",
+            "value": "0.20",
+            "unit": "USD"
+        },
+        {
+            "usage_start": '30',
+            "value": '0.40',
+            "unit": "USD"
+        }]
+        normalized_tier = self.updater._normalize_tier(rate_json)
+        self.assertEqual(len(normalized_tier), len(rate_json))
+        self.assertIsNone(normalized_tier[0].get('usage_start'))
+        self.assertGreater(normalized_tier[1].get('usage_end'), normalized_tier[0].get('usage_end'))
+        self.assertGreater(normalized_tier[2].get('usage_end'), normalized_tier[1].get('usage_end'))
+        self.assertIsNone(normalized_tier[3].get('usage_end'))
+
+    def test_normalize_tier_missing_first(self):
+        """Test the tier helper function when first tier is missing."""
+        rate_json = [{
+            "usage_start": None,
+            "usage_end": "10",
+            "value": "0.10",
+            "unit": "USD"
+        },
+        {
+            "usage_start": '20',
+            "usage_end": '30',
+            "value": '0.30',
+            "unit": "USD"
+        },
+        {
+            "usage_start": "10",
+            "usage_end": "20",
+            "value": "0.20",
+            "unit": "USD"
+        },
+        {
+            "usage_start": '30',
+            "usage_end": '40',
+            "value": '0.40',
+            "unit": "USD"
+        }]  
+        with self.assertRaises(OCPReportChargeUpdaterError) as error:
+            self.updater._normalize_tier(rate_json)
+            self.assertIn('Missing first tier', error)
+
+    def test_normalize_tier_two_starts(self):
+        """Test the tier helper function when two starting tiers are provided."""
+        rate_json = [{
+            "usage_start": None,
+            "usage_end": "10",
+            "value": "0.10",
+            "unit": "USD"
+        },
+        {
+            "usage_start": None,
+            "usage_end": '30',
+            "value": '0.30',
+            "unit": "USD"
+        },
+        {
+            "usage_start": "10",
+            "usage_end": "20",
+            "value": "0.20",
+            "unit": "USD"
+        },
+        {
+            "usage_start": '30',
+            "value": '0.40',
+            "unit": "USD"
+        }]  
+        with self.assertRaises(OCPReportChargeUpdaterError) as error:
+            self.updater._normalize_tier(rate_json)
+            self.assertIn('Two starting tiers', error)
+
+    def test_normalize_tier_two_final(self):
+        """Test the tier helper function when two final tiers are provided."""
+        rate_json = [{
+            "usage_start": None,
+            "usage_end": "10",
+            "value": "0.10",
+            "unit": "USD"
+        },
+        {
+            "usage_start": '20',
+            "usage_end": '30',
+            "value": '0.30',
+            "unit": "USD"
+        },
+        {
+            "usage_start": "10",
+            "usage_end": None,
+            "value": "0.20",
+            "unit": "USD"
+        },
+        {
+            "usage_start": '30',
+            "value": '0.40',
+            "unit": "USD"
+        }]  
+        with self.assertRaises(OCPReportChargeUpdaterError) as error:
+            self.updater._normalize_tier(rate_json)
+            self.assertIn('Two final tiers', error)
+
+    def test_normalize_tier_missing_last(self):
+        """Test the tier helper function when last tier is missing."""
+        rate_json = [{
+            "usage_start": '20',
+            "usage_end": '30',
+            "value": '0.30',
+            "unit": "USD"
+        },
+        {
+            "usage_start": "10",
+            "usage_end": "20",
+            "value": "0.20",
+            "unit": "USD"
+        },
+        {
+            "usage_start": '30',
+            "usage_end": None,
+            "value": '0.40',
+            "unit": "USD"
+        }]  
+        with self.assertRaises(OCPReportChargeUpdaterError) as error:
+            self.updater._normalize_tier(rate_json)
+            self.assertIn('Missing final tier', error)
+
+    def test_bucket_applied(self):
+        """Test the tier helper function."""
+        lower_limit = 0
+        upper_limit = 10
+        test_matrix = [{'usage': -10, 'expected_usage_applied': 0},
+                       {'usage': 5, 'expected_usage_applied': 5},
+                       {'usage': 10, 'expected_usage_applied': 10},
+                       {'usage': 15, 'expected_usage_applied': 10}]
 
         for test in test_matrix:
-            tier_rate = self.updater._get_tier_rate(rate_json.get('tiered_rate'), test.get('usage'))
-            self.assertEqual(round(float(tier_rate), 2), test.get('expected_rate'))
+            usage_applied = self.updater._bucket_applied(test.get('usage'), lower_limit, upper_limit)
+            self.assertEqual(usage_applied, test.get('expected_usage_applied'))
 
-    def test_calculate_rate(self):
-        """Test the tier helper function to calculate total rate."""
+    def test_aggregate_charges(self):
+        """Test the helper function to aggregate usage and request charges."""
+        usage_charge = {3: {'usage': Decimal('0.000249'), 'charge': Decimal('0.049800')},
+                        4: {'usage': Decimal('0.05'), 'charge': Decimal('0.10')}}
+        request_charge = {3: {'usage': Decimal('0.000173'), 'charge': Decimal('0.043250')},
+                          4: {'usage': Decimal('0.06'), 'charge': Decimal('0.20')}}
+
+        total_charge = self.updater._aggregate_charges(usage_charge, request_charge)
+        for key, charge in total_charge.items():
+            usage_charge_value = usage_charge.get(key).get('charge')
+            request_charge_value = request_charge.get(key).get('charge')
+            total_charge = usage_charge_value + request_charge_value
+
+            self.assertEqual(charge.get('usage_charge'), usage_charge_value)
+            self.assertEqual(charge.get('request_charge'), request_charge_value)
+            self.assertEqual(charge.get('charge'), total_charge)
+
+    def test_aggregate_charges_extra_usage(self):
+        """Test the helper function to aggregate usage and request charges where usage_charge is larger."""
+        usage_charge = {3: {'usage': Decimal('0.000249'), 'charge': Decimal('0.049800')},
+                        4: {'usage': Decimal('0.05'), 'charge': Decimal('0.10')}}
+        request_charge = {3: {'usage': Decimal('0.000173'), 'charge': Decimal('0.043250')}}
+
+        with self.assertRaises(OCPReportChargeUpdaterError):
+            self.updater._aggregate_charges(usage_charge, request_charge)
+
+    def test_aggregate_charges_extra_request(self):
+        """Test the helper function to aggregate usage and request charges where request_charge is larger."""
+        usage_charge = {3: {'usage': Decimal('0.000249'), 'charge': Decimal('0.049800')}}
+        request_charge = {3: {'usage': Decimal('0.000173'), 'charge': Decimal('0.043250')},
+                          4: {'usage': Decimal('0.06'), 'charge': Decimal('0.20')}}
+
+        with self.assertRaises(OCPReportChargeUpdaterError):
+            self.updater._aggregate_charges(usage_charge, request_charge)
+
+    def test_aggregate_charges_mismatched_keys(self):
+        """Test the helper function to aggregate usage and request charges where dictionaries have different keys."""
+        usage_charge = {3: {'usage': Decimal('0.000249'), 'charge': Decimal('0.049800')},
+                        4: {'usage': Decimal('0.05'), 'charge': Decimal('0.10')}}
+        request_charge = {3: {'usage': Decimal('0.000173'), 'charge': Decimal('0.043250')},
+                          5: {'usage': Decimal('0.06'), 'charge': Decimal('0.20')}}
+
+        with self.assertRaises(OCPReportChargeUpdaterError):
+            self.updater._aggregate_charges(usage_charge, request_charge)
+
+    def test_calculate_variable_charge(self):
+        """Test the helper function to calculate charge."""
         rate_json = {"tiered_rate": [{
             "usage_start": None,
             "usage_end": "10",
-            "value": "0.12",
+            "value": "0.10",
             "unit": "USD"
         },
         {
-            "usage_start": "11",
+            "usage_start": "10",
             "usage_end": "20",
-            "value": "0.14",
+            "value": "0.20",
             "unit": "USD"
         },
         {
-            "usage_start": '21',
-            "value": '0.18',
+            "usage_start": '20',
+            "usage_end": '30',
+            "value": '0.30',
             "unit": "USD"
-        }],
-        'fixed_rate':
+        },
         {
-            'value': '100',
-            'unit': 'USD'
-        }}
-        test_matrix = [{'usage': 5, 'expected_rate': 100.12},
-                       {'usage': 15, 'expected_rate': 100.14},
-                       {'usage': 25, 'expected_rate': 100.18}]
+            "usage_start": '30',
+            "usage_end": None,
+            "value": '0.40',
+            "unit": "USD"
+        }]
+        }
+        usage_dictionary = {1: Decimal(5),
+                            2: Decimal(15),
+                            3: Decimal(25),
+                            4: Decimal(50),
+                            5: Decimal(0)}
 
-        for test in test_matrix:
-            tier_rate = self.updater._calculate_rate(rate_json, test.get('usage'))
-            self.assertEqual(round(float(tier_rate), 2), test.get('expected_rate'))
+        expected_results = {1: Decimal(0.5),  # usage: 5,  charge: 0.5 = 5 * 0.1
+                            2: Decimal(2.0),  # usage: 15, charge: 2.0 = (10 * 0.1) + (5 * 0.2)
+                            3: Decimal(4.5),  # usage: 25, charge: 4.5 = (10 * 0.1) + (10 * 0.2) + (5 * 0.3)
+                            4: Decimal(14.0), # usage: 50, charge: 14.0 = (10 * 0.1) + (10 * 0.2) + (10 * 0.3) + (20 * 0.4)
+                            5: Decimal(0.0)}  # usage: 0, charge: 0
+
+        for key, usage in usage_dictionary.items():
+            tier_charge = self.updater._calculate_variable_charge(usage, rate_json)
+            self.assertEqual(tier_charge, expected_results.get(key))
+
+    def test_calculate_variable_charge_floating_ends(self):
+        """Test the helper function to calculate charge with floating endpoints."""
+        rate_json = {"tiered_rate": [{
+            "usage_start": None,
+            "usage_end": "10.3",
+            "value": "0.10",
+            "unit": "USD"
+        },
+        {
+            "usage_start": "10.3",
+            "usage_end": "19.8",
+            "value": "0.20",
+            "unit": "USD"
+        },
+        {
+            "usage_start": '19.8',
+            "usage_end": '22.6',
+            "value": '0.30',
+            "unit": "USD"
+        },
+        {
+            "usage_start": '22.6',
+            "usage_end": None,
+            "value": '0.40',
+            "unit": "USD"
+        }]
+        }
+
+        usage_dictionary = {1: Decimal(5),
+                            2: Decimal(15),
+                            3: Decimal(25),
+                            4: Decimal(50),
+                            5: Decimal(0)}
+
+        expected_results = {1: Decimal('0.5'),    # usage: 5,  charge: 0.5 = 5 * 0.1
+                            2: Decimal('1.97'),   # usage: 15, charge: 1.97 = (10.3 * 0.1) + (4.7 * 0.2)
+                            3: Decimal('4.730'),  # usage: 25, charge: 4.730 = (10.3 * 0.1) + (9.5 * 0.2) + (2.8 * 0.3) + (2.4 * 0.4)
+                            4: Decimal('14.730'), # usage: 50, charge: 14.73 = (10.3 * 0.1) + (9.5 * 0.2) + (2.8 * 0.3) + (27.4 * 0.4)
+                            5: Decimal('0.0')}    # usage: 0, charge: 0
+
+        for key, usage in usage_dictionary.items():
+            tier_charge = self.updater._calculate_variable_charge(usage, rate_json)
+            self.assertEqual(tier_charge, expected_results.get(key))
+
+    def test_calculate_variable_charge_ends_missing(self):
+        """Test the helper function to calculate charge when end limits are missing."""
+        rate_json = {"tiered_rate": [{
+            "usage_end": "10",
+            "value": "0.10",
+            "unit": "USD"
+        },
+        {
+            "usage_start": "10",
+            "usage_end": "20",
+            "value": "0.20",
+            "unit": "USD"
+        },
+        {
+            "usage_start": '20',
+            "usage_end": '30',
+            "value": '0.30',
+            "unit": "USD"
+        },
+        {
+            "usage_start": '30',
+            "value": '0.40',
+            "unit": "USD"
+        }]
+        }
+        usage_dictionary = {1: Decimal(5),
+                            2: Decimal(15),
+                            3: Decimal(25),
+                            4: Decimal(50),
+                            5: Decimal(0)}
+
+        expected_results = {1: Decimal(0.5),
+                            2: Decimal(2.0),
+                            3: Decimal(4.5),
+                            4: Decimal(14.0),
+                            5: Decimal(0.0)}
+
+        for key, usage in usage_dictionary.items():
+            tier_charge = self.updater._calculate_variable_charge(usage, rate_json)
+            self.assertEqual(tier_charge, expected_results.get(key))
 
     def test_calculate_charge(self):
         """Test the helper function to calculate charge."""
         rate_json = {"tiered_rate": [{
             "usage_start": None,
             "usage_end": "10",
-            "value": "0.12",
+            "value": "0.10",
             "unit": "USD"
         },
         {
-            "usage_start": "11",
+            "usage_start": "10",
             "usage_end": "20",
-            "value": "0.14",
+            "value": "0.20",
             "unit": "USD"
         },
         {
-            "usage_start": '21',
-            "usage_end": None,
-            "value": '0.18',
+            "usage_start": '20',
+            "usage_end": '30',
+            "value": '0.30',
             "unit": "USD"
-        }],
-        'fixed_rate':
+        },
         {
-            'value': '100',
-            'unit': 'USD'
-        }}
+            "usage_start": '30',
+            "usage_end": None,
+            "value": '0.40',
+            "unit": "USD"
+        }]
+        }
         usage_dictionary = {1: Decimal(5), 2: Decimal(15), 3: Decimal(25)}
 
-        expected_results = {1: {'expected_rate': 100.12, 'expected_charge': Decimal(500.6)},
-                            2: {'expected_rate': 100.14, 'expected_charge': Decimal(1502.1)},
-                            3: {'expected_rate': 100.18, 'expected_charge': Decimal(2504.5)}}
+        expected_results = {1: {'expected_charge': Decimal(0.5)},
+                            2: {'expected_charge': Decimal(2.0)},
+                            3: {'expected_charge': Decimal(4.5)}}
 
         charge_dictionary = self.updater._calculate_charge(rate_json, usage_dictionary)
-
         for key, entry in expected_results.items():
+            usage = charge_dictionary[key].get('usage')
             calculated_charge = charge_dictionary[key].get('charge')
+            self.assertEqual(usage, usage_dictionary[key])
             self.assertEqual(round(float(calculated_charge), 1), entry.get('expected_charge'))
+
+    @patch('masu.database.ocp_rate_db_accessor.OCPRateDBAccessor.get_cpu_core_request_per_hour_rates')
+    @patch('masu.database.ocp_rate_db_accessor.OCPRateDBAccessor.get_cpu_core_usage_per_hour_rates')
+    @patch('masu.database.ocp_rate_db_accessor.OCPRateDBAccessor.get_memory_gb_request_per_hour_rates')
+    @patch('masu.database.ocp_rate_db_accessor.OCPRateDBAccessor.get_memory_gb_usage_per_hour_rates')
+    def test_update_summary_charge_info_mem_cpu(self, mock_db_mem_usage_rate, mock_db_mem_request_rate, mock_db_cpu_usage_rate, mock_db_cpu_request_rate):
+        """Test that OCP charge information is updated for cpu and memory."""
+        mem_rate_usage = {'tiered_rate': [{'value': '100', 'unit': 'USD'}]}
+        mem_rate_request = {'tiered_rate': [{'value': '150', 'unit': 'USD'}]}
+        cpu_rate_usage = {'tiered_rate': [{'value': '200', 'unit': 'USD'}]}
+        cpu_rate_request = {'tiered_rate': [{'value': '250', 'unit': 'USD'}]}
+
+        mock_db_mem_usage_rate.return_value = mem_rate_usage
+        mock_db_mem_request_rate.return_value = mem_rate_request
+        mock_db_cpu_usage_rate.return_value = cpu_rate_usage
+        mock_db_cpu_request_rate.return_value = cpu_rate_request
+
+        cpu_usage_rate_value = float(cpu_rate_usage.get('tiered_rate')[0].get('value'))
+        cpu_request_rate_value = float(cpu_rate_request.get('tiered_rate')[0].get('value'))
+        mem_usage_rate_value = float(mem_rate_usage.get('tiered_rate')[0].get('value'))
+        mem_request_rate_value = float(mem_rate_request.get('tiered_rate')[0].get('value'))
+
+        usage_period = self.accessor.get_current_usage_period()
+        start_date = usage_period.report_period_start.date() + relativedelta(days=-1)
+        end_date = usage_period.report_period_end.date() + relativedelta(days=+1)
+
+        self.accessor.populate_line_item_daily_table(start_date, end_date)
+        self.accessor.populate_line_item_daily_summary_table(start_date, end_date)
+        self.updater.update_summary_charge_info()
+
+        table_name = OCP_REPORT_TABLE_MAP['line_item_daily_summary']
+
+        items = self.accessor._get_db_obj_query(table_name).all()
+        for item in items:
+            mem_usage_value = float(item.pod_usage_memory_gigabyte_hours)
+            mem_request_value = float(item.pod_request_memory_gigabyte_hours)
+            mem_charge = (mem_usage_value * mem_usage_rate_value) + (mem_request_value * mem_request_rate_value)
+            self.assertEqual(round(mem_charge, 6),
+                             round(float(item.pod_charge_memory_gigabyte_hours), 6))
+
+            cpu_usage_value = float(item.pod_usage_cpu_core_hours)
+            cpu_request_value = float(item.pod_request_cpu_core_hours)
+            cpu_charge = (cpu_usage_value * cpu_usage_rate_value) + (cpu_request_value * cpu_request_rate_value)
+            self.assertEqual(round(cpu_charge, 6),
+                             round(float(item.pod_charge_cpu_core_hours), 6))
+
+    @patch('masu.database.ocp_rate_db_accessor.OCPRateDBAccessor.get_cpu_core_usage_per_hour_rates')
+    @patch('masu.database.ocp_rate_db_accessor.OCPRateDBAccessor.get_memory_gb_usage_per_hour_rates')
+    def test_update_summary_charge_info_cpu(self, mock_db_mem_usage_rate, mock_db_cpu_usage_rate):
+        """Test that OCP charge information is updated for cpu."""
+        mem_rate = None
+        cpu_rate = {'tiered_rate': [{'value': '200', 'unit': 'USD'}]}
+
+        mock_db_mem_usage_rate.return_value = mem_rate
+        mock_db_cpu_usage_rate.return_value = cpu_rate
+
+        cpu_rate_value = float(cpu_rate.get('tiered_rate')[0].get('value'))
+
+        usage_period = self.accessor.get_current_usage_period()
+        start_date = usage_period.report_period_start.date() + relativedelta(days=-1)
+        end_date = usage_period.report_period_end.date() + relativedelta(days=+1)
+
+        self.accessor.populate_line_item_daily_table(start_date, end_date)
+        self.accessor.populate_line_item_daily_summary_table(start_date, end_date)
+        self.updater.update_summary_charge_info()
+
+        table_name = OCP_REPORT_TABLE_MAP['line_item_daily_summary']
+
+        items = self.accessor._get_db_obj_query(table_name).all()
+        for item in items:
+            cpu_usage_value = float(item.pod_usage_cpu_core_hours)
+            self.assertEqual(round(0.0, 6),
+                             round(float(item.pod_charge_memory_gigabyte_hours), 6))
+            self.assertEqual(round(cpu_usage_value*cpu_rate_value, 6),
+                             round(float(item.pod_charge_cpu_core_hours), 6))
+
+    @patch('masu.database.ocp_rate_db_accessor.OCPRateDBAccessor.get_cpu_core_usage_per_hour_rates')
+    @patch('masu.database.ocp_rate_db_accessor.OCPRateDBAccessor.get_memory_gb_usage_per_hour_rates')
+    def test_update_summary_charge_info_mem(self, mock_db_mem_usage_rate, mock_db_cpu_usage_rate):
+        """Test that OCP charge information is updated for cpu and memory."""
+        mem_rate = {'tiered_rate': [{'value': '100', 'unit': 'USD'}]}
+        cpu_rate = None
+
+        mock_db_mem_usage_rate.return_value = mem_rate
+        mock_db_cpu_usage_rate.return_value = cpu_rate
+
+        mem_rate_value = float(mem_rate.get('tiered_rate')[0].get('value'))
+
+        usage_period = self.accessor.get_current_usage_period()
+        start_date = usage_period.report_period_start.date() + relativedelta(days=-1)
+        end_date = usage_period.report_period_end.date() + relativedelta(days=+1)
+
+        self.accessor.populate_line_item_daily_table(start_date, end_date)
+        self.accessor.populate_line_item_daily_summary_table(start_date, end_date)
+        self.updater.update_summary_charge_info()
+
+        table_name = OCP_REPORT_TABLE_MAP['line_item_daily_summary']
+
+        items = self.accessor._get_db_obj_query(table_name).all()
+        for item in items:
+            mem_usage_value = float(item.pod_usage_memory_gigabyte_hours)
+            self.assertEqual(round(mem_usage_value*mem_rate_value, 6),
+                             round(float(item.pod_charge_memory_gigabyte_hours), 6))
+            self.assertEqual(round(0.0, 6),
+                             round(float(item.pod_charge_cpu_core_hours), 6))
+
+    @patch('masu.database.ocp_rate_db_accessor.OCPRateDBAccessor.get_cpu_core_usage_per_hour_rates')
+    @patch('masu.database.ocp_rate_db_accessor.OCPRateDBAccessor.get_memory_gb_usage_per_hour_rates')
+    def test_update_summary_charge_info_mem_cpu_malformed_mem(self, mock_db_mem_usage_rate, mock_db_cpu_usage_rate):
+        """Test that OCP charge information is updated for cpu and memory with malformed memory rates."""
+        mem_rate = {"tiered_rate": [{
+            "usage_start": None,
+            "usage_end": "10",
+            "value": "0.10",
+            "unit": "USD"
+        },
+        {
+            "usage_start": "10",
+            "usage_end": "20",
+            "value": "0.20",
+            "unit": "USD"
+        },
+        {
+            "usage_start": '20',
+            "usage_end": '30',
+            "value": '0.30',
+            "unit": "USD"
+        },
+        {
+            "usage_start": '30',
+            "usage_end": '40',
+            "value": '0.40',
+            "unit": "USD"
+        }]
+        }
+        cpu_rate = {'tiered_rate': [{'value': '200', 'unit': 'USD'}]}
+
+        mock_db_mem_usage_rate.return_value = mem_rate
+        mock_db_cpu_usage_rate.return_value = cpu_rate
+
+        cpu_rate_value = float(cpu_rate.get('tiered_rate')[0].get('value'))
+
+        usage_period = self.accessor.get_current_usage_period()
+        start_date = usage_period.report_period_start.date() + relativedelta(days=-1)
+        end_date = usage_period.report_period_end.date() + relativedelta(days=+1)
+
+        self.accessor.populate_line_item_daily_table(start_date, end_date)
+        self.accessor.populate_line_item_daily_summary_table(start_date, end_date)
+        self.updater.update_summary_charge_info()
+
+        table_name = OCP_REPORT_TABLE_MAP['line_item_daily_summary']
+
+        items = self.accessor._get_db_obj_query(table_name).all()
+        for item in items:
+            cpu_usage_value = float(item.pod_usage_cpu_core_hours)
+
+            self.assertIsNone(item.pod_charge_memory_gigabyte_hours)
+            self.assertEqual(round(cpu_usage_value*cpu_rate_value, 6),
+                             round(float(item.pod_charge_cpu_core_hours), 6))
+
+    @patch('masu.database.ocp_rate_db_accessor.OCPRateDBAccessor.get_cpu_core_usage_per_hour_rates')
+    @patch('masu.database.ocp_rate_db_accessor.OCPRateDBAccessor.get_memory_gb_usage_per_hour_rates')
+    def test_update_summary_charge_info_mem_cpu_malformed_cpu(self, mock_db_mem_usage_rate, mock_db_cpu_usage_rate):
+        """Test that OCP charge information is updated for cpu and memory with malformed cpu rates."""
+        mem_rate = {'tiered_rate': [{'value': '100', 'unit': 'USD'}]}
+        cpu_rate = {"tiered_rate": [{
+            "usage_start": "5",
+            "usage_end": "10",
+            "value": "0.10",
+            "unit": "USD"
+        },
+        {
+            "usage_start": "10",
+            "usage_end": "20",
+            "value": "0.20",
+            "unit": "USD"
+        },
+        {
+            "usage_start": '20',
+            "usage_end": '30',
+            "value": '0.30',
+            "unit": "USD"
+        },
+        {
+            "usage_start": '30',
+            "usage_end": None,
+            "value": '0.40',
+            "unit": "USD"
+        }]
+        }
+
+        mock_db_mem_usage_rate.return_value = mem_rate
+        mock_db_cpu_usage_rate.return_value = cpu_rate
+
+        mem_rate_value = float(mem_rate.get('tiered_rate')[0].get('value'))
+
+        usage_period = self.accessor.get_current_usage_period()
+        start_date = usage_period.report_period_start.date() + relativedelta(days=-1)
+        end_date = usage_period.report_period_end.date() + relativedelta(days=+1)
+
+        self.accessor.populate_line_item_daily_table(start_date, end_date)
+        self.accessor.populate_line_item_daily_summary_table(start_date, end_date)
+        self.updater.update_summary_charge_info()
+
+        table_name = OCP_REPORT_TABLE_MAP['line_item_daily_summary']
+
+        items = self.accessor._get_db_obj_query(table_name).all()
+        for item in items:
+            mem_usage_value = float(item.pod_usage_memory_gigabyte_hours)
+            self.assertEqual(round(mem_usage_value*mem_rate_value, 6),
+                             round(float(item.pod_charge_memory_gigabyte_hours), 6))
+            self.assertIsNone(item.pod_charge_cpu_core_hours)

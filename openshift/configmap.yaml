@@ -32,6 +32,7 @@ objects:
     rabbitmq-host: rabbitmq.${NAMESPACE}.svc
     insights-kafka-server-host: ${KAFKA_HOST}.${KAFKA_NAMESPACE}.svc
     insights-kafka-server-port: ${KAFKA_PORT}
+    insights-kafka-conn-retry-interval: ${KAFKA_TIMEOUT_SECONDS}
     log-level: INFO
     worker-queues: 'celery,download,process,remove_expired,reporting'
     schedule-check-interval: "60"
@@ -68,4 +69,9 @@ parameters:
   name: KAFKA_PORT
   required: true
   value: "29092"
+- description: Insights Upload Server Connection Retry Interval 
+  displayName: Kafka server reconnect timeout
+  name: KAFKA_TIMEOUT_SECONDS
+  required: true
+  value: "30"
 

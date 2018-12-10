@@ -175,6 +175,12 @@ objects:
                   name: ${NAME}
                   key: insights-kafka-server-port
                   optional: false
+            - name: INSIGHTS_KAFKA_CONN_RETRY_INTERVAL
+              valueFrom:
+                configMapKeyRef:
+                  name: ${NAME}
+                  key: insights-kafka-conn-retry-interval
+                  optional: false
             - name: LOG_LEVEL
               valueFrom:
                 configMapKeyRef:

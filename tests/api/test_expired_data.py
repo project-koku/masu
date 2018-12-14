@@ -32,7 +32,7 @@ class ExpiredDataTest(MasuTestCase):
     @patch.object(Orchestrator, 'remove_expired_report_data')
     def test_get_expired_data(self, mock_orchestrator):
         """Test the GET expired_data endpoint."""
-        mock_response = [{'customer': 'acct10001org20002',
+        mock_response = [{'customer': 'acct10001',
                           'async_id': 'f9eb2ce7-4564-4509-aecc-1200958c07cf'}]
         expected_key = 'Async jobs for expired data removal (simulated)'
         mock_orchestrator.return_value = mock_response
@@ -48,7 +48,7 @@ class ExpiredDataTest(MasuTestCase):
     @patch.object(Orchestrator, 'remove_expired_report_data')
     def test_del_expired_data(self, mock_orchestrator, mock_debug):
         """Test the DELETE expired_data endpoint."""
-        mock_response = [{'customer': 'acct10001org20002',
+        mock_response = [{'customer': 'acct10001',
                           'async_id': 'f9eb2ce7-4564-4509-aecc-1200958c07cf'}]
         expected_key = 'Async jobs for expired data removal'
         mock_orchestrator.return_value = mock_response

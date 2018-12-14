@@ -38,7 +38,7 @@ class OCPReportDBCleanerTest(MasuTestCase):
         cls.common_accessor = ReportingCommonDBAccessor()
         cls.column_map = cls.common_accessor.column_map
         cls.accessor = OCPReportDBAccessor(
-            schema='acct10001org20002',
+            schema='acct10001',
             column_map=cls.column_map
         )
         cls.report_schema = cls.accessor.report_schema
@@ -87,7 +87,7 @@ class OCPReportDBCleanerTest(MasuTestCase):
         report_table_name = OCP_REPORT_TABLE_MAP['report']
         line_item_table_name = OCP_REPORT_TABLE_MAP['line_item']
 
-        cleaner = OCPReportDBCleaner('acct10001org20002')
+        cleaner = OCPReportDBCleaner('acct10001')
 
         # Verify that data is cleared for a cutoff date == billing_period_start
         first_period = self.accessor._get_db_obj_query(report_period_table_name).first()
@@ -113,7 +113,7 @@ class OCPReportDBCleanerTest(MasuTestCase):
         report_table_name = OCP_REPORT_TABLE_MAP['report']
         line_item_table_name = OCP_REPORT_TABLE_MAP['line_item']
 
-        cleaner = OCPReportDBCleaner('acct10001org20002')
+        cleaner = OCPReportDBCleaner('acct10001')
 
         # Verify that data is not cleared for a cutoff date < billing_period_start
         first_period = self.accessor._get_db_obj_query(report_period_table_name).first()
@@ -139,7 +139,7 @@ class OCPReportDBCleanerTest(MasuTestCase):
         report_table_name = OCP_REPORT_TABLE_MAP['report']
         line_item_table_name = OCP_REPORT_TABLE_MAP['line_item']
 
-        cleaner = OCPReportDBCleaner('acct10001org20002')
+        cleaner = OCPReportDBCleaner('acct10001')
 
         # Verify that data is cleared for a cutoff date > billing_period_start
         first_period = self.accessor._get_db_obj_query(report_period_table_name).first()
@@ -166,7 +166,7 @@ class OCPReportDBCleanerTest(MasuTestCase):
         report_table_name = OCP_REPORT_TABLE_MAP['report']
         line_item_table_name = OCP_REPORT_TABLE_MAP['line_item']
 
-        cleaner = OCPReportDBCleaner('acct10001org20002')
+        cleaner = OCPReportDBCleaner('acct10001')
 
         # Verify that data is cleared for a cutoff date == billing_period_start
         first_period = self.accessor._get_db_obj_query(report_period_table_name).first()
@@ -192,7 +192,7 @@ class OCPReportDBCleanerTest(MasuTestCase):
         report_table_name = OCP_REPORT_TABLE_MAP['report']
         line_item_table_name = OCP_REPORT_TABLE_MAP['line_item']
 
-        cleaner = OCPReportDBCleaner('acct10001org20002')
+        cleaner = OCPReportDBCleaner('acct10001')
 
         # Verify that data is cleared for a cutoff date == billing_period_start
         first_period = self.accessor._get_db_obj_query(report_period_table_name).first()
@@ -214,7 +214,7 @@ class OCPReportDBCleanerTest(MasuTestCase):
     def test_purge_expired_report_data_no_args(self):
         """Test that the provider_id deletes all data for the provider."""
 
-        cleaner = OCPReportDBCleaner('acct10001org20002')
+        cleaner = OCPReportDBCleaner('acct10001')
         with self.assertRaises(OCPReportDBCleanerError):
             cleaner.purge_expired_report_data()
 
@@ -222,7 +222,7 @@ class OCPReportDBCleanerTest(MasuTestCase):
     def test_purge_expired_report_data_both_args(self):
         """Test that the provider_id deletes all data for the provider."""
         now = datetime.datetime.utcnow()
-        cleaner = OCPReportDBCleaner('acct10001org20002')
+        cleaner = OCPReportDBCleaner('acct10001')
         with self.assertRaises(OCPReportDBCleanerError):
             cleaner.purge_expired_report_data(
                 expired_date=now,

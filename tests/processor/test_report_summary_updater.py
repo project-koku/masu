@@ -41,7 +41,7 @@ class ReportSummaryUpdaterTest(MasuTestCase):
     def setUpClass(cls):
         """Set up the test class."""
         super().setUpClass()
-        cls.schema = 'acct10001org20002'
+        cls.schema = 'acct10001'
         cls.today = DateAccessor().today_with_timezone('UTC')
         cls.tomorrow = cls.today + datetime.timedelta(days=1)
 

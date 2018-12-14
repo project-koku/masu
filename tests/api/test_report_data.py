@@ -34,7 +34,7 @@ class ReportDataTests(MasuTestCase):
         """Test the GET report_data endpoint."""
         start_date = datetime.date.today()
         params = {
-            'schema': 'acct10001org20002',
+            'schema': 'acct10001',
             'start_date': start_date,
             'provider_uuid': '6e212746-484a-40cd-bba0-09a19d132d64'
         }
@@ -84,7 +84,7 @@ class ReportDataTests(MasuTestCase):
         start_date = datetime.date.today()
         params = {
             'start_date': start_date,
-            'schema': 'acct10001org20002'
+            'schema': 'acct10001'
         }
         query_string = urlencode(params)
         expected_key = 'Error'
@@ -106,7 +106,7 @@ class ReportDataTests(MasuTestCase):
         start_date = datetime.date.today()
         params = {
             'start_date': start_date,
-            'schema': 'acct10001org20002',
+            'schema': 'acct10001',
             'provider_uuid': '6e212746-484a-40cd-bba0-09a19d132ddd'
         }
         query_string = urlencode(params)
@@ -127,7 +127,7 @@ class ReportDataTests(MasuTestCase):
     def test_get_report_data_date_missing(self, mock_update):
         """Test GET report_data endpoint returns a 400 for missing date."""
         params = {
-            'schema': 'acct10001org20002',
+            'schema': 'acct10001',
             'provider_uuid': '6e212746-484a-40cd-bba0-09a19d132d64'}
         query_string = urlencode(params)
         expected_key = 'Error'
@@ -149,7 +149,7 @@ class ReportDataTests(MasuTestCase):
         start_date = datetime.date.today()
         end_date = start_date + datetime.timedelta(days=1)
         params = {
-            'schema': 'acct10001org20002',
+            'schema': 'acct10001',
             'provider_uuid': '6e212746-484a-40cd-bba0-09a19d132d64',
             'start_date': start_date,
             'end_date': end_date
@@ -177,7 +177,7 @@ class ReportDataTests(MasuTestCase):
     def test_remove_report_data(self, mock_remove):
         """Test that the DELETE call to report_data works."""
         params = {
-            'schema': 'acct10001org20002',
+            'schema': 'acct10001',
             'provider': 'AWS',
             'provider_id': 1,
             'simulate': False
@@ -204,7 +204,7 @@ class ReportDataTests(MasuTestCase):
     def test_remove_report_data_simulate(self, mock_remove):
         """Test that the DELETE call to report_data works."""
         params = {
-            'schema': 'acct10001org20002',
+            'schema': 'acct10001',
             'provider': 'AWS',
             'provider_id': 1,
             'simulate': True
@@ -231,7 +231,7 @@ class ReportDataTests(MasuTestCase):
     def test_remove_report_data_simulate_missing(self, mock_remove):
         """Test that the DELETE call to report_data works."""
         params = {
-            'schema': 'acct10001org20002',
+            'schema': 'acct10001',
             'provider': 'AWS',
             'provider_id': 1
         }
@@ -278,7 +278,7 @@ class ReportDataTests(MasuTestCase):
     def test_remove_report_data_provider_missing(self, mock_remove):
         """Test that the DELETE call to report_data works."""
         params = {
-            'schema': 'acct10001org20002',
+            'schema': 'acct10001',
             'provider_id': 1,
             'simulate': True
         }
@@ -299,7 +299,7 @@ class ReportDataTests(MasuTestCase):
     def test_remove_report_data_provider_id_missing(self, mock_remove):
         """Test that the DELETE call to report_data works."""
         params = {
-            'schema': 'acct10001org20002',
+            'schema': 'acct10001',
             'provider': 'AWS',
             'simulate': True
         }

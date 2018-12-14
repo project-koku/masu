@@ -16,13 +16,13 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
--- Name: acct10001org20002; Type: SCHEMA; Schema: -; Owner: kokuadmin
+-- Name: acct10001; Type: SCHEMA; Schema: -; Owner: kokuadmin
 --
 
-CREATE SCHEMA acct10001org20002;
+CREATE SCHEMA acct10001;
 
 
-ALTER SCHEMA acct10001org20002 OWNER TO kokuadmin;
+ALTER SCHEMA acct10001 OWNER TO kokuadmin;
 
 --
 -- Name: plpgsql; Type: EXTENSION; Schema: -; Owner:
@@ -43,10 +43,10 @@ SET default_tablespace = '';
 SET default_with_oids = false;
 
 --
--- Name: django_migrations; Type: TABLE; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: django_migrations; Type: TABLE; Schema: acct10001; Owner: kokuadmin
 --
 
-CREATE TABLE acct10001org20002.django_migrations (
+CREATE TABLE acct10001.django_migrations (
     id integer NOT NULL,
     app character varying(255) NOT NULL,
     name character varying(255) NOT NULL,
@@ -54,13 +54,13 @@ CREATE TABLE acct10001org20002.django_migrations (
 );
 
 
-ALTER TABLE acct10001org20002.django_migrations OWNER TO kokuadmin;
+ALTER TABLE acct10001.django_migrations OWNER TO kokuadmin;
 
 --
--- Name: django_migrations_id_seq; Type: SEQUENCE; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: django_migrations_id_seq; Type: SEQUENCE; Schema: acct10001; Owner: kokuadmin
 --
 
-CREATE SEQUENCE acct10001org20002.django_migrations_id_seq
+CREATE SEQUENCE acct10001.django_migrations_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -68,20 +68,20 @@ CREATE SEQUENCE acct10001org20002.django_migrations_id_seq
     CACHE 1;
 
 
-ALTER TABLE acct10001org20002.django_migrations_id_seq OWNER TO kokuadmin;
+ALTER TABLE acct10001.django_migrations_id_seq OWNER TO kokuadmin;
 
 --
--- Name: django_migrations_id_seq; Type: SEQUENCE OWNED BY; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: django_migrations_id_seq; Type: SEQUENCE OWNED BY; Schema: acct10001; Owner: kokuadmin
 --
 
-ALTER SEQUENCE acct10001org20002.django_migrations_id_seq OWNED BY acct10001org20002.django_migrations.id;
+ALTER SEQUENCE acct10001.django_migrations_id_seq OWNED BY acct10001.django_migrations.id;
 
 
 --
--- Name: rates_rate; Type: TABLE; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: rates_rate; Type: TABLE; Schema: acct10001; Owner: kokuadmin
 --
 
-CREATE TABLE acct10001org20002.rates_rate (
+CREATE TABLE acct10001.rates_rate (
     id integer NOT NULL,
     uuid uuid NOT NULL,
     provider_uuid uuid NOT NULL,
@@ -90,13 +90,13 @@ CREATE TABLE acct10001org20002.rates_rate (
 );
 
 
-ALTER TABLE acct10001org20002.rates_rate OWNER TO kokuadmin;
+ALTER TABLE acct10001.rates_rate OWNER TO kokuadmin;
 
 --
--- Name: rates_rate_id_seq; Type: SEQUENCE; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: rates_rate_id_seq; Type: SEQUENCE; Schema: acct10001; Owner: kokuadmin
 --
 
-CREATE SEQUENCE acct10001org20002.rates_rate_id_seq
+CREATE SEQUENCE acct10001.rates_rate_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -104,33 +104,33 @@ CREATE SEQUENCE acct10001org20002.rates_rate_id_seq
     CACHE 1;
 
 
-ALTER TABLE acct10001org20002.rates_rate_id_seq OWNER TO kokuadmin;
+ALTER TABLE acct10001.rates_rate_id_seq OWNER TO kokuadmin;
 
 --
--- Name: rates_rate_id_seq; Type: SEQUENCE OWNED BY; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: rates_rate_id_seq; Type: SEQUENCE OWNED BY; Schema: acct10001; Owner: kokuadmin
 --
 
-ALTER SEQUENCE acct10001org20002.rates_rate_id_seq OWNED BY acct10001org20002.rates_rate.id;
+ALTER SEQUENCE acct10001.rates_rate_id_seq OWNED BY acct10001.rates_rate.id;
 
 
 --
--- Name: reporting_awsaccountalias; Type: TABLE; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awsaccountalias; Type: TABLE; Schema: acct10001; Owner: kokuadmin
 --
 
-CREATE TABLE acct10001org20002.reporting_awsaccountalias (
+CREATE TABLE acct10001.reporting_awsaccountalias (
     id integer NOT NULL,
     account_id character varying(50) NOT NULL,
     account_alias character varying(63)
 );
 
 
-ALTER TABLE acct10001org20002.reporting_awsaccountalias OWNER TO kokuadmin;
+ALTER TABLE acct10001.reporting_awsaccountalias OWNER TO kokuadmin;
 
 --
--- Name: reporting_awsaccountalias_id_seq; Type: SEQUENCE; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awsaccountalias_id_seq; Type: SEQUENCE; Schema: acct10001; Owner: kokuadmin
 --
 
-CREATE SEQUENCE acct10001org20002.reporting_awsaccountalias_id_seq
+CREATE SEQUENCE acct10001.reporting_awsaccountalias_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -138,20 +138,20 @@ CREATE SEQUENCE acct10001org20002.reporting_awsaccountalias_id_seq
     CACHE 1;
 
 
-ALTER TABLE acct10001org20002.reporting_awsaccountalias_id_seq OWNER TO kokuadmin;
+ALTER TABLE acct10001.reporting_awsaccountalias_id_seq OWNER TO kokuadmin;
 
 --
--- Name: reporting_awsaccountalias_id_seq; Type: SEQUENCE OWNED BY; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awsaccountalias_id_seq; Type: SEQUENCE OWNED BY; Schema: acct10001; Owner: kokuadmin
 --
 
-ALTER SEQUENCE acct10001org20002.reporting_awsaccountalias_id_seq OWNED BY acct10001org20002.reporting_awsaccountalias.id;
+ALTER SEQUENCE acct10001.reporting_awsaccountalias_id_seq OWNED BY acct10001.reporting_awsaccountalias.id;
 
 
 --
--- Name: reporting_awscostentry; Type: TABLE; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awscostentry; Type: TABLE; Schema: acct10001; Owner: kokuadmin
 --
 
-CREATE TABLE acct10001org20002.reporting_awscostentry (
+CREATE TABLE acct10001.reporting_awscostentry (
     id integer NOT NULL,
     interval_start timestamp with time zone NOT NULL,
     interval_end timestamp with time zone NOT NULL,
@@ -159,13 +159,13 @@ CREATE TABLE acct10001org20002.reporting_awscostentry (
 );
 
 
-ALTER TABLE acct10001org20002.reporting_awscostentry OWNER TO kokuadmin;
+ALTER TABLE acct10001.reporting_awscostentry OWNER TO kokuadmin;
 
 --
--- Name: reporting_awscostentry_id_seq; Type: SEQUENCE; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awscostentry_id_seq; Type: SEQUENCE; Schema: acct10001; Owner: kokuadmin
 --
 
-CREATE SEQUENCE acct10001org20002.reporting_awscostentry_id_seq
+CREATE SEQUENCE acct10001.reporting_awscostentry_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -173,20 +173,20 @@ CREATE SEQUENCE acct10001org20002.reporting_awscostentry_id_seq
     CACHE 1;
 
 
-ALTER TABLE acct10001org20002.reporting_awscostentry_id_seq OWNER TO kokuadmin;
+ALTER TABLE acct10001.reporting_awscostentry_id_seq OWNER TO kokuadmin;
 
 --
--- Name: reporting_awscostentry_id_seq; Type: SEQUENCE OWNED BY; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awscostentry_id_seq; Type: SEQUENCE OWNED BY; Schema: acct10001; Owner: kokuadmin
 --
 
-ALTER SEQUENCE acct10001org20002.reporting_awscostentry_id_seq OWNED BY acct10001org20002.reporting_awscostentry.id;
+ALTER SEQUENCE acct10001.reporting_awscostentry_id_seq OWNED BY acct10001.reporting_awscostentry.id;
 
 
 --
--- Name: reporting_awscostentrybill; Type: TABLE; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awscostentrybill; Type: TABLE; Schema: acct10001; Owner: kokuadmin
 --
 
-CREATE TABLE acct10001org20002.reporting_awscostentrybill (
+CREATE TABLE acct10001.reporting_awscostentrybill (
     id integer NOT NULL,
     billing_resource character varying(50) NOT NULL,
     bill_type character varying(50) NOT NULL,
@@ -200,13 +200,13 @@ CREATE TABLE acct10001org20002.reporting_awscostentrybill (
 );
 
 
-ALTER TABLE acct10001org20002.reporting_awscostentrybill OWNER TO kokuadmin;
+ALTER TABLE acct10001.reporting_awscostentrybill OWNER TO kokuadmin;
 
 --
--- Name: reporting_awscostentrybill_id_seq; Type: SEQUENCE; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awscostentrybill_id_seq; Type: SEQUENCE; Schema: acct10001; Owner: kokuadmin
 --
 
-CREATE SEQUENCE acct10001org20002.reporting_awscostentrybill_id_seq
+CREATE SEQUENCE acct10001.reporting_awscostentrybill_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -214,20 +214,20 @@ CREATE SEQUENCE acct10001org20002.reporting_awscostentrybill_id_seq
     CACHE 1;
 
 
-ALTER TABLE acct10001org20002.reporting_awscostentrybill_id_seq OWNER TO kokuadmin;
+ALTER TABLE acct10001.reporting_awscostentrybill_id_seq OWNER TO kokuadmin;
 
 --
--- Name: reporting_awscostentrybill_id_seq; Type: SEQUENCE OWNED BY; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awscostentrybill_id_seq; Type: SEQUENCE OWNED BY; Schema: acct10001; Owner: kokuadmin
 --
 
-ALTER SEQUENCE acct10001org20002.reporting_awscostentrybill_id_seq OWNED BY acct10001org20002.reporting_awscostentrybill.id;
+ALTER SEQUENCE acct10001.reporting_awscostentrybill_id_seq OWNED BY acct10001.reporting_awscostentrybill.id;
 
 
 --
--- Name: reporting_awscostentrylineitem; Type: TABLE; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awscostentrylineitem; Type: TABLE; Schema: acct10001; Owner: kokuadmin
 --
 
-CREATE TABLE acct10001org20002.reporting_awscostentrylineitem (
+CREATE TABLE acct10001.reporting_awscostentrylineitem (
     id bigint NOT NULL,
     hash text,
     tags jsonb,
@@ -265,13 +265,13 @@ CREATE TABLE acct10001org20002.reporting_awscostentrylineitem (
 );
 
 
-ALTER TABLE acct10001org20002.reporting_awscostentrylineitem OWNER TO kokuadmin;
+ALTER TABLE acct10001.reporting_awscostentrylineitem OWNER TO kokuadmin;
 
 --
--- Name: reporting_awscostentrylineitem_aggregates; Type: TABLE; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awscostentrylineitem_aggregates; Type: TABLE; Schema: acct10001; Owner: kokuadmin
 --
 
-CREATE TABLE acct10001org20002.reporting_awscostentrylineitem_aggregates (
+CREATE TABLE acct10001.reporting_awscostentrylineitem_aggregates (
     id integer NOT NULL,
     time_scope_value integer NOT NULL,
     report_type character varying(50) NOT NULL,
@@ -286,13 +286,13 @@ CREATE TABLE acct10001org20002.reporting_awscostentrylineitem_aggregates (
 );
 
 
-ALTER TABLE acct10001org20002.reporting_awscostentrylineitem_aggregates OWNER TO kokuadmin;
+ALTER TABLE acct10001.reporting_awscostentrylineitem_aggregates OWNER TO kokuadmin;
 
 --
--- Name: reporting_awscostentrylineitem_aggregates_id_seq; Type: SEQUENCE; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awscostentrylineitem_aggregates_id_seq; Type: SEQUENCE; Schema: acct10001; Owner: kokuadmin
 --
 
-CREATE SEQUENCE acct10001org20002.reporting_awscostentrylineitem_aggregates_id_seq
+CREATE SEQUENCE acct10001.reporting_awscostentrylineitem_aggregates_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -300,20 +300,20 @@ CREATE SEQUENCE acct10001org20002.reporting_awscostentrylineitem_aggregates_id_s
     CACHE 1;
 
 
-ALTER TABLE acct10001org20002.reporting_awscostentrylineitem_aggregates_id_seq OWNER TO kokuadmin;
+ALTER TABLE acct10001.reporting_awscostentrylineitem_aggregates_id_seq OWNER TO kokuadmin;
 
 --
--- Name: reporting_awscostentrylineitem_aggregates_id_seq; Type: SEQUENCE OWNED BY; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awscostentrylineitem_aggregates_id_seq; Type: SEQUENCE OWNED BY; Schema: acct10001; Owner: kokuadmin
 --
 
-ALTER SEQUENCE acct10001org20002.reporting_awscostentrylineitem_aggregates_id_seq OWNED BY acct10001org20002.reporting_awscostentrylineitem_aggregates.id;
+ALTER SEQUENCE acct10001.reporting_awscostentrylineitem_aggregates_id_seq OWNED BY acct10001.reporting_awscostentrylineitem_aggregates.id;
 
 
 --
--- Name: reporting_awscostentrylineitem_daily; Type: TABLE; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awscostentrylineitem_daily; Type: TABLE; Schema: acct10001; Owner: kokuadmin
 --
 
-CREATE TABLE acct10001org20002.reporting_awscostentrylineitem_daily (
+CREATE TABLE acct10001.reporting_awscostentrylineitem_daily (
     id bigint NOT NULL,
     line_item_type character varying(50) NOT NULL,
     usage_account_id character varying(50) NOT NULL,
@@ -342,13 +342,13 @@ CREATE TABLE acct10001org20002.reporting_awscostentrylineitem_daily (
 );
 
 
-ALTER TABLE acct10001org20002.reporting_awscostentrylineitem_daily OWNER TO kokuadmin;
+ALTER TABLE acct10001.reporting_awscostentrylineitem_daily OWNER TO kokuadmin;
 
 --
--- Name: reporting_awscostentrylineitem_daily_id_seq; Type: SEQUENCE; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awscostentrylineitem_daily_id_seq; Type: SEQUENCE; Schema: acct10001; Owner: kokuadmin
 --
 
-CREATE SEQUENCE acct10001org20002.reporting_awscostentrylineitem_daily_id_seq
+CREATE SEQUENCE acct10001.reporting_awscostentrylineitem_daily_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -356,20 +356,20 @@ CREATE SEQUENCE acct10001org20002.reporting_awscostentrylineitem_daily_id_seq
     CACHE 1;
 
 
-ALTER TABLE acct10001org20002.reporting_awscostentrylineitem_daily_id_seq OWNER TO kokuadmin;
+ALTER TABLE acct10001.reporting_awscostentrylineitem_daily_id_seq OWNER TO kokuadmin;
 
 --
--- Name: reporting_awscostentrylineitem_daily_id_seq; Type: SEQUENCE OWNED BY; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awscostentrylineitem_daily_id_seq; Type: SEQUENCE OWNED BY; Schema: acct10001; Owner: kokuadmin
 --
 
-ALTER SEQUENCE acct10001org20002.reporting_awscostentrylineitem_daily_id_seq OWNED BY acct10001org20002.reporting_awscostentrylineitem_daily.id;
+ALTER SEQUENCE acct10001.reporting_awscostentrylineitem_daily_id_seq OWNED BY acct10001.reporting_awscostentrylineitem_daily.id;
 
 
 --
--- Name: reporting_awscostentrylineitem_daily_summary; Type: TABLE; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awscostentrylineitem_daily_summary; Type: TABLE; Schema: acct10001; Owner: kokuadmin
 --
 
-CREATE TABLE acct10001org20002.reporting_awscostentrylineitem_daily_summary (
+CREATE TABLE acct10001.reporting_awscostentrylineitem_daily_summary (
     id bigint NOT NULL,
     usage_start timestamp with time zone NOT NULL,
     usage_end timestamp with time zone,
@@ -396,13 +396,13 @@ CREATE TABLE acct10001org20002.reporting_awscostentrylineitem_daily_summary (
 );
 
 
-ALTER TABLE acct10001org20002.reporting_awscostentrylineitem_daily_summary OWNER TO kokuadmin;
+ALTER TABLE acct10001.reporting_awscostentrylineitem_daily_summary OWNER TO kokuadmin;
 
 --
--- Name: reporting_awscostentrylineitem_daily_summary_id_seq; Type: SEQUENCE; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awscostentrylineitem_daily_summary_id_seq; Type: SEQUENCE; Schema: acct10001; Owner: kokuadmin
 --
 
-CREATE SEQUENCE acct10001org20002.reporting_awscostentrylineitem_daily_summary_id_seq
+CREATE SEQUENCE acct10001.reporting_awscostentrylineitem_daily_summary_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -410,20 +410,20 @@ CREATE SEQUENCE acct10001org20002.reporting_awscostentrylineitem_daily_summary_i
     CACHE 1;
 
 
-ALTER TABLE acct10001org20002.reporting_awscostentrylineitem_daily_summary_id_seq OWNER TO kokuadmin;
+ALTER TABLE acct10001.reporting_awscostentrylineitem_daily_summary_id_seq OWNER TO kokuadmin;
 
 --
--- Name: reporting_awscostentrylineitem_daily_summary_id_seq; Type: SEQUENCE OWNED BY; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awscostentrylineitem_daily_summary_id_seq; Type: SEQUENCE OWNED BY; Schema: acct10001; Owner: kokuadmin
 --
 
-ALTER SEQUENCE acct10001org20002.reporting_awscostentrylineitem_daily_summary_id_seq OWNED BY acct10001org20002.reporting_awscostentrylineitem_daily_summary.id;
+ALTER SEQUENCE acct10001.reporting_awscostentrylineitem_daily_summary_id_seq OWNED BY acct10001.reporting_awscostentrylineitem_daily_summary.id;
 
 
 --
--- Name: reporting_awscostentrylineitem_id_seq; Type: SEQUENCE; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awscostentrylineitem_id_seq; Type: SEQUENCE; Schema: acct10001; Owner: kokuadmin
 --
 
-CREATE SEQUENCE acct10001org20002.reporting_awscostentrylineitem_id_seq
+CREATE SEQUENCE acct10001.reporting_awscostentrylineitem_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -431,33 +431,33 @@ CREATE SEQUENCE acct10001org20002.reporting_awscostentrylineitem_id_seq
     CACHE 1;
 
 
-ALTER TABLE acct10001org20002.reporting_awscostentrylineitem_id_seq OWNER TO kokuadmin;
+ALTER TABLE acct10001.reporting_awscostentrylineitem_id_seq OWNER TO kokuadmin;
 
 --
--- Name: reporting_awscostentrylineitem_id_seq; Type: SEQUENCE OWNED BY; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awscostentrylineitem_id_seq; Type: SEQUENCE OWNED BY; Schema: acct10001; Owner: kokuadmin
 --
 
-ALTER SEQUENCE acct10001org20002.reporting_awscostentrylineitem_id_seq OWNED BY acct10001org20002.reporting_awscostentrylineitem.id;
+ALTER SEQUENCE acct10001.reporting_awscostentrylineitem_id_seq OWNED BY acct10001.reporting_awscostentrylineitem.id;
 
 
 --
--- Name: reporting_awscostentrypricing; Type: TABLE; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awscostentrypricing; Type: TABLE; Schema: acct10001; Owner: kokuadmin
 --
 
-CREATE TABLE acct10001org20002.reporting_awscostentrypricing (
+CREATE TABLE acct10001.reporting_awscostentrypricing (
     id integer NOT NULL,
     term character varying(63),
     unit character varying(63)
 );
 
 
-ALTER TABLE acct10001org20002.reporting_awscostentrypricing OWNER TO kokuadmin;
+ALTER TABLE acct10001.reporting_awscostentrypricing OWNER TO kokuadmin;
 
 --
--- Name: reporting_awscostentrypricing_id_seq; Type: SEQUENCE; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awscostentrypricing_id_seq; Type: SEQUENCE; Schema: acct10001; Owner: kokuadmin
 --
 
-CREATE SEQUENCE acct10001org20002.reporting_awscostentrypricing_id_seq
+CREATE SEQUENCE acct10001.reporting_awscostentrypricing_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -465,20 +465,20 @@ CREATE SEQUENCE acct10001org20002.reporting_awscostentrypricing_id_seq
     CACHE 1;
 
 
-ALTER TABLE acct10001org20002.reporting_awscostentrypricing_id_seq OWNER TO kokuadmin;
+ALTER TABLE acct10001.reporting_awscostentrypricing_id_seq OWNER TO kokuadmin;
 
 --
--- Name: reporting_awscostentrypricing_id_seq; Type: SEQUENCE OWNED BY; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awscostentrypricing_id_seq; Type: SEQUENCE OWNED BY; Schema: acct10001; Owner: kokuadmin
 --
 
-ALTER SEQUENCE acct10001org20002.reporting_awscostentrypricing_id_seq OWNED BY acct10001org20002.reporting_awscostentrypricing.id;
+ALTER SEQUENCE acct10001.reporting_awscostentrypricing_id_seq OWNED BY acct10001.reporting_awscostentrypricing.id;
 
 
 --
--- Name: reporting_awscostentryproduct; Type: TABLE; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awscostentryproduct; Type: TABLE; Schema: acct10001; Owner: kokuadmin
 --
 
-CREATE TABLE acct10001org20002.reporting_awscostentryproduct (
+CREATE TABLE acct10001.reporting_awscostentryproduct (
     id integer NOT NULL,
     sku character varying(128),
     product_name character varying(63),
@@ -493,13 +493,13 @@ CREATE TABLE acct10001org20002.reporting_awscostentryproduct (
 );
 
 
-ALTER TABLE acct10001org20002.reporting_awscostentryproduct OWNER TO kokuadmin;
+ALTER TABLE acct10001.reporting_awscostentryproduct OWNER TO kokuadmin;
 
 --
--- Name: reporting_awscostentryproduct_id_seq; Type: SEQUENCE; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awscostentryproduct_id_seq; Type: SEQUENCE; Schema: acct10001; Owner: kokuadmin
 --
 
-CREATE SEQUENCE acct10001org20002.reporting_awscostentryproduct_id_seq
+CREATE SEQUENCE acct10001.reporting_awscostentryproduct_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -507,20 +507,20 @@ CREATE SEQUENCE acct10001org20002.reporting_awscostentryproduct_id_seq
     CACHE 1;
 
 
-ALTER TABLE acct10001org20002.reporting_awscostentryproduct_id_seq OWNER TO kokuadmin;
+ALTER TABLE acct10001.reporting_awscostentryproduct_id_seq OWNER TO kokuadmin;
 
 --
--- Name: reporting_awscostentryproduct_id_seq; Type: SEQUENCE OWNED BY; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awscostentryproduct_id_seq; Type: SEQUENCE OWNED BY; Schema: acct10001; Owner: kokuadmin
 --
 
-ALTER SEQUENCE acct10001org20002.reporting_awscostentryproduct_id_seq OWNED BY acct10001org20002.reporting_awscostentryproduct.id;
+ALTER SEQUENCE acct10001.reporting_awscostentryproduct_id_seq OWNED BY acct10001.reporting_awscostentryproduct.id;
 
 
 --
--- Name: reporting_awscostentryreservation; Type: TABLE; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awscostentryreservation; Type: TABLE; Schema: acct10001; Owner: kokuadmin
 --
 
-CREATE TABLE acct10001org20002.reporting_awscostentryreservation (
+CREATE TABLE acct10001.reporting_awscostentryreservation (
     id integer NOT NULL,
     reservation_arn text NOT NULL,
     number_of_reservations integer,
@@ -531,13 +531,13 @@ CREATE TABLE acct10001org20002.reporting_awscostentryreservation (
 );
 
 
-ALTER TABLE acct10001org20002.reporting_awscostentryreservation OWNER TO kokuadmin;
+ALTER TABLE acct10001.reporting_awscostentryreservation OWNER TO kokuadmin;
 
 --
--- Name: reporting_awscostentryreservation_id_seq; Type: SEQUENCE; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awscostentryreservation_id_seq; Type: SEQUENCE; Schema: acct10001; Owner: kokuadmin
 --
 
-CREATE SEQUENCE acct10001org20002.reporting_awscostentryreservation_id_seq
+CREATE SEQUENCE acct10001.reporting_awscostentryreservation_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -545,20 +545,20 @@ CREATE SEQUENCE acct10001org20002.reporting_awscostentryreservation_id_seq
     CACHE 1;
 
 
-ALTER TABLE acct10001org20002.reporting_awscostentryreservation_id_seq OWNER TO kokuadmin;
+ALTER TABLE acct10001.reporting_awscostentryreservation_id_seq OWNER TO kokuadmin;
 
 --
--- Name: reporting_awscostentryreservation_id_seq; Type: SEQUENCE OWNED BY; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awscostentryreservation_id_seq; Type: SEQUENCE OWNED BY; Schema: acct10001; Owner: kokuadmin
 --
 
-ALTER SEQUENCE acct10001org20002.reporting_awscostentryreservation_id_seq OWNED BY acct10001org20002.reporting_awscostentryreservation.id;
+ALTER SEQUENCE acct10001.reporting_awscostentryreservation_id_seq OWNED BY acct10001.reporting_awscostentryreservation.id;
 
 
 --
--- Name: reporting_ocpusagelineitem; Type: TABLE; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_ocpusagelineitem; Type: TABLE; Schema: acct10001; Owner: kokuadmin
 --
 
-CREATE TABLE acct10001org20002.reporting_ocpusagelineitem (
+CREATE TABLE acct10001.reporting_ocpusagelineitem (
     id bigint NOT NULL,
     namespace character varying(253) NOT NULL,
     pod character varying(253) NOT NULL,
@@ -579,13 +579,13 @@ CREATE TABLE acct10001org20002.reporting_ocpusagelineitem (
 );
 
 
-ALTER TABLE acct10001org20002.reporting_ocpusagelineitem OWNER TO kokuadmin;
+ALTER TABLE acct10001.reporting_ocpusagelineitem OWNER TO kokuadmin;
 
 --
--- Name: reporting_ocpusagelineitem_aggregates; Type: TABLE; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_ocpusagelineitem_aggregates; Type: TABLE; Schema: acct10001; Owner: kokuadmin
 --
 
-CREATE TABLE acct10001org20002.reporting_ocpusagelineitem_aggregates (
+CREATE TABLE acct10001.reporting_ocpusagelineitem_aggregates (
     id integer NOT NULL,
     time_scope_value integer NOT NULL,
     cluster_id character varying(50),
@@ -605,13 +605,13 @@ CREATE TABLE acct10001org20002.reporting_ocpusagelineitem_aggregates (
 );
 
 
-ALTER TABLE acct10001org20002.reporting_ocpusagelineitem_aggregates OWNER TO kokuadmin;
+ALTER TABLE acct10001.reporting_ocpusagelineitem_aggregates OWNER TO kokuadmin;
 
 --
--- Name: reporting_ocpusagelineitem_aggregates_id_seq; Type: SEQUENCE; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_ocpusagelineitem_aggregates_id_seq; Type: SEQUENCE; Schema: acct10001; Owner: kokuadmin
 --
 
-CREATE SEQUENCE acct10001org20002.reporting_ocpusagelineitem_aggregates_id_seq
+CREATE SEQUENCE acct10001.reporting_ocpusagelineitem_aggregates_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -619,20 +619,20 @@ CREATE SEQUENCE acct10001org20002.reporting_ocpusagelineitem_aggregates_id_seq
     CACHE 1;
 
 
-ALTER TABLE acct10001org20002.reporting_ocpusagelineitem_aggregates_id_seq OWNER TO kokuadmin;
+ALTER TABLE acct10001.reporting_ocpusagelineitem_aggregates_id_seq OWNER TO kokuadmin;
 
 --
--- Name: reporting_ocpusagelineitem_aggregates_id_seq; Type: SEQUENCE OWNED BY; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_ocpusagelineitem_aggregates_id_seq; Type: SEQUENCE OWNED BY; Schema: acct10001; Owner: kokuadmin
 --
 
-ALTER SEQUENCE acct10001org20002.reporting_ocpusagelineitem_aggregates_id_seq OWNED BY acct10001org20002.reporting_ocpusagelineitem_aggregates.id;
+ALTER SEQUENCE acct10001.reporting_ocpusagelineitem_aggregates_id_seq OWNED BY acct10001.reporting_ocpusagelineitem_aggregates.id;
 
 
 --
--- Name: reporting_ocpusagelineitem_daily; Type: TABLE; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_ocpusagelineitem_daily; Type: TABLE; Schema: acct10001; Owner: kokuadmin
 --
 
-CREATE TABLE acct10001org20002.reporting_ocpusagelineitem_daily (
+CREATE TABLE acct10001.reporting_ocpusagelineitem_daily (
     id bigint NOT NULL,
     namespace character varying(253) NOT NULL,
     pod character varying(253) NOT NULL,
@@ -657,13 +657,13 @@ CREATE TABLE acct10001org20002.reporting_ocpusagelineitem_daily (
 );
 
 
-ALTER TABLE acct10001org20002.reporting_ocpusagelineitem_daily OWNER TO kokuadmin;
+ALTER TABLE acct10001.reporting_ocpusagelineitem_daily OWNER TO kokuadmin;
 
 --
--- Name: reporting_ocpusagelineitem_daily_id_seq; Type: SEQUENCE; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_ocpusagelineitem_daily_id_seq; Type: SEQUENCE; Schema: acct10001; Owner: kokuadmin
 --
 
-CREATE SEQUENCE acct10001org20002.reporting_ocpusagelineitem_daily_id_seq
+CREATE SEQUENCE acct10001.reporting_ocpusagelineitem_daily_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -671,20 +671,20 @@ CREATE SEQUENCE acct10001org20002.reporting_ocpusagelineitem_daily_id_seq
     CACHE 1;
 
 
-ALTER TABLE acct10001org20002.reporting_ocpusagelineitem_daily_id_seq OWNER TO kokuadmin;
+ALTER TABLE acct10001.reporting_ocpusagelineitem_daily_id_seq OWNER TO kokuadmin;
 
 --
--- Name: reporting_ocpusagelineitem_daily_id_seq; Type: SEQUENCE OWNED BY; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_ocpusagelineitem_daily_id_seq; Type: SEQUENCE OWNED BY; Schema: acct10001; Owner: kokuadmin
 --
 
-ALTER SEQUENCE acct10001org20002.reporting_ocpusagelineitem_daily_id_seq OWNED BY acct10001org20002.reporting_ocpusagelineitem_daily.id;
+ALTER SEQUENCE acct10001.reporting_ocpusagelineitem_daily_id_seq OWNED BY acct10001.reporting_ocpusagelineitem_daily.id;
 
 
 --
--- Name: reporting_ocpusagelineitem_daily_summary; Type: TABLE; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_ocpusagelineitem_daily_summary; Type: TABLE; Schema: acct10001; Owner: kokuadmin
 --
 
-CREATE TABLE acct10001org20002.reporting_ocpusagelineitem_daily_summary (
+CREATE TABLE acct10001.reporting_ocpusagelineitem_daily_summary (
     id bigint NOT NULL,
     cluster_id character varying(50),
     namespace character varying(253) NOT NULL,
@@ -710,13 +710,13 @@ CREATE TABLE acct10001org20002.reporting_ocpusagelineitem_daily_summary (
 );
 
 
-ALTER TABLE acct10001org20002.reporting_ocpusagelineitem_daily_summary OWNER TO kokuadmin;
+ALTER TABLE acct10001.reporting_ocpusagelineitem_daily_summary OWNER TO kokuadmin;
 
 --
--- Name: reporting_ocpusagelineitem_daily_summary_id_seq; Type: SEQUENCE; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_ocpusagelineitem_daily_summary_id_seq; Type: SEQUENCE; Schema: acct10001; Owner: kokuadmin
 --
 
-CREATE SEQUENCE acct10001org20002.reporting_ocpusagelineitem_daily_summary_id_seq
+CREATE SEQUENCE acct10001.reporting_ocpusagelineitem_daily_summary_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -724,20 +724,20 @@ CREATE SEQUENCE acct10001org20002.reporting_ocpusagelineitem_daily_summary_id_se
     CACHE 1;
 
 
-ALTER TABLE acct10001org20002.reporting_ocpusagelineitem_daily_summary_id_seq OWNER TO kokuadmin;
+ALTER TABLE acct10001.reporting_ocpusagelineitem_daily_summary_id_seq OWNER TO kokuadmin;
 
 --
--- Name: reporting_ocpusagelineitem_daily_summary_id_seq; Type: SEQUENCE OWNED BY; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_ocpusagelineitem_daily_summary_id_seq; Type: SEQUENCE OWNED BY; Schema: acct10001; Owner: kokuadmin
 --
 
-ALTER SEQUENCE acct10001org20002.reporting_ocpusagelineitem_daily_summary_id_seq OWNED BY acct10001org20002.reporting_ocpusagelineitem_daily_summary.id;
+ALTER SEQUENCE acct10001.reporting_ocpusagelineitem_daily_summary_id_seq OWNED BY acct10001.reporting_ocpusagelineitem_daily_summary.id;
 
 
 --
--- Name: reporting_ocpusagelineitem_id_seq; Type: SEQUENCE; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_ocpusagelineitem_id_seq; Type: SEQUENCE; Schema: acct10001; Owner: kokuadmin
 --
 
-CREATE SEQUENCE acct10001org20002.reporting_ocpusagelineitem_id_seq
+CREATE SEQUENCE acct10001.reporting_ocpusagelineitem_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -745,20 +745,20 @@ CREATE SEQUENCE acct10001org20002.reporting_ocpusagelineitem_id_seq
     CACHE 1;
 
 
-ALTER TABLE acct10001org20002.reporting_ocpusagelineitem_id_seq OWNER TO kokuadmin;
+ALTER TABLE acct10001.reporting_ocpusagelineitem_id_seq OWNER TO kokuadmin;
 
 --
--- Name: reporting_ocpusagelineitem_id_seq; Type: SEQUENCE OWNED BY; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_ocpusagelineitem_id_seq; Type: SEQUENCE OWNED BY; Schema: acct10001; Owner: kokuadmin
 --
 
-ALTER SEQUENCE acct10001org20002.reporting_ocpusagelineitem_id_seq OWNED BY acct10001org20002.reporting_ocpusagelineitem.id;
+ALTER SEQUENCE acct10001.reporting_ocpusagelineitem_id_seq OWNED BY acct10001.reporting_ocpusagelineitem.id;
 
 
 --
--- Name: reporting_ocpusagereport; Type: TABLE; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_ocpusagereport; Type: TABLE; Schema: acct10001; Owner: kokuadmin
 --
 
-CREATE TABLE acct10001org20002.reporting_ocpusagereport (
+CREATE TABLE acct10001.reporting_ocpusagereport (
     id integer NOT NULL,
     interval_start timestamp with time zone NOT NULL,
     interval_end timestamp with time zone NOT NULL,
@@ -766,13 +766,13 @@ CREATE TABLE acct10001org20002.reporting_ocpusagereport (
 );
 
 
-ALTER TABLE acct10001org20002.reporting_ocpusagereport OWNER TO kokuadmin;
+ALTER TABLE acct10001.reporting_ocpusagereport OWNER TO kokuadmin;
 
 --
--- Name: reporting_ocpusagereport_id_seq; Type: SEQUENCE; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_ocpusagereport_id_seq; Type: SEQUENCE; Schema: acct10001; Owner: kokuadmin
 --
 
-CREATE SEQUENCE acct10001org20002.reporting_ocpusagereport_id_seq
+CREATE SEQUENCE acct10001.reporting_ocpusagereport_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -780,20 +780,20 @@ CREATE SEQUENCE acct10001org20002.reporting_ocpusagereport_id_seq
     CACHE 1;
 
 
-ALTER TABLE acct10001org20002.reporting_ocpusagereport_id_seq OWNER TO kokuadmin;
+ALTER TABLE acct10001.reporting_ocpusagereport_id_seq OWNER TO kokuadmin;
 
 --
--- Name: reporting_ocpusagereport_id_seq; Type: SEQUENCE OWNED BY; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_ocpusagereport_id_seq; Type: SEQUENCE OWNED BY; Schema: acct10001; Owner: kokuadmin
 --
 
-ALTER SEQUENCE acct10001org20002.reporting_ocpusagereport_id_seq OWNED BY acct10001org20002.reporting_ocpusagereport.id;
+ALTER SEQUENCE acct10001.reporting_ocpusagereport_id_seq OWNED BY acct10001.reporting_ocpusagereport.id;
 
 
 --
--- Name: reporting_ocpusagereportperiod; Type: TABLE; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_ocpusagereportperiod; Type: TABLE; Schema: acct10001; Owner: kokuadmin
 --
 
-CREATE TABLE acct10001org20002.reporting_ocpusagereportperiod (
+CREATE TABLE acct10001.reporting_ocpusagereportperiod (
     id integer NOT NULL,
     cluster_id character varying(50) NOT NULL,
     report_period_start timestamp with time zone NOT NULL,
@@ -804,13 +804,13 @@ CREATE TABLE acct10001org20002.reporting_ocpusagereportperiod (
 );
 
 
-ALTER TABLE acct10001org20002.reporting_ocpusagereportperiod OWNER TO kokuadmin;
+ALTER TABLE acct10001.reporting_ocpusagereportperiod OWNER TO kokuadmin;
 
 --
--- Name: reporting_ocpusagereportperiod_id_seq; Type: SEQUENCE; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_ocpusagereportperiod_id_seq; Type: SEQUENCE; Schema: acct10001; Owner: kokuadmin
 --
 
-CREATE SEQUENCE acct10001org20002.reporting_ocpusagereportperiod_id_seq
+CREATE SEQUENCE acct10001.reporting_ocpusagereportperiod_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -818,13 +818,13 @@ CREATE SEQUENCE acct10001org20002.reporting_ocpusagereportperiod_id_seq
     CACHE 1;
 
 
-ALTER TABLE acct10001org20002.reporting_ocpusagereportperiod_id_seq OWNER TO kokuadmin;
+ALTER TABLE acct10001.reporting_ocpusagereportperiod_id_seq OWNER TO kokuadmin;
 
 --
--- Name: reporting_ocpusagereportperiod_id_seq; Type: SEQUENCE OWNED BY; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_ocpusagereportperiod_id_seq; Type: SEQUENCE OWNED BY; Schema: acct10001; Owner: kokuadmin
 --
 
-ALTER SEQUENCE acct10001org20002.reporting_ocpusagereportperiod_id_seq OWNED BY acct10001org20002.reporting_ocpusagereportperiod.id;
+ALTER SEQUENCE acct10001.reporting_ocpusagereportperiod_id_seq OWNED BY acct10001.reporting_ocpusagereportperiod.id;
 
 
 --
@@ -1596,129 +1596,129 @@ ALTER SEQUENCE public.si_unit_scale_id_seq OWNED BY public.si_unit_scale.id;
 
 
 --
--- Name: django_migrations id; Type: DEFAULT; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: django_migrations id; Type: DEFAULT; Schema: acct10001; Owner: kokuadmin
 --
 
-ALTER TABLE ONLY acct10001org20002.django_migrations ALTER COLUMN id SET DEFAULT nextval('acct10001org20002.django_migrations_id_seq'::regclass);
-
-
---
--- Name: rates_rate id; Type: DEFAULT; Schema: acct10001org20002; Owner: kokuadmin
---
-
-ALTER TABLE ONLY acct10001org20002.rates_rate ALTER COLUMN id SET DEFAULT nextval('acct10001org20002.rates_rate_id_seq'::regclass);
+ALTER TABLE ONLY acct10001.django_migrations ALTER COLUMN id SET DEFAULT nextval('acct10001.django_migrations_id_seq'::regclass);
 
 
 --
--- Name: reporting_awsaccountalias id; Type: DEFAULT; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: rates_rate id; Type: DEFAULT; Schema: acct10001; Owner: kokuadmin
 --
 
-ALTER TABLE ONLY acct10001org20002.reporting_awsaccountalias ALTER COLUMN id SET DEFAULT nextval('acct10001org20002.reporting_awsaccountalias_id_seq'::regclass);
-
-
---
--- Name: reporting_awscostentry id; Type: DEFAULT; Schema: acct10001org20002; Owner: kokuadmin
---
-
-ALTER TABLE ONLY acct10001org20002.reporting_awscostentry ALTER COLUMN id SET DEFAULT nextval('acct10001org20002.reporting_awscostentry_id_seq'::regclass);
+ALTER TABLE ONLY acct10001.rates_rate ALTER COLUMN id SET DEFAULT nextval('acct10001.rates_rate_id_seq'::regclass);
 
 
 --
--- Name: reporting_awscostentrybill id; Type: DEFAULT; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awsaccountalias id; Type: DEFAULT; Schema: acct10001; Owner: kokuadmin
 --
 
-ALTER TABLE ONLY acct10001org20002.reporting_awscostentrybill ALTER COLUMN id SET DEFAULT nextval('acct10001org20002.reporting_awscostentrybill_id_seq'::regclass);
-
-
---
--- Name: reporting_awscostentrylineitem id; Type: DEFAULT; Schema: acct10001org20002; Owner: kokuadmin
---
-
-ALTER TABLE ONLY acct10001org20002.reporting_awscostentrylineitem ALTER COLUMN id SET DEFAULT nextval('acct10001org20002.reporting_awscostentrylineitem_id_seq'::regclass);
+ALTER TABLE ONLY acct10001.reporting_awsaccountalias ALTER COLUMN id SET DEFAULT nextval('acct10001.reporting_awsaccountalias_id_seq'::regclass);
 
 
 --
--- Name: reporting_awscostentrylineitem_aggregates id; Type: DEFAULT; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awscostentry id; Type: DEFAULT; Schema: acct10001; Owner: kokuadmin
 --
 
-ALTER TABLE ONLY acct10001org20002.reporting_awscostentrylineitem_aggregates ALTER COLUMN id SET DEFAULT nextval('acct10001org20002.reporting_awscostentrylineitem_aggregates_id_seq'::regclass);
-
-
---
--- Name: reporting_awscostentrylineitem_daily id; Type: DEFAULT; Schema: acct10001org20002; Owner: kokuadmin
---
-
-ALTER TABLE ONLY acct10001org20002.reporting_awscostentrylineitem_daily ALTER COLUMN id SET DEFAULT nextval('acct10001org20002.reporting_awscostentrylineitem_daily_id_seq'::regclass);
+ALTER TABLE ONLY acct10001.reporting_awscostentry ALTER COLUMN id SET DEFAULT nextval('acct10001.reporting_awscostentry_id_seq'::regclass);
 
 
 --
--- Name: reporting_awscostentrylineitem_daily_summary id; Type: DEFAULT; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awscostentrybill id; Type: DEFAULT; Schema: acct10001; Owner: kokuadmin
 --
 
-ALTER TABLE ONLY acct10001org20002.reporting_awscostentrylineitem_daily_summary ALTER COLUMN id SET DEFAULT nextval('acct10001org20002.reporting_awscostentrylineitem_daily_summary_id_seq'::regclass);
-
-
---
--- Name: reporting_awscostentrypricing id; Type: DEFAULT; Schema: acct10001org20002; Owner: kokuadmin
---
-
-ALTER TABLE ONLY acct10001org20002.reporting_awscostentrypricing ALTER COLUMN id SET DEFAULT nextval('acct10001org20002.reporting_awscostentrypricing_id_seq'::regclass);
+ALTER TABLE ONLY acct10001.reporting_awscostentrybill ALTER COLUMN id SET DEFAULT nextval('acct10001.reporting_awscostentrybill_id_seq'::regclass);
 
 
 --
--- Name: reporting_awscostentryproduct id; Type: DEFAULT; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awscostentrylineitem id; Type: DEFAULT; Schema: acct10001; Owner: kokuadmin
 --
 
-ALTER TABLE ONLY acct10001org20002.reporting_awscostentryproduct ALTER COLUMN id SET DEFAULT nextval('acct10001org20002.reporting_awscostentryproduct_id_seq'::regclass);
-
-
---
--- Name: reporting_awscostentryreservation id; Type: DEFAULT; Schema: acct10001org20002; Owner: kokuadmin
---
-
-ALTER TABLE ONLY acct10001org20002.reporting_awscostentryreservation ALTER COLUMN id SET DEFAULT nextval('acct10001org20002.reporting_awscostentryreservation_id_seq'::regclass);
+ALTER TABLE ONLY acct10001.reporting_awscostentrylineitem ALTER COLUMN id SET DEFAULT nextval('acct10001.reporting_awscostentrylineitem_id_seq'::regclass);
 
 
 --
--- Name: reporting_ocpusagelineitem id; Type: DEFAULT; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awscostentrylineitem_aggregates id; Type: DEFAULT; Schema: acct10001; Owner: kokuadmin
 --
 
-ALTER TABLE ONLY acct10001org20002.reporting_ocpusagelineitem ALTER COLUMN id SET DEFAULT nextval('acct10001org20002.reporting_ocpusagelineitem_id_seq'::regclass);
-
-
---
--- Name: reporting_ocpusagelineitem_aggregates id; Type: DEFAULT; Schema: acct10001org20002; Owner: kokuadmin
---
-
-ALTER TABLE ONLY acct10001org20002.reporting_ocpusagelineitem_aggregates ALTER COLUMN id SET DEFAULT nextval('acct10001org20002.reporting_ocpusagelineitem_aggregates_id_seq'::regclass);
+ALTER TABLE ONLY acct10001.reporting_awscostentrylineitem_aggregates ALTER COLUMN id SET DEFAULT nextval('acct10001.reporting_awscostentrylineitem_aggregates_id_seq'::regclass);
 
 
 --
--- Name: reporting_ocpusagelineitem_daily id; Type: DEFAULT; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awscostentrylineitem_daily id; Type: DEFAULT; Schema: acct10001; Owner: kokuadmin
 --
 
-ALTER TABLE ONLY acct10001org20002.reporting_ocpusagelineitem_daily ALTER COLUMN id SET DEFAULT nextval('acct10001org20002.reporting_ocpusagelineitem_daily_id_seq'::regclass);
-
-
---
--- Name: reporting_ocpusagelineitem_daily_summary id; Type: DEFAULT; Schema: acct10001org20002; Owner: kokuadmin
---
-
-ALTER TABLE ONLY acct10001org20002.reporting_ocpusagelineitem_daily_summary ALTER COLUMN id SET DEFAULT nextval('acct10001org20002.reporting_ocpusagelineitem_daily_summary_id_seq'::regclass);
+ALTER TABLE ONLY acct10001.reporting_awscostentrylineitem_daily ALTER COLUMN id SET DEFAULT nextval('acct10001.reporting_awscostentrylineitem_daily_id_seq'::regclass);
 
 
 --
--- Name: reporting_ocpusagereport id; Type: DEFAULT; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awscostentrylineitem_daily_summary id; Type: DEFAULT; Schema: acct10001; Owner: kokuadmin
 --
 
-ALTER TABLE ONLY acct10001org20002.reporting_ocpusagereport ALTER COLUMN id SET DEFAULT nextval('acct10001org20002.reporting_ocpusagereport_id_seq'::regclass);
+ALTER TABLE ONLY acct10001.reporting_awscostentrylineitem_daily_summary ALTER COLUMN id SET DEFAULT nextval('acct10001.reporting_awscostentrylineitem_daily_summary_id_seq'::regclass);
 
 
 --
--- Name: reporting_ocpusagereportperiod id; Type: DEFAULT; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awscostentrypricing id; Type: DEFAULT; Schema: acct10001; Owner: kokuadmin
 --
 
-ALTER TABLE ONLY acct10001org20002.reporting_ocpusagereportperiod ALTER COLUMN id SET DEFAULT nextval('acct10001org20002.reporting_ocpusagereportperiod_id_seq'::regclass);
+ALTER TABLE ONLY acct10001.reporting_awscostentrypricing ALTER COLUMN id SET DEFAULT nextval('acct10001.reporting_awscostentrypricing_id_seq'::regclass);
+
+
+--
+-- Name: reporting_awscostentryproduct id; Type: DEFAULT; Schema: acct10001; Owner: kokuadmin
+--
+
+ALTER TABLE ONLY acct10001.reporting_awscostentryproduct ALTER COLUMN id SET DEFAULT nextval('acct10001.reporting_awscostentryproduct_id_seq'::regclass);
+
+
+--
+-- Name: reporting_awscostentryreservation id; Type: DEFAULT; Schema: acct10001; Owner: kokuadmin
+--
+
+ALTER TABLE ONLY acct10001.reporting_awscostentryreservation ALTER COLUMN id SET DEFAULT nextval('acct10001.reporting_awscostentryreservation_id_seq'::regclass);
+
+
+--
+-- Name: reporting_ocpusagelineitem id; Type: DEFAULT; Schema: acct10001; Owner: kokuadmin
+--
+
+ALTER TABLE ONLY acct10001.reporting_ocpusagelineitem ALTER COLUMN id SET DEFAULT nextval('acct10001.reporting_ocpusagelineitem_id_seq'::regclass);
+
+
+--
+-- Name: reporting_ocpusagelineitem_aggregates id; Type: DEFAULT; Schema: acct10001; Owner: kokuadmin
+--
+
+ALTER TABLE ONLY acct10001.reporting_ocpusagelineitem_aggregates ALTER COLUMN id SET DEFAULT nextval('acct10001.reporting_ocpusagelineitem_aggregates_id_seq'::regclass);
+
+
+--
+-- Name: reporting_ocpusagelineitem_daily id; Type: DEFAULT; Schema: acct10001; Owner: kokuadmin
+--
+
+ALTER TABLE ONLY acct10001.reporting_ocpusagelineitem_daily ALTER COLUMN id SET DEFAULT nextval('acct10001.reporting_ocpusagelineitem_daily_id_seq'::regclass);
+
+
+--
+-- Name: reporting_ocpusagelineitem_daily_summary id; Type: DEFAULT; Schema: acct10001; Owner: kokuadmin
+--
+
+ALTER TABLE ONLY acct10001.reporting_ocpusagelineitem_daily_summary ALTER COLUMN id SET DEFAULT nextval('acct10001.reporting_ocpusagelineitem_daily_summary_id_seq'::regclass);
+
+
+--
+-- Name: reporting_ocpusagereport id; Type: DEFAULT; Schema: acct10001; Owner: kokuadmin
+--
+
+ALTER TABLE ONLY acct10001.reporting_ocpusagereport ALTER COLUMN id SET DEFAULT nextval('acct10001.reporting_ocpusagereport_id_seq'::regclass);
+
+
+--
+-- Name: reporting_ocpusagereportperiod id; Type: DEFAULT; Schema: acct10001; Owner: kokuadmin
+--
+
+ALTER TABLE ONLY acct10001.reporting_ocpusagereportperiod ALTER COLUMN id SET DEFAULT nextval('acct10001.reporting_ocpusagereportperiod_id_seq'::regclass);
 
 
 --
@@ -1869,10 +1869,10 @@ ALTER TABLE ONLY public.si_unit_scale ALTER COLUMN id SET DEFAULT nextval('publi
 
 
 --
--- Data for Name: django_migrations; Type: TABLE DATA; Schema: acct10001org20002; Owner: kokuadmin
+-- Data for Name: django_migrations; Type: TABLE DATA; Schema: acct10001; Owner: kokuadmin
 --
 
-COPY acct10001org20002.django_migrations (id, app, name, applied) FROM stdin;
+COPY acct10001.django_migrations (id, app, name, applied) FROM stdin;
 1	contenttypes	0001_initial	2018-12-12 19:00:37.447788+00
 2	auth	0001_initial	2018-12-12 19:00:37.471512+00
 3	admin	0001_initial	2018-12-12 19:00:37.492559+00
@@ -1926,138 +1926,138 @@ COPY acct10001org20002.django_migrations (id, app, name, applied) FROM stdin;
 
 
 --
--- Data for Name: rates_rate; Type: TABLE DATA; Schema: acct10001org20002; Owner: kokuadmin
+-- Data for Name: rates_rate; Type: TABLE DATA; Schema: acct10001; Owner: kokuadmin
 --
 
-COPY acct10001org20002.rates_rate (id, uuid, provider_uuid, metric, rates) FROM stdin;
+COPY acct10001.rates_rate (id, uuid, provider_uuid, metric, rates) FROM stdin;
 \.
 
 
 --
--- Data for Name: reporting_awsaccountalias; Type: TABLE DATA; Schema: acct10001org20002; Owner: kokuadmin
+-- Data for Name: reporting_awsaccountalias; Type: TABLE DATA; Schema: acct10001; Owner: kokuadmin
 --
 
-COPY acct10001org20002.reporting_awsaccountalias (id, account_id, account_alias) FROM stdin;
+COPY acct10001.reporting_awsaccountalias (id, account_id, account_alias) FROM stdin;
 \.
 
 
 --
--- Data for Name: reporting_awscostentry; Type: TABLE DATA; Schema: acct10001org20002; Owner: kokuadmin
+-- Data for Name: reporting_awscostentry; Type: TABLE DATA; Schema: acct10001; Owner: kokuadmin
 --
 
-COPY acct10001org20002.reporting_awscostentry (id, interval_start, interval_end, bill_id) FROM stdin;
+COPY acct10001.reporting_awscostentry (id, interval_start, interval_end, bill_id) FROM stdin;
 \.
 
 
 --
--- Data for Name: reporting_awscostentrybill; Type: TABLE DATA; Schema: acct10001org20002; Owner: kokuadmin
+-- Data for Name: reporting_awscostentrybill; Type: TABLE DATA; Schema: acct10001; Owner: kokuadmin
 --
 
-COPY acct10001org20002.reporting_awscostentrybill (id, billing_resource, bill_type, payer_account_id, billing_period_start, billing_period_end, finalized_datetime, summary_data_creation_datetime, summary_data_updated_datetime, provider_id) FROM stdin;
+COPY acct10001.reporting_awscostentrybill (id, billing_resource, bill_type, payer_account_id, billing_period_start, billing_period_end, finalized_datetime, summary_data_creation_datetime, summary_data_updated_datetime, provider_id) FROM stdin;
 \.
 
 
 --
--- Data for Name: reporting_awscostentrylineitem; Type: TABLE DATA; Schema: acct10001org20002; Owner: kokuadmin
+-- Data for Name: reporting_awscostentrylineitem; Type: TABLE DATA; Schema: acct10001; Owner: kokuadmin
 --
 
-COPY acct10001org20002.reporting_awscostentrylineitem (id, hash, tags, invoice_id, line_item_type, usage_account_id, usage_start, usage_end, product_code, usage_type, operation, availability_zone, resource_id, usage_amount, normalization_factor, normalized_usage_amount, currency_code, unblended_rate, unblended_cost, blended_rate, blended_cost, public_on_demand_cost, public_on_demand_rate, reservation_amortized_upfront_fee, reservation_amortized_upfront_cost_for_usage, reservation_recurring_fee_for_usage, reservation_unused_quantity, reservation_unused_recurring_fee, tax_type, cost_entry_id, cost_entry_bill_id, cost_entry_pricing_id, cost_entry_product_id, cost_entry_reservation_id) FROM stdin;
+COPY acct10001.reporting_awscostentrylineitem (id, hash, tags, invoice_id, line_item_type, usage_account_id, usage_start, usage_end, product_code, usage_type, operation, availability_zone, resource_id, usage_amount, normalization_factor, normalized_usage_amount, currency_code, unblended_rate, unblended_cost, blended_rate, blended_cost, public_on_demand_cost, public_on_demand_rate, reservation_amortized_upfront_fee, reservation_amortized_upfront_cost_for_usage, reservation_recurring_fee_for_usage, reservation_unused_quantity, reservation_unused_recurring_fee, tax_type, cost_entry_id, cost_entry_bill_id, cost_entry_pricing_id, cost_entry_product_id, cost_entry_reservation_id) FROM stdin;
 \.
 
 
 --
--- Data for Name: reporting_awscostentrylineitem_aggregates; Type: TABLE DATA; Schema: acct10001org20002; Owner: kokuadmin
+-- Data for Name: reporting_awscostentrylineitem_aggregates; Type: TABLE DATA; Schema: acct10001; Owner: kokuadmin
 --
 
-COPY acct10001org20002.reporting_awscostentrylineitem_aggregates (id, time_scope_value, report_type, usage_account_id, product_code, region, availability_zone, usage_amount, unblended_cost, resource_count, account_alias_id) FROM stdin;
+COPY acct10001.reporting_awscostentrylineitem_aggregates (id, time_scope_value, report_type, usage_account_id, product_code, region, availability_zone, usage_amount, unblended_cost, resource_count, account_alias_id) FROM stdin;
 \.
 
 
 --
--- Data for Name: reporting_awscostentrylineitem_daily; Type: TABLE DATA; Schema: acct10001org20002; Owner: kokuadmin
+-- Data for Name: reporting_awscostentrylineitem_daily; Type: TABLE DATA; Schema: acct10001; Owner: kokuadmin
 --
 
-COPY acct10001org20002.reporting_awscostentrylineitem_daily (id, line_item_type, usage_account_id, usage_start, usage_end, product_code, usage_type, operation, availability_zone, resource_id, usage_amount, normalization_factor, normalized_usage_amount, currency_code, unblended_rate, unblended_cost, blended_rate, blended_cost, public_on_demand_cost, public_on_demand_rate, tax_type, tags, cost_entry_pricing_id, cost_entry_product_id, cost_entry_reservation_id) FROM stdin;
+COPY acct10001.reporting_awscostentrylineitem_daily (id, line_item_type, usage_account_id, usage_start, usage_end, product_code, usage_type, operation, availability_zone, resource_id, usage_amount, normalization_factor, normalized_usage_amount, currency_code, unblended_rate, unblended_cost, blended_rate, blended_cost, public_on_demand_cost, public_on_demand_rate, tax_type, tags, cost_entry_pricing_id, cost_entry_product_id, cost_entry_reservation_id) FROM stdin;
 \.
 
 
 --
--- Data for Name: reporting_awscostentrylineitem_daily_summary; Type: TABLE DATA; Schema: acct10001org20002; Owner: kokuadmin
+-- Data for Name: reporting_awscostentrylineitem_daily_summary; Type: TABLE DATA; Schema: acct10001; Owner: kokuadmin
 --
 
-COPY acct10001org20002.reporting_awscostentrylineitem_daily_summary (id, usage_start, usage_end, usage_account_id, product_code, product_family, availability_zone, region, instance_type, unit, resource_count, usage_amount, normalization_factor, normalized_usage_amount, currency_code, unblended_rate, unblended_cost, blended_rate, blended_cost, public_on_demand_cost, public_on_demand_rate, tax_type, account_alias_id) FROM stdin;
+COPY acct10001.reporting_awscostentrylineitem_daily_summary (id, usage_start, usage_end, usage_account_id, product_code, product_family, availability_zone, region, instance_type, unit, resource_count, usage_amount, normalization_factor, normalized_usage_amount, currency_code, unblended_rate, unblended_cost, blended_rate, blended_cost, public_on_demand_cost, public_on_demand_rate, tax_type, account_alias_id) FROM stdin;
 \.
 
 
 --
--- Data for Name: reporting_awscostentrypricing; Type: TABLE DATA; Schema: acct10001org20002; Owner: kokuadmin
+-- Data for Name: reporting_awscostentrypricing; Type: TABLE DATA; Schema: acct10001; Owner: kokuadmin
 --
 
-COPY acct10001org20002.reporting_awscostentrypricing (id, term, unit) FROM stdin;
+COPY acct10001.reporting_awscostentrypricing (id, term, unit) FROM stdin;
 \.
 
 
 --
--- Data for Name: reporting_awscostentryproduct; Type: TABLE DATA; Schema: acct10001org20002; Owner: kokuadmin
+-- Data for Name: reporting_awscostentryproduct; Type: TABLE DATA; Schema: acct10001; Owner: kokuadmin
 --
 
-COPY acct10001org20002.reporting_awscostentryproduct (id, sku, product_name, product_family, service_code, region, instance_type, memory, memory_unit, vcpu) FROM stdin;
+COPY acct10001.reporting_awscostentryproduct (id, sku, product_name, product_family, service_code, region, instance_type, memory, memory_unit, vcpu) FROM stdin;
 \.
 
 
 --
--- Data for Name: reporting_awscostentryreservation; Type: TABLE DATA; Schema: acct10001org20002; Owner: kokuadmin
+-- Data for Name: reporting_awscostentryreservation; Type: TABLE DATA; Schema: acct10001; Owner: kokuadmin
 --
 
-COPY acct10001org20002.reporting_awscostentryreservation (id, reservation_arn, number_of_reservations, units_per_reservation, start_time, end_time) FROM stdin;
+COPY acct10001.reporting_awscostentryreservation (id, reservation_arn, number_of_reservations, units_per_reservation, start_time, end_time) FROM stdin;
 \.
 
 
 --
--- Data for Name: reporting_ocpusagelineitem; Type: TABLE DATA; Schema: acct10001org20002; Owner: kokuadmin
+-- Data for Name: reporting_ocpusagelineitem; Type: TABLE DATA; Schema: acct10001; Owner: kokuadmin
 --
 
-COPY acct10001org20002.reporting_ocpusagelineitem (id, namespace, pod, node, pod_usage_cpu_core_seconds, pod_limit_cpu_core_seconds, report_id, report_period_id, pod_limit_memory_byte_seconds, pod_request_cpu_core_seconds, pod_request_memory_byte_seconds, pod_usage_memory_byte_seconds, node_capacity_cpu_core_seconds, node_capacity_cpu_cores, node_capacity_memory_byte_seconds, node_capacity_memory_bytes, pod_labels) FROM stdin;
+COPY acct10001.reporting_ocpusagelineitem (id, namespace, pod, node, pod_usage_cpu_core_seconds, pod_limit_cpu_core_seconds, report_id, report_period_id, pod_limit_memory_byte_seconds, pod_request_cpu_core_seconds, pod_request_memory_byte_seconds, pod_usage_memory_byte_seconds, node_capacity_cpu_core_seconds, node_capacity_cpu_cores, node_capacity_memory_byte_seconds, node_capacity_memory_bytes, pod_labels) FROM stdin;
 \.
 
 
 --
--- Data for Name: reporting_ocpusagelineitem_aggregates; Type: TABLE DATA; Schema: acct10001org20002; Owner: kokuadmin
+-- Data for Name: reporting_ocpusagelineitem_aggregates; Type: TABLE DATA; Schema: acct10001; Owner: kokuadmin
 --
 
-COPY acct10001org20002.reporting_ocpusagelineitem_aggregates (id, time_scope_value, cluster_id, namespace, pod, node, pod_usage_cpu_core_hours, pod_request_cpu_core_hours, pod_limit_cpu_core_hours, pod_usage_memory_gigabytes, pod_request_memory_gigabytes, pod_limit_memory_gigabytes, node_capacity_cpu_core_hours, node_capacity_cpu_cores, node_capacity_memory_byte_hours, node_capacity_memory_bytes) FROM stdin;
+COPY acct10001.reporting_ocpusagelineitem_aggregates (id, time_scope_value, cluster_id, namespace, pod, node, pod_usage_cpu_core_hours, pod_request_cpu_core_hours, pod_limit_cpu_core_hours, pod_usage_memory_gigabytes, pod_request_memory_gigabytes, pod_limit_memory_gigabytes, node_capacity_cpu_core_hours, node_capacity_cpu_cores, node_capacity_memory_byte_hours, node_capacity_memory_bytes) FROM stdin;
 \.
 
 
 --
--- Data for Name: reporting_ocpusagelineitem_daily; Type: TABLE DATA; Schema: acct10001org20002; Owner: kokuadmin
+-- Data for Name: reporting_ocpusagelineitem_daily; Type: TABLE DATA; Schema: acct10001; Owner: kokuadmin
 --
 
-COPY acct10001org20002.reporting_ocpusagelineitem_daily (id, namespace, pod, node, usage_start, usage_end, pod_usage_cpu_core_seconds, pod_limit_cpu_core_seconds, pod_limit_memory_byte_seconds, pod_request_cpu_core_seconds, pod_request_memory_byte_seconds, pod_usage_memory_byte_seconds, cluster_id, total_seconds, node_capacity_cpu_core_seconds, node_capacity_cpu_cores, node_capacity_memory_byte_seconds, node_capacity_memory_bytes, pod_labels, cluster_capacity_cpu_core_seconds, cluster_capacity_memory_byte_seconds) FROM stdin;
+COPY acct10001.reporting_ocpusagelineitem_daily (id, namespace, pod, node, usage_start, usage_end, pod_usage_cpu_core_seconds, pod_limit_cpu_core_seconds, pod_limit_memory_byte_seconds, pod_request_cpu_core_seconds, pod_request_memory_byte_seconds, pod_usage_memory_byte_seconds, cluster_id, total_seconds, node_capacity_cpu_core_seconds, node_capacity_cpu_cores, node_capacity_memory_byte_seconds, node_capacity_memory_bytes, pod_labels, cluster_capacity_cpu_core_seconds, cluster_capacity_memory_byte_seconds) FROM stdin;
 \.
 
 
 --
--- Data for Name: reporting_ocpusagelineitem_daily_summary; Type: TABLE DATA; Schema: acct10001org20002; Owner: kokuadmin
+-- Data for Name: reporting_ocpusagelineitem_daily_summary; Type: TABLE DATA; Schema: acct10001; Owner: kokuadmin
 --
 
-COPY acct10001org20002.reporting_ocpusagelineitem_daily_summary (id, cluster_id, namespace, pod, node, usage_start, usage_end, pod_usage_cpu_core_hours, pod_request_cpu_core_hours, pod_limit_cpu_core_hours, pod_usage_memory_gigabyte_hours, pod_request_memory_gigabyte_hours, pod_limit_memory_gigabyte_hours, node_capacity_cpu_core_hours, node_capacity_cpu_cores, pod_charge_cpu_core_hours, pod_charge_memory_gigabyte_hours, node_capacity_memory_gigabyte_hours, node_capacity_memory_gigabytes, cluster_capacity_cpu_core_hours, cluster_capacity_memory_gigabyte_hours, pod_labels) FROM stdin;
+COPY acct10001.reporting_ocpusagelineitem_daily_summary (id, cluster_id, namespace, pod, node, usage_start, usage_end, pod_usage_cpu_core_hours, pod_request_cpu_core_hours, pod_limit_cpu_core_hours, pod_usage_memory_gigabyte_hours, pod_request_memory_gigabyte_hours, pod_limit_memory_gigabyte_hours, node_capacity_cpu_core_hours, node_capacity_cpu_cores, pod_charge_cpu_core_hours, pod_charge_memory_gigabyte_hours, node_capacity_memory_gigabyte_hours, node_capacity_memory_gigabytes, cluster_capacity_cpu_core_hours, cluster_capacity_memory_gigabyte_hours, pod_labels) FROM stdin;
 \.
 
 
 --
--- Data for Name: reporting_ocpusagereport; Type: TABLE DATA; Schema: acct10001org20002; Owner: kokuadmin
+-- Data for Name: reporting_ocpusagereport; Type: TABLE DATA; Schema: acct10001; Owner: kokuadmin
 --
 
-COPY acct10001org20002.reporting_ocpusagereport (id, interval_start, interval_end, report_period_id) FROM stdin;
+COPY acct10001.reporting_ocpusagereport (id, interval_start, interval_end, report_period_id) FROM stdin;
 \.
 
 
 --
--- Data for Name: reporting_ocpusagereportperiod; Type: TABLE DATA; Schema: acct10001org20002; Owner: kokuadmin
+-- Data for Name: reporting_ocpusagereportperiod; Type: TABLE DATA; Schema: acct10001; Owner: kokuadmin
 --
 
-COPY acct10001org20002.reporting_ocpusagereportperiod (id, cluster_id, report_period_start, report_period_end, provider_id, summary_data_creation_datetime, summary_data_updated_datetime) FROM stdin;
+COPY acct10001.reporting_ocpusagereportperiod (id, cluster_id, report_period_start, report_period_end, provider_id, summary_data_creation_datetime, summary_data_updated_datetime) FROM stdin;
 \.
 
 
@@ -2066,7 +2066,7 @@ COPY acct10001org20002.reporting_ocpusagereportperiod (id, cluster_id, report_pe
 --
 
 COPY public.api_customer (id, date_created, uuid, account_id, org_id, schema_name) FROM stdin;
-1	2018-12-12 19:00:37.361142+00	3a13371e-f419-45cd-a5e2-1a1a00a66510	10001	20001	acct10001org20002
+1	2018-12-12 19:00:37.361142+00	3a13371e-f419-45cd-a5e2-1a1a00a66510	10001	20001	acct10001
 \.
 
 
@@ -2104,7 +2104,7 @@ COPY public.api_providerbillingsource (id, uuid, bucket) FROM stdin;
 --
 
 COPY public.api_tenant (id, schema_name) FROM stdin;
-1	acct10001org20002
+1	acct10001
 \.
 
 
@@ -2539,129 +2539,129 @@ COPY public.si_unit_scale (id, prefix, prefix_symbol, multiplying_factor) FROM s
 
 
 --
--- Name: django_migrations_id_seq; Type: SEQUENCE SET; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: django_migrations_id_seq; Type: SEQUENCE SET; Schema: acct10001; Owner: kokuadmin
 --
 
-SELECT pg_catalog.setval('acct10001org20002.django_migrations_id_seq', 49, true);
-
-
---
--- Name: rates_rate_id_seq; Type: SEQUENCE SET; Schema: acct10001org20002; Owner: kokuadmin
---
-
-SELECT pg_catalog.setval('acct10001org20002.rates_rate_id_seq', 1, false);
+SELECT pg_catalog.setval('acct10001.django_migrations_id_seq', 49, true);
 
 
 --
--- Name: reporting_awsaccountalias_id_seq; Type: SEQUENCE SET; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: rates_rate_id_seq; Type: SEQUENCE SET; Schema: acct10001; Owner: kokuadmin
 --
 
-SELECT pg_catalog.setval('acct10001org20002.reporting_awsaccountalias_id_seq', 1, false);
-
-
---
--- Name: reporting_awscostentry_id_seq; Type: SEQUENCE SET; Schema: acct10001org20002; Owner: kokuadmin
---
-
-SELECT pg_catalog.setval('acct10001org20002.reporting_awscostentry_id_seq', 1, false);
+SELECT pg_catalog.setval('acct10001.rates_rate_id_seq', 1, false);
 
 
 --
--- Name: reporting_awscostentrybill_id_seq; Type: SEQUENCE SET; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awsaccountalias_id_seq; Type: SEQUENCE SET; Schema: acct10001; Owner: kokuadmin
 --
 
-SELECT pg_catalog.setval('acct10001org20002.reporting_awscostentrybill_id_seq', 1, false);
-
-
---
--- Name: reporting_awscostentrylineitem_aggregates_id_seq; Type: SEQUENCE SET; Schema: acct10001org20002; Owner: kokuadmin
---
-
-SELECT pg_catalog.setval('acct10001org20002.reporting_awscostentrylineitem_aggregates_id_seq', 1, false);
+SELECT pg_catalog.setval('acct10001.reporting_awsaccountalias_id_seq', 1, false);
 
 
 --
--- Name: reporting_awscostentrylineitem_daily_id_seq; Type: SEQUENCE SET; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awscostentry_id_seq; Type: SEQUENCE SET; Schema: acct10001; Owner: kokuadmin
 --
 
-SELECT pg_catalog.setval('acct10001org20002.reporting_awscostentrylineitem_daily_id_seq', 1, false);
-
-
---
--- Name: reporting_awscostentrylineitem_daily_summary_id_seq; Type: SEQUENCE SET; Schema: acct10001org20002; Owner: kokuadmin
---
-
-SELECT pg_catalog.setval('acct10001org20002.reporting_awscostentrylineitem_daily_summary_id_seq', 1, false);
+SELECT pg_catalog.setval('acct10001.reporting_awscostentry_id_seq', 1, false);
 
 
 --
--- Name: reporting_awscostentrylineitem_id_seq; Type: SEQUENCE SET; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awscostentrybill_id_seq; Type: SEQUENCE SET; Schema: acct10001; Owner: kokuadmin
 --
 
-SELECT pg_catalog.setval('acct10001org20002.reporting_awscostentrylineitem_id_seq', 1, false);
-
-
---
--- Name: reporting_awscostentrypricing_id_seq; Type: SEQUENCE SET; Schema: acct10001org20002; Owner: kokuadmin
---
-
-SELECT pg_catalog.setval('acct10001org20002.reporting_awscostentrypricing_id_seq', 1, false);
+SELECT pg_catalog.setval('acct10001.reporting_awscostentrybill_id_seq', 1, false);
 
 
 --
--- Name: reporting_awscostentryproduct_id_seq; Type: SEQUENCE SET; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awscostentrylineitem_aggregates_id_seq; Type: SEQUENCE SET; Schema: acct10001; Owner: kokuadmin
 --
 
-SELECT pg_catalog.setval('acct10001org20002.reporting_awscostentryproduct_id_seq', 1, false);
-
-
---
--- Name: reporting_awscostentryreservation_id_seq; Type: SEQUENCE SET; Schema: acct10001org20002; Owner: kokuadmin
---
-
-SELECT pg_catalog.setval('acct10001org20002.reporting_awscostentryreservation_id_seq', 1, false);
+SELECT pg_catalog.setval('acct10001.reporting_awscostentrylineitem_aggregates_id_seq', 1, false);
 
 
 --
--- Name: reporting_ocpusagelineitem_aggregates_id_seq; Type: SEQUENCE SET; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awscostentrylineitem_daily_id_seq; Type: SEQUENCE SET; Schema: acct10001; Owner: kokuadmin
 --
 
-SELECT pg_catalog.setval('acct10001org20002.reporting_ocpusagelineitem_aggregates_id_seq', 1, false);
-
-
---
--- Name: reporting_ocpusagelineitem_daily_id_seq; Type: SEQUENCE SET; Schema: acct10001org20002; Owner: kokuadmin
---
-
-SELECT pg_catalog.setval('acct10001org20002.reporting_ocpusagelineitem_daily_id_seq', 1, false);
+SELECT pg_catalog.setval('acct10001.reporting_awscostentrylineitem_daily_id_seq', 1, false);
 
 
 --
--- Name: reporting_ocpusagelineitem_daily_summary_id_seq; Type: SEQUENCE SET; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awscostentrylineitem_daily_summary_id_seq; Type: SEQUENCE SET; Schema: acct10001; Owner: kokuadmin
 --
 
-SELECT pg_catalog.setval('acct10001org20002.reporting_ocpusagelineitem_daily_summary_id_seq', 1, false);
-
-
---
--- Name: reporting_ocpusagelineitem_id_seq; Type: SEQUENCE SET; Schema: acct10001org20002; Owner: kokuadmin
---
-
-SELECT pg_catalog.setval('acct10001org20002.reporting_ocpusagelineitem_id_seq', 1, false);
+SELECT pg_catalog.setval('acct10001.reporting_awscostentrylineitem_daily_summary_id_seq', 1, false);
 
 
 --
--- Name: reporting_ocpusagereport_id_seq; Type: SEQUENCE SET; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awscostentrylineitem_id_seq; Type: SEQUENCE SET; Schema: acct10001; Owner: kokuadmin
 --
 
-SELECT pg_catalog.setval('acct10001org20002.reporting_ocpusagereport_id_seq', 1, false);
+SELECT pg_catalog.setval('acct10001.reporting_awscostentrylineitem_id_seq', 1, false);
 
 
 --
--- Name: reporting_ocpusagereportperiod_id_seq; Type: SEQUENCE SET; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awscostentrypricing_id_seq; Type: SEQUENCE SET; Schema: acct10001; Owner: kokuadmin
 --
 
-SELECT pg_catalog.setval('acct10001org20002.reporting_ocpusagereportperiod_id_seq', 1, false);
+SELECT pg_catalog.setval('acct10001.reporting_awscostentrypricing_id_seq', 1, false);
+
+
+--
+-- Name: reporting_awscostentryproduct_id_seq; Type: SEQUENCE SET; Schema: acct10001; Owner: kokuadmin
+--
+
+SELECT pg_catalog.setval('acct10001.reporting_awscostentryproduct_id_seq', 1, false);
+
+
+--
+-- Name: reporting_awscostentryreservation_id_seq; Type: SEQUENCE SET; Schema: acct10001; Owner: kokuadmin
+--
+
+SELECT pg_catalog.setval('acct10001.reporting_awscostentryreservation_id_seq', 1, false);
+
+
+--
+-- Name: reporting_ocpusagelineitem_aggregates_id_seq; Type: SEQUENCE SET; Schema: acct10001; Owner: kokuadmin
+--
+
+SELECT pg_catalog.setval('acct10001.reporting_ocpusagelineitem_aggregates_id_seq', 1, false);
+
+
+--
+-- Name: reporting_ocpusagelineitem_daily_id_seq; Type: SEQUENCE SET; Schema: acct10001; Owner: kokuadmin
+--
+
+SELECT pg_catalog.setval('acct10001.reporting_ocpusagelineitem_daily_id_seq', 1, false);
+
+
+--
+-- Name: reporting_ocpusagelineitem_daily_summary_id_seq; Type: SEQUENCE SET; Schema: acct10001; Owner: kokuadmin
+--
+
+SELECT pg_catalog.setval('acct10001.reporting_ocpusagelineitem_daily_summary_id_seq', 1, false);
+
+
+--
+-- Name: reporting_ocpusagelineitem_id_seq; Type: SEQUENCE SET; Schema: acct10001; Owner: kokuadmin
+--
+
+SELECT pg_catalog.setval('acct10001.reporting_ocpusagelineitem_id_seq', 1, false);
+
+
+--
+-- Name: reporting_ocpusagereport_id_seq; Type: SEQUENCE SET; Schema: acct10001; Owner: kokuadmin
+--
+
+SELECT pg_catalog.setval('acct10001.reporting_ocpusagereport_id_seq', 1, false);
+
+
+--
+-- Name: reporting_ocpusagereportperiod_id_seq; Type: SEQUENCE SET; Schema: acct10001; Owner: kokuadmin
+--
+
+SELECT pg_catalog.setval('acct10001.reporting_ocpusagereportperiod_id_seq', 1, false);
 
 
 --
@@ -2812,234 +2812,234 @@ SELECT pg_catalog.setval('public.si_unit_scale_id_seq', 1, false);
 
 
 --
--- Name: django_migrations django_migrations_pkey; Type: CONSTRAINT; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: django_migrations django_migrations_pkey; Type: CONSTRAINT; Schema: acct10001; Owner: kokuadmin
 --
 
-ALTER TABLE ONLY acct10001org20002.django_migrations
+ALTER TABLE ONLY acct10001.django_migrations
     ADD CONSTRAINT django_migrations_pkey PRIMARY KEY (id);
 
 
 --
--- Name: rates_rate rates_rate_pkey; Type: CONSTRAINT; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: rates_rate rates_rate_pkey; Type: CONSTRAINT; Schema: acct10001; Owner: kokuadmin
 --
 
-ALTER TABLE ONLY acct10001org20002.rates_rate
+ALTER TABLE ONLY acct10001.rates_rate
     ADD CONSTRAINT rates_rate_pkey PRIMARY KEY (id);
 
 
 --
--- Name: rates_rate rates_rate_provider_uuid_metric_1f411ad3_uniq; Type: CONSTRAINT; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: rates_rate rates_rate_provider_uuid_metric_1f411ad3_uniq; Type: CONSTRAINT; Schema: acct10001; Owner: kokuadmin
 --
 
-ALTER TABLE ONLY acct10001org20002.rates_rate
+ALTER TABLE ONLY acct10001.rates_rate
     ADD CONSTRAINT rates_rate_provider_uuid_metric_1f411ad3_uniq UNIQUE (provider_uuid, metric);
 
 
 --
--- Name: rates_rate rates_rate_uuid_key; Type: CONSTRAINT; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: rates_rate rates_rate_uuid_key; Type: CONSTRAINT; Schema: acct10001; Owner: kokuadmin
 --
 
-ALTER TABLE ONLY acct10001org20002.rates_rate
+ALTER TABLE ONLY acct10001.rates_rate
     ADD CONSTRAINT rates_rate_uuid_key UNIQUE (uuid);
 
 
 --
--- Name: reporting_awsaccountalias reporting_awsaccountalias_account_id_key; Type: CONSTRAINT; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awsaccountalias reporting_awsaccountalias_account_id_key; Type: CONSTRAINT; Schema: acct10001; Owner: kokuadmin
 --
 
-ALTER TABLE ONLY acct10001org20002.reporting_awsaccountalias
+ALTER TABLE ONLY acct10001.reporting_awsaccountalias
     ADD CONSTRAINT reporting_awsaccountalias_account_id_key UNIQUE (account_id);
 
 
 --
--- Name: reporting_awsaccountalias reporting_awsaccountalias_pkey; Type: CONSTRAINT; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awsaccountalias reporting_awsaccountalias_pkey; Type: CONSTRAINT; Schema: acct10001; Owner: kokuadmin
 --
 
-ALTER TABLE ONLY acct10001org20002.reporting_awsaccountalias
+ALTER TABLE ONLY acct10001.reporting_awsaccountalias
     ADD CONSTRAINT reporting_awsaccountalias_pkey PRIMARY KEY (id);
 
 
 --
--- Name: reporting_awscostentry reporting_awscostentry_pkey; Type: CONSTRAINT; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awscostentry reporting_awscostentry_pkey; Type: CONSTRAINT; Schema: acct10001; Owner: kokuadmin
 --
 
-ALTER TABLE ONLY acct10001org20002.reporting_awscostentry
+ALTER TABLE ONLY acct10001.reporting_awscostentry
     ADD CONSTRAINT reporting_awscostentry_pkey PRIMARY KEY (id);
 
 
 --
--- Name: reporting_awscostentrybill reporting_awscostentrybi_bill_type_payer_account__2d62ede9_uniq; Type: CONSTRAINT; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awscostentrybill reporting_awscostentrybi_bill_type_payer_account__2d62ede9_uniq; Type: CONSTRAINT; Schema: acct10001; Owner: kokuadmin
 --
 
-ALTER TABLE ONLY acct10001org20002.reporting_awscostentrybill
+ALTER TABLE ONLY acct10001.reporting_awscostentrybill
     ADD CONSTRAINT reporting_awscostentrybi_bill_type_payer_account__2d62ede9_uniq UNIQUE (bill_type, payer_account_id, billing_period_start);
 
 
 --
--- Name: reporting_awscostentrybill reporting_awscostentrybill_pkey; Type: CONSTRAINT; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awscostentrybill reporting_awscostentrybill_pkey; Type: CONSTRAINT; Schema: acct10001; Owner: kokuadmin
 --
 
-ALTER TABLE ONLY acct10001org20002.reporting_awscostentrybill
+ALTER TABLE ONLY acct10001.reporting_awscostentrybill
     ADD CONSTRAINT reporting_awscostentrybill_pkey PRIMARY KEY (id);
 
 
 --
--- Name: reporting_awscostentrylineitem_aggregates reporting_awscostentrylineitem_aggregates_pkey; Type: CONSTRAINT; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awscostentrylineitem_aggregates reporting_awscostentrylineitem_aggregates_pkey; Type: CONSTRAINT; Schema: acct10001; Owner: kokuadmin
 --
 
-ALTER TABLE ONLY acct10001org20002.reporting_awscostentrylineitem_aggregates
+ALTER TABLE ONLY acct10001.reporting_awscostentrylineitem_aggregates
     ADD CONSTRAINT reporting_awscostentrylineitem_aggregates_pkey PRIMARY KEY (id);
 
 
 --
--- Name: reporting_awscostentrylineitem_daily reporting_awscostentrylineitem_daily_pkey; Type: CONSTRAINT; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awscostentrylineitem_daily reporting_awscostentrylineitem_daily_pkey; Type: CONSTRAINT; Schema: acct10001; Owner: kokuadmin
 --
 
-ALTER TABLE ONLY acct10001org20002.reporting_awscostentrylineitem_daily
+ALTER TABLE ONLY acct10001.reporting_awscostentrylineitem_daily
     ADD CONSTRAINT reporting_awscostentrylineitem_daily_pkey PRIMARY KEY (id);
 
 
 --
--- Name: reporting_awscostentrylineitem_daily_summary reporting_awscostentrylineitem_daily_summary_pkey; Type: CONSTRAINT; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awscostentrylineitem_daily_summary reporting_awscostentrylineitem_daily_summary_pkey; Type: CONSTRAINT; Schema: acct10001; Owner: kokuadmin
 --
 
-ALTER TABLE ONLY acct10001org20002.reporting_awscostentrylineitem_daily_summary
+ALTER TABLE ONLY acct10001.reporting_awscostentrylineitem_daily_summary
     ADD CONSTRAINT reporting_awscostentrylineitem_daily_summary_pkey PRIMARY KEY (id);
 
 
 --
--- Name: reporting_awscostentrylineitem reporting_awscostentrylineitem_hash_cost_entry_id_f3893306_uniq; Type: CONSTRAINT; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awscostentrylineitem reporting_awscostentrylineitem_hash_cost_entry_id_f3893306_uniq; Type: CONSTRAINT; Schema: acct10001; Owner: kokuadmin
 --
 
-ALTER TABLE ONLY acct10001org20002.reporting_awscostentrylineitem
+ALTER TABLE ONLY acct10001.reporting_awscostentrylineitem
     ADD CONSTRAINT reporting_awscostentrylineitem_hash_cost_entry_id_f3893306_uniq UNIQUE (hash, cost_entry_id);
 
 
 --
--- Name: reporting_awscostentrylineitem reporting_awscostentrylineitem_pkey; Type: CONSTRAINT; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awscostentrylineitem reporting_awscostentrylineitem_pkey; Type: CONSTRAINT; Schema: acct10001; Owner: kokuadmin
 --
 
-ALTER TABLE ONLY acct10001org20002.reporting_awscostentrylineitem
+ALTER TABLE ONLY acct10001.reporting_awscostentrylineitem
     ADD CONSTRAINT reporting_awscostentrylineitem_pkey PRIMARY KEY (id);
 
 
 --
--- Name: reporting_awscostentryproduct reporting_awscostentrypr_sku_product_name_region_fea902ae_uniq; Type: CONSTRAINT; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awscostentryproduct reporting_awscostentrypr_sku_product_name_region_fea902ae_uniq; Type: CONSTRAINT; Schema: acct10001; Owner: kokuadmin
 --
 
-ALTER TABLE ONLY acct10001org20002.reporting_awscostentryproduct
+ALTER TABLE ONLY acct10001.reporting_awscostentryproduct
     ADD CONSTRAINT reporting_awscostentrypr_sku_product_name_region_fea902ae_uniq UNIQUE (sku, product_name, region);
 
 
 --
--- Name: reporting_awscostentrypricing reporting_awscostentrypricing_pkey; Type: CONSTRAINT; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awscostentrypricing reporting_awscostentrypricing_pkey; Type: CONSTRAINT; Schema: acct10001; Owner: kokuadmin
 --
 
-ALTER TABLE ONLY acct10001org20002.reporting_awscostentrypricing
+ALTER TABLE ONLY acct10001.reporting_awscostentrypricing
     ADD CONSTRAINT reporting_awscostentrypricing_pkey PRIMARY KEY (id);
 
 
 --
--- Name: reporting_awscostentrypricing reporting_awscostentrypricing_term_unit_c3978af3_uniq; Type: CONSTRAINT; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awscostentrypricing reporting_awscostentrypricing_term_unit_c3978af3_uniq; Type: CONSTRAINT; Schema: acct10001; Owner: kokuadmin
 --
 
-ALTER TABLE ONLY acct10001org20002.reporting_awscostentrypricing
+ALTER TABLE ONLY acct10001.reporting_awscostentrypricing
     ADD CONSTRAINT reporting_awscostentrypricing_term_unit_c3978af3_uniq UNIQUE (term, unit);
 
 
 --
--- Name: reporting_awscostentryproduct reporting_awscostentryproduct_pkey; Type: CONSTRAINT; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awscostentryproduct reporting_awscostentryproduct_pkey; Type: CONSTRAINT; Schema: acct10001; Owner: kokuadmin
 --
 
-ALTER TABLE ONLY acct10001org20002.reporting_awscostentryproduct
+ALTER TABLE ONLY acct10001.reporting_awscostentryproduct
     ADD CONSTRAINT reporting_awscostentryproduct_pkey PRIMARY KEY (id);
 
 
 --
--- Name: reporting_awscostentryreservation reporting_awscostentryreservation_pkey; Type: CONSTRAINT; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awscostentryreservation reporting_awscostentryreservation_pkey; Type: CONSTRAINT; Schema: acct10001; Owner: kokuadmin
 --
 
-ALTER TABLE ONLY acct10001org20002.reporting_awscostentryreservation
+ALTER TABLE ONLY acct10001.reporting_awscostentryreservation
     ADD CONSTRAINT reporting_awscostentryreservation_pkey PRIMARY KEY (id);
 
 
 --
--- Name: reporting_awscostentryreservation reporting_awscostentryreservation_reservation_arn_key; Type: CONSTRAINT; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awscostentryreservation reporting_awscostentryreservation_reservation_arn_key; Type: CONSTRAINT; Schema: acct10001; Owner: kokuadmin
 --
 
-ALTER TABLE ONLY acct10001org20002.reporting_awscostentryreservation
+ALTER TABLE ONLY acct10001.reporting_awscostentryreservation
     ADD CONSTRAINT reporting_awscostentryreservation_reservation_arn_key UNIQUE (reservation_arn);
 
 
 --
--- Name: reporting_ocpusagelineitem reporting_ocpusagelineit_report_id_namespace_pod__dfc2c342_uniq; Type: CONSTRAINT; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_ocpusagelineitem reporting_ocpusagelineit_report_id_namespace_pod__dfc2c342_uniq; Type: CONSTRAINT; Schema: acct10001; Owner: kokuadmin
 --
 
-ALTER TABLE ONLY acct10001org20002.reporting_ocpusagelineitem
+ALTER TABLE ONLY acct10001.reporting_ocpusagelineitem
     ADD CONSTRAINT reporting_ocpusagelineit_report_id_namespace_pod__dfc2c342_uniq UNIQUE (report_id, namespace, pod, node);
 
 
 --
--- Name: reporting_ocpusagelineitem_aggregates reporting_ocpusagelineitem_aggregates_pkey; Type: CONSTRAINT; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_ocpusagelineitem_aggregates reporting_ocpusagelineitem_aggregates_pkey; Type: CONSTRAINT; Schema: acct10001; Owner: kokuadmin
 --
 
-ALTER TABLE ONLY acct10001org20002.reporting_ocpusagelineitem_aggregates
+ALTER TABLE ONLY acct10001.reporting_ocpusagelineitem_aggregates
     ADD CONSTRAINT reporting_ocpusagelineitem_aggregates_pkey PRIMARY KEY (id);
 
 
 --
--- Name: reporting_ocpusagelineitem_daily reporting_ocpusagelineitem_daily_pkey; Type: CONSTRAINT; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_ocpusagelineitem_daily reporting_ocpusagelineitem_daily_pkey; Type: CONSTRAINT; Schema: acct10001; Owner: kokuadmin
 --
 
-ALTER TABLE ONLY acct10001org20002.reporting_ocpusagelineitem_daily
+ALTER TABLE ONLY acct10001.reporting_ocpusagelineitem_daily
     ADD CONSTRAINT reporting_ocpusagelineitem_daily_pkey PRIMARY KEY (id);
 
 
 --
--- Name: reporting_ocpusagelineitem_daily_summary reporting_ocpusagelineitem_daily_summary_pkey; Type: CONSTRAINT; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_ocpusagelineitem_daily_summary reporting_ocpusagelineitem_daily_summary_pkey; Type: CONSTRAINT; Schema: acct10001; Owner: kokuadmin
 --
 
-ALTER TABLE ONLY acct10001org20002.reporting_ocpusagelineitem_daily_summary
+ALTER TABLE ONLY acct10001.reporting_ocpusagelineitem_daily_summary
     ADD CONSTRAINT reporting_ocpusagelineitem_daily_summary_pkey PRIMARY KEY (id);
 
 
 --
--- Name: reporting_ocpusagelineitem reporting_ocpusagelineitem_pkey; Type: CONSTRAINT; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_ocpusagelineitem reporting_ocpusagelineitem_pkey; Type: CONSTRAINT; Schema: acct10001; Owner: kokuadmin
 --
 
-ALTER TABLE ONLY acct10001org20002.reporting_ocpusagelineitem
+ALTER TABLE ONLY acct10001.reporting_ocpusagelineitem
     ADD CONSTRAINT reporting_ocpusagelineitem_pkey PRIMARY KEY (id);
 
 
 --
--- Name: reporting_ocpusagereportperiod reporting_ocpusagereport_cluster_id_report_period_94b94003_uniq; Type: CONSTRAINT; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_ocpusagereportperiod reporting_ocpusagereport_cluster_id_report_period_94b94003_uniq; Type: CONSTRAINT; Schema: acct10001; Owner: kokuadmin
 --
 
-ALTER TABLE ONLY acct10001org20002.reporting_ocpusagereportperiod
+ALTER TABLE ONLY acct10001.reporting_ocpusagereportperiod
     ADD CONSTRAINT reporting_ocpusagereport_cluster_id_report_period_94b94003_uniq UNIQUE (cluster_id, report_period_start);
 
 
 --
--- Name: reporting_ocpusagereport reporting_ocpusagereport_pkey; Type: CONSTRAINT; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_ocpusagereport reporting_ocpusagereport_pkey; Type: CONSTRAINT; Schema: acct10001; Owner: kokuadmin
 --
 
-ALTER TABLE ONLY acct10001org20002.reporting_ocpusagereport
+ALTER TABLE ONLY acct10001.reporting_ocpusagereport
     ADD CONSTRAINT reporting_ocpusagereport_pkey PRIMARY KEY (id);
 
 
 --
--- Name: reporting_ocpusagereport reporting_ocpusagereport_report_period_id_interva_066551f3_uniq; Type: CONSTRAINT; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_ocpusagereport reporting_ocpusagereport_report_period_id_interva_066551f3_uniq; Type: CONSTRAINT; Schema: acct10001; Owner: kokuadmin
 --
 
-ALTER TABLE ONLY acct10001org20002.reporting_ocpusagereport
+ALTER TABLE ONLY acct10001.reporting_ocpusagereport
     ADD CONSTRAINT reporting_ocpusagereport_report_period_id_interva_066551f3_uniq UNIQUE (report_period_id, interval_start);
 
 
 --
--- Name: reporting_ocpusagereportperiod reporting_ocpusagereportperiod_pkey; Type: CONSTRAINT; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_ocpusagereportperiod reporting_ocpusagereportperiod_pkey; Type: CONSTRAINT; Schema: acct10001; Owner: kokuadmin
 --
 
-ALTER TABLE ONLY acct10001org20002.reporting_ocpusagereportperiod
+ALTER TABLE ONLY acct10001.reporting_ocpusagereportperiod
     ADD CONSTRAINT reporting_ocpusagereportperiod_pkey PRIMARY KEY (id);
 
 
@@ -3428,241 +3428,241 @@ ALTER TABLE ONLY public.si_unit_scale
 
 
 --
--- Name: interval_start_idx; Type: INDEX; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: interval_start_idx; Type: INDEX; Schema: acct10001; Owner: kokuadmin
 --
 
-CREATE INDEX interval_start_idx ON acct10001org20002.reporting_awscostentry USING btree (interval_start);
+CREATE INDEX interval_start_idx ON acct10001.reporting_awscostentry USING btree (interval_start);
 
 
 --
--- Name: namespace_idx; Type: INDEX; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: namespace_idx; Type: INDEX; Schema: acct10001; Owner: kokuadmin
 --
 
-CREATE INDEX namespace_idx ON acct10001org20002.reporting_ocpusagelineitem_daily USING btree (namespace);
+CREATE INDEX namespace_idx ON acct10001.reporting_ocpusagelineitem_daily USING btree (namespace);
 
 
 --
--- Name: node_idx; Type: INDEX; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: node_idx; Type: INDEX; Schema: acct10001; Owner: kokuadmin
 --
 
-CREATE INDEX node_idx ON acct10001org20002.reporting_ocpusagelineitem_daily USING btree (node);
+CREATE INDEX node_idx ON acct10001.reporting_ocpusagelineitem_daily USING btree (node);
 
 
 --
--- Name: ocp_interval_start_idx; Type: INDEX; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: ocp_interval_start_idx; Type: INDEX; Schema: acct10001; Owner: kokuadmin
 --
 
-CREATE INDEX ocp_interval_start_idx ON acct10001org20002.reporting_ocpusagereport USING btree (interval_start);
+CREATE INDEX ocp_interval_start_idx ON acct10001.reporting_ocpusagereport USING btree (interval_start);
 
 
 --
--- Name: ocp_usage_idx; Type: INDEX; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: ocp_usage_idx; Type: INDEX; Schema: acct10001; Owner: kokuadmin
 --
 
-CREATE INDEX ocp_usage_idx ON acct10001org20002.reporting_ocpusagelineitem_daily USING btree (usage_start);
+CREATE INDEX ocp_usage_idx ON acct10001.reporting_ocpusagelineitem_daily USING btree (usage_start);
 
 
 --
--- Name: pod_idx; Type: INDEX; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: pod_idx; Type: INDEX; Schema: acct10001; Owner: kokuadmin
 --
 
-CREATE INDEX pod_idx ON acct10001org20002.reporting_ocpusagelineitem_daily USING btree (pod);
+CREATE INDEX pod_idx ON acct10001.reporting_ocpusagelineitem_daily USING btree (pod);
 
 
 --
--- Name: pod_labels_idx; Type: INDEX; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: pod_labels_idx; Type: INDEX; Schema: acct10001; Owner: kokuadmin
 --
 
-CREATE INDEX pod_labels_idx ON acct10001org20002.reporting_ocpusagelineitem_daily_summary USING gin (pod_labels);
+CREATE INDEX pod_labels_idx ON acct10001.reporting_ocpusagelineitem_daily_summary USING gin (pod_labels);
 
 
 --
--- Name: product_code_idx; Type: INDEX; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: product_code_idx; Type: INDEX; Schema: acct10001; Owner: kokuadmin
 --
 
-CREATE INDEX product_code_idx ON acct10001org20002.reporting_awscostentrylineitem_daily USING btree (product_code);
+CREATE INDEX product_code_idx ON acct10001.reporting_awscostentrylineitem_daily USING btree (product_code);
 
 
 --
--- Name: region_idx; Type: INDEX; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: region_idx; Type: INDEX; Schema: acct10001; Owner: kokuadmin
 --
 
-CREATE INDEX region_idx ON acct10001org20002.reporting_awscostentryproduct USING btree (region);
+CREATE INDEX region_idx ON acct10001.reporting_awscostentryproduct USING btree (region);
 
 
 --
--- Name: reporting_awsaccountalias_account_id_85724b8c_like; Type: INDEX; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awsaccountalias_account_id_85724b8c_like; Type: INDEX; Schema: acct10001; Owner: kokuadmin
 --
 
-CREATE INDEX reporting_awsaccountalias_account_id_85724b8c_like ON acct10001org20002.reporting_awsaccountalias USING btree (account_id varchar_pattern_ops);
+CREATE INDEX reporting_awsaccountalias_account_id_85724b8c_like ON acct10001.reporting_awsaccountalias USING btree (account_id varchar_pattern_ops);
 
 
 --
--- Name: reporting_awscostentry_bill_id_017f27a3; Type: INDEX; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awscostentry_bill_id_017f27a3; Type: INDEX; Schema: acct10001; Owner: kokuadmin
 --
 
-CREATE INDEX reporting_awscostentry_bill_id_017f27a3 ON acct10001org20002.reporting_awscostentry USING btree (bill_id);
+CREATE INDEX reporting_awscostentry_bill_id_017f27a3 ON acct10001.reporting_awscostentry USING btree (bill_id);
 
 
 --
--- Name: reporting_awscostentryline_account_alias_id_684d6c01; Type: INDEX; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awscostentryline_account_alias_id_684d6c01; Type: INDEX; Schema: acct10001; Owner: kokuadmin
 --
 
-CREATE INDEX reporting_awscostentryline_account_alias_id_684d6c01 ON acct10001org20002.reporting_awscostentrylineitem_daily_summary USING btree (account_alias_id);
+CREATE INDEX reporting_awscostentryline_account_alias_id_684d6c01 ON acct10001.reporting_awscostentrylineitem_daily_summary USING btree (account_alias_id);
 
 
 --
--- Name: reporting_awscostentryline_account_alias_id_f97d76e5; Type: INDEX; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awscostentryline_account_alias_id_f97d76e5; Type: INDEX; Schema: acct10001; Owner: kokuadmin
 --
 
-CREATE INDEX reporting_awscostentryline_account_alias_id_f97d76e5 ON acct10001org20002.reporting_awscostentrylineitem_aggregates USING btree (account_alias_id);
+CREATE INDEX reporting_awscostentryline_account_alias_id_f97d76e5 ON acct10001.reporting_awscostentrylineitem_aggregates USING btree (account_alias_id);
 
 
 --
--- Name: reporting_awscostentryline_cost_entry_pricing_id_5a6a9b38; Type: INDEX; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awscostentryline_cost_entry_pricing_id_5a6a9b38; Type: INDEX; Schema: acct10001; Owner: kokuadmin
 --
 
-CREATE INDEX reporting_awscostentryline_cost_entry_pricing_id_5a6a9b38 ON acct10001org20002.reporting_awscostentrylineitem_daily USING btree (cost_entry_pricing_id);
+CREATE INDEX reporting_awscostentryline_cost_entry_pricing_id_5a6a9b38 ON acct10001.reporting_awscostentrylineitem_daily USING btree (cost_entry_pricing_id);
 
 
 --
--- Name: reporting_awscostentryline_cost_entry_product_id_4d8ef2fd; Type: INDEX; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awscostentryline_cost_entry_product_id_4d8ef2fd; Type: INDEX; Schema: acct10001; Owner: kokuadmin
 --
 
-CREATE INDEX reporting_awscostentryline_cost_entry_product_id_4d8ef2fd ON acct10001org20002.reporting_awscostentrylineitem_daily USING btree (cost_entry_product_id);
+CREATE INDEX reporting_awscostentryline_cost_entry_product_id_4d8ef2fd ON acct10001.reporting_awscostentrylineitem_daily USING btree (cost_entry_product_id);
 
 
 --
--- Name: reporting_awscostentryline_cost_entry_reservation_id_13b1cb08; Type: INDEX; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awscostentryline_cost_entry_reservation_id_13b1cb08; Type: INDEX; Schema: acct10001; Owner: kokuadmin
 --
 
-CREATE INDEX reporting_awscostentryline_cost_entry_reservation_id_13b1cb08 ON acct10001org20002.reporting_awscostentrylineitem_daily USING btree (cost_entry_reservation_id);
+CREATE INDEX reporting_awscostentryline_cost_entry_reservation_id_13b1cb08 ON acct10001.reporting_awscostentrylineitem_daily USING btree (cost_entry_reservation_id);
 
 
 --
--- Name: reporting_awscostentryline_cost_entry_reservation_id_9332b371; Type: INDEX; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awscostentryline_cost_entry_reservation_id_9332b371; Type: INDEX; Schema: acct10001; Owner: kokuadmin
 --
 
-CREATE INDEX reporting_awscostentryline_cost_entry_reservation_id_9332b371 ON acct10001org20002.reporting_awscostentrylineitem USING btree (cost_entry_reservation_id);
+CREATE INDEX reporting_awscostentryline_cost_entry_reservation_id_9332b371 ON acct10001.reporting_awscostentrylineitem USING btree (cost_entry_reservation_id);
 
 
 --
--- Name: reporting_awscostentrylineitem_cost_entry_bill_id_5ae74e09; Type: INDEX; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awscostentrylineitem_cost_entry_bill_id_5ae74e09; Type: INDEX; Schema: acct10001; Owner: kokuadmin
 --
 
-CREATE INDEX reporting_awscostentrylineitem_cost_entry_bill_id_5ae74e09 ON acct10001org20002.reporting_awscostentrylineitem USING btree (cost_entry_bill_id);
+CREATE INDEX reporting_awscostentrylineitem_cost_entry_bill_id_5ae74e09 ON acct10001.reporting_awscostentrylineitem USING btree (cost_entry_bill_id);
 
 
 --
--- Name: reporting_awscostentrylineitem_cost_entry_id_4d1a7fc4; Type: INDEX; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awscostentrylineitem_cost_entry_id_4d1a7fc4; Type: INDEX; Schema: acct10001; Owner: kokuadmin
 --
 
-CREATE INDEX reporting_awscostentrylineitem_cost_entry_id_4d1a7fc4 ON acct10001org20002.reporting_awscostentrylineitem USING btree (cost_entry_id);
+CREATE INDEX reporting_awscostentrylineitem_cost_entry_id_4d1a7fc4 ON acct10001.reporting_awscostentrylineitem USING btree (cost_entry_id);
 
 
 --
--- Name: reporting_awscostentrylineitem_cost_entry_pricing_id_a654a7e3; Type: INDEX; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awscostentrylineitem_cost_entry_pricing_id_a654a7e3; Type: INDEX; Schema: acct10001; Owner: kokuadmin
 --
 
-CREATE INDEX reporting_awscostentrylineitem_cost_entry_pricing_id_a654a7e3 ON acct10001org20002.reporting_awscostentrylineitem USING btree (cost_entry_pricing_id);
+CREATE INDEX reporting_awscostentrylineitem_cost_entry_pricing_id_a654a7e3 ON acct10001.reporting_awscostentrylineitem USING btree (cost_entry_pricing_id);
 
 
 --
--- Name: reporting_awscostentrylineitem_cost_entry_product_id_29c80210; Type: INDEX; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awscostentrylineitem_cost_entry_product_id_29c80210; Type: INDEX; Schema: acct10001; Owner: kokuadmin
 --
 
-CREATE INDEX reporting_awscostentrylineitem_cost_entry_product_id_29c80210 ON acct10001org20002.reporting_awscostentrylineitem USING btree (cost_entry_product_id);
+CREATE INDEX reporting_awscostentrylineitem_cost_entry_product_id_29c80210 ON acct10001.reporting_awscostentrylineitem USING btree (cost_entry_product_id);
 
 
 --
--- Name: reporting_awscostentryreservation_reservation_arn_e387aa5b_like; Type: INDEX; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awscostentryreservation_reservation_arn_e387aa5b_like; Type: INDEX; Schema: acct10001; Owner: kokuadmin
 --
 
-CREATE INDEX reporting_awscostentryreservation_reservation_arn_e387aa5b_like ON acct10001org20002.reporting_awscostentryreservation USING btree (reservation_arn text_pattern_ops);
+CREATE INDEX reporting_awscostentryreservation_reservation_arn_e387aa5b_like ON acct10001.reporting_awscostentryreservation USING btree (reservation_arn text_pattern_ops);
 
 
 --
--- Name: reporting_ocpusagelineitem_report_id_32a973b0; Type: INDEX; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_ocpusagelineitem_report_id_32a973b0; Type: INDEX; Schema: acct10001; Owner: kokuadmin
 --
 
-CREATE INDEX reporting_ocpusagelineitem_report_id_32a973b0 ON acct10001org20002.reporting_ocpusagelineitem USING btree (report_id);
+CREATE INDEX reporting_ocpusagelineitem_report_id_32a973b0 ON acct10001.reporting_ocpusagelineitem USING btree (report_id);
 
 
 --
--- Name: reporting_ocpusagelineitem_report_period_id_be7fa5ad; Type: INDEX; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_ocpusagelineitem_report_period_id_be7fa5ad; Type: INDEX; Schema: acct10001; Owner: kokuadmin
 --
 
-CREATE INDEX reporting_ocpusagelineitem_report_period_id_be7fa5ad ON acct10001org20002.reporting_ocpusagelineitem USING btree (report_period_id);
+CREATE INDEX reporting_ocpusagelineitem_report_period_id_be7fa5ad ON acct10001.reporting_ocpusagelineitem USING btree (report_period_id);
 
 
 --
--- Name: reporting_ocpusagereport_report_period_id_477508c6; Type: INDEX; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_ocpusagereport_report_period_id_477508c6; Type: INDEX; Schema: acct10001; Owner: kokuadmin
 --
 
-CREATE INDEX reporting_ocpusagereport_report_period_id_477508c6 ON acct10001org20002.reporting_ocpusagereport USING btree (report_period_id);
+CREATE INDEX reporting_ocpusagereport_report_period_id_477508c6 ON acct10001.reporting_ocpusagereport USING btree (report_period_id);
 
 
 --
--- Name: summary_namespace_idx; Type: INDEX; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: summary_namespace_idx; Type: INDEX; Schema: acct10001; Owner: kokuadmin
 --
 
-CREATE INDEX summary_namespace_idx ON acct10001org20002.reporting_ocpusagelineitem_daily_summary USING btree (namespace);
+CREATE INDEX summary_namespace_idx ON acct10001.reporting_ocpusagelineitem_daily_summary USING btree (namespace);
 
 
 --
--- Name: summary_node_idx; Type: INDEX; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: summary_node_idx; Type: INDEX; Schema: acct10001; Owner: kokuadmin
 --
 
-CREATE INDEX summary_node_idx ON acct10001org20002.reporting_ocpusagelineitem_daily_summary USING btree (node);
+CREATE INDEX summary_node_idx ON acct10001.reporting_ocpusagelineitem_daily_summary USING btree (node);
 
 
 --
--- Name: summary_ocp_usage_idx; Type: INDEX; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: summary_ocp_usage_idx; Type: INDEX; Schema: acct10001; Owner: kokuadmin
 --
 
-CREATE INDEX summary_ocp_usage_idx ON acct10001org20002.reporting_ocpusagelineitem_daily_summary USING btree (usage_start);
+CREATE INDEX summary_ocp_usage_idx ON acct10001.reporting_ocpusagelineitem_daily_summary USING btree (usage_start);
 
 
 --
--- Name: summary_pod_idx; Type: INDEX; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: summary_pod_idx; Type: INDEX; Schema: acct10001; Owner: kokuadmin
 --
 
-CREATE INDEX summary_pod_idx ON acct10001org20002.reporting_ocpusagelineitem_daily_summary USING btree (pod);
+CREATE INDEX summary_pod_idx ON acct10001.reporting_ocpusagelineitem_daily_summary USING btree (pod);
 
 
 --
--- Name: summary_product_code_idx; Type: INDEX; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: summary_product_code_idx; Type: INDEX; Schema: acct10001; Owner: kokuadmin
 --
 
-CREATE INDEX summary_product_code_idx ON acct10001org20002.reporting_awscostentrylineitem_daily_summary USING btree (product_code);
+CREATE INDEX summary_product_code_idx ON acct10001.reporting_awscostentrylineitem_daily_summary USING btree (product_code);
 
 
 --
--- Name: summary_usage_account_id_idx; Type: INDEX; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: summary_usage_account_id_idx; Type: INDEX; Schema: acct10001; Owner: kokuadmin
 --
 
-CREATE INDEX summary_usage_account_id_idx ON acct10001org20002.reporting_awscostentrylineitem_daily_summary USING btree (usage_account_id);
+CREATE INDEX summary_usage_account_id_idx ON acct10001.reporting_awscostentrylineitem_daily_summary USING btree (usage_account_id);
 
 
 --
--- Name: summary_usage_start_idx; Type: INDEX; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: summary_usage_start_idx; Type: INDEX; Schema: acct10001; Owner: kokuadmin
 --
 
-CREATE INDEX summary_usage_start_idx ON acct10001org20002.reporting_awscostentrylineitem_daily_summary USING btree (usage_start);
+CREATE INDEX summary_usage_start_idx ON acct10001.reporting_awscostentrylineitem_daily_summary USING btree (usage_start);
 
 
 --
--- Name: usage_account_id_idx; Type: INDEX; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: usage_account_id_idx; Type: INDEX; Schema: acct10001; Owner: kokuadmin
 --
 
-CREATE INDEX usage_account_id_idx ON acct10001org20002.reporting_awscostentrylineitem_daily USING btree (usage_account_id);
+CREATE INDEX usage_account_id_idx ON acct10001.reporting_awscostentrylineitem_daily USING btree (usage_account_id);
 
 
 --
--- Name: usage_start_idx; Type: INDEX; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: usage_start_idx; Type: INDEX; Schema: acct10001; Owner: kokuadmin
 --
 
-CREATE INDEX usage_start_idx ON acct10001org20002.reporting_awscostentrylineitem_daily USING btree (usage_start);
+CREATE INDEX usage_start_idx ON acct10001.reporting_awscostentrylineitem_daily USING btree (usage_start);
 
 
 --
@@ -3883,115 +3883,115 @@ CREATE INDEX si_unit_scale_prefix_eb9daade_like ON public.si_unit_scale USING bt
 
 
 --
--- Name: reporting_awscostentrylineitem_daily_summary reporting_awscostent_account_alias_id_684d6c01_fk_reporting; Type: FK CONSTRAINT; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awscostentrylineitem_daily_summary reporting_awscostent_account_alias_id_684d6c01_fk_reporting; Type: FK CONSTRAINT; Schema: acct10001; Owner: kokuadmin
 --
 
-ALTER TABLE ONLY acct10001org20002.reporting_awscostentrylineitem_daily_summary
-    ADD CONSTRAINT reporting_awscostent_account_alias_id_684d6c01_fk_reporting FOREIGN KEY (account_alias_id) REFERENCES acct10001org20002.reporting_awsaccountalias(id) DEFERRABLE INITIALLY DEFERRED;
-
-
---
--- Name: reporting_awscostentrylineitem_aggregates reporting_awscostent_account_alias_id_f97d76e5_fk_reporting; Type: FK CONSTRAINT; Schema: acct10001org20002; Owner: kokuadmin
---
-
-ALTER TABLE ONLY acct10001org20002.reporting_awscostentrylineitem_aggregates
-    ADD CONSTRAINT reporting_awscostent_account_alias_id_f97d76e5_fk_reporting FOREIGN KEY (account_alias_id) REFERENCES acct10001org20002.reporting_awsaccountalias(id) DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE ONLY acct10001.reporting_awscostentrylineitem_daily_summary
+    ADD CONSTRAINT reporting_awscostent_account_alias_id_684d6c01_fk_reporting FOREIGN KEY (account_alias_id) REFERENCES acct10001.reporting_awsaccountalias(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
--- Name: reporting_awscostentry reporting_awscostent_bill_id_017f27a3_fk_reporting; Type: FK CONSTRAINT; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awscostentrylineitem_aggregates reporting_awscostent_account_alias_id_f97d76e5_fk_reporting; Type: FK CONSTRAINT; Schema: acct10001; Owner: kokuadmin
 --
 
-ALTER TABLE ONLY acct10001org20002.reporting_awscostentry
-    ADD CONSTRAINT reporting_awscostent_bill_id_017f27a3_fk_reporting FOREIGN KEY (bill_id) REFERENCES acct10001org20002.reporting_awscostentrybill(id) DEFERRABLE INITIALLY DEFERRED;
-
-
---
--- Name: reporting_awscostentrylineitem reporting_awscostent_cost_entry_bill_id_5ae74e09_fk_reporting; Type: FK CONSTRAINT; Schema: acct10001org20002; Owner: kokuadmin
---
-
-ALTER TABLE ONLY acct10001org20002.reporting_awscostentrylineitem
-    ADD CONSTRAINT reporting_awscostent_cost_entry_bill_id_5ae74e09_fk_reporting FOREIGN KEY (cost_entry_bill_id) REFERENCES acct10001org20002.reporting_awscostentrybill(id) DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE ONLY acct10001.reporting_awscostentrylineitem_aggregates
+    ADD CONSTRAINT reporting_awscostent_account_alias_id_f97d76e5_fk_reporting FOREIGN KEY (account_alias_id) REFERENCES acct10001.reporting_awsaccountalias(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
--- Name: reporting_awscostentrylineitem reporting_awscostent_cost_entry_id_4d1a7fc4_fk_reporting; Type: FK CONSTRAINT; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awscostentry reporting_awscostent_bill_id_017f27a3_fk_reporting; Type: FK CONSTRAINT; Schema: acct10001; Owner: kokuadmin
 --
 
-ALTER TABLE ONLY acct10001org20002.reporting_awscostentrylineitem
-    ADD CONSTRAINT reporting_awscostent_cost_entry_id_4d1a7fc4_fk_reporting FOREIGN KEY (cost_entry_id) REFERENCES acct10001org20002.reporting_awscostentry(id) DEFERRABLE INITIALLY DEFERRED;
-
-
---
--- Name: reporting_awscostentrylineitem_daily reporting_awscostent_cost_entry_pricing_i_5a6a9b38_fk_reporting; Type: FK CONSTRAINT; Schema: acct10001org20002; Owner: kokuadmin
---
-
-ALTER TABLE ONLY acct10001org20002.reporting_awscostentrylineitem_daily
-    ADD CONSTRAINT reporting_awscostent_cost_entry_pricing_i_5a6a9b38_fk_reporting FOREIGN KEY (cost_entry_pricing_id) REFERENCES acct10001org20002.reporting_awscostentrypricing(id) DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE ONLY acct10001.reporting_awscostentry
+    ADD CONSTRAINT reporting_awscostent_bill_id_017f27a3_fk_reporting FOREIGN KEY (bill_id) REFERENCES acct10001.reporting_awscostentrybill(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
--- Name: reporting_awscostentrylineitem reporting_awscostent_cost_entry_pricing_i_a654a7e3_fk_reporting; Type: FK CONSTRAINT; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awscostentrylineitem reporting_awscostent_cost_entry_bill_id_5ae74e09_fk_reporting; Type: FK CONSTRAINT; Schema: acct10001; Owner: kokuadmin
 --
 
-ALTER TABLE ONLY acct10001org20002.reporting_awscostentrylineitem
-    ADD CONSTRAINT reporting_awscostent_cost_entry_pricing_i_a654a7e3_fk_reporting FOREIGN KEY (cost_entry_pricing_id) REFERENCES acct10001org20002.reporting_awscostentrypricing(id) DEFERRABLE INITIALLY DEFERRED;
-
-
---
--- Name: reporting_awscostentrylineitem reporting_awscostent_cost_entry_product_i_29c80210_fk_reporting; Type: FK CONSTRAINT; Schema: acct10001org20002; Owner: kokuadmin
---
-
-ALTER TABLE ONLY acct10001org20002.reporting_awscostentrylineitem
-    ADD CONSTRAINT reporting_awscostent_cost_entry_product_i_29c80210_fk_reporting FOREIGN KEY (cost_entry_product_id) REFERENCES acct10001org20002.reporting_awscostentryproduct(id) DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE ONLY acct10001.reporting_awscostentrylineitem
+    ADD CONSTRAINT reporting_awscostent_cost_entry_bill_id_5ae74e09_fk_reporting FOREIGN KEY (cost_entry_bill_id) REFERENCES acct10001.reporting_awscostentrybill(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
--- Name: reporting_awscostentrylineitem_daily reporting_awscostent_cost_entry_product_i_4d8ef2fd_fk_reporting; Type: FK CONSTRAINT; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awscostentrylineitem reporting_awscostent_cost_entry_id_4d1a7fc4_fk_reporting; Type: FK CONSTRAINT; Schema: acct10001; Owner: kokuadmin
 --
 
-ALTER TABLE ONLY acct10001org20002.reporting_awscostentrylineitem_daily
-    ADD CONSTRAINT reporting_awscostent_cost_entry_product_i_4d8ef2fd_fk_reporting FOREIGN KEY (cost_entry_product_id) REFERENCES acct10001org20002.reporting_awscostentryproduct(id) DEFERRABLE INITIALLY DEFERRED;
-
-
---
--- Name: reporting_awscostentrylineitem_daily reporting_awscostent_cost_entry_reservati_13b1cb08_fk_reporting; Type: FK CONSTRAINT; Schema: acct10001org20002; Owner: kokuadmin
---
-
-ALTER TABLE ONLY acct10001org20002.reporting_awscostentrylineitem_daily
-    ADD CONSTRAINT reporting_awscostent_cost_entry_reservati_13b1cb08_fk_reporting FOREIGN KEY (cost_entry_reservation_id) REFERENCES acct10001org20002.reporting_awscostentryreservation(id) DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE ONLY acct10001.reporting_awscostentrylineitem
+    ADD CONSTRAINT reporting_awscostent_cost_entry_id_4d1a7fc4_fk_reporting FOREIGN KEY (cost_entry_id) REFERENCES acct10001.reporting_awscostentry(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
--- Name: reporting_awscostentrylineitem reporting_awscostent_cost_entry_reservati_9332b371_fk_reporting; Type: FK CONSTRAINT; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awscostentrylineitem_daily reporting_awscostent_cost_entry_pricing_i_5a6a9b38_fk_reporting; Type: FK CONSTRAINT; Schema: acct10001; Owner: kokuadmin
 --
 
-ALTER TABLE ONLY acct10001org20002.reporting_awscostentrylineitem
-    ADD CONSTRAINT reporting_awscostent_cost_entry_reservati_9332b371_fk_reporting FOREIGN KEY (cost_entry_reservation_id) REFERENCES acct10001org20002.reporting_awscostentryreservation(id) DEFERRABLE INITIALLY DEFERRED;
-
-
---
--- Name: reporting_ocpusagelineitem reporting_ocpusageli_report_id_32a973b0_fk_reporting; Type: FK CONSTRAINT; Schema: acct10001org20002; Owner: kokuadmin
---
-
-ALTER TABLE ONLY acct10001org20002.reporting_ocpusagelineitem
-    ADD CONSTRAINT reporting_ocpusageli_report_id_32a973b0_fk_reporting FOREIGN KEY (report_id) REFERENCES acct10001org20002.reporting_ocpusagereport(id) DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE ONLY acct10001.reporting_awscostentrylineitem_daily
+    ADD CONSTRAINT reporting_awscostent_cost_entry_pricing_i_5a6a9b38_fk_reporting FOREIGN KEY (cost_entry_pricing_id) REFERENCES acct10001.reporting_awscostentrypricing(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
--- Name: reporting_ocpusagelineitem reporting_ocpusageli_report_period_id_be7fa5ad_fk_reporting; Type: FK CONSTRAINT; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awscostentrylineitem reporting_awscostent_cost_entry_pricing_i_a654a7e3_fk_reporting; Type: FK CONSTRAINT; Schema: acct10001; Owner: kokuadmin
 --
 
-ALTER TABLE ONLY acct10001org20002.reporting_ocpusagelineitem
-    ADD CONSTRAINT reporting_ocpusageli_report_period_id_be7fa5ad_fk_reporting FOREIGN KEY (report_period_id) REFERENCES acct10001org20002.reporting_ocpusagereportperiod(id) DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE ONLY acct10001.reporting_awscostentrylineitem
+    ADD CONSTRAINT reporting_awscostent_cost_entry_pricing_i_a654a7e3_fk_reporting FOREIGN KEY (cost_entry_pricing_id) REFERENCES acct10001.reporting_awscostentrypricing(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
--- Name: reporting_ocpusagereport reporting_ocpusagere_report_period_id_477508c6_fk_reporting; Type: FK CONSTRAINT; Schema: acct10001org20002; Owner: kokuadmin
+-- Name: reporting_awscostentrylineitem reporting_awscostent_cost_entry_product_i_29c80210_fk_reporting; Type: FK CONSTRAINT; Schema: acct10001; Owner: kokuadmin
 --
 
-ALTER TABLE ONLY acct10001org20002.reporting_ocpusagereport
-    ADD CONSTRAINT reporting_ocpusagere_report_period_id_477508c6_fk_reporting FOREIGN KEY (report_period_id) REFERENCES acct10001org20002.reporting_ocpusagereportperiod(id) DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE ONLY acct10001.reporting_awscostentrylineitem
+    ADD CONSTRAINT reporting_awscostent_cost_entry_product_i_29c80210_fk_reporting FOREIGN KEY (cost_entry_product_id) REFERENCES acct10001.reporting_awscostentryproduct(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: reporting_awscostentrylineitem_daily reporting_awscostent_cost_entry_product_i_4d8ef2fd_fk_reporting; Type: FK CONSTRAINT; Schema: acct10001; Owner: kokuadmin
+--
+
+ALTER TABLE ONLY acct10001.reporting_awscostentrylineitem_daily
+    ADD CONSTRAINT reporting_awscostent_cost_entry_product_i_4d8ef2fd_fk_reporting FOREIGN KEY (cost_entry_product_id) REFERENCES acct10001.reporting_awscostentryproduct(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: reporting_awscostentrylineitem_daily reporting_awscostent_cost_entry_reservati_13b1cb08_fk_reporting; Type: FK CONSTRAINT; Schema: acct10001; Owner: kokuadmin
+--
+
+ALTER TABLE ONLY acct10001.reporting_awscostentrylineitem_daily
+    ADD CONSTRAINT reporting_awscostent_cost_entry_reservati_13b1cb08_fk_reporting FOREIGN KEY (cost_entry_reservation_id) REFERENCES acct10001.reporting_awscostentryreservation(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: reporting_awscostentrylineitem reporting_awscostent_cost_entry_reservati_9332b371_fk_reporting; Type: FK CONSTRAINT; Schema: acct10001; Owner: kokuadmin
+--
+
+ALTER TABLE ONLY acct10001.reporting_awscostentrylineitem
+    ADD CONSTRAINT reporting_awscostent_cost_entry_reservati_9332b371_fk_reporting FOREIGN KEY (cost_entry_reservation_id) REFERENCES acct10001.reporting_awscostentryreservation(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: reporting_ocpusagelineitem reporting_ocpusageli_report_id_32a973b0_fk_reporting; Type: FK CONSTRAINT; Schema: acct10001; Owner: kokuadmin
+--
+
+ALTER TABLE ONLY acct10001.reporting_ocpusagelineitem
+    ADD CONSTRAINT reporting_ocpusageli_report_id_32a973b0_fk_reporting FOREIGN KEY (report_id) REFERENCES acct10001.reporting_ocpusagereport(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: reporting_ocpusagelineitem reporting_ocpusageli_report_period_id_be7fa5ad_fk_reporting; Type: FK CONSTRAINT; Schema: acct10001; Owner: kokuadmin
+--
+
+ALTER TABLE ONLY acct10001.reporting_ocpusagelineitem
+    ADD CONSTRAINT reporting_ocpusageli_report_period_id_be7fa5ad_fk_reporting FOREIGN KEY (report_period_id) REFERENCES acct10001.reporting_ocpusagereportperiod(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: reporting_ocpusagereport reporting_ocpusagere_report_period_id_477508c6_fk_reporting; Type: FK CONSTRAINT; Schema: acct10001; Owner: kokuadmin
+--
+
+ALTER TABLE ONLY acct10001.reporting_ocpusagereport
+    ADD CONSTRAINT reporting_ocpusagere_report_period_id_477508c6_fk_reporting FOREIGN KEY (report_period_id) REFERENCES acct10001.reporting_ocpusagereportperiod(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --

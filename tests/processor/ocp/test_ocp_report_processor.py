@@ -62,7 +62,7 @@ class OCPReportProcessorTest(MasuTestCase):
         cls.test_report_gzip = './tests/data/test_cur.csv.gz'
 
         cls.processor = OCPReportProcessor(
-            schema_name='acct10001org20002',
+            schema_name='acct10001',
             report_path=cls.test_report,
             compression=UNCOMPRESSED,
             provider_id=1
@@ -106,7 +106,7 @@ class OCPReportProcessorTest(MasuTestCase):
     def test_initializer_unsupported_compression(self):
         """Assert that an error is raised for an invalid compression."""
         with self.assertRaises(MasuProcessingError):
-            OCPReportProcessor(schema_name='acct10001org20002',
+            OCPReportProcessor(schema_name='acct10001',
                                report_path=self.test_report,
                                compression='unsupported',
                                provider_id=1)
@@ -115,7 +115,7 @@ class OCPReportProcessorTest(MasuTestCase):
         """Test the processing of an uncompressed file."""
         counts = {}
         processor = OCPReportProcessor(
-            schema_name='acct10001org20002',
+            schema_name='acct10001',
             report_path=self.test_report,
             compression=UNCOMPRESSED,
             provider_id=1
@@ -141,7 +141,7 @@ class OCPReportProcessorTest(MasuTestCase):
         """Test that row duplicates are not inserted into the DB."""
         counts = {}
         processor = OCPReportProcessor(
-            schema_name='acct10001org20002',
+            schema_name='acct10001',
             report_path=self.test_report,
             compression=UNCOMPRESSED,
             provider_id=1
@@ -159,7 +159,7 @@ class OCPReportProcessorTest(MasuTestCase):
             counts[table_name] = count
 
         processor = OCPReportProcessor(
-            schema_name='acct10001org20002',
+            schema_name='acct10001',
             report_path=self.test_report,
             compression=UNCOMPRESSED,
             provider_id=1

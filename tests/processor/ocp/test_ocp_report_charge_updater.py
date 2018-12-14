@@ -39,11 +39,11 @@ class OCPReportChargeUpdaterTest(MasuTestCase):
         cls.common_accessor = ReportingCommonDBAccessor()
         cls.column_map = cls.common_accessor.column_map
         cls.accessor = OCPReportDBAccessor(
-            schema='acct10001org20002',
+            schema='acct10001',
             column_map=cls.column_map
         )
         cls.updater = OCPReportChargeUpdater(
-            schema='acct10001org20002',
+            schema='acct10001',
             provider_uuid='6e212746-484a-40cd-bba0-09a19d132d64'
         )
         cls.report_schema = cls.accessor.report_schema

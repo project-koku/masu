@@ -34,7 +34,7 @@ class AWSAccountAliasTest(MasuTestCase):
 
     def tearDown(self):
         """Teardown test case."""
-        db_access = AccountAliasAccessor(self.account_id, 'acct10001org20002')
+        db_access = AccountAliasAccessor(self.account_id, 'acct10001')
         db_access._get_db_obj_query().delete()
         db_access.get_session().commit()
         db_access.close_session()
@@ -42,7 +42,7 @@ class AWSAccountAliasTest(MasuTestCase):
     def test_initializer(self):
         """Test AWSAccountAlias initializer."""
         arn = 'roleArn'
-        schema = 'acct10001org20002'
+        schema = 'acct10001'
         accessor = AWSAccountAlias(arn, schema)
         self.assertEqual(accessor._role_arn, arn)
         self.assertEqual(accessor._schema, schema)
@@ -52,10 +52,10 @@ class AWSAccountAliasTest(MasuTestCase):
     def test_update_account_alias_no_alias(self):
         """Test updating alias when none is set."""
         role_arn = 'arn:aws:iam::{}:role/CostManagement'.format(self.account_id)
-        accessor = AWSAccountAlias(role_arn, 'acct10001org20002')
+        accessor = AWSAccountAlias(role_arn, 'acct10001')
         accessor.update_account_alias()
 
-        db_access = AccountAliasAccessor(self.account_id, 'acct10001org20002')
+        db_access = AccountAliasAccessor(self.account_id, 'acct10001')
         self.assertEqual(db_access._obj.account_id, self.account_id)
         self.assertIsNone(db_access._obj.account_alias)
 
@@ -70,15 +70,15 @@ class AWSAccountAliasTest(MasuTestCase):
         client.create_account_alias(AccountAlias=alias)
 
         role_arn = 'arn:aws:iam::{}:role/CostManagement'.format(self.account_id)
-        accessor = AWSAccountAlias(role_arn, 'acct10001org20002')
+        accessor = AWSAccountAlias(role_arn, 'acct10001')
         accessor.update_account_alias()
 
-        db_access = AccountAliasAccessor(self.account_id, 'acct10001org20002')
+        db_access = AccountAliasAccessor(self.account_id, 'acct10001')
         self.assertEqual(db_access._obj.account_id, self.account_id)
         self.assertEqual(db_access._obj.account_alias, alias)
 
         # Remove account alias and verify that database is updated.
         client.delete_account_alias(AccountAlias=alias)
         accessor.update_account_alias()
-        db_access = AccountAliasAccessor(self.account_id, 'acct10001org20002')
+        db_access = AccountAliasAccessor(self.account_id, 'acct10001')
         self.assertIsNone(db_access._obj.account_alias)

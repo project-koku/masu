@@ -32,26 +32,26 @@ class ExpiredDataRemoverTest(MasuTestCase):
 
     def test_initializer(self):
         """Test to init"""
-        remover = ExpiredDataRemover('acct10001org20002', 'AWS')
+        remover = ExpiredDataRemover('acct10001', 'AWS')
         self.assertEqual(remover._months_to_keep, 3)
         self.assertIsInstance(remover._expiration_date, datetime)
 
     def test_initializer_ocp(self):
         """Test to init for OCP"""
-        remover = ExpiredDataRemover('acct10001org20002', 'OCP')
+        remover = ExpiredDataRemover('acct10001', 'OCP')
         self.assertEqual(remover._months_to_keep, 3)
         self.assertIsInstance(remover._expiration_date, datetime)
 
     def test_initializer_invalid_provider(self):
         """Test to init with unknown provider"""
         with self.assertRaises(ExpiredDataRemoverError):
-            ExpiredDataRemover('acct10001org20002', 'BAD')
+            ExpiredDataRemover('acct10001', 'BAD')
 
     @patch('masu.processor.aws.aws_report_db_cleaner.AWSReportDBCleaner.__init__', side_effect=Exception)
     def test_initializer_provider_exception(self, mock_aws_cleaner):
         """Test to init"""
         with self.assertRaises(ExpiredDataRemoverError):
-            ExpiredDataRemover('acct10001org20002', 'AWS')
+            ExpiredDataRemover('acct10001', 'AWS')
 
     def test_calculate_expiration_date(self):
         """Test that the expiration date is correctly calculated."""
@@ -77,15 +77,15 @@ class ExpiredDataRemoverTest(MasuTestCase):
             with patch.object(DateAccessor, 'today', return_value=test_case.get('current_date')):
                 retention_policy = test_case.get('months_to_keep')
                 if retention_policy:
-                    remover = ExpiredDataRemover('acct10001org20002', 'AWS', retention_policy)
+                    remover = ExpiredDataRemover('acct10001', 'AWS', retention_policy)
                 else:
-                    remover = ExpiredDataRemover('acct10001org20002', 'AWS')
+                    remover = ExpiredDataRemover('acct10001', 'AWS')
                 expire_date = remover._calculate_expiration_date()
                 self.assertEqual(expire_date, test_case.get('expected_expire'))
 
     def test_remove(self):
         """Test that removes the expired data based on the retention policy."""
-        remover = ExpiredDataRemover('acct10001org20002', 'AWS')
+        remover = ExpiredDataRemover('acct10001', 'AWS')
         removed_data = remover.remove()
         self.assertEqual(len(removed_data), 0)
 
@@ -93,6 +93,6 @@ class ExpiredDataRemoverTest(MasuTestCase):
     def test_remove_provider(self, mock_purge):
         """Test that remove is called with provider_id."""
         provider_id = 1
-        remover = ExpiredDataRemover('acct10001org20002', 'AWS')
+        remover = ExpiredDataRemover('acct10001', 'AWS')
         remover.remove(provider_id=provider_id)
         mock_purge.assert_called_with(simulate=False, provider_id=provider_id)

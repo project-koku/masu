@@ -38,10 +38,10 @@ class CURAccountsDBTest(MasuTestCase):
             if account.get('provider_type') == AMAZON_WEB_SERVICES:
                 self.assertEqual(account.get('authentication'), 'arn:aws:iam::111111111111:role/CostManagement')
                 self.assertEqual(account.get('billing_source'), 'test-bucket')
-                self.assertEqual(account.get('customer_name'), 'acct10001org20002')
+                self.assertEqual(account.get('customer_name'), 'acct10001')
             elif account.get('provider_type') == OPENSHIFT_CONTAINER_PLATFORM:
                 self.assertEqual(account.get('authentication'), 'my-ocp-cluster-1')
                 self.assertEqual(account.get('billing_source'), None)
-                self.assertEqual(account.get('customer_name'), 'acct10001org20002')
+                self.assertEqual(account.get('customer_name'), 'acct10001')
             else:
                 self.fail('Unexpected provider')

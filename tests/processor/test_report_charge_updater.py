@@ -35,7 +35,7 @@ class ReportChargeUpdaterTest(MasuTestCase):
     def setUpClass(cls):
         """Set up the test class."""
         super().setUpClass()
-        cls.schema = 'acct10001org20002'
+        cls.schema = 'acct10001'
 
     @patch('masu.processor.report_charge_updater.OCPReportChargeUpdater.update_summary_charge_info')
     def test_ocp_route(self, mock_update):

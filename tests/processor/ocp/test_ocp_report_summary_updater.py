@@ -41,7 +41,7 @@ class OCPReportSummaryUpdaterTest(MasuTestCase):
         super().setUpClass()
         cls.common_accessor = ReportingCommonDBAccessor()
         cls.column_map = cls.common_accessor.column_map
-        cls.updater = OCPReportSummaryUpdater(schema='acct10001org20002')
+        cls.updater = OCPReportSummaryUpdater(schema='acct10001')
 
         cls.accessor = cls.updater._accessor
         cls.report_schema = cls.accessor.report_schema

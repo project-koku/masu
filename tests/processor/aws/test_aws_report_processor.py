@@ -78,7 +78,7 @@ class AWSReportProcessorTest(MasuTestCase):
         cls.test_report_gzip = './tests/data/test_cur.csv.gz'
 
         cls.processor = AWSReportProcessor(
-            schema_name='acct10001org20002',
+            schema_name='acct10001',
             report_path=cls.test_report,
             compression=UNCOMPRESSED,
             provider_id=1
@@ -133,7 +133,7 @@ class AWSReportProcessorTest(MasuTestCase):
     def test_initializer_unsupported_compression(self):
         """Assert that an error is raised for an invalid compression."""
         with self.assertRaises(MasuProcessingError):
-            AWSReportProcessor(schema_name='acct10001org20002',
+            AWSReportProcessor(schema_name='acct10001',
                                report_path=self.test_report,
                                compression='unsupported',
                                provider_id=1)
@@ -142,7 +142,7 @@ class AWSReportProcessorTest(MasuTestCase):
         """Test the processing of an uncompressed file."""
         counts = {}
         processor = AWSReportProcessor(
-            schema_name='acct10001org20002',
+            schema_name='acct10001',
             report_path=self.test_report,
             compression=UNCOMPRESSED,
             provider_id=1
@@ -172,7 +172,7 @@ class AWSReportProcessorTest(MasuTestCase):
         """Test the processing of a gzip compressed file."""
         counts = {}
         processor = AWSReportProcessor(
-            schema_name='acct10001org20002',
+            schema_name='acct10001',
             report_path=self.test_report_gzip,
             compression=GZIP_COMPRESSED,
             provider_id=1
@@ -202,7 +202,7 @@ class AWSReportProcessorTest(MasuTestCase):
         """Test that row duplicates are not inserted into the DB."""
         counts = {}
         processor = AWSReportProcessor(
-            schema_name='acct10001org20002',
+            schema_name='acct10001',
             report_path=self.test_report,
             compression=UNCOMPRESSED,
             provider_id=1
@@ -219,7 +219,7 @@ class AWSReportProcessorTest(MasuTestCase):
             counts[table_name] = count
 
         processor = AWSReportProcessor(
-            schema_name='acct10001org20002',
+            schema_name='acct10001',
             report_path=self.test_report,
             compression=UNCOMPRESSED,
             provider_id=1

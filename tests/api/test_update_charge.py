@@ -33,7 +33,7 @@ class UpdateChargeTest(MasuTestCase):
     def test_get_update_charge(self, mock_update):
         """Test the GET report_data endpoint."""
         params = {
-            'schema': 'acct10001org20002',
+            'schema': 'acct10001',
             'provider_uuid': '3c6e687e-1a09-4a05-970c-2ccf44b0952e'
         }
         query_string = urlencode(params)
@@ -72,7 +72,7 @@ class UpdateChargeTest(MasuTestCase):
     @patch('masu.api.update_charge.update_charge_info')
     def test_get_update_charge_provider_missing(self, mock_update):
         """Test GET report_data endpoint returns a 400 for missing schema."""
-        params = {'schema': 'acct10001org20002'}
+        params = {'schema': 'acct10001'}
         query_string = urlencode(params)
         expected_key = 'Error'
         expected_message = 'provider_uuid and schema_name are required parameters.'

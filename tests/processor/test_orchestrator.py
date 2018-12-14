@@ -73,11 +73,11 @@ class OrchestratorTest(MasuTestCase):
             if account.get('provider_type') == AMAZON_WEB_SERVICES:
                 self.assertEqual(account.get('authentication'), 'arn:aws:iam::111111111111:role/CostManagement')
                 self.assertEqual(account.get('billing_source'), 'test-bucket')
-                self.assertEqual(account.get('customer_name'), 'acct10001org20002')
+                self.assertEqual(account.get('customer_name'), 'acct10001')
             elif account.get('provider_type') == OPENSHIFT_CONTAINER_PLATFORM:
                 self.assertEqual(account.get('authentication'), 'my-ocp-cluster-1')
                 self.assertEqual(account.get('billing_source'), None)
-                self.assertEqual(account.get('customer_name'), 'acct10001org20002')
+                self.assertEqual(account.get('customer_name'), 'acct10001')
             else:
                 self.fail('Unexpected provider')
 
@@ -140,7 +140,7 @@ class OrchestratorTest(MasuTestCase):
                              'billing_period_start': '2018-06-24 15:47:33.052509'}]
         mock_remover.return_value = expected_results
 
-        expected = 'INFO:masu.processor.orchestrator:Expired data removal queued - customer: acct10001org20002, Task ID: {}'
+        expected = 'INFO:masu.processor.orchestrator:Expired data removal queued - customer: acct10001, Task ID: {}'
         logging.disable(logging.NOTSET) # We are currently disabling all logging below CRITICAL in masu/__init__.py
         with self.assertLogs('masu.processor.orchestrator', level='INFO') as logger:
             orchestrator = Orchestrator()

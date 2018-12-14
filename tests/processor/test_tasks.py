@@ -171,7 +171,7 @@ class ProcessReportFileTests(MasuTestCase):
         """Test the process_report_file functionality."""
         report_dir = tempfile.mkdtemp()
         path = '{}/{}'.format(report_dir, 'file1.csv')
-        schema_name = 'acct10001org20002'
+        schema_name = 'acct10001'
         provider = 'AWS'
         provider_uuid = '6e212746-484a-40cd-bba0-09a19d132d64'
         report_dict = {'file': path,
@@ -197,7 +197,7 @@ class ProcessReportFileTests(MasuTestCase):
         """Test the process_report_file functionality when exception is thrown."""
         report_dir = tempfile.mkdtemp()
         path = '{}/{}'.format(report_dir, 'file1.csv')
-        schema_name = 'acct10001org20002'
+        schema_name = 'acct10001'
         provider = 'AWS'
         provider_uuid = '6e212746-484a-40cd-bba0-09a19d132d64'
         report_dict = {'file': path,
@@ -485,7 +485,7 @@ class TestRemoveExpiredDataTasks(MasuTestCase):
 
         logging.disable(logging.NOTSET) # We are currently disabling all logging below CRITICAL in masu/__init__.py
         with self.assertLogs('masu.processor._tasks.remove_expired') as logger:
-            remove_expired_data(schema_name='acct10001org20002', provider='AWS', simulate=True)
+            remove_expired_data(schema_name='acct10001', provider='AWS', simulate=True)
             self.assertIn(expected.format(str(expected_results)), logger.output)
 
 
@@ -502,7 +502,7 @@ class TestUpdateSummaryTablesTask(MasuTestCase):
         report_common_db = ReportingCommonDBAccessor()
         column_map = report_common_db.column_map
         report_common_db.close_session()
-        cls.schema_name = 'acct10001org20002'
+        cls.schema_name = 'acct10001'
         cls.aws_accessor = AWSReportDBAccessor(schema=cls.schema_name,
                                                column_map=column_map)
         cls.ocp_accessor = OCPReportDBAccessor(schema=cls.schema_name,
@@ -693,7 +693,7 @@ class TestUpdateSummaryTablesTask(MasuTestCase):
         self.assertNotEqual(daily_query.count(), initial_daily_count)
         self.assertNotEqual(agg_query.count(), initial_agg_count)
 
-        update_charge_info(schema_name='acct10001org20002', provider_uuid=provider_ocp_uuid)
+        update_charge_info(schema_name='acct10001', provider_uuid=provider_ocp_uuid)
 
         table_name = OCP_REPORT_TABLE_MAP['line_item_daily_summary']
         items = self.ocp_accessor._get_db_obj_query(table_name).all()
@@ -752,4 +752,4 @@ class TestUpdateSummaryTablesTask(MasuTestCase):
     def test_update_charge_info_aws(self):
         """Test that update_charge_info is not called for AWS."""
         provider_aws_uuid = '6e212746-484a-40cd-bba0-09a19d132d64'
-        update_charge_info(schema_name='acct10001org20002', provider_uuid=provider_aws_uuid)
+        update_charge_info(schema_name='acct10001', provider_uuid=provider_aws_uuid)

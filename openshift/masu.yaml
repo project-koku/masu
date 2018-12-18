@@ -29,6 +29,10 @@ objects:
       port: 8080
       protocol: TCP
       targetPort: 8080
+    - name: 9100-tcp
+      port: 9100
+      protocol: TCP
+      targetPort: 9100
     selector:
       name: ${NAME}
 - kind: Route
@@ -39,6 +43,8 @@ objects:
       app: ${NAME}
   spec:
     host: ${APPLICATION_DOMAIN}
+    port:
+      targetPort: 8080-tcp
     to:
       kind: Service
       name: ${NAME}
@@ -220,6 +226,12 @@ objects:
                 configMapKeyRef:
                   name: ${NAME}
                   key: log-level
+                  optional: false
+            - name: prometheus_multiproc_dir
+              valueFrom:
+                configMapKeyRef:
+                  name: ${NAME}
+                  key: prometheus-dir
                   optional: false
           livenessProbe:
             failureThreshold: 3

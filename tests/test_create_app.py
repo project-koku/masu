@@ -33,11 +33,15 @@ class CreateAppTest(TestCase):
 
     @patch('masu.api.status.ApplicationStatus.celery_status',
            new_callable=PropertyMock)
-    def test_create_app(self, mock_status, mock_celery):
+    @patch('prometheus_flask_exporter.multiprocess.GunicornPrometheusMetrics.init_app',
+           return_value=True)
+    def test_create_app(self, mock_status, mock_prometheus, mock_celery):
         """Assert testing is false without passing test config."""
         self.assertFalse(create_app().testing)
 
-    def test_create_test_app(self, mock_celery):
+    @patch('prometheus_flask_exporter.multiprocess.GunicornPrometheusMetrics.init_app',
+           return_value=True)
+    def test_create_test_app(self, mock_prometheus, mock_celery):
         """Assert that testing is true with test config."""
         self.assertTrue(
             create_app(
@@ -52,7 +56,9 @@ class CreateAppTest(TestCase):
         )
 
     @patch('masu.os.makedirs')
-    def test_create_app_dirs_exist(self, mock_mkdir, mock_celery):
+    @patch('prometheus_flask_exporter.multiprocess.GunicornPrometheusMetrics.init_app',
+           return_value=True)
+    def test_create_app_dirs_exist(self, mock_mkdir, mock_prometheus, mock_celery):
         """Test handling of os exception."""
         err = OSError('test error', errno.EEXIST)
         mock_mkdir.side_effect = err
@@ -61,7 +67,9 @@ class CreateAppTest(TestCase):
         self.assertIsInstance(app, Flask)
 
     @patch('masu.os.makedirs')
-    def test_create_app_oserror(self, mock_mkdir, mock_celery):
+    @patch('prometheus_flask_exporter.multiprocess.GunicornPrometheusMetrics.init_app',
+           return_value=True)
+    def test_create_app_oserror(self, mock_mkdir, mock_prometheus, mock_celery):
         """Test handling of os exception."""
         logging.disable(logging.NOTSET)
 
@@ -70,5 +78,5 @@ class CreateAppTest(TestCase):
 
         expected = 'WARNING:masu:test error'
         with self.assertLogs('masu', level='WARNING') as logger:
-            app = create_app(test_config=dict())
+            create_app(test_config=dict())
             self.assertIn(expected, logger.output)

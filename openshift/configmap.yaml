@@ -38,6 +38,7 @@ objects:
     schedule-check-interval: "60"
     remove-expired-data-on-day: "1"
     remove-expired-data-utc-time: "00:00"
+    prometheus-dir: ${PROMETHEUS_DIR}
 parameters:
 - description: The name assigned to all frontend objects defined in this template.
   displayName: Name
@@ -74,4 +75,9 @@ parameters:
   name: KAFKA_TIMEOUT_SECONDS
   required: true
   value: "30"
+- description: Directory for Prometheus metrics.
+  displayName: Masu Prometheus metrics directory
+  name: PROMETHEUS_DIR
+  required: true
+  value: '/tmp'
 

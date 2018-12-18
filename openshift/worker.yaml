@@ -223,6 +223,12 @@ objects:
                   name: ${NAME}
                   key: remove-expired-data-utc-time
                   optional: false
+            - name: prometheus_multiproc_dir
+              valueFrom:
+                configMapKeyRef:
+                  name: ${NAME}
+                  key: prometheus-dir
+                  optional: false
           resources:
             requests:
               cpu: ${CELERY_WORKER_CPU_REQUEST}

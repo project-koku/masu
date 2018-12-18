@@ -214,6 +214,35 @@ class ProcessReportFileTests(MasuTestCase):
         mock_stats_acc.commit.assert_called()
         shutil.rmtree(report_dir)
 
+    @patch('masu.processor._tasks.process.ReportProcessor')
+    @patch('masu.processor._tasks.process.ReportStatsDBAccessor')
+    @patch('masu.database.report_manifest_db_accessor.ReportManifestDBAccessor')
+    def test_process_file_missing_manifest(self, mock_manifest_accessor, mock_stats_accessor,
+                                           mock_processor):
+        """Test the process_report_file functionality when manifest is missing."""
+        mock_manifest_accessor.get_manifest_by_id.return_value = None
+        report_dir = tempfile.mkdtemp()
+        path = '{}/{}'.format(report_dir, 'file1.csv')
+        schema_name = 'acct10001'
+        provider = 'AWS'
+        provider_uuid = '6e212746-484a-40cd-bba0-09a19d132d64'
+        report_dict = {'file': path,
+                   'compression': 'gzip',
+                   'start_date': str(DateAccessor().today())}
+
+        mock_proc = mock_processor()
+        mock_stats_acc = mock_stats_accessor()
+        mock_manifest_acc = mock_manifest_accessor()
+
+        _process_report_file(schema_name, provider, provider_uuid, report_dict)
+
+        mock_proc.process.assert_called()
+        mock_stats_acc.log_last_started_datetime.assert_called()
+        mock_stats_acc.log_last_completed_datetime.assert_called()
+        mock_stats_acc.commit.assert_called()
+        mock_manifest_acc.mark_manifest_as_updated.assert_not_called()
+        shutil.rmtree(report_dir)
+
 class TestProcessorTasks(MasuTestCase):
     """Test cases for Processor Celery tasks."""
 

@@ -611,7 +611,7 @@ class TestUpdateSummaryTablesTask(MasuTestCase):
     def test_update_summary_tables_aws(self, mock_charge_info):
         """Test that the summary table task runs."""
         provider = 'AWS'
-        provider_aws_uuid = '6e212746-484a-40cd-bba0-09a19d132d64'
+        provider_aws_uuid = None
 
         daily_table_name = AWS_CUR_TABLE_MAP['line_item_daily']
         summary_table_name = AWS_CUR_TABLE_MAP['line_item_daily_summary']

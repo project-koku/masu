@@ -88,7 +88,7 @@ class ReportDataTests(MasuTestCase):
         }
         query_string = urlencode(params)
         expected_key = 'Error'
-        expected_message = 'provider_uuid is a required parameter.'
+        expected_message = 'provider_uuid or provider_type must be supplied as a parameter.'
 
         # self.client.get()
         response = self.client.get('/api/v1/report_data/',
@@ -144,6 +144,27 @@ class ReportDataTests(MasuTestCase):
         self.assertEqual(body[expected_key], expected_message)
 
     @patch('masu.api.report_data.update_summary_tables')
+    def test_get_report_data_mismatch_types_uuid(self, mock_update):
+        """Test GET report_data endpoint returns a 400 for mismatched type and uuid."""
+        params = {
+            'schema': 'acct10001',
+            'provider_uuid': '6e212746-484a-40cd-bba0-09a19d132d64',
+            'provider_type': 'OCP'}
+        query_string = urlencode(params)
+        expected_key = 'Error'
+        expected_message = 'provider_uuid and provider_type have mismatched provider types.'
+
+        # self.client.get()
+        response = self.client.get('/api/v1/report_data/',
+                                   query_string=query_string)
+        body = response.json
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        self.assertIn(expected_key, body)
+        self.assertEqual(body[expected_key], expected_message)
+
+    @patch('masu.api.report_data.update_summary_tables')
     def test_get_report_data_with_end_date(self, mock_update):
         """Test GET report_data endpoint with end date."""
         start_date = datetime.date.today()
@@ -169,6 +190,36 @@ class ReportDataTests(MasuTestCase):
             params['schema'],
             'AWS',
             params['provider_uuid'],
+            str(params['start_date']),
+            str(params['end_date'])
+        )
+
+    @patch('masu.api.report_data.update_summary_tables')
+    def test_get_report_data_with_only_provider_type(self, mock_update):
+        """Test GET report_data endpoint with only provider_type."""
+        start_date = datetime.date.today()
+        end_date = start_date + datetime.timedelta(days=1)
+        params = {
+            'schema': 'acct10001',
+            'provider_type': 'AWS',
+            'start_date': start_date,
+            'end_date': end_date
+        }
+        query_string = urlencode(params)
+        expected_key = 'Report Data Task ID'
+
+        # self.client.get()
+        response = self.client.get('/api/v1/report_data/',
+                                   query_string=query_string)
+        body = response.json
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        self.assertIn(expected_key, body)
+        mock_update.delay.assert_called_with(
+            params['schema'],
+            params['provider_type'],
+            None,
             str(params['start_date']),
             str(params['end_date'])
         )

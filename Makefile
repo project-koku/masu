@@ -29,6 +29,13 @@ Please use \`make <target>' where <target> is one of:
   test-db                   create database schemas and tables
   unittest                  run unittests
 
+--- Commands using Docker Compose ---
+  docker-up                 run flask, worker, and rabbit services
+  docker-down               shut down service containers
+  docker-shell              run django and db containers with shell access to server (for pdb)
+  docker-logs               connect to console logs for all services
+  docker-test-all           run unittests
+  
 --- Commands using an OpenShift Cluster ---
   oc-clean                  stop openshift cluster & remove local config data
   oc-create-all             run all application services in openshift cluster
@@ -226,3 +233,18 @@ oc-up:
 oc-up-all: oc-up oc-create-all
 
 oc-up-db: oc-up oc-create-db
+
+docker-up:
+	docker-compose up --build -d
+
+docker-logs:
+	docker-compose logs -f
+
+docker-shell:
+	docker-compose run --service-ports server
+
+docker-test-all:
+	docker-compose -f masu-test.yml up --build
+
+docker-down:
+	docker-compose down

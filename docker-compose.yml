@@ -1,0 +1,73 @@
+version: '3'
+services:
+  rabbit:
+      hostname: rabbit
+      image: rabbitmq:latest
+      environment:
+          - RABBITMQ_DEFAULT_USER=guest
+          - RABBITMQ_DEFAULT_PASS=guest
+      ports:
+          - "5673:5672"
+
+  server:
+      build:
+          context: .
+          dockerfile: Dockerfile
+      working_dir: /masu
+      entrypoint: 'flask run --host 0.0.0.0'
+      environment:
+        - DATABASE_ENGINE=postgresql
+        - DATABASE_NAME=koku
+        - DATABASE_HOST=db
+        - DATABASE_PORT=5432
+        - DATABASE_USER=kokuadmin
+        - DATABASE_PASSWORD=admin123
+        - RABBITMQ_HOST=rabbit
+        - RABBITMQ_PORT=5672
+        - MASU_SECRET_KEY=abc
+        - OPENSHIFT_BUILD_COMMIT=blah
+        - AWS_ACCESS_KEY_ID
+        - AWS_SECRET_ACCESS_KEY
+        - FLASK_APP=masu
+        - FLASK_ENV=development
+        - prometheus_multiproc_dir=/tmp
+      privileged: true
+      ports:
+          - "5000:5000"
+      volumes:
+        - '.:/masu/'
+      links:
+        - rabbit
+
+  worker:
+      build:
+          context: .
+          dockerfile: Dockerfile
+      working_dir: /masu
+      entrypoint: ['celery', 'worker', '-A', 'masu.celery.worker', '-l', 'debug', '-B', '--broker=amqp://guest:guest@rabbit:5672//', '-Q', 'celery,download,process,remove_expired', '--loglevel=INFO']
+      environment:
+        - DATABASE_ENGINE=postgresql
+        - DATABASE_NAME=koku
+        - DATABASE_HOST=db
+        - DATABASE_PORT=5432
+        - DATABASE_USER=kokuadmin
+        - DATABASE_PASSWORD=admin123
+        - MASU_SECRET_KEY=abc
+        - AWS_ACCESS_KEY_ID
+        - AWS_SECRET_ACCESS_KEY
+        - INSIGHTS_KAFKA_HOST=kafka
+        - INSIGHTS_KAFKA_PORT=29092
+        - prometheus_multiproc_dir=/tmp
+      privileged: true
+      volumes:
+        - '.:/masu/'
+        # - '~/insights_local:/var/tmp/insights_local'
+      links:
+          - rabbit
+      depends_on:
+          - rabbit
+
+networks:
+  default:
+    external:
+      name: koku-network

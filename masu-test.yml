@@ -1,0 +1,30 @@
+version: '3'
+services:
+  masu_test:
+      build:
+          context: .
+          dockerfile: Dockerfile-test
+      working_dir: /masu
+      entrypoint: 'tox -r'
+      environment:
+        - DATABASE_ENGINE=postgresql
+        - DATABASE_NAME=masu_test
+        - DATABASE_HOST=db
+        - DATABASE_PORT=5432
+        - DATABASE_USER=postgres
+        - DATABASE_PASSWORD=postgres
+        - PGPASSWORD=postgres
+      volumes:
+        - '.:/masu/'
+      links:
+        - db
+
+  db:
+    image: postgres:9.6
+    environment:
+    - POSTGRES_DB=masu_test
+    - POSTGRES_USER=postgres
+    ports:
+      - "15434:5432"
+    volumes:
+      - ./pg_data:/var/lib/pgsql/data

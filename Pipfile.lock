@@ -795,7 +795,7 @@
                 "sha256:454532779425098969b8f54ab0f056000b883909f69d05905ea114df886e3251"
             ],
             "index": "pypi",
-            "version": "===2.0.1"
+            "version": "==2.0.1"
         },
         "python-dateutil": {
             "hashes": [

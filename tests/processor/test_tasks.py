@@ -616,7 +616,7 @@ class TestUpdateSummaryTablesTask(MasuTestCase):
         daily_table_name = AWS_CUR_TABLE_MAP['line_item_daily']
         summary_table_name = AWS_CUR_TABLE_MAP['line_item_daily_summary']
         agg_table_name = AWS_CUR_TABLE_MAP['line_item_aggregates']
-        start_date = self.start_date.replace(day=1, month=(self.start_date.month - 1))
+        start_date = self.start_date.replace(day=1) + relativedelta.relativedelta(months=-1)
 
         daily_query = self.aws_accessor._get_db_obj_query(daily_table_name)
         summary_query = self.aws_accessor._get_db_obj_query(summary_table_name)
@@ -645,9 +645,12 @@ class TestUpdateSummaryTablesTask(MasuTestCase):
         daily_table_name = AWS_CUR_TABLE_MAP['line_item_daily']
         summary_table_name = AWS_CUR_TABLE_MAP['line_item_daily_summary']
 
-        start_date = self.start_date.replace(day=1, month=(self.start_date.month - 1),
-                                             hour=0, minute=0, second=0,
-                                             microsecond=0)
+        start_date = self.start_date.replace(day=1,
+                                             hour=0,
+                                             minute=0,
+                                             second=0,
+                                             microsecond=0) + relativedelta.relativedelta(months=-1)
+
         end_date = start_date + timedelta(days=10)
         end_date = end_date.replace(hour=23, minute=59, second=59)
 
@@ -706,7 +709,7 @@ class TestUpdateSummaryTablesTask(MasuTestCase):
 
         daily_table_name = OCP_REPORT_TABLE_MAP['line_item_daily']
         agg_table_name = OCP_REPORT_TABLE_MAP['line_item_aggregates']
-        start_date = self.start_date.replace(day=1, month=(self.start_date.month - 1))
+        start_date = self.start_date.replace(day=1) + relativedelta.relativedelta(months=-1)
 
         daily_query = self.ocp_accessor._get_db_obj_query(daily_table_name)
         agg_query = self.ocp_accessor._get_db_obj_query(agg_table_name)
@@ -742,9 +745,9 @@ class TestUpdateSummaryTablesTask(MasuTestCase):
         ce_table_name = OCP_REPORT_TABLE_MAP['report']
         daily_table_name = OCP_REPORT_TABLE_MAP['line_item_daily']
 
-        start_date = self.start_date.replace(day=1, month=(self.start_date.month - 1),
+        start_date = self.start_date.replace(day=1,
                                              hour=0, minute=0, second=0,
-                                             microsecond=0)
+                                             microsecond=0) + relativedelta.relativedelta(months=-1)
 
         end_date = start_date + timedelta(days=10)
         end_date = end_date.replace(hour=23, minute=59, second=59)

@@ -18,6 +18,7 @@
 """Test the AWSReportProcessor."""
 import calendar
 import datetime
+from dateutil.relativedelta import relativedelta
 import logging
 from unittest.mock import patch
 
@@ -200,8 +201,7 @@ class AWSReportSummaryUpdaterTest(MasuTestCase):
     def test_update_summary_tables_new_bill_last_month(self, mock_daily,
                                                        mock_summary, mock_agg):
         """Test that summary tables are run for the month of the manifest."""
-        billing_start = self.date_accessor.today_with_timezone('UTC').replace(day=1)
-        billing_start = billing_start.replace(month=(billing_start.month - 1))
+        billing_start = self.date_accessor.today_with_timezone('UTC').replace(day=1) + relativedelta(months=-1)
         manifest_dict = {
             'assembly_id': '1234',
             'billing_period_start_datetime': billing_start,

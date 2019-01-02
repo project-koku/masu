@@ -129,8 +129,7 @@ class AWSReportDBCleanerTest(MasuTestCase):
         # Verify that data is not cleared for a cutoff date < billing_period_start
         first_bill = self.accessor._get_db_obj_query(bill_table_name).first()
         cutoff_date = first_bill.billing_period_start
-        earlier_date = cutoff_date + relativedelta.relativedelta(months=-1)
-        earlier_cutoff = cutoff_date.replace(month=earlier_date.month, day=15)
+        earlier_cutoff = cutoff_date.replace(day=15) + relativedelta.relativedelta(months=-1)
 
         self.assertIsNotNone(self.accessor._get_db_obj_query(bill_table_name).first())
         self.assertIsNotNone(self.accessor._get_db_obj_query(line_item_table_name).first())

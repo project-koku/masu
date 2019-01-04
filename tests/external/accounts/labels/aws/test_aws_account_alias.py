@@ -18,7 +18,6 @@
 """Test the AWSAccountAlias object."""
 
 import boto3
-from moto import (mock_iam, mock_sts)
 from unittest.mock import patch
 from masu.database.account_alias_accessor import AccountAliasAccessor
 from masu.external.accounts.labels.aws.aws_account_alias import AWSAccountAlias
@@ -47,10 +46,10 @@ class AWSAccountAliasTest(MasuTestCase):
         self.assertEqual(accessor._role_arn, arn)
         self.assertEqual(accessor._schema, schema)
 
-    @mock_iam
-    @mock_sts
-    def test_update_account_alias_no_alias(self):
+    @patch('masu.external.accounts.labels.aws.aws_account_alias.get_account_alias_from_role_arn')
+    def test_update_account_alias_no_alias(self, mock_get_alias):
         """Test updating alias when none is set."""
+        mock_get_alias.return_value = (self.account_id, None)
         role_arn = 'arn:aws:iam::{}:role/CostManagement'.format(self.account_id)
         accessor = AWSAccountAlias(role_arn, 'acct10001')
         accessor.update_account_alias()
@@ -59,16 +58,12 @@ class AWSAccountAliasTest(MasuTestCase):
         self.assertEqual(db_access._obj.account_id, self.account_id)
         self.assertIsNone(db_access._obj.account_alias)
 
-    @mock_iam
-    @mock_sts
-    def test_update_account_alias_with_alias(self):
+
+    @patch('masu.external.accounts.labels.aws.aws_account_alias.get_account_alias_from_role_arn')
+    def test_update_account_alias_with_alias(self, mock_get_alias):
         """Test updating alias."""
-        client = boto3.client('iam', region_name='us-east-1')
-
-        # Set an account alias and verify database is updated.
         alias = 'hccm-alias'
-        client.create_account_alias(AccountAlias=alias)
-
+        mock_get_alias.return_value = (self.account_id, alias)
         role_arn = 'arn:aws:iam::{}:role/CostManagement'.format(self.account_id)
         accessor = AWSAccountAlias(role_arn, 'acct10001')
         accessor.update_account_alias()
@@ -77,8 +72,7 @@ class AWSAccountAliasTest(MasuTestCase):
         self.assertEqual(db_access._obj.account_id, self.account_id)
         self.assertEqual(db_access._obj.account_alias, alias)
 
-        # Remove account alias and verify that database is updated.
-        client.delete_account_alias(AccountAlias=alias)
+        mock_get_alias.return_value = (self.account_id, None)
         accessor.update_account_alias()
         db_access = AccountAliasAccessor(self.account_id, 'acct10001')
         self.assertIsNone(db_access._obj.account_alias)

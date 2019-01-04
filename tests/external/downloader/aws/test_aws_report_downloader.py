@@ -30,7 +30,6 @@ import boto3
 from botocore.exceptions import ClientError
 from dateutil.relativedelta import relativedelta
 from faker import Faker
-from moto import mock_s3
 
 from masu.config import Config
 from masu.database.report_manifest_db_accessor import ReportManifestDBAccessor
@@ -56,6 +55,17 @@ PREFIX = FAKE.word()
 AWS_REGIONS = list(filter(lambda reg: not reg.startswith('cn-'), AWS_REGIONS))
 REGION = random.choice(AWS_REGIONS)
 
+
+def mock_kwargs_error(**kwargs):
+    """Mock side effect method for raising an AWSReportDownloaderError."""
+    raise AWSReportDownloaderError()
+
+
+def mock_download_file_error(manifest):
+    """Mock side effect for raising an AWSReportDownloaderNoFileError."""
+    raise AWSReportDownloaderNoFileError()
+
+
 class FakeSession():
     """
     Fake Boto Session object.
@@ -68,21 +78,19 @@ class FakeSession():
     def client(service):
         fake_report = {'ReportDefinitions': [{
             'ReportName': REPORT,
-            'TimeUnit': random.choice(['HOURLY','DAILY']),
+            'TimeUnit': random.choice(['HOURLY', 'DAILY']),
             'Format': random.choice(['text', 'csv']),
-            'Compression': random.choice(['ZIP','GZIP']),
+            'Compression': random.choice(['ZIP', 'GZIP']),
             'S3Bucket': BUCKET,
             'S3Prefix': PREFIX,
             'S3Region': REGION,
         }]}
 
-        # only mock the 'cur' boto client.
         if 'cur' in service:
             return Mock(**{'describe_report_definitions.return_value': fake_report})
+        else:
+            return Mock()
 
-        # pass-through requests for the 's3' boto client.
-        with mock_s3():
-            return boto3.client(service)
 
 class FakeSessionNoReport():
     """
@@ -99,10 +107,37 @@ class FakeSessionNoReport():
         # only mock the 'cur' boto client.
         if 'cur' in service:
             return Mock(**{'describe_report_definitions.return_value': fake_report})
+        else:
+            return Mock()
 
-        # pass-through requests for the 's3' boto client.
-        with mock_s3():
-            return boto3.client(service)
+
+class FakeSessionDownloadError():
+    """
+    Fake Boto Session object.
+
+    This is here because Moto doesn't mock out the 'cur' endpoint yet. As soon
+    as Moto supports 'cur', this can be removed.
+    """
+
+    @staticmethod
+    def client(service):
+        fake_report = {'ReportDefinitions': [{
+            'ReportName': REPORT,
+            'TimeUnit': random.choice(['HOURLY', 'DAILY']),
+            'Format': random.choice(['text', 'csv']),
+            'Compression': random.choice(['ZIP', 'GZIP']),
+            'S3Bucket': BUCKET,
+            'S3Prefix': PREFIX,
+            'S3Region': REGION,
+        }]}
+
+        if 'cur' in service:
+            return Mock(**{'describe_report_definitions.return_value': fake_report})
+        elif 's3' in service:
+            return Mock(**{'get_object.side_effect': mock_kwargs_error})
+        else:
+            return Mock()
+
 
 class AWSReportDownloaderTest(MasuTestCase):
     """Test Cases for the AWS S3 functions."""
@@ -135,10 +170,10 @@ class AWSReportDownloaderTest(MasuTestCase):
                                                   'AWS',
                                                   1)
         self.aws_report_downloader = AWSReportDownloader(**{'customer_name': self.fake_customer_name,
-                                                        'auth_credential': self.auth_credential,
-                                                        'bucket': self.fake_bucket_name,
-                                                        'report_name': self.fake_report_name,
-                                                        'provider_id': 1})
+                                                            'auth_credential': self.auth_credential,
+                                                            'bucket': self.fake_bucket_name,
+                                                            'report_name': self.fake_report_name,
+                                                            'provider_id': 1})
 
     def tearDown(self):
         shutil.rmtree(DATA_DIR, ignore_errors=True)
@@ -148,289 +183,56 @@ class AWSReportDownloaderTest(MasuTestCase):
             self.manifest_accessor.delete(manifest)
         self.manifest_accessor.commit()
 
-    @mock_s3
-    def test_download_bucket(self):
-        fake_report_date = datetime.today().replace(day=1)
-        fake_report_end_date = fake_report_date + relativedelta(months=+1)
-        report_range = '{}-{}'.format(fake_report_date.strftime('%Y%m%d'),
-                                      fake_report_end_date.strftime('%Y%m%d'))
-
-        # Moto setup
-        conn = boto3.resource('s3', region_name=self.selected_region)
-        conn.create_bucket(Bucket=self.fake_bucket_name)
-
-        # push mocked csvs into Moto env
-        fake_csv_files = []
-        fake_csv_files_with_key = {}
-        for x in range(0, random.randint(2, 10)):
-            csv_filename = '{}.csv'.format('-'.join(self.fake.words(random.randint(2, 5))))
-            fake_csv_files.append(csv_filename)
-
-            # mocked report file definition
-            fake_report_file = '{}/{}/{}/{}/{}'.format(
-                self.fake_bucket_prefix,
-                self.fake_report_name,
-                report_range,
-                uuid.uuid4(),
-                csv_filename)
-            fake_csv_files_with_key[csv_filename] = fake_report_file
-            fake_csv_body = ','.join(self.fake.words(random.randint(5, 10)))
-            conn.Object(self.fake_bucket_name,
-                        fake_report_file).put(Body=fake_csv_body)
-            key = conn.Object(self.fake_bucket_name, fake_report_file).get()
-            self.assertEqual(fake_csv_body, str(key['Body'].read(), 'utf-8'))
-
-        # mocked Manifest definition
-        fake_object = '{}/{}/{}/{}-Manifest.json'.format(
-            self.fake_bucket_prefix,
-            self.fake_report_name,
-            report_range,
-            self.fake_report_name)
-        fake_object_body = {'reportKeys': fake_csv_files}
-
-        # push mocked manifest into Moto env
-        conn.Object(self.fake_bucket_name,
-                    fake_object).put(Body=json.dumps(fake_object_body))
-        key = conn.Object(self.fake_bucket_name, fake_object).get()
-        self.assertEqual(fake_object_body, json.load(key['Body']))
-
-        # actual test
+    @patch('masu.external.downloader.aws.aws_report_downloader.boto3.resource')
+    @patch('masu.external.downloader.aws.aws_report_downloader.AWSReportDownloader.download_file',
+           return_value=('mock_file_name', None,))
+    def test_download_bucket(self, mock_boto_resource, mock_download_file):
+        """Test download bucket method."""
+        mock_resource = Mock()
+        mock_bucket = Mock()
+        mock_bucket.objects.all.return_value = []
+        mock_resource.Bucket.return_value = mock_bucket
+        mock_boto_resource = mock_resource
         out = self.aws_report_downloader.download_bucket()
-        expected_files = []
-        for csv_filename in fake_csv_files:
-            report_key = fake_csv_files_with_key.get(csv_filename)
-            expected_assembly_id = utils.get_assembly_id_from_cur_key(report_key)
-            expected_csv = '{}/{}/aws/{}/{}-{}'.format(DATA_DIR,
-                                                 self.fake_customer_name,
-                                                 self.fake_bucket_name,
-                                                 expected_assembly_id,
-                                                 csv_filename)
-            expected_files.append(expected_csv)
-        expected_manifest = '{}/{}/aws/{}/{}-Manifest.json'.format(DATA_DIR,
-                                                                self.fake_customer_name,
-                                                                self.fake_bucket_name,
-                                                                self.fake_report_name)
-        expected_files.append(expected_manifest)
-        self.assertEqual(sorted(out), sorted(expected_files))
+        expected_files = [] 
+        self.assertEqual(out, expected_files)
 
-
-    @mock_s3
-    def test_download_reports(self):
-        today = datetime.today().replace(day=1)
-        last_month = today + relativedelta(months=-1)
-        bill_months = [last_month, today]
-
-        expected_csv_list = []
-        for bill_month in bill_months:
-            fake_report_date = bill_month
-            fake_report_end_date = fake_report_date + relativedelta(months=+1)
-            report_range = '{}-{}'.format(fake_report_date.strftime('%Y%m%d'),
-                                        fake_report_end_date.strftime('%Y%m%d'))
-
-            # Moto setup
-            conn = boto3.resource('s3', region_name=self.selected_region)
-            conn.create_bucket(Bucket=self.fake_bucket_name)
-
-            # push mocked csvs into Moto env
-            fake_csv_files = {}
-            for x in range(0, random.randint(2, 10)):
-                csv_filename = '{}.csv'.format('-'.join(self.fake.words(random.randint(2, 5))))
-
-                # mocked report file definition
-                fake_report_file = '{}/{}/{}/{}/{}'.format(
-                    self.fake_bucket_prefix,
-                    self.fake_report_name,
-                    report_range,
-                    uuid.uuid4(),
-                    csv_filename)
-                fake_csv_files[csv_filename] = fake_report_file
-
-                fake_csv_body = ','.join(self.fake.words(random.randint(5, 10)))
-                conn.Object(self.fake_bucket_name,
-                            fake_report_file).put(Body=fake_csv_body)
-                key = conn.Object(self.fake_bucket_name, fake_report_file).get()
-                self.assertEqual(fake_csv_body, str(key['Body'].read(), 'utf-8'))
-
-            # mocked Manifest definition
-            selected_csv = random.choice(list(fake_csv_files.keys()))
-            fake_object = '{}/{}/{}/{}-Manifest.json'.format(
-                self.fake_bucket_prefix,
-                self.fake_report_name,
-                report_range,
-                self.fake_report_name)
-            fake_object_body = {
-                'assemblyId': '1234',
-                'reportKeys': [fake_csv_files[selected_csv]],
-                'billingPeriod': {'start': '20180901T000000.000Z'}
-            }
-
-            # push mocked manifest into Moto env
-            conn.Object(self.fake_bucket_name,
-                        fake_object).put(Body=json.dumps(fake_object_body))
-            key = conn.Object(self.fake_bucket_name, fake_object).get()
-            self.assertEqual(fake_object_body, json.load(key['Body']))
-            report_key = fake_object_body.get('reportKeys').pop()
-            expected_assembly_id = utils.get_assembly_id_from_cur_key(report_key)
-            expected_csv = '{}/{}/aws/{}/{}-{}'.format(DATA_DIR,
-                                                       self.fake_customer_name,
-                                                       self.fake_bucket_name,
-                                                       expected_assembly_id,
-                                                       selected_csv)
-            expected_csv_list.append(expected_csv)
-
-
-        # actual test
-        out = self.report_downloader.get_reports(len(bill_months))
-        files_list = []
-        for cur_dict in out:
-            files_list.append(cur_dict['file'])
-            self.assertIsNotNone(cur_dict['compression'])
-
-        self.assertEqual(files_list, expected_csv_list)
-
-        # Verify etag is stored
-        for cur_dict in out:
-            cur_file = cur_dict['file']
-            file_name = cur_file.split('/')[-1]
-            stats_recorder = ReportStatsDBAccessor(file_name, 1)
-            self.assertIsNotNone(stats_recorder.get_etag())
-
-            # Cleanup
-            stats_recorder.remove()
-            stats_recorder.commit()
-
-            stats_recorder2 = ReportStatsDBAccessor(file_name, 1)
-            self.assertIsNone(stats_recorder2.get_etag())
-            stats_recorder.close_session()
-            stats_recorder2.close_session()
-
-
-    @mock_s3
-    def test_download_file(self):
-        fake_object = self.fake.word().lower()
-        conn = boto3.resource('s3', region_name=self.selected_region)
-        conn.create_bucket(Bucket=self.fake_bucket_name)
-        conn.Object(self.fake_bucket_name, fake_object).put(Body='test')
-
-        out, _ = self.aws_report_downloader.download_file(fake_object)
-        self.assertEqual(out, DATA_DIR+'/'+self.fake_customer_name+'/aws/'+self.fake_bucket_name+'/'+fake_object)
-
-    @mock_s3
-    def test_download_file_missing_key(self):
-        fake_object = self.fake.word().lower()
-        conn = boto3.resource('s3', region_name=self.selected_region)
-        conn.create_bucket(Bucket=self.fake_bucket_name)
-        conn.Object(self.fake_bucket_name, fake_object).put(Body='test')
-
-        missing_key = 'missing' + fake_object
-        with self.assertRaises(AWSReportDownloaderNoFileError) as error:
-            self.aws_report_downloader.download_file(missing_key)
-        expected_err = 'Unable to find {} in S3 Bucket: {}'.format(missing_key, self.fake_bucket_name)
-        self.assertEqual(expected_err, str(error.exception))
-
-    @mock_s3
-    def test_download_file_other_error(self):
-        fake_object = self.fake.word().lower()
-        # No S3 bucket created
-        with self.assertRaises(AWSReportDownloaderError) as error:
-            self.aws_report_downloader.download_file(fake_object)
-        self.assertTrue('NoSuchBucket' in str(error.exception))
-
-    @mock_s3
-    def test_download_report(self):
+    @patch('masu.external.downloader.aws.aws_report_downloader.AWSReportDownloader.download_file',
+           side_effect=mock_download_file_error)
+    def test_download_report_missing_manifest(self, mock_download_file):
         fake_report_date = self.fake.date_time().replace(day=1)
-        fake_report_end_date = fake_report_date + relativedelta(months=+1)
-        report_range = '{}-{}'.format(fake_report_date.strftime('%Y%m%d'),
-                                      fake_report_end_date.strftime('%Y%m%d'))
-
-        # mocked report file definition
-        fake_report_file = '{}/{}/{}/{}/{}.csv'.format(
-            self.fake_bucket_prefix,
-            self.fake_report_name,
-            report_range,
-            uuid.uuid4(),
-            'mocked-report-file')
-
-        fake_report_file2 = '{}/{}/{}/{}/{}.csv'.format(
-            self.fake_bucket_prefix,
-            self.fake_report_name,
-            report_range,
-            uuid.uuid4(),
-            'mocked-report-file2')
-
-        # mocked Manifest definition
-        fake_object = '{}/{}/{}/{}-Manifest.json'.format(
-            self.fake_bucket_prefix,
-            self.fake_report_name,
-            report_range,
-            self.fake_report_name)
-        fake_object_body = {
-            'assemblyId': '1234',
-            'reportKeys':[fake_report_file, fake_report_file2],
-            'billingPeriod': {'start': '20180901T000000.000Z'}
-        }
-
-        # Moto setup
-        conn = boto3.resource('s3', region_name=self.selected_region)
-        conn.create_bucket(Bucket=self.fake_bucket_name)
-
-        # push mocked manifest into Moto env
-        conn.Object(self.fake_bucket_name,
-                    fake_object).put(Body=json.dumps(fake_object_body))
-        key = conn.Object(self.fake_bucket_name, fake_object).get()
-        self.assertEqual(fake_object_body, json.load(key['Body']))
-
-        # push mocked csv into Moto env
-        fake_csv_body = ','.join(self.fake.words(random.randint(5, 10)))
-        conn.Object(self.fake_bucket_name,
-                    fake_report_file).put(Body=fake_csv_body)
-        conn.Object(self.fake_bucket_name,
-                    fake_report_file2).put(Body=fake_csv_body)
-        key = conn.Object(self.fake_bucket_name, fake_report_file).get()
-        self.assertEqual(fake_csv_body, str(key['Body'].read(), 'utf-8'))
-
-        # actual test. Run twice
-        for _ in range(2):
-            out = self.report_downloader.download_report(fake_report_date)
-            files_list = []
-            for cur_dict in out:
-                files_list.append(cur_dict['file'])
-                self.assertIsNotNone(cur_dict['compression'])
-
-            expected_paths = []
-            for report_key in fake_object_body.get('reportKeys'):
-                expected_assembly_id = utils.get_assembly_id_from_cur_key(report_key)
-
-                expected_path_base = '{}/{}/{}/{}/{}-{}'
-                file_name = os.path.basename(report_key)
-                expected_path = expected_path_base.format(DATA_DIR,
-                                                        self.fake_customer_name,
-                                                        'aws',
-                                                        self.fake_bucket_name,
-                                                        expected_assembly_id,
-                                                        file_name)
-                expected_paths.append(expected_path)
-            self.assertEqual(files_list, expected_paths)
-
-    @mock_s3
-    def test_download_report_missing_manifest(self):
-        fake_report_date = self.fake.date_time().replace(day=1)
-
-        # Moto setup
-        conn = boto3.resource('s3', region_name=self.selected_region)
-        conn.create_bucket(Bucket=self.fake_bucket_name)
-
         out = self.report_downloader.download_report(fake_report_date)
         self.assertEqual(out, [])
 
-    @mock_s3
-    def test_download_report_missing_bucket(self):
+    @patch('masu.external.report_downloader.ReportStatsDBAccessor', return_value=Mock())
+    @patch('masu.util.aws.common.get_assume_role_session',
+           return_value=FakeSessionDownloadError)
+    def test_download_report_missing_bucket(self, mock_stats, fake_session):
         fake_report_date = self.fake.date_time().replace(day=1)
+        fake_report_date_str = fake_report_date.strftime('%Y%m%dT000000.000Z')
+        expected_assembly_id = '882083b7-ea62-4aab-aa6a-f0d08d65ee2b'
+        input_key = f'/koku/20180701-20180801/{expected_assembly_id}/koku-1.csv.gz'
+        mock_manifest = {
+            'assemblyId': expected_assembly_id,
+            'billingPeriod': {
+                'start': fake_report_date_str
+            },
+            'reportKeys': [input_key]
+        }
+        with patch.object(AWSReportDownloader, '_get_manifest', return_value=mock_manifest):
+            with self.assertRaises(AWSReportDownloaderError):
+                report_downloader = ReportDownloader(self.fake_customer_name,
+                                                     self.auth_credential,
+                                                     self.fake_bucket_name,
+                                                     'AWS',
+                                                     2)
+                AWSReportDownloader(**{'customer_name': self.fake_customer_name,
+                                       'auth_credential': self.auth_credential,
+                                       'bucket': self.fake_bucket_name,
+                                       'report_name': self.fake_report_name,
+                                       'provider_id': 2})
+                report_downloader.download_report(fake_report_date)
 
-        with self.assertRaises(AWSReportDownloaderError) as error:
-            self.report_downloader.download_report(fake_report_date)
-
-    @mock_s3
     @patch('masu.util.aws.common.get_assume_role_session',
            return_value=FakeSession)
     def test_missing_report_name(self, fake_session):
@@ -443,49 +245,9 @@ class AWSReportDownloaderTest(MasuTestCase):
                                 's3_bucket',
                                 'wrongreport')
 
-
-    @mock_s3
     @patch('masu.util.aws.common.get_assume_role_session',
            return_value=FakeSession)
     def test_download_default_report(self, fake_session):
-        fake_report_date = self.fake.date_time().replace(day=1)
-        fake_report_end_date = fake_report_date + relativedelta(months=+1)
-        report_range = '{}-{}'.format(fake_report_date.strftime('%Y%m%d'),
-                                      fake_report_end_date.strftime('%Y%m%d'))
-
-        # mocked report file definition
-        fake_report_file = '{}/{}/{}/{}/{}.csv'.format(
-            self.fake_bucket_prefix,
-            self.fake_report_name,
-            report_range,
-            uuid.uuid4(),
-            'mocked-report-file')
-
-        # mocked Manifest definition
-        fake_object = '{}/{}/{}/{}-Manifest.json'.format(
-            self.fake_bucket_prefix,
-            self.fake_report_name,
-            report_range,
-            self.fake_report_name)
-        fake_object_body = {'assemblyId': '1234', 'reportKeys':[fake_report_file]}
-
-        # Moto setup
-        conn = boto3.resource('s3', region_name=self.selected_region)
-        conn.create_bucket(Bucket=self.fake_bucket_name)
-
-        # push mocked manifest into Moto env
-        conn.Object(self.fake_bucket_name,
-                    fake_object).put(Body=json.dumps(fake_object_body))
-        key = conn.Object(self.fake_bucket_name, fake_object).get()
-        self.assertEqual(fake_object_body, json.load(key['Body']))
-
-        # push mocked csv into Moto env
-        fake_csv_body = ','.join(self.fake.words(random.randint(5, 10)))
-        conn.Object(self.fake_bucket_name,
-                    fake_report_file).put(Body=fake_csv_body)
-        key = conn.Object(self.fake_bucket_name, fake_report_file).get()
-        self.assertEqual(fake_csv_body, str(key['Body'].read(), 'utf-8'))
-
         # actual test
         auth_credential = fake_arn(service='iam', generate_account_id=True)
         downloader = AWSReportDownloader(self.fake_customer_name,
@@ -493,7 +255,6 @@ class AWSReportDownloaderTest(MasuTestCase):
                                          self.fake_bucket_name)
         self.assertEqual(downloader.report_name, self.fake_report_name)
 
-    @mock_s3
     @patch('masu.util.aws.common.get_assume_role_session',
            return_value=FakeSessionNoReport)
     @patch('masu.util.aws.common.get_cur_report_definitions',

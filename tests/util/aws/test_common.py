@@ -26,7 +26,6 @@ from unittest.mock import patch, Mock
 import boto3
 from botocore.exceptions import ClientError
 from faker import Faker
-from moto import (mock_iam, mock_sts)
 
 from masu.util.aws import common as utils
 from tests.external.downloader.aws import (fake_arn,
@@ -50,6 +49,15 @@ REPORT_DEFS = [{'ReportName': NAME,
                 'S3Bucket': BUCKET,
                 'S3Prefix': PREFIX,
                 'S3Region': REGION}]
+MOCK_BOTO_CLIENT = Mock()
+response = {
+    'Credentials': {
+        'AccessKeyId': 'mock_access_key_id',
+        'SecretAccessKey': 'mock_secret_access_key',
+        'SessionToken': 'mock_session_token'
+    }
+}
+MOCK_BOTO_CLIENT.assume_role.return_value = response
 
 
 class TestAWSUtils(TestCase):
@@ -61,8 +69,8 @@ class TestAWSUtils(TestCase):
                             region=REGION,
                             service='iam')
 
-    @mock_sts
-    def test_get_assume_role_session(self):
+    @patch('masu.util.aws.common.boto3.client', return_value=MOCK_BOTO_CLIENT)
+    def test_get_assume_role_session(self, mock_boto_client):
         session = utils.get_assume_role_session(self.arn)
         self.assertIsInstance(session, boto3.Session)
 
@@ -78,23 +86,19 @@ class TestAWSUtils(TestCase):
 
         self.assertEqual(out, expected_string)
 
-    @mock_sts
     @patch('masu.util.aws.common.get_cur_report_definitions',
            return_value=REPORT_DEFS)
     def test_cur_report_names_in_bucket(self, fake_report_defs):
-        session = utils.get_assume_role_session(self.arn)
-
+        session = Mock()
         report_names = utils.get_cur_report_names_in_bucket(self.account_id,
                                                             BUCKET,
                                                             session)
         self.assertIn(NAME, report_names)
 
-    @mock_sts
     @patch('masu.util.aws.common.get_cur_report_definitions',
            return_value=REPORT_DEFS)
     def test_cur_report_names_in_bucket_malformed(self, fake_report_defs):
-        session = utils.get_assume_role_session(self.arn)
-
+        session = Mock()
         report_names = utils.get_cur_report_names_in_bucket(self.account_id,
                                                             'wrong-bucket',
                                                             session)
@@ -111,18 +115,17 @@ class TestAWSUtils(TestCase):
         defs = utils.get_cur_report_definitions(self.arn)
         self.assertEqual(len(defs), 1)
 
-    @mock_sts
-    @mock_iam
     def test_get_account_alias_from_role_arn(self):
         mock_account_id = '111111111111'
         role_arn = 'arn:aws:iam::{}:role/CostManagement'.format(mock_account_id)
-
-        client = boto3.client('iam', region_name='us-east-1')
-
         mock_alias = 'test-alias'
-        client.create_account_alias(AccountAlias=mock_alias)
 
-        session = FakeSession()
+        session = Mock()
+        mock_client = Mock()
+        mock_client.list_account_aliases.return_value = {
+            'AccountAliases': [mock_alias]
+        }
+        session.client.return_value = mock_client
         account_id, account_alias = utils.get_account_alias_from_role_arn(role_arn, session)
         self.assertEqual(mock_account_id, account_id)
         self.assertEqual(mock_alias, account_alias)
@@ -139,6 +142,43 @@ class TestAWSUtils(TestCase):
         account_id, account_alias = utils.get_account_alias_from_role_arn(role_arn, mock_session)
         self.assertEqual(mock_account_id, account_id)
         self.assertEqual(mock_account_id, account_alias)
+
+    @patch('masu.util.aws.common.get_assume_role_session')
+    def test_get_account_alias_from_role_arn_no_session(self,
+                                                        mock_get_role_session):
+        mock_session = mock_get_role_session.return_value
+        mock_client = mock_session.client
+        mock_client.return_value.list_account_aliases.side_effect = ClientError({}, 'Error')
+
+        mock_account_id = '111111111111'
+        role_arn = 'arn:aws:iam::{}:role/CostManagement'.format(mock_account_id)
+
+        account_id, account_alias = utils.get_account_alias_from_role_arn(role_arn)
+        self.assertEqual(mock_account_id, account_id)
+        self.assertEqual(mock_account_id, account_alias)
+
+    def test_get_assembly_id_from_cur_key(self):
+        """Test get_assembly_id_from_cur_key is successful."""
+        expected_assembly_id = '882083b7-ea62-4aab-aa6a-f0d08d65ee2b'
+        input_key = f'/koku/20180701-20180801/{expected_assembly_id}/koku-1.csv.gz'
+        assembly_id = utils.get_assembly_id_from_cur_key(input_key)
+        self.assertEqual(expected_assembly_id, assembly_id)
+
+    def test_get_local_file_name_with_assembly(self):
+        """ Test get_local_file_name is successful with assembly ID."""
+        expected_assembly_id = '882083b7-ea62-4aab-aa6a-f0d08d65ee2b'
+        input_key = f'/koku/20180701-20180801/{expected_assembly_id}/koku-1.csv.gz'
+        expected_local_file = f'{expected_assembly_id}-koku-1.csv.gz'
+        local_file = utils.get_local_file_name(input_key)
+        self.assertEqual(expected_local_file, local_file)
+
+    def test_get_local_file_name_no_assembly(self):
+        """ Test get_local_file_name is successful with no assembly ID."""
+        input_key = '/koku/20180701-20180801/koku-Manifest.json'
+        expected_local_file = 'koku-Manifest.json'
+        local_file = utils.get_local_file_name(input_key)
+        self.assertEqual(expected_local_file, local_file)
+
 
 class AwsArnTest(TestCase):
     """AwnArn class test case."""

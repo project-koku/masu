@@ -17,8 +17,7 @@
 """Test the AWS notifiation (SNS) handler."""
 
 import boto3
-from moto import mock_sns
-from unittest.mock import patch
+from unittest.mock import patch, Mock
 import json
 from masu.external.notifications.aws.aws_notification_handler import AWSNotificationHandler, AWSNotificationHandlerError
 from masu.external.notifications.notification_interface import NotificationInterfaceFilter
@@ -35,30 +34,38 @@ class AWSNotificationHandlerTest(MasuTestCase):
         self.notification_headers = list(sns_helper.sns_notification_headers)
         self.notification_body_dict = dict(sns_helper.sns_notification_body_dict)
 
-    @mock_sns
-    def test_confirm_subscription(self):
-        # Setup
-        conn = boto3.client('sns', region_name='us-east-1')
-        response = conn.create_topic(Name='CostUsageNotificationDemo')
-        body_dict = self.confirm_body_dict
 
+    @patch('masu.external.notifications.aws.aws_notification_handler.boto3.client')
+    def test_confirm_subscription(self, mock_boto3_client):
+        sns_client = Mock()
+        sns_client.confirm_subscription.return_value = {
+            'ResponseMetadata': {
+                'HTTPStatusCode': 201
+            }
+        } 
+        mock_boto3_client.return_value = sns_client
+
+        topic_arn = 'arn:aws:sns:us-east-1:123456789012:MyTopic'
+        body_dict = self.confirm_body_dict
         headers =  sns_helper.modify_header_list(self.confirm_headers,
-                                           'X-Amz-Sns-Topic-Arn', response['TopicArn'])
-        body_dict['TopicArn'] = response['TopicArn']
+                                                 'X-Amz-Sns-Topic-Arn', topic_arn)
+        body_dict['TopicArn'] = topic_arn
         body = json.dumps(body_dict)
         try:
             AWSNotificationHandler(headers, body, validation=False)
         except Exception:
             self.fail('Unexpected exception')
 
-    @mock_sns
-    def test_confirm_subscription_not_successful(self):
-        # Setup
-        conn = boto3.client('sns', region_name='us-east-1')
-        response = conn.create_topic(Name='CostUsageNotificationDemo')
+
+    @patch('masu.external.notifications.aws.aws_notification_handler.boto3.client')
+    def test_confirm_subscription_not_successful(self, mock_boto3_client):
+        sns_client = Mock()
+        sns_client.confirm_subscription.return_value = {} 
+        mock_boto3_client.return_value = sns_client
 
         # Make the TopicArn into a non-standard, unexpected format
-        corrupted_arn_name = 'Mangle{}'.format(response['TopicArn'])
+        topic_arn = 'arn:aws:sns:us-east-1:123456789012:MyTopic'
+        corrupted_arn_name = 'Mangle{}'.format(topic_arn)
 
         body_dict = self.confirm_body_dict
 
@@ -173,7 +180,6 @@ class AWSNotificationHandlerTest(MasuTestCase):
             AWSNotificationHandler(headers, body, validation=False)
         self.assertTrue('Unexpected Subscription ARN format' in str(error.exception))
 
-    @mock_sns
     def test_get_region_unknown_region(self):
         # Set the region to an unknown value (mars-east-1) in the Topic-Arn
         headers =  sns_helper.modify_header_list(self.confirm_headers,
@@ -186,7 +192,6 @@ class AWSNotificationHandlerTest(MasuTestCase):
             AWSNotificationHandler(headers, body, validation=False)
         self.assertTrue('Unexpected region name.' in str(error.exception))
 
-    @mock_sns
     def test_get_region_missing_header(self):
         # Missing X-Amz-Sns-Topic-Arn
         headers =  sns_helper.modify_header_list(self.confirm_headers,

@@ -23,7 +23,6 @@ import boto3
 from masu.external.notifications.aws.aws_notification_handler import AWSNotificationHandlerError
 from masu.external.notification_handler import NotificationHandlerError
 from tests import MasuTestCase
-from moto import mock_sns
 
 
 class NotificationAPIViewTest(MasuTestCase):
@@ -32,20 +31,13 @@ class NotificationAPIViewTest(MasuTestCase):
     file_list = ['/var/tmp/masu/region/aws/catch-clearly.csv',
                  '/var/tmp/masu/base/aws/professor-hour-industry-television.csv']
 
-    @mock_sns
     @patch('masu.processor.orchestrator.Orchestrator.prepare', return_value=file_list)
     @patch('masu.external.notifications.aws.aws_notification_handler.AWSNotificationHandler._confirm_subscription', returns=None)
     def test_notification_handle_notification(self, file_list, mock_confirm):
         """Test the notification handling endpoint with Notification msg."""
 
-        # Create topic.
-        conn = boto3.client('sns', region_name='us-east-1')
-        conn.create_topic(Name="CostUsageReportUpdateTopic")
-        response = conn.list_topics()
-        topic_arn = response["Topics"][0]['TopicArn']
-
-        # Subscribe to topic
-        subscribe_response = conn.subscribe(TopicArn=topic_arn, Protocol='http', Endpoint='http://www.masu.com/api/v1/notification/')
+        topic_arn = 'arn:aws:sns:us-east-1:123456789012:MyTopic'
+        subscribe_arn = 'arn:aws:sns:us-east-1:123456789012:MyTopicSubscribe'
 
         header = {"X-Amz-Sns-Message-Type": "Notification",
                   "X-Amz-Sns-Message-Id": "156c18c0-c49f-5067-b3ab-4b77cae67e77",
@@ -56,7 +48,7 @@ class NotificationAPIViewTest(MasuTestCase):
                   "User-Agent": "Amazon Simple Notification Service Agent",
                   "Accept-Encoding": "gzip,deflate"}
         header['X-Amz-Sns-Topic-Arn'] = topic_arn
-        header['X-Amz-Sns-Subscription-Arn'] = subscribe_response['SubscriptionArn']
+        header['X-Amz-Sns-Subscription-Arn'] = subscribe_arn
 
         body_dict = {"Type" : "Notification",
                      "MessageId" : "156c18c0-c49f-5067-b3ab-4b77cae67e77",
@@ -75,19 +67,12 @@ class NotificationAPIViewTest(MasuTestCase):
         self.assertEqual(response.status_code, 204)
         self.assertEqual(response.headers['Content-Type'], 'text/html; charset=utf-8')
 
-    @mock_sns
     @patch('masu.external.notifications.aws.aws_notification_handler.AWSNotificationHandler._confirm_subscription', returns=None)
     def test_notification_handle_notification_error(self, mock_confirm):
         """Test the notification endpoint with error event."""
 
-        # Create topic.
-        conn = boto3.client('sns', region_name='us-east-1')
-        conn.create_topic(Name="CostUsageReportUpdateTopic")
-        response = conn.list_topics()
-        topic_arn = response["Topics"][0]['TopicArn']
-
-        # Subscribe to topic
-        subscribe_response = conn.subscribe(TopicArn=topic_arn, Protocol='http', Endpoint='http://www.masu.com/api/v1/notification/')
+        topic_arn = 'arn:aws:sns:us-east-1:123456789012:MyTopic'
+        subscribe_arn = 'arn:aws:sns:us-east-1:123456789012:MyTopicSubscribe'
 
         # Force error with invalid message type
         header = {"X-Amz-Sns-Message-Type": "InvalidMessage",
@@ -99,7 +84,7 @@ class NotificationAPIViewTest(MasuTestCase):
                   "User-Agent": "Amazon Simple Notification Service Agent",
                   "Accept-Encoding": "gzip,deflate"}
         header['X-Amz-Sns-Topic-Arn'] = topic_arn
-        header['X-Amz-Sns-Subscription-Arn'] = subscribe_response['SubscriptionArn']
+        header['X-Amz-Sns-Subscription-Arn'] = subscribe_arn
 
         body_dict = {"Type" : "InvalidMessage",
                      "MessageId" : "156c18c0-c49f-5067-b3ab-4b77cae67e77",
@@ -118,19 +103,12 @@ class NotificationAPIViewTest(MasuTestCase):
         self.assertEqual(response.status_code, 204)
         self.assertEqual(response.headers['Content-Type'], 'text/html; charset=utf-8')
 
-    @mock_sns
     @patch('masu.external.notifications.aws.aws_notification_handler.AWSNotificationHandler._confirm_subscription', returns=None)
     def test_notification_handle_notification_filter(self, mock_confirm):
         """Test the notification endpoint with filter event."""
 
-        # Create topic.
-        conn = boto3.client('sns', region_name='us-east-1')
-        conn.create_topic(Name="CostUsageReportUpdateTopic")
-        response = conn.list_topics()
-        topic_arn = response["Topics"][0]['TopicArn']
-
-        # Subscribe to topic
-        subscribe_response = conn.subscribe(TopicArn=topic_arn, Protocol='http', Endpoint='http://www.masu.com/api/v1/notification/')
+        topic_arn = 'arn:aws:sns:us-east-1:123456789012:MyTopic'
+        subscribe_arn = 'arn:aws:sns:us-east-1:123456789012:MyTopicSubscribe'
 
         header = {"X-Amz-Sns-Message-Type": "Notification",
                   "X-Amz-Sns-Message-Id": "156c18c0-c49f-5067-b3ab-4b77cae67e77",
@@ -141,7 +119,7 @@ class NotificationAPIViewTest(MasuTestCase):
                   "User-Agent": "Amazon Simple Notification Service Agent",
                   "Accept-Encoding": "gzip,deflate"}
         header['X-Amz-Sns-Topic-Arn'] = topic_arn
-        header['X-Amz-Sns-Subscription-Arn'] = subscribe_response['SubscriptionArn']
+        header['X-Amz-Sns-Subscription-Arn'] = subscribe_arn
 
         # Force filter with non-top level manifest file
         body_dict = {"Type" : "Notification",

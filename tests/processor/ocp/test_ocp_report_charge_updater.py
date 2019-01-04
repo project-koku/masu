@@ -58,7 +58,6 @@ class OCPReportChargeUpdaterTest(MasuTestCase):
     def tearDownClass(cls):
         """Close the DB session."""
         cls.accessor.close_session()
-        cls.updater.close_session()
 
     def setUp(self):
         """"Set up a test with database objects."""

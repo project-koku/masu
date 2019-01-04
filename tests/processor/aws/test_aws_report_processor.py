@@ -84,7 +84,10 @@ class AWSReportProcessorTest(MasuTestCase):
             provider_id=1
         )
 
-        cls.accessor = cls.processor.report_db
+        with ReportingCommonDBAccessor() as report_common_db:
+            cls.column_map = report_common_db.column_map
+
+        cls.accessor = AWSReportDBAccessor('acct10001', cls.column_map)
         cls.report_schema = cls.accessor.report_schema
         cls.session = cls.accessor._session
 
@@ -147,7 +150,7 @@ class AWSReportProcessorTest(MasuTestCase):
             compression=UNCOMPRESSED,
             provider_id=1
         )
-        report_db = processor.report_db
+        report_db = self.accessor
         report_schema = report_db.report_schema
         for table_name in self.report_tables:
             table = getattr(report_schema, table_name)
@@ -164,9 +167,6 @@ class AWSReportProcessorTest(MasuTestCase):
                 self.assertTrue(count >= counts[table_name])
             else:
                 self.assertTrue(count > counts[table_name])
-
-        self.assertTrue(processor.report_db._conn.closed)
-        self.assertTrue(processor.report_db._pg2_conn.closed)
 
     def test_process_gzip(self):
         """Test the processing of a gzip compressed file."""
@@ -177,7 +177,7 @@ class AWSReportProcessorTest(MasuTestCase):
             compression=GZIP_COMPRESSED,
             provider_id=1
         )
-        report_db = processor.report_db
+        report_db = self.accessor
         report_schema = report_db.report_schema
         for table_name in self.report_tables:
             table = getattr(report_schema, table_name)
@@ -194,9 +194,6 @@ class AWSReportProcessorTest(MasuTestCase):
                 self.assertTrue(count >= counts[table_name])
             else:
                 self.assertTrue(count > counts[table_name])
-
-        self.assertTrue(processor.report_db._conn.closed)
-        self.assertTrue(processor.report_db._pg2_conn.closed)
 
     def test_process_duplicates(self):
         """Test that row duplicates are not inserted into the DB."""
@@ -210,7 +207,7 @@ class AWSReportProcessorTest(MasuTestCase):
 
         # Process for the first time
         processor.process()
-        report_db = processor.report_db
+        report_db = self.accessor
         report_schema = report_db.report_schema
 
         for table_name in self.report_tables:
@@ -270,18 +267,19 @@ class AWSReportProcessorTest(MasuTestCase):
 
     def test_write_processed_rows_to_csv(self):
         """Test that the CSV bulk upload file contains proper data."""
-        bill_id = self.processor._create_cost_entry_bill(self.row)
-        cost_entry_id = self.processor._create_cost_entry(self.row, bill_id)
-        product_id = self.processor._create_cost_entry_product(self.row)
-        pricing_id = self.processor._create_cost_entry_pricing(self.row)
-        reservation_id = self.processor._create_cost_entry_reservation(self.row)
+        bill_id = self.processor._create_cost_entry_bill(self.row, self.accessor)
+        cost_entry_id = self.processor._create_cost_entry(self.row, bill_id, self.accessor)
+        product_id = self.processor._create_cost_entry_product(self.row, self.accessor)
+        pricing_id = self.processor._create_cost_entry_pricing(self.row, self.accessor)
+        reservation_id = self.processor._create_cost_entry_reservation(self.row, self.accessor)
         self.processor._create_cost_entry_line_item(
             self.row,
             cost_entry_id,
             bill_id,
             product_id,
             pricing_id,
-            reservation_id
+            reservation_id,
+            self.accessor
         )
 
         file_obj = self.processor._write_processed_rows_to_csv()
@@ -304,7 +302,7 @@ class AWSReportProcessorTest(MasuTestCase):
 
     def test_get_data_for_table(self):
         """Test that a row is disected into appropriate data structures."""
-        column_map = self.processor.report_common_db.column_map
+        column_map = self.column_map
 
         for table_name in self.report_tables:
             expected_columns = sorted(column_map[table_name].values())
@@ -347,7 +345,7 @@ class AWSReportProcessorTest(MasuTestCase):
         table_name = AWS_CUR_TABLE_MAP['bill']
         table = getattr(self.report_schema, table_name)
         id_column = getattr(table, 'id')
-        bill_id = self.processor._create_cost_entry_bill(self.row)
+        bill_id = self.processor._create_cost_entry_bill(self.row, self.accessor)
 
         self.assertIsNotNone(bill_id)
 
@@ -363,14 +361,14 @@ class AWSReportProcessorTest(MasuTestCase):
         table_name = AWS_CUR_TABLE_MAP['bill']
         table = getattr(self.report_schema, table_name)
         id_column = getattr(table, 'id')
-        bill_id = self.processor._create_cost_entry_bill(self.row)
+        bill_id = self.processor._create_cost_entry_bill(self.row, self.accessor)
 
         query = self.accessor._get_db_obj_query(table_name)
         bill = query.first()
 
         self.processor.current_bill = bill
 
-        new_bill_id = self.processor._create_cost_entry_bill(self.row)
+        new_bill_id = self.processor._create_cost_entry_bill(self.row, self.accessor)
 
         self.assertEqual(bill_id, new_bill_id)
 
@@ -382,10 +380,11 @@ class AWSReportProcessorTest(MasuTestCase):
         table = getattr(self.report_schema, table_name)
         id_column = getattr(table, 'id')
 
-        bill_id = self.processor._create_cost_entry_bill(self.row)
+        bill_id = self.processor._create_cost_entry_bill(self.row, self.accessor)
 
         cost_entry_id = self.processor._create_cost_entry(self.row,
-                                                          bill_id)
+                                                          bill_id,
+                                                          self.accessor)
         self.accessor.commit()
 
         self.assertIsNotNone(cost_entry_id)
@@ -400,7 +399,7 @@ class AWSReportProcessorTest(MasuTestCase):
         table_name = AWS_CUR_TABLE_MAP['cost_entry']
         table = getattr(self.report_schema, table_name)
 
-        bill_id = self.processor._create_cost_entry_bill(self.row)
+        bill_id = self.processor._create_cost_entry_bill(self.row, self.accessor)
         self.accessor.commit()
 
         interval = self.row.get('identity/TimeInterval')
@@ -410,16 +409,17 @@ class AWSReportProcessorTest(MasuTestCase):
         self.processor.existing_cost_entry_map[key] = expected_id
 
         cost_entry_id = self.processor._create_cost_entry(self.row,
-                                                          bill_id)
+                                                          bill_id,
+                                                          self.accessor)
         self.assertEqual(cost_entry_id, expected_id)
 
     def test_create_cost_entry_line_item(self):
         """Test that line item data is returned properly."""
-        bill_id = self.processor._create_cost_entry_bill(self.row)
-        cost_entry_id = self.processor._create_cost_entry(self.row, bill_id)
-        product_id = self.processor._create_cost_entry_product(self.row)
-        pricing_id = self.processor._create_cost_entry_pricing(self.row)
-        reservation_id = self.processor._create_cost_entry_reservation(self.row)
+        bill_id = self.processor._create_cost_entry_bill(self.row, self.accessor)
+        cost_entry_id = self.processor._create_cost_entry(self.row, bill_id, self.accessor)
+        product_id = self.processor._create_cost_entry_product(self.row, self.accessor)
+        pricing_id = self.processor._create_cost_entry_pricing(self.row, self.accessor)
+        reservation_id = self.processor._create_cost_entry_reservation(self.row, self.accessor)
 
         self.accessor.commit()
 
@@ -429,7 +429,8 @@ class AWSReportProcessorTest(MasuTestCase):
             bill_id,
             product_id,
             pricing_id,
-            reservation_id
+            reservation_id,
+            self.accessor
         )
 
         line_item = None
@@ -461,7 +462,7 @@ class AWSReportProcessorTest(MasuTestCase):
         table = getattr(self.report_schema, table_name)
         id_column = getattr(table, 'id')
 
-        product_id = self.processor._create_cost_entry_product(self.row)
+        product_id = self.processor._create_cost_entry_product(self.row, self.accessor)
 
         self.accessor.commit()
 
@@ -481,7 +482,7 @@ class AWSReportProcessorTest(MasuTestCase):
         key = (sku, product_name, region)
         self.processor.processed_report.products.update({key: expected_id})
 
-        product_id = self.processor._create_cost_entry_product(self.row)
+        product_id = self.processor._create_cost_entry_product(self.row, self.accessor)
 
         self.assertEqual(product_id, expected_id)
 
@@ -494,7 +495,7 @@ class AWSReportProcessorTest(MasuTestCase):
         key = (sku, product_name, region)
         self.processor.existing_product_map.update({key: expected_id})
 
-        product_id = self.processor._create_cost_entry_product(self.row)
+        product_id = self.processor._create_cost_entry_product(self.row, self.accessor)
 
         self.assertEqual(product_id, expected_id)
 
@@ -504,7 +505,7 @@ class AWSReportProcessorTest(MasuTestCase):
         table = getattr(self.report_schema, table_name)
         id_column = getattr(table, 'id')
 
-        pricing_id = self.processor._create_cost_entry_pricing(self.row)
+        pricing_id = self.processor._create_cost_entry_pricing(self.row, self.accessor)
 
         self.accessor.commit()
 
@@ -525,7 +526,7 @@ class AWSReportProcessorTest(MasuTestCase):
         )
         self.processor.processed_report.pricing.update({key: expected_id})
 
-        pricing_id = self.processor._create_cost_entry_pricing(self.row)
+        pricing_id = self.processor._create_cost_entry_pricing(self.row, self.accessor)
 
         self.assertEqual(pricing_id, expected_id)
 
@@ -539,7 +540,7 @@ class AWSReportProcessorTest(MasuTestCase):
         )
         self.processor.existing_pricing_map.update({key: expected_id})
 
-        pricing_id = self.processor._create_cost_entry_pricing(self.row)
+        pricing_id = self.processor._create_cost_entry_pricing(self.row, self.accessor)
 
         self.assertEqual(pricing_id, expected_id)
 
@@ -554,7 +555,7 @@ class AWSReportProcessorTest(MasuTestCase):
         table = getattr(self.report_schema, table_name)
         id_column = getattr(table, 'id')
 
-        reservation_id = self.processor._create_cost_entry_reservation(row)
+        reservation_id = self.processor._create_cost_entry_reservation(row, self.accessor)
 
         self.accessor.commit()
 
@@ -577,7 +578,7 @@ class AWSReportProcessorTest(MasuTestCase):
         table = getattr(self.report_schema, table_name)
         id_column = getattr(table, 'id')
 
-        reservation_id = self.processor._create_cost_entry_reservation(row)
+        reservation_id = self.processor._create_cost_entry_reservation(row, self.accessor)
 
         self.accessor.commit()
 
@@ -591,7 +592,7 @@ class AWSReportProcessorTest(MasuTestCase):
         row['lineItem/LineItemType'] = 'RIFee'
         res_count = row['reservation/NumberOfReservations']
         row['reservation/NumberOfReservations'] = res_count + 1
-        reservation_id = self.processor._create_cost_entry_reservation(row)
+        reservation_id = self.processor._create_cost_entry_reservation(row, self.accessor)
         self.accessor.commit()
 
         self.assertEqual(reservation_id, id_in_db)
@@ -608,7 +609,7 @@ class AWSReportProcessorTest(MasuTestCase):
         arn = self.row.get('reservation/ReservationARN')
         self.processor.processed_report.reservations.update({arn: expected_id})
 
-        reservation_id = self.processor._create_cost_entry_reservation(self.row)
+        reservation_id = self.processor._create_cost_entry_reservation(self.row, self.accessor)
 
         self.assertEqual(reservation_id, expected_id)
 
@@ -618,7 +619,7 @@ class AWSReportProcessorTest(MasuTestCase):
         arn = self.row.get('reservation/ReservationARN')
         self.processor.existing_reservation_map.update({arn: expected_id})
 
-        product_id = self.processor._create_cost_entry_reservation(self.row)
+        product_id = self.processor._create_cost_entry_reservation(self.row, self.accessor)
 
         self.assertEqual(product_id, expected_id)
 
@@ -634,11 +635,11 @@ class AWSReportProcessorTest(MasuTestCase):
 
     def test_create_line_item_hash_string(self):
         """Test that a hash string is properly formatted."""
-        bill_id = self.processor._create_cost_entry_bill(self.row)
-        cost_entry_id = self.processor._create_cost_entry(self.row, bill_id)
-        product_id = self.processor._create_cost_entry_product(self.row)
-        pricing_id = self.processor._create_cost_entry_pricing(self.row)
-        reservation_id = self.processor._create_cost_entry_reservation(self.row)
+        bill_id = self.processor._create_cost_entry_bill(self.row, self.accessor)
+        cost_entry_id = self.processor._create_cost_entry(self.row, bill_id, self.accessor)
+        product_id = self.processor._create_cost_entry_product(self.row, self.accessor)
+        pricing_id = self.processor._create_cost_entry_pricing(self.row, self.accessor)
+        reservation_id = self.processor._create_cost_entry_reservation(self.row, self.accessor)
 
         self.accessor.commit()
 
@@ -648,7 +649,8 @@ class AWSReportProcessorTest(MasuTestCase):
             bill_id,
             product_id,
             pricing_id,
-            reservation_id
+            reservation_id,
+            self.accessor
         )
 
         line_item = None

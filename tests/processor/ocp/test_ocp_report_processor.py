@@ -26,6 +26,8 @@ import tempfile
 from sqlalchemy.sql.expression import delete
 
 from masu.database import OCP_REPORT_TABLE_MAP
+from masu.database.ocp_report_db_accessor import OCPReportDBAccessor
+from masu.database.reporting_common_db_accessor import ReportingCommonDBAccessor
 from masu.exceptions import MasuProcessingError
 from masu.external import GZIP_COMPRESSED, UNCOMPRESSED
 from masu.processor.ocp.ocp_report_processor import OCPReportProcessor, ProcessedOCPReport
@@ -68,7 +70,10 @@ class OCPReportProcessorTest(MasuTestCase):
             provider_id=1
         )
 
-        cls.accessor = cls.processor.report_db
+        with ReportingCommonDBAccessor() as report_common_db:
+            cls.column_map = report_common_db.column_map
+
+        cls.accessor = OCPReportDBAccessor('acct10001', cls.column_map)
         cls.report_schema = cls.accessor.report_schema
         cls.session = cls.accessor._session
 
@@ -120,7 +125,7 @@ class OCPReportProcessorTest(MasuTestCase):
             compression=UNCOMPRESSED,
             provider_id=1
         )
-        report_db = processor.report_db
+        report_db = self.accessor
         report_schema = report_db.report_schema
         for table_name in self.report_tables:
             table = getattr(report_schema, table_name)
@@ -133,9 +138,6 @@ class OCPReportProcessorTest(MasuTestCase):
             count = report_db._session.query(table).count()
             if table_name not in ('reporting_ocpusagelineitem_daily', 'reporting_ocpusagelineitem_daily_summary'):
                 self.assertTrue(count >= counts[table_name])
-
-        self.assertTrue(processor.report_db._conn.closed)
-        self.assertTrue(processor.report_db._pg2_conn.closed)
 
     def test_process_duplicates(self):
         """Test that row duplicates are not inserted into the DB."""
@@ -150,7 +152,7 @@ class OCPReportProcessorTest(MasuTestCase):
         # Process for the first time
         processor.process()
 
-        report_db = processor.report_db
+        report_db = self.accessor
         report_schema = report_db.report_schema
 
         for table_name in self.report_tables:
@@ -208,12 +210,13 @@ class OCPReportProcessorTest(MasuTestCase):
     def test_write_processed_rows_to_csv(self):
         """Test that the CSV bulk upload file contains proper data."""
         cluster_id = '12345'
-        report_period_id = self.processor._create_report_period(self.row, cluster_id)
-        report_id = self.processor._create_report(self.row, report_period_id)
+        report_period_id = self.processor._create_report_period(self.row, cluster_id, self.accessor)
+        report_id = self.processor._create_report(self.row, report_period_id, self.accessor)
         self.processor._create_usage_report_line_item(
             self.row,
             report_period_id,
-            report_id
+            report_id,
+            self.accessor
         )
 
         file_obj = self.processor._write_processed_rows_to_csv()
@@ -240,7 +243,7 @@ class OCPReportProcessorTest(MasuTestCase):
         table = getattr(self.report_schema, table_name)
         id_column = getattr(table, 'id')
         cluster_id = '12345'
-        report_period_id = self.processor._create_report_period(self.row, cluster_id)
+        report_period_id = self.processor._create_report_period(self.row, cluster_id, self.accessor)
 
         self.assertIsNotNone(report_period_id)
 
@@ -255,9 +258,9 @@ class OCPReportProcessorTest(MasuTestCase):
         table = getattr(self.report_schema, table_name)
         id_column = getattr(table, 'id')
         cluster_id = '12345'
-        report_period_id = self.processor._create_report_period(self.row, cluster_id)
+        report_period_id = self.processor._create_report_period(self.row, cluster_id, self.accessor)
 
-        report_id = self.processor._create_report(self.row, report_period_id)
+        report_id = self.processor._create_report(self.row, report_period_id, self.accessor)
         self.accessor.commit()
 
         self.assertIsNotNone(report_id)
@@ -270,14 +273,15 @@ class OCPReportProcessorTest(MasuTestCase):
     def test_create_usage_report_line_item(self):
         """Test that line item data is returned properly."""
         cluster_id = '12345'
-        report_period_id = self.processor._create_report_period(self.row, cluster_id)
-        report_id = self.processor._create_report(self.row, report_period_id)
+        report_period_id = self.processor._create_report_period(self.row, cluster_id, self.accessor)
+        report_id = self.processor._create_report(self.row, report_period_id, self.accessor)
         row = copy.deepcopy(self.row)
         row['pod_labels'] = 'label_one:mic_check|label_two:one_two'
         self.processor._create_usage_report_line_item(
             row,
             report_period_id,
-            report_id
+            report_id,
+            self.accessor
         )
 
         line_item = None

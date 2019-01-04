@@ -204,10 +204,11 @@ class AWSReportDownloaderTest(MasuTestCase):
         out = self.report_downloader.download_report(fake_report_date)
         self.assertEqual(out, [])
 
-    @patch('masu.external.report_downloader.ReportStatsDBAccessor', return_value=Mock())
+    @patch('masu.external.report_downloader.ReportStatsDBAccessor')
     @patch('masu.util.aws.common.get_assume_role_session',
            return_value=FakeSessionDownloadError)
     def test_download_report_missing_bucket(self, mock_stats, fake_session):
+        mock_stats.return_value.__enter__ = Mock()
         fake_report_date = self.fake.date_time().replace(day=1)
         fake_report_date_str = fake_report_date.strftime('%Y%m%dT000000.000Z')
         expected_assembly_id = '882083b7-ea62-4aab-aa6a-f0d08d65ee2b'

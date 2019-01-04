@@ -107,18 +107,20 @@ class RegionMapTests(MasuTestCase):
     @patch('masu.util.aws.region_map.requests.get')
     def test_update_region_mapping_success(self, mock_response, mock_accessor):
         """test sucessful update_region_mapping()"""
+        mock_common_accessor = mock_accessor().__enter__()
         mock_response.return_value = MockResponse(self.test_data, 200)
         response = rmap.update_region_mapping()
         self.assertEqual(str(response), 'True')
-        mock_accessor.return_value.add.assert_called()
+        mock_common_accessor.add.assert_called()
 
     @patch('masu.database.reporting_common_db_accessor.ReportingCommonDBAccessor',
            autospec=True)
     @patch('masu.util.aws.region_map.requests.get')
     def test_update_region_mapping_fail(self, mock_response, mock_accessor):
         """test sucessful update_region_mapping()"""
+        mock_common_accessor = mock_accessor().__enter__()
         mock_response.return_value = MockResponse(self.test_data, 200)
-        mock_accessor.return_value.add.side_effect = IntegrityError('fake', 'fake', 'fake')
+        mock_common_accessor.add.side_effect = IntegrityError('fake', 'fake', 'fake')
 
         expected = 'WARNING:masu.util.aws.region_map:Duplicate entry in DB: "us-east-1" - "US East (N. Virginia)"'
 

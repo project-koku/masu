@@ -179,8 +179,8 @@ class ProcessReportFileTests(MasuTestCase):
                    'start_date': str(DateAccessor().today())}
 
         mock_proc = mock_processor()
-        mock_stats_acc = mock_stats_accessor()
-        mock_manifest_acc = mock_manifest_accessor()
+        mock_stats_acc = mock_stats_accessor().__enter__()
+        mock_manifest_acc = mock_manifest_accessor().__enter__()
 
         _process_report_file(schema_name, provider, provider_uuid, report_dict)
 
@@ -205,7 +205,7 @@ class ProcessReportFileTests(MasuTestCase):
                    'start_date': str(DateAccessor().today())}
 
         mock_processor.side_effect = ReportProcessorError('mock error')
-        mock_stats_acc = mock_stats_accessor()
+        mock_stats_acc = mock_stats_accessor().__enter__()
 
         _process_report_file(schema_name, provider, provider_uuid, report_dict)
 
@@ -231,8 +231,8 @@ class ProcessReportFileTests(MasuTestCase):
                    'start_date': str(DateAccessor().today())}
 
         mock_proc = mock_processor()
-        mock_stats_acc = mock_stats_accessor()
-        mock_manifest_acc = mock_manifest_accessor()
+        mock_stats_acc = mock_stats_accessor().__enter__()
+        mock_manifest_acc = mock_manifest_accessor().__enter__()
 
         _process_report_file(schema_name, provider, provider_uuid, report_dict)
 

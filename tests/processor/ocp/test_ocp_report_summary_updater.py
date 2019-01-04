@@ -40,11 +40,12 @@ class OCPReportSummaryUpdaterTest(MasuTestCase):
     def setUpClass(cls):
         """Set up the test class with required objects."""
         super().setUpClass()
-        cls.common_accessor = ReportingCommonDBAccessor()
-        cls.column_map = cls.common_accessor.column_map
+        with ReportingCommonDBAccessor() as report_common_db:
+            cls.column_map = report_common_db.column_map
+
         cls.updater = OCPReportSummaryUpdater(schema='acct10001')
 
-        cls.accessor = cls.updater._accessor
+        cls.accessor = OCPReportDBAccessor('acct10001', cls.column_map)
         cls.report_schema = cls.accessor.report_schema
         cls.session = cls.accessor._session
 
@@ -70,8 +71,6 @@ class OCPReportSummaryUpdaterTest(MasuTestCase):
     def tearDownClass(cls):
         """Tear down the test class."""
         super().tearDownClass()
-        cls.updater.close_session()
-        cls.common_accessor.close_session()
 
     def setUp(self):
         """Set up each test."""
@@ -141,8 +140,10 @@ class OCPReportSummaryUpdaterTest(MasuTestCase):
         mock_sum.assert_called_with(expected_start_date, expected_end_date)
         mock_agg.assert_called()
 
-        self.assertIsNotNone(period.summary_data_creation_datetime)
-        self.assertIsNotNone(period.summary_data_updated_datetime)
+        with OCPReportDBAccessor('acct10001', self.column_map) as accessor:
+            period = accessor.get_usage_periods_by_date(bill_date)[0]
+            self.assertIsNotNone(period.summary_data_creation_datetime)
+            self.assertIsNotNone(period.summary_data_updated_datetime)
 
     @patch('masu.processor.ocp.ocp_report_summary_updater.OCPReportDBAccessor.populate_line_item_aggregate_table')
     @patch('masu.processor.ocp.ocp_report_summary_updater.OCPReportDBAccessor.populate_line_item_daily_summary_table')
@@ -183,8 +184,10 @@ class OCPReportSummaryUpdaterTest(MasuTestCase):
         mock_sum.assert_called_with(expected_start_date, expected_end_date)
         mock_agg.assert_called()
 
-        self.assertIsNotNone(period.summary_data_creation_datetime)
-        self.assertIsNotNone(period.summary_data_updated_datetime)
+        with OCPReportDBAccessor('acct10001', self.column_map) as accessor:
+            period = accessor.get_usage_periods_by_date(bill_date)[0]
+            self.assertIsNotNone(period.summary_data_creation_datetime)
+            self.assertIsNotNone(period.summary_data_updated_datetime)
 
     @patch('masu.processor.ocp.ocp_report_summary_updater.OCPReportDBAccessor.populate_line_item_aggregate_table')
     @patch('masu.processor.ocp.ocp_report_summary_updater.OCPReportDBAccessor.populate_line_item_daily_summary_table')
@@ -237,8 +240,10 @@ class OCPReportSummaryUpdaterTest(MasuTestCase):
         mock_sum.assert_called_with(expected_start_date, expected_end_date)
         mock_agg.assert_called()
 
-        self.assertIsNotNone(period.summary_data_creation_datetime)
-        self.assertIsNotNone(period.summary_data_updated_datetime)
+        with OCPReportDBAccessor('acct10001', self.column_map) as accessor:
+            period = accessor.get_usage_periods_by_date(bill_date)[0]
+            self.assertIsNotNone(period.summary_data_creation_datetime)
+            self.assertIsNotNone(period.summary_data_updated_datetime)
 
     @patch('masu.processor.ocp.ocp_report_summary_updater.OCPReportDBAccessor.populate_line_item_aggregate_table')
     @patch('masu.processor.ocp.ocp_report_summary_updater.OCPReportDBAccessor.populate_line_item_daily_summary_table')
@@ -273,8 +278,10 @@ class OCPReportSummaryUpdaterTest(MasuTestCase):
         mock_sum.assert_called_with(expected_start_date, expected_end_date)
         mock_agg.assert_called()
 
-        self.assertIsNotNone(period.summary_data_creation_datetime)
-        self.assertIsNotNone(period.summary_data_updated_datetime)
+        with OCPReportDBAccessor('acct10001', self.column_map) as accessor:
+            period = accessor.get_usage_periods_by_date(bill_date)[0]
+            self.assertIsNotNone(period.summary_data_creation_datetime)
+            self.assertIsNotNone(period.summary_data_updated_datetime)
 
     @patch('masu.processor.ocp.ocp_report_summary_updater.OCPReportDBAccessor.populate_line_item_aggregate_table')
     @patch('masu.processor.ocp.ocp_report_summary_updater.OCPReportDBAccessor.populate_line_item_daily_summary_table')
@@ -303,8 +310,10 @@ class OCPReportSummaryUpdaterTest(MasuTestCase):
         mock_sum.assert_called_with(expected_start_date, expected_end_date)
         mock_agg.assert_called()
 
-        self.assertIsNotNone(period.summary_data_creation_datetime)
-        self.assertGreater(period.summary_data_updated_datetime, start_date)
+        with OCPReportDBAccessor('acct10001', self.column_map) as accessor:
+            period = accessor.get_usage_periods_by_date(bill_date)[0]
+            self.assertIsNotNone(period.summary_data_creation_datetime)
+            self.assertGreater(period.summary_data_updated_datetime, start_date)
 
     @patch('masu.processor.ocp.ocp_report_summary_updater.OCPReportDBAccessor.populate_line_item_aggregate_table')
     @patch('masu.processor.ocp.ocp_report_summary_updater.OCPReportDBAccessor.populate_line_item_daily_summary_table')

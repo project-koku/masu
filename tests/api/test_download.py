@@ -25,7 +25,7 @@ from tests import MasuTestCase
 class DownloadAPIViewTest(MasuTestCase):
     """Test Cases for the Download API."""
 
-    @patch('masu.processor.orchestrator.Orchestrator.prepare',
+    @patch('masu.celery.tasks.check_report_updates.delay',
            return_value=AsyncResult('dc350f15-ffc7-4fcb-92d7-2a9f1275568e'))
     def test_download(self, file_list):
         """Test the download endpoint."""

@@ -61,6 +61,7 @@ services:
       privileged: true
       volumes:
         - '.:/masu/'
+        # - '~/aws_local:/tmp/local_bucket'
         # - '~/insights_local:/var/tmp/insights_local'
       links:
           - rabbit

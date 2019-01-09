@@ -314,13 +314,12 @@ class AWSReportProcessorTest(MasuTestCase):
     def test_process_tags(self):
         """Test that tags are properly packaged in a JSON string."""
         row = {
-            'resourceTags\\User': 'value',
+            'resourceTags/user:environment': 'prod',
             'notATag': 'value',
-            'resourceTags\\System': 'value'
+            'resourceTags/System': 'value',
+            'resourceTags/system:system_key': 'system_value'
         }
-
-        expected = {key: value for key, value in row.items()
-                    if 'resourceTags' in key}
+        expected = {'environment': 'prod', 'system_key': 'system_value'}
         actual = json.loads(self.processor._process_tags(row))
 
         self.assertNotIn(row['notATag'], actual)

@@ -475,7 +475,9 @@ class TestProcessorTasks(MasuTestCase):
     @patch('masu.processor.tasks._process_report_file')
     def test_process_report_file(self, mock_process_files, mock_update_task):
         """Test process report file functionality."""
-        expected_start_date = DateAccessor().today().strftime('%Y-%m-%d')
+        expected_start_date = DateAccessor().today() - timedelta(days=2)
+        expected_end_date = DateAccessor().today().strftime('%Y-%m-%d')
+        expected_start_date = expected_start_date.strftime('%Y-%m-%d')
         schema_name = self.fake.word()
         report_dict = {
             'file': 'path/to/file',
@@ -497,6 +499,7 @@ class TestProcessorTasks(MasuTestCase):
             provider,
             provider_uuid,
             expected_start_date,
+            end_date=expected_end_date,
             manifest_id=None
         )
 

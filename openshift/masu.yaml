@@ -233,6 +233,36 @@ objects:
                   name: ${NAME}
                   key: prometheus-dir
                   optional: false
+            - name: MASU_DATE_OVERRIDE
+              valueFrom:
+                configMapKeyRef:
+                  name: ${NAME}
+                  key: date-override
+                  optional: true
+            - name: MASU_RETAIN_NUM_MONTHS
+              valueFrom:
+                configMapKeyRef:
+                  name: ${NAME}
+                  key: retain-num-months
+                  optional: true
+            - name: INITIAL_INGEST_NUM_MONTHS
+              valueFrom:
+                configMapKeyRef:
+                  name: ${NAME}
+                  key: initial-ingest-num-months
+                  optional: true
+            - name: INITIAL_INGEST_OVERRIDE
+              valueFrom:
+                configMapKeyRef:
+                  name: ${NAME}
+                  key: initial-ingest-override
+                  optional: true
+            - name: DEBUG
+              valueFrom:
+                configMapKeyRef:
+                  name: ${NAME}
+                  key: debug
+                  optional: true
           livenessProbe:
             failureThreshold: 3
             httpGet:

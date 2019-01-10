@@ -34,11 +34,19 @@ objects:
     insights-kafka-server-port: ${KAFKA_PORT}
     insights-kafka-conn-retry-interval: ${KAFKA_TIMEOUT_SECONDS}
     log-level: INFO
-    worker-queues: 'celery,download,process,remove_expired,reporting'
+    worker-queues: "celery,download,process,remove_expired,reporting"
+    schedule-report-checks: "True"
     schedule-check-interval: "60"
     remove-expired-data-on-day: "1"
     remove-expired-data-utc-time: "00:00"
     prometheus-dir: ${PROMETHEUS_DIR}
+    date-override: ""
+    retain-num-months: "3"
+    remove-expired-report-data-on-day: "1"
+    remove-expired-report-utc-time: "00:00"
+    initial-ingest-num-months: "2"
+    initial-ingest-override: "False"
+    debug: "False"
 parameters:
 - description: The name assigned to all frontend objects defined in this template.
   displayName: Name
@@ -55,22 +63,22 @@ parameters:
   name: DATABASE_SERVICE_NAME
   required: true
   value: koku-pgsql
-- description: Insights Upload Server address 
+- description: Insights Upload Server address
   displayName: Kafka server address
   name: KAFKA_HOST
   required: true
   value: localhost
-- description: Insights Upload Server namespace 
+- description: Insights Upload Server namespace
   displayName: Kafka server namespace
   name: KAFKA_NAMESPACE
   required: true
   value: myproject
-- description: Insights Upload Server port 
+- description: Insights Upload Server port
   displayName: Kafka server port
   name: KAFKA_PORT
   required: true
   value: "29092"
-- description: Insights Upload Server Connection Retry Interval 
+- description: Insights Upload Server Connection Retry Interval
   displayName: Kafka server reconnect timeout
   name: KAFKA_TIMEOUT_SECONDS
   required: true
@@ -80,4 +88,3 @@ parameters:
   name: PROMETHEUS_DIR
   required: true
   value: '/tmp'
-

@@ -193,6 +193,12 @@ objects:
                   name: ${NAME}
                   key: prometheus-dir
                   optional: false
+            - name: DEBUG
+              valueFrom:
+                configMapKeyRef:
+                  name: ${NAME}
+                  key: debug
+                  optional: true
           resources:
             requests:
               cpu: ${CELERY_SCHEDULER_CPU_REQUEST}

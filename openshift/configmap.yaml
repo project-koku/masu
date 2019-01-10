@@ -34,7 +34,7 @@ objects:
     insights-kafka-server-port: ${KAFKA_PORT}
     insights-kafka-conn-retry-interval: ${KAFKA_TIMEOUT_SECONDS}
     log-level: INFO
-    worker-queues: "celery,download,process,remove_expired,reporting"
+    worker-queues: "celery,download,remove_expired,reporting"
     schedule-report-checks: "True"
     schedule-check-interval: "60"
     remove-expired-data-on-day: "1"

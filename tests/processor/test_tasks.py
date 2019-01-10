@@ -369,7 +369,7 @@ class TestProcessorTasks(MasuTestCase):
         mock_started.return_value = None
         mock_completed.return_value = self.today
         get_report_files(**self.fake_get_report_args)
-        mock_process_files.delay.assert_called()
+        mock_process_files.assert_called()
 
     @patch('masu.processor.tasks.ReportStatsDBAccessor.get_last_completed_datetime')
     @patch('masu.processor.tasks.ReportStatsDBAccessor.get_last_started_datetime')
@@ -423,7 +423,7 @@ class TestProcessorTasks(MasuTestCase):
 
         mock_date.return_value = self.today + timedelta(hours=3)
         get_report_files(**self.fake_get_report_args)
-        mock_process_files.delay.assert_called()
+        mock_process_files.assert_called()
 
     @patch('masu.processor.tasks.ReportStatsDBAccessor.get_last_completed_datetime')
     @patch('masu.processor.tasks.ReportStatsDBAccessor.get_last_started_datetime')
@@ -469,7 +469,7 @@ class TestProcessorTasks(MasuTestCase):
         mock_started.return_value = None
         mock_completed.return_value = None
         get_report_files(**self.fake_get_report_args)
-        mock_process_files.delay.assert_called()
+        mock_process_files.assert_called()
 
     @patch('masu.processor.tasks.update_summary_tables')
     @patch('masu.processor.tasks._process_report_file')

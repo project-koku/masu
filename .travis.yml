@@ -2,6 +2,8 @@ sudo: false
 language: python
 python:
   - "3.6"
+  - "3.7"
+dist: xenial  # needed for py37
 cache: pip
 
 services:
@@ -22,7 +24,7 @@ before_install:
   - export BOTO_CONFIG=/dev/null
   - sudo rm -f /etc/boto.cfg
 install:
-    - pip install tox codecov
+    - pip install tox-travis codecov
 
 script:
     - tox

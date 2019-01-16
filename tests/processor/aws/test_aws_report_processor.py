@@ -229,6 +229,124 @@ class AWSReportProcessorTest(MasuTestCase):
             count = report_db._session.query(table).count()
             self.assertTrue(count == counts[table_name])
 
+    def test_process_finalized_rows(self):
+        """Test that a finalized bill is processed properly."""
+        data = []
+        table_name = AWS_CUR_TABLE_MAP['line_item']
+
+        with open(self.test_report, 'r') as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                data.append(row)
+
+        for row in data:
+            row['bill/InvoiceId'] = '12345'
+
+        tmp_file = '/tmp/test_process_finalized_rows.csv'
+        field_names = data[0].keys()
+
+        with open(tmp_file, 'w') as f:
+            writer = csv.DictWriter(f, fieldnames=field_names)
+            writer.writeheader()
+            writer.writerows(data)
+
+        processor = AWSReportProcessor(
+            schema_name='acct10001',
+            report_path=self.test_report,
+            compression=UNCOMPRESSED,
+            provider_id=1
+        )
+
+        # Process for the first time
+        processor.process()
+        report_db = self.accessor
+        report_schema = report_db.report_schema
+
+        bill_table_name = AWS_CUR_TABLE_MAP['bill']
+        bill_table = getattr(report_schema, bill_table_name)
+        bill = report_db._session.query(bill_table).first()
+        self.assertIsNone(bill.finalized_datetime)
+
+        table = getattr(report_schema, table_name)
+        orig_count = report_db._session.query(table).count()
+
+        processor = AWSReportProcessor(
+            schema_name='acct10001',
+            report_path=tmp_file,
+            compression=UNCOMPRESSED,
+            provider_id=1
+        )
+        # Process for the second time
+        processor.process()
+
+        count = report_db._session.query(table).count()
+        self.assertTrue(count == orig_count)
+        count = report_db._session.query(table).filter(table.invoice_id != None).count()
+        self.assertTrue(count == orig_count)
+
+        report_db._session.commit()
+        self.assertIsNotNone(bill.finalized_datetime)
+
+    def test_process_finalized_rows_small_batch_size(self):
+        """Test that a finalized bill is processed properly on batch size."""
+        data = []
+        table_name = AWS_CUR_TABLE_MAP['line_item']
+
+        with open(self.test_report, 'r') as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                data.append(row)
+
+        for row in data:
+            row['bill/InvoiceId'] = '12345'
+
+        tmp_file = '/tmp/test_process_finalized_rows.csv'
+        field_names = data[0].keys()
+
+        with open(tmp_file, 'w') as f:
+            writer = csv.DictWriter(f, fieldnames=field_names)
+            writer.writeheader()
+            writer.writerows(data)
+
+        processor = AWSReportProcessor(
+            schema_name='acct10001',
+            report_path=self.test_report,
+            compression=UNCOMPRESSED,
+            provider_id=1
+        )
+
+        # Process for the first time
+        processor.process()
+        report_db = self.accessor
+        report_schema = report_db.report_schema
+
+        bill_table_name = AWS_CUR_TABLE_MAP['bill']
+        bill_table = getattr(report_schema, bill_table_name)
+        bill = report_db._session.query(bill_table).first()
+        self.assertIsNone(bill.finalized_datetime)
+
+        table = getattr(report_schema, table_name)
+        orig_count = report_db._session.query(table).count()
+
+        processor = AWSReportProcessor(
+            schema_name='acct10001',
+            report_path=tmp_file,
+            compression=UNCOMPRESSED,
+            provider_id=1
+        )
+        processor._batch_size = 2
+        # Process for the second time
+        processor.process()
+
+        count = report_db._session.query(table).count()
+        self.assertTrue(count == orig_count)
+        count = report_db._session.query(table).filter(table.invoice_id != None).count()
+        self.assertTrue(count == orig_count)
+
+        report_db._session.commit()
+        self.assertIsNotNone(bill.finalized_datetime)
+
+
     def test_get_file_opener_default(self):
         """Test that the default file opener is returned."""
         opener, mode = self.processor._get_file_opener(UNCOMPRESSED)

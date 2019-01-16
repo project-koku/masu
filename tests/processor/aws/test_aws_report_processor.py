@@ -346,6 +346,63 @@ class AWSReportProcessorTest(MasuTestCase):
         report_db._session.commit()
         self.assertIsNotNone(bill.finalized_datetime)
 
+    def test_do_not_overwrite_finalized_bill_timestamp(self):
+        """Test that a finalized bill timestamp does not get overwritten."""
+        data = []
+        with open(self.test_report, 'r') as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                data.append(row)
+
+        for row in data:
+            row['bill/InvoiceId'] = '12345'
+
+        tmp_file = '/tmp/test_process_finalized_rows.csv'
+        field_names = data[0].keys()
+
+        with open(tmp_file, 'w') as f:
+            writer = csv.DictWriter(f, fieldnames=field_names)
+            writer.writeheader()
+            writer.writerows(data)
+
+        processor = AWSReportProcessor(
+            schema_name='acct10001',
+            report_path=self.test_report,
+            compression=UNCOMPRESSED,
+            provider_id=1
+        )
+
+        # Process for the first time
+        processor.process()
+        report_db = self.accessor
+        report_schema = report_db.report_schema
+
+        bill_table_name = AWS_CUR_TABLE_MAP['bill']
+        bill_table = getattr(report_schema, bill_table_name)
+        bill = report_db._session.query(bill_table).first()
+
+        processor = AWSReportProcessor(
+            schema_name='acct10001',
+            report_path=tmp_file,
+            compression=UNCOMPRESSED,
+            provider_id=1
+        )
+        # Process for the second time
+        processor.process()
+
+        report_db._session.commit()
+        finalized_datetime = bill.finalized_datetime
+
+        processor = AWSReportProcessor(
+            schema_name='acct10001',
+            report_path=tmp_file,
+            compression=UNCOMPRESSED,
+            provider_id=1
+        )
+        # Process for the third time to make sure the timestamp is the same
+        processor.process()
+        report_db._session.commit()
+        self.assertEqual(bill.finalized_datetime, finalized_datetime)
 
     def test_get_file_opener_default(self):
         """Test that the default file opener is returned."""

@@ -775,8 +775,6 @@ class AWSReportProcessorTest(MasuTestCase):
         self.assertEqual(db_row.number_of_reservations,
                          row['reservation/NumberOfReservations'])
 
-
-
     def test_create_cost_entry_reservation_already_processed(self):
         """Test that an already processed reservation id is returned."""
         expected_id = random.randint(1,9)
@@ -796,16 +794,6 @@ class AWSReportProcessorTest(MasuTestCase):
         product_id = self.processor._create_cost_entry_reservation(self.row, self.accessor)
 
         self.assertEqual(product_id, expected_id)
-
-    def test_get_line_item_hash_columns(self):
-        """Test that the correct list of columns is returned."""
-        table_name = AWS_CUR_TABLE_MAP['line_item']
-        columns = self.processor.column_map[table_name].values()
-        expected = [column for column in columns if column != 'invoice_id']
-
-        result = self.processor._get_line_item_hash_columns()
-
-        self.assertEqual(result, expected)
 
     def test_create_line_item_hash_string(self):
         """Test that a hash string is properly formatted."""

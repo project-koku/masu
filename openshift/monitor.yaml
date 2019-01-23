@@ -19,6 +19,9 @@ objects:
   metadata:
     annotations:
       description: Exposes and load balances the application pods
+      prometheus.io/scrape: 'true'
+      prometheus.io/path: /metrics
+      prometheus.io/port: '8888'
     name: ${NAME}-monitor
     labels:
       app: ${NAME}

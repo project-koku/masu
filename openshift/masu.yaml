@@ -20,6 +20,9 @@ objects:
     annotations:
       description: Exposes and load balances the application pods
       service.alpha.openshift.io/dependencies: '[{"name": "${DATABASE_SERVICE_NAME}", "kind": "Service"}]'
+      prometheus.io/scrape: 'true'
+      prometheus.io/path: /metrics
+      prometheus.io/port: '9100'
     name: ${NAME}
     labels:
       app: ${NAME}

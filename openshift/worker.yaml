@@ -77,8 +77,8 @@ objects:
     - github:
         secret: ${GITHUB_WEBHOOK_SECRET}
       type: GitHub
-- kind: DeploymentConfig
-  apiVersion: v1
+- kind: StatefulSet
+  apiVersion: apps/v1beta1
   metadata:
     annotations:
       description: Defines how to deploy the celery workers
@@ -89,7 +89,8 @@ objects:
   spec:
     replicas: ${CELERY_WORKER_REPLICAS}
     selector:
-      name: ${NAME}-worker
+      matchLabels:
+        app: ${NAME}
     resources:
       requests:
         cpu: ${CELERY_WORKER_CPU_REQUEST}
@@ -102,8 +103,10 @@ objects:
     template:
       metadata:
         labels:
-          name: ${NAME}-worker
+          app: ${NAME}
         name: ${NAME}-worker
+        annotations:
+          alpha.image.policy.openshift.io/resolve-names: '*'
       spec:
         containers:
         - name: ${NAME}-worker
@@ -269,10 +272,18 @@ objects:
           volumeMounts:
           - mountPath: /var/tmp/masu/
             name: ${NAME}-worker-data
-        volumes:
-        - name: ${NAME}-worker-data
-          persistentVolumeClaim:
-            claimName: ${NAME}-worker-data
+    volumeClaimTemplates:
+    - metadata:
+        labels:
+          app: ${NAME}
+          template: ${NAME}-template
+        name: ${NAME}-worker-data
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: ${VOLUME_CAPACITY}
     triggers:
     - type: ConfigChange
     - imageChangeParams:
@@ -291,19 +302,9 @@ objects:
       description: "Keeps track of changes in the application image"
     labels:
       app: ${NAME}
-- kind: PersistentVolumeClaim
-  apiVersion: v1
-  metadata:
-    labels:
-      app: ${NAME}
-      template: ${NAME}-template
-    name: ${NAME}-worker-data
   spec:
-    accessModes:
-    - ReadWriteOnce
-    resources:
-      requests:
-        storage: ${VOLUME_CAPACITY}
+    lookupPolicy:
+      local: true
 parameters:
 - description: The name assigned to all frontend objects defined in this template.
   displayName: Name

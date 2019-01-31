@@ -262,6 +262,12 @@ objects:
                   name: ${NAME}
                   key: debug
                   optional: true
+            - name: KAFKA_CONNECT
+              valueFrom:
+                configMapKeyRef:
+                  name: ${NAME}
+                  key: kafka-connect
+                  optional: true
           resources:
             requests:
               cpu: ${CELERY_WORKER_CPU_REQUEST}

@@ -126,6 +126,7 @@ oc-create-masu: oc-create-configmap oc-create-secrets
 oc-create-rabbitmq:
 	oc get statefulsets/rabbitmq || \
 	oc process -f $(TOPDIR)/openshift/rabbitmq.yaml \
+		--param-file=$(TOPDIR)/openshift/rabbitmq.env \
 		-p SOURCE_REPOSITORY_REF=$(shell git rev-parse --abbrev-ref HEAD) \
 	| oc create -f -
 

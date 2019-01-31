@@ -199,6 +199,8 @@ objects:
                   name: ${NAME}
                   key: debug
                   optional: true
+            - name: KAFKA_CONNECT
+              value: "False"
           resources:
             requests:
               cpu: ${CELERY_SCHEDULER_CPU_REQUEST}

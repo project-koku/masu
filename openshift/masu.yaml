@@ -266,6 +266,8 @@ objects:
                   name: ${NAME}
                   key: debug
                   optional: true
+            - name: KAFKA_CONNECT
+              value: "False"
           livenessProbe:
             failureThreshold: 3
             httpGet:

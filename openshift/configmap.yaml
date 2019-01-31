@@ -47,6 +47,7 @@ objects:
     initial-ingest-num-months: "2"
     initial-ingest-override: "False"
     debug: "False"
+    kafka-connect: "True"
 parameters:
 - description: The name assigned to all frontend objects defined in this template.
   displayName: Name

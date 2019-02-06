@@ -209,7 +209,7 @@ class AWSReportDBAccessor(ReportDBAccessorBase):
         self._cursor.execute(agg_sql)
         self._pg2_conn.commit()
         self._vacuum_table(table_name)
-        LOG.info(f'Finished updating %s.', table_name)
+        LOG.info('Finished updating %s.', table_name)
 
     def mark_bill_as_finalized(self, bill_id):
         """Mark a bill in the database as finalized."""
@@ -236,7 +236,7 @@ class AWSReportDBAccessor(ReportDBAccessorBase):
         self._cursor.execute(agg_sql)
         self._pg2_conn.commit()
         self._vacuum_table(table_name)
-        LOG.info(f'Finished updating %s.', table_name)
+        LOG.info('Finished updating %s.', table_name)
 
     def populate_ocp_on_aws_cost_daily_summary(self, start_date, end_date):
         """Populate the daily cost aggregated summary for OCP on AWS.

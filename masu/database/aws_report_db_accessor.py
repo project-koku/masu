@@ -237,3 +237,31 @@ class AWSReportDBAccessor(ReportDBAccessorBase):
         self._pg2_conn.commit()
         self._vacuum_table(table_name)
         LOG.info(f'Finished updating %s.', table_name)
+
+    def populate_ocp_on_aws_cost_daily_summary(self, start_date, end_date):
+        """Populate the daily cost aggregated summary for OCP on AWS.
+
+        Args:
+            start_date (datetime.date) The date to start populating the table.
+            end_date (datetime.date) The date to end on.
+
+        Returns
+            (None)
+
+        """
+        table_name = AWS_CUR_TABLE_MAP['ocp_on_aws_daily_summary']
+        summary_sql = pkgutil.get_data(
+            'masu.database',
+            'sql/reporting_ocpawscostlineitem_daily_summary.sql'
+        )
+        summary_sql = summary_sql.decode('utf-8').format(
+            uuid=str(uuid.uuid4()).replace('-', '_'),
+            start_date=start_date,
+            end_date=end_date
+        )
+        LOG.info('Updating %s from %s to %s.',
+                 table_name, start_date, end_date)
+        self._cursor.execute(summary_sql)
+        self._pg2_conn.commit()
+        self._vacuum_table(table_name)
+        LOG.info('Finished updating %s.', table_name)

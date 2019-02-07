@@ -18,7 +18,7 @@
 """Test the report_data endpoint view."""
 
 import datetime
-from unittest.mock import patch
+from unittest.mock import patch, ANY
 from urllib.parse import urlencode
 
 from celery.result import AsyncResult
@@ -146,10 +146,12 @@ class ReportDataTests(MasuTestCase):
     @patch('masu.api.report_data.update_summary_tables')
     def test_get_report_data_mismatch_types_uuid(self, mock_update):
         """Test GET report_data endpoint returns a 400 for mismatched type and uuid."""
+        start_date = datetime.date.today()
         params = {
             'schema': 'acct10001',
             'provider_uuid': '6e212746-484a-40cd-bba0-09a19d132d64',
-            'provider_type': 'OCP'}
+            'provider_type': 'OCP',
+            'start_date': start_date}
         query_string = urlencode(params)
         expected_key = 'Error'
         expected_message = 'provider_uuid and provider_type have mismatched provider types.'
@@ -222,6 +224,32 @@ class ReportDataTests(MasuTestCase):
             None,
             str(params['start_date']),
             str(params['end_date'])
+        )
+
+    @patch('masu.api.report_data.update_summary_tables')
+    def test_get_report_data_for_all_providers(self, mock_update):
+        """Test GET report_data endpoint with provider_uuid=*."""
+        start_date = datetime.date.today()
+        params = {
+            'provider_uuid': '*',
+            'start_date': start_date,
+        }
+        query_string = urlencode(params)
+        expected_key = 'Report Data Task ID'
+
+        # self.client.get()
+        response = self.client.get('/api/v1/report_data/',
+                                   query_string=query_string)
+        body = response.json
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        self.assertIn(expected_key, body)
+        mock_update.delay.assert_called_with(
+            ANY,
+            ANY,
+            ANY,
+            str(params['start_date'])
         )
 
     @patch('masu.api.report_data.remove_expired_data')

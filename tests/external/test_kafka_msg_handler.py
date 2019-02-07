@@ -48,7 +48,7 @@ class KafkaMsgHandlerTest(MasuTestCase):
         payload_file.close()
 
         self.cluster_id = 'my-ocp-cluster-1'
-        self.date_range = '20181001-20181101'
+        self.date_range = '20190201-20190301'
 
     def test_extract_payload(self):
         """Test to verify extracting payload is successful."""

@@ -56,7 +56,7 @@ class ReportProcessorTest(MasuTestCase):
     def test_initializer_ocp(self):
         """Test to initializer for OCP"""
         processor = ReportProcessor(schema_name='acct10001',
-                                     report_path='/my/report/file',
+                                     report_path='./tests/data/ocp/e6b3701e-1e91-433b-b238-a31e49937558_February-2019-my-ocp-cluster-1.csv',
                                      compression='PLAIN',
                                      provider=OPENSHIFT_CONTAINER_PLATFORM,
                                      provider_id=1,
@@ -66,7 +66,7 @@ class ReportProcessorTest(MasuTestCase):
     def test_initializer_ocp_local(self):
         """Test to initializer for OCP-local"""
         processor = ReportProcessor(schema_name='acct10001',
-                                     report_path='/my/report/file',
+                                     report_path='./tests/data/ocp/e6b3701e-1e91-433b-b238-a31e49937558_February-2019-my-ocp-cluster-1.csv',
                                      compression='PLAIN',
                                      provider=OCP_LOCAL_SERVICE_PROVIDER,
                                      provider_id=1,

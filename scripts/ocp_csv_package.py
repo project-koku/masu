@@ -24,7 +24,7 @@ import shutil
 from datetime import datetime
 import tarfile
 
-def generate_package(csv_file, cluster_id):
+def generate_package(csv_files, cluster_id):
     """
     Generate tarball package for OpenShift usage report files.
 
@@ -37,7 +37,7 @@ def generate_package(csv_file, cluster_id):
                 cluster_id - unique identifier for OCP cluster
 
     Args:
-        csv_file   - full path to the report file to be bundled
+        csv_files  - list of full path to the report files to be bundled
         cluster_id - unique identifier for OCP cluster
 
     Returns:
@@ -53,14 +53,17 @@ def generate_package(csv_file, cluster_id):
     today = datetime.today()
 
     # Copy the .csv report file to the staging directory with uuid prepended.
-    src_file_name = os.path.basename(csv_file)
-    dst_file_name = '{}_{}'.format(file_uuid, src_file_name)
-    dst_file = '{}/{}'.format(temp_dir, dst_file_name)
-    shutil.copy(csv_file, dst_file)
+    dst_file_list = []
+    for csv_file in csv_files:
+        src_file_name = os.path.basename(csv_file)
+        dst_file_name = '{}_{}'.format(file_uuid, src_file_name)
+        dst_file = '{}/{}'.format(temp_dir, dst_file_name)
+        shutil.copy(csv_file, dst_file)
+        dst_file_list.append(dst_file_name)
 
     # Populate package dictionary
     package_dict = {}
-    package_dict['file'] = dst_file_name
+    package_dict['files'] = dst_file_list
     package_dict['date'] = str(today)
     package_dict['uuid'] = str(file_uuid)
     package_dict['cluster_id'] = cluster_id
@@ -101,17 +104,22 @@ def main(args):
         print('python ocp_csv_package.py <.csv file> <cluster_id>')
         exit(2)
 
-    csv_file = args[0]
-    full_csv_path = os.path.abspath(csv_file)
-    if not os.path.isfile(full_csv_path):
-        print('Unable to locate file:', full_csv_path)
-        exit(2)
+    csv_files = args[0]
+    parsed_file_list = csv_files.split(',')
+
+    csv_files = []
+    for csv_file in parsed_file_list:
+        full_csv_path = os.path.abspath(csv_file)
+        if not os.path.isfile(full_csv_path):
+            print('Unable to locate file:', full_csv_path)
+            exit(2)
+        csv_files.append(full_csv_path)
 
     cluster_id = args[1]
     if cluster_id is None:
         print('Cluster ID not specified')
         exit(2)
-    generate_package(full_csv_path, cluster_id)
+    generate_package(csv_files, cluster_id)
 
 if '__main__' in __name__:
     main(sys.argv[1:])

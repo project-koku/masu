@@ -53,7 +53,7 @@ class OCPReportDownloaderTest(MasuTestCase):
         report_path = '{}/{}/{}'.format(REPORTS_DIR, self.cluster_id, '20180901-20181001')
         os.makedirs(report_path, exist_ok=True)
 
-        test_file_path = './tests/data/ocp/1a6e1405-d964-4749-aa5b-104f8d280a3b_pod-cpu-usage-ocp.csv'
+        test_file_path = './tests/data/ocp/e6b3701e-1e91-433b-b238-a31e49937558_February-2019-my-ocp-cluster-1.csv'
         self.test_file_path = os.path.join(report_path, os.path.basename(test_file_path))
         shutil.copyfile(test_file_path, os.path.join(report_path, self.test_file_path))
 

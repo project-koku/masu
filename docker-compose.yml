@@ -57,6 +57,7 @@ services:
         - AWS_SECRET_ACCESS_KEY
         - INSIGHTS_KAFKA_HOST=kafka
         - INSIGHTS_KAFKA_PORT=29092
+        - KAFKA_CONNECT=True
         - prometheus_multiproc_dir=/tmp
       privileged: true
       volumes:

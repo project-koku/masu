@@ -60,7 +60,8 @@ class OCPReportProcessorTest(MasuTestCase):
     def setUpClass(cls):
         """Set up the test class with required objects."""
         # These test reports should be replaced with OCP reports once processor is impelmented.
-        cls.test_report = './tests/data/ocp/1a6e1405-d964-4749-aa5b-104f8d280a3b_pod-cpu-usage-ocp.csv'
+        cls.test_report = './tests/data/ocp/e6b3701e-1e91-433b-b238-a31e49937558_February-2019-my-ocp-cluster-1.csv'
+        cls.storage_report = './tests/data/ocp/e6b3701e-1e91-433b-b238-a31e49937558_storage.csv'
         cls.test_report_gzip = './tests/data/test_cur.csv.gz'
 
         cls.processor = OCPReportProcessor(
@@ -255,17 +256,15 @@ class OCPReportProcessorTest(MasuTestCase):
         )
 
         file_obj = self.processor._write_processed_rows_to_csv()
-
         line_item_data = self.processor.processed_report.line_items.pop()
         # Convert data to CSV format
         expected_values = [str(value) if value else None
                            for value in line_item_data.values()]
 
-        reader = csv.reader(file_obj)
+        reader = csv.reader(file_obj, delimiter='\t')
         new_row = next(reader)
-        new_row = new_row[0].split('\t')
-        actual = {}
 
+        actual = {}
         for i, key in enumerate(line_item_data.keys()):
             actual[key] = new_row[i] if new_row[i] else None
 
@@ -365,3 +364,15 @@ class OCPReportProcessorTest(MasuTestCase):
         result = self.processor._process_pod_labels(test_label_str)
 
         self.assertEqual(result, expected)
+
+    def test_process_storage_default(self):
+        """Test the processing of an uncompressed storagefile."""
+        processor = OCPReportProcessor(
+            schema_name='acct10001',
+            report_path=self.storage_report,
+            compression=UNCOMPRESSED,
+            provider_id=1
+        )
+
+        processor.process()
+        self.assertIsNone(processor._report_path)

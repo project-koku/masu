@@ -30,7 +30,7 @@ from masu.database.ocp_report_db_accessor import OCPReportDBAccessor
 from masu.database.reporting_common_db_accessor import ReportingCommonDBAccessor
 from masu.exceptions import MasuProcessingError
 from masu.external import GZIP_COMPRESSED, UNCOMPRESSED
-from masu.processor.ocp.ocp_report_processor import OCPReportProcessor, ProcessedOCPReport
+from masu.processor.ocp.ocp_report_processor import OCPReportProcessor, OCPReportProcessorError, OCPReportTypes, ProcessedOCPReport
 from tests import MasuTestCase
 
 
@@ -62,9 +62,10 @@ class OCPReportProcessorTest(MasuTestCase):
         # These test reports should be replaced with OCP reports once processor is impelmented.
         cls.test_report = './tests/data/ocp/e6b3701e-1e91-433b-b238-a31e49937558_February-2019-my-ocp-cluster-1.csv'
         cls.storage_report = './tests/data/ocp/e6b3701e-1e91-433b-b238-a31e49937558_storage.csv'
+        cls.unknown_report = './tests/data/test_cur.csv'
         cls.test_report_gzip = './tests/data/test_cur.csv.gz'
 
-        cls.processor = OCPReportProcessor(
+        cls.ocp_processor = OCPReportProcessor(
             schema_name='acct10001',
             report_path=cls.test_report,
             compression=UNCOMPRESSED,
@@ -99,15 +100,15 @@ class OCPReportProcessorTest(MasuTestCase):
             self.accessor._cursor.execute(f'DELETE FROM {table_name}')
         self.accessor._pg2_conn.commit()
 
-        self.processor.processed_report.remove_processed_rows()
+        self.ocp_processor._processor.processed_report.remove_processed_rows()
 
-        self.processor.line_item_columns = None
+        self.ocp_processor._processor.line_item_columns = None
 
     def test_initializer(self):
         """Test initializer."""
-        self.assertIsNotNone(self.processor._schema_name)
-        self.assertIsNotNone(self.processor._report_path)
-        self.assertIsNotNone(self.processor._compression)
+        self.assertIsNotNone(self.ocp_processor._processor._schema_name)
+        self.assertIsNotNone(self.ocp_processor._processor._report_path)
+        self.assertIsNotNone(self.ocp_processor._processor._compression)
 
     def test_initializer_unsupported_compression(self):
         """Assert that an error is raised for an invalid compression."""
@@ -116,6 +117,31 @@ class OCPReportProcessorTest(MasuTestCase):
                                report_path=self.test_report,
                                compression='unsupported',
                                provider_id=1)
+
+    def test_detect_report_type(self):
+        usage_processor = OCPReportProcessor(
+            schema_name='acct10001',
+            report_path=self.test_report,
+            compression=UNCOMPRESSED,
+            provider_id=1
+        )
+        self.assertEqual(usage_processor.report_type, OCPReportTypes.CPU_MEM_USAGE)
+
+        storage_processor = OCPReportProcessor(
+            schema_name='acct10001',
+            report_path=self.storage_report,
+            compression=UNCOMPRESSED,
+            provider_id=1
+        )
+        self.assertEqual(storage_processor.report_type, OCPReportTypes.STORAGE)
+
+        with self.assertRaises(OCPReportProcessorError):
+            OCPReportProcessor(
+                schema_name='acct10001',
+                report_path=self.unknown_report,
+                compression=UNCOMPRESSED,
+                provider_id=1
+            )
 
     def test_process_default(self):
         """Test the processing of an uncompressed file."""
@@ -211,14 +237,14 @@ class OCPReportProcessorTest(MasuTestCase):
 
     def test_get_file_opener_default(self):
         """Test that the default file opener is returned."""
-        opener, mode = self.processor._get_file_opener(UNCOMPRESSED)
+        opener, mode = self.ocp_processor._processor._get_file_opener(UNCOMPRESSED)
 
         self.assertEqual(opener, open)
         self.assertEqual(mode, 'r')
 
     def test_get_file_opener_gzip(self):
         """Test that the gzip file opener is returned."""
-        opener, mode = self.processor._get_file_opener(GZIP_COMPRESSED)
+        opener, mode = self.ocp_processor._processor._get_file_opener(GZIP_COMPRESSED)
 
         self.assertEqual(opener, gzip.open)
         self.assertEqual(mode, 'rt')
@@ -228,15 +254,15 @@ class OCPReportProcessorTest(MasuTestCase):
         test_entry = {'key': 'value'}
         counts = {}
         ce_maps = {
-            'report_periods': self.processor.existing_report_periods_map,
-            'reports': self.processor.existing_report_map,
+            'report_periods': self.ocp_processor._processor.existing_report_periods_map,
+            'reports': self.ocp_processor._processor.existing_report_map,
         }
 
         for name, ce_map in ce_maps.items():
             counts[name] =  len(ce_map.values())
             ce_map.update(test_entry)
 
-        self.processor._update_mappings()
+        self.ocp_processor._processor._update_mappings()
 
         for name, ce_map in ce_maps.items():
             self.assertTrue(len(ce_map.values()) > counts[name])
@@ -246,17 +272,17 @@ class OCPReportProcessorTest(MasuTestCase):
     def test_write_processed_rows_to_csv(self):
         """Test that the CSV bulk upload file contains proper data."""
         cluster_id = '12345'
-        report_period_id = self.processor._create_report_period(self.row, cluster_id, self.accessor)
-        report_id = self.processor._create_report(self.row, report_period_id, self.accessor)
-        self.processor._create_usage_report_line_item(
+        report_period_id = self.ocp_processor._processor._create_report_period(self.row, cluster_id, self.accessor)
+        report_id = self.ocp_processor._processor._create_report(self.row, report_period_id, self.accessor)
+        self.ocp_processor._processor._create_usage_report_line_item(
             self.row,
             report_period_id,
             report_id,
             self.accessor
         )
 
-        file_obj = self.processor._write_processed_rows_to_csv()
-        line_item_data = self.processor.processed_report.line_items.pop()
+        file_obj = self.ocp_processor._processor._write_processed_rows_to_csv()
+        line_item_data = self.ocp_processor._processor.processed_report.line_items.pop()
         # Convert data to CSV format
         expected_values = [str(value) if value else None
                            for value in line_item_data.values()]
@@ -277,7 +303,7 @@ class OCPReportProcessorTest(MasuTestCase):
         table = getattr(self.report_schema, table_name)
         id_column = getattr(table, 'id')
         cluster_id = '12345'
-        report_period_id = self.processor._create_report_period(self.row, cluster_id, self.accessor)
+        report_period_id = self.ocp_processor._processor._create_report_period(self.row, cluster_id, self.accessor)
 
         self.assertIsNotNone(report_period_id)
 
@@ -292,9 +318,9 @@ class OCPReportProcessorTest(MasuTestCase):
         table = getattr(self.report_schema, table_name)
         id_column = getattr(table, 'id')
         cluster_id = '12345'
-        report_period_id = self.processor._create_report_period(self.row, cluster_id, self.accessor)
+        report_period_id = self.ocp_processor._processor._create_report_period(self.row, cluster_id, self.accessor)
 
-        report_id = self.processor._create_report(self.row, report_period_id, self.accessor)
+        report_id = self.ocp_processor._processor._create_report(self.row, report_period_id, self.accessor)
         self.accessor.commit()
 
         self.assertIsNotNone(report_id)
@@ -307,11 +333,11 @@ class OCPReportProcessorTest(MasuTestCase):
     def test_create_usage_report_line_item(self):
         """Test that line item data is returned properly."""
         cluster_id = '12345'
-        report_period_id = self.processor._create_report_period(self.row, cluster_id, self.accessor)
-        report_id = self.processor._create_report(self.row, report_period_id, self.accessor)
+        report_period_id = self.ocp_processor._processor._create_report_period(self.row, cluster_id, self.accessor)
+        report_id = self.ocp_processor._processor._create_report(self.row, report_period_id, self.accessor)
         row = copy.deepcopy(self.row)
         row['pod_labels'] = 'label_one:mic_check|label_two:one_two'
-        self.processor._create_usage_report_line_item(
+        self.ocp_processor._processor._create_usage_report_line_item(
             row,
             report_period_id,
             report_id,
@@ -319,15 +345,15 @@ class OCPReportProcessorTest(MasuTestCase):
         )
 
         line_item = None
-        if self.processor.processed_report.line_items:
-            line_item = self.processor.processed_report.line_items[-1]
+        if self.ocp_processor._processor.processed_report.line_items:
+            line_item = self.ocp_processor._processor.processed_report.line_items[-1]
 
         self.assertIsNotNone(line_item)
         self.assertEqual(line_item.get('report_period_id'), report_period_id)
         self.assertEqual(line_item.get('report_id'), report_id)
         self.assertIsNotNone(line_item.get('pod_labels'))
 
-        self.assertIsNotNone(self.processor.line_item_columns)
+        self.assertIsNotNone(self.ocp_processor._processor.line_item_columns)
 
     def test_remove_temp_cur_files(self):
         """Test to remove temporary usage report files."""
@@ -336,7 +362,7 @@ class OCPReportProcessorTest(MasuTestCase):
         manifest_id = 1
         expected_delete_list = []
 
-        removed_files = self.processor.remove_temp_cur_files(cur_dir, manifest_id)
+        removed_files = self.ocp_processor.remove_temp_cur_files(cur_dir, manifest_id)
         self.assertEqual(sorted(removed_files), sorted(expected_delete_list))
 
         shutil.rmtree(cur_dir)
@@ -351,7 +377,7 @@ class OCPReportProcessorTest(MasuTestCase):
             'three': 'final'
         })
 
-        result = self.processor._process_pod_labels(test_label_str)
+        result = self.ocp_processor._processor._process_pod_labels(test_label_str)
 
         self.assertEqual(result, expected)
 
@@ -361,7 +387,7 @@ class OCPReportProcessorTest(MasuTestCase):
 
         expected = json.dumps({})
 
-        result = self.processor._process_pod_labels(test_label_str)
+        result = self.ocp_processor._processor._process_pod_labels(test_label_str)
 
         self.assertEqual(result, expected)
 
@@ -375,4 +401,4 @@ class OCPReportProcessorTest(MasuTestCase):
         )
 
         processor.process()
-        self.assertIsNone(processor._report_path)
+        self.assertIsNotNone(processor._processor._report_path)

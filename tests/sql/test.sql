@@ -1793,7 +1793,8 @@ CREATE TABLE public.reporting_common_reportcolumnmap (
     provider_type character varying(50) NOT NULL,
     provider_column_name character varying(128) NOT NULL,
     database_table character varying(50) NOT NULL,
-    database_column character varying(128) NOT NULL
+    database_column character varying(128) NOT NULL,
+    report_type character varying(50)
 );
 
 
@@ -2161,64 +2162,66 @@ ALTER TABLE ONLY public.si_unit_scale ALTER COLUMN id SET DEFAULT nextval('publi
 --
 
 COPY acct10001.django_migrations (id, app, name, applied) FROM stdin;
-1	contenttypes	0001_initial	2019-02-07 18:15:42.054002+00
-2	auth	0001_initial	2019-02-07 18:15:42.072959+00
-3	admin	0001_initial	2019-02-07 18:15:42.111687+00
-4	admin	0002_logentry_remove_auto_add	2019-02-07 18:15:42.123136+00
-5	admin	0003_logentry_add_action_flag_choices	2019-02-07 18:15:42.136422+00
-6	api	0001_initial	2019-02-07 18:15:42.181609+00
-7	api	0002_auto_20180926_1905	2019-02-07 18:15:42.193086+00
-8	api	0003_auto_20181008_1819	2019-02-07 18:15:42.215015+00
-9	api	0004_auto_20181012_1507	2019-02-07 18:15:42.226235+00
-10	api	0005_auto_20181109_2121	2019-02-07 18:15:42.234529+00
-11	api	0006_delete_rate	2019-02-07 18:15:42.240539+00
-12	api	0007_auto_20181213_1940	2019-02-07 18:15:42.257714+00
-13	contenttypes	0002_remove_content_type_name	2019-02-07 18:15:42.27382+00
-14	auth	0002_alter_permission_name_max_length	2019-02-07 18:15:42.281535+00
-15	auth	0003_alter_user_email_max_length	2019-02-07 18:15:42.294367+00
-16	auth	0004_alter_user_username_opts	2019-02-07 18:15:42.30695+00
-17	auth	0005_alter_user_last_login_null	2019-02-07 18:15:42.318333+00
-18	auth	0006_require_contenttypes_0002	2019-02-07 18:15:42.322039+00
-19	auth	0007_alter_validators_add_error_messages	2019-02-07 18:15:42.332718+00
-20	auth	0008_alter_user_username_max_length	2019-02-07 18:15:42.344511+00
-21	auth	0009_alter_user_last_name_max_length	2019-02-07 18:15:42.355537+00
-22	rates	0001_initial	2019-02-07 18:15:42.376539+00
-23	rates	0002_auto_20181205_1810	2019-02-07 18:15:42.382316+00
-24	reporting	0001_initial	2019-02-07 18:15:42.713353+00
-25	reporting	0002_auto_20180926_1818	2019-02-07 18:15:42.863261+00
-26	reporting	0003_auto_20180928_1840	2019-02-07 18:15:42.937737+00
-27	reporting	0004_auto_20181003_1633	2019-02-07 18:15:43.062095+00
-28	reporting	0005_auto_20181003_1416	2019-02-07 18:15:43.084934+00
-29	reporting	0006_awscostentrylineitemaggregates_account_alias	2019-02-07 18:15:43.099332+00
-30	reporting	0007_awscostentrybill_provider_id	2019-02-07 18:15:43.111138+00
-31	reporting	0008_auto_20181012_1724	2019-02-07 18:15:43.124097+00
-32	reporting	0009_auto_20181016_1940	2019-02-07 18:15:43.173902+00
-33	reporting	0010_auto_20181017_1659	2019-02-07 18:15:43.332974+00
-34	reporting	0011_auto_20181018_1811	2019-02-07 18:15:43.414317+00
-35	reporting	0012_auto_20181106_1502	2019-02-07 18:15:43.432873+00
-36	reporting	0013_auto_20181107_1956	2019-02-07 18:15:43.512636+00
-37	reporting	0014_auto_20181108_0207	2019-02-07 18:15:43.523868+00
-38	reporting	0015_auto_20181109_1618	2019-02-07 18:15:43.530174+00
-39	reporting	0016_delete_rate	2019-02-07 18:15:43.539655+00
-40	reporting	0017_auto_20181121_1444	2019-02-07 18:15:43.574226+00
-41	reporting	0018_auto_20181129_0217	2019-02-07 18:15:43.701744+00
-42	reporting	0019_auto_20181206_2138	2019-02-07 18:15:43.724342+00
-43	reporting	0020_auto_20181211_1557	2019-02-07 18:15:43.752167+00
-44	reporting	0021_auto_20181212_1816	2019-02-07 18:15:43.782539+00
-45	reporting	0022_auto_20181221_1617	2019-02-07 18:15:43.800007+00
-46	reporting	0023_awscostentrylineitemdailysummary_tags	2019-02-07 18:15:43.811529+00
-47	reporting	0024_ocpusagepodlabelsummary	2019-02-07 18:15:43.824884+00
-48	reporting	0025_auto_20190128_1825	2019-02-07 18:15:43.850628+00
-49	reporting	0026_auto_20190130_1746	2019-02-07 18:15:43.887491+00
-50	reporting	0027_auto_20190205_1659	2019-02-07 18:15:43.899631+00
-51	reporting	0028_auto_20190205_2022	2019-02-07 18:15:43.975035+00
-52	reporting	0029_auto_20190207_1526	2019-02-07 18:15:44.071948+00
-53	reporting_common	0001_initial	2019-02-07 18:15:44.092073+00
-54	reporting_common	0002_auto_20180926_1905	2019-02-07 18:15:44.101634+00
-55	reporting_common	0003_auto_20180928_1732	2019-02-07 18:15:44.107532+00
-56	reporting_common	0004_auto_20181003_1859	2019-02-07 18:15:44.13978+00
-57	reporting_common	0005_auto_20181127_2046	2019-02-07 18:15:44.146504+00
-58	sessions	0001_initial	2019-02-07 18:15:44.153395+00
+1	contenttypes	0001_initial	2019-02-11 16:21:15.76127+00
+2	auth	0001_initial	2019-02-11 16:21:15.79944+00
+3	admin	0001_initial	2019-02-11 16:21:15.809829+00
+4	admin	0002_logentry_remove_auto_add	2019-02-11 16:21:15.818085+00
+5	admin	0003_logentry_add_action_flag_choices	2019-02-11 16:21:15.825828+00
+6	api	0001_initial	2019-02-11 16:21:15.863155+00
+7	api	0002_auto_20180926_1905	2019-02-11 16:21:15.870373+00
+8	api	0003_auto_20181008_1819	2019-02-11 16:21:15.887375+00
+9	api	0004_auto_20181012_1507	2019-02-11 16:21:15.89509+00
+10	api	0005_auto_20181109_2121	2019-02-11 16:21:15.900611+00
+11	api	0006_delete_rate	2019-02-11 16:21:15.903792+00
+12	api	0007_auto_20181213_1940	2019-02-11 16:21:15.916495+00
+13	contenttypes	0002_remove_content_type_name	2019-02-11 16:21:15.929028+00
+14	auth	0002_alter_permission_name_max_length	2019-02-11 16:21:15.934376+00
+15	auth	0003_alter_user_email_max_length	2019-02-11 16:21:15.944486+00
+16	auth	0004_alter_user_username_opts	2019-02-11 16:21:15.952745+00
+17	auth	0005_alter_user_last_login_null	2019-02-11 16:21:15.960683+00
+18	auth	0006_require_contenttypes_0002	2019-02-11 16:21:15.962287+00
+19	auth	0007_alter_validators_add_error_messages	2019-02-11 16:21:15.970292+00
+20	auth	0008_alter_user_username_max_length	2019-02-11 16:21:15.978063+00
+21	auth	0009_alter_user_last_name_max_length	2019-02-11 16:21:15.986522+00
+22	rates	0001_initial	2019-02-11 16:21:16.00323+00
+23	rates	0002_auto_20181205_1810	2019-02-11 16:21:16.007204+00
+24	reporting	0001_initial	2019-02-11 16:21:16.275814+00
+25	reporting	0002_auto_20180926_1818	2019-02-11 16:21:16.396856+00
+26	reporting	0003_auto_20180928_1840	2019-02-11 16:21:16.460851+00
+27	reporting	0004_auto_20181003_1633	2019-02-11 16:21:16.56388+00
+28	reporting	0005_auto_20181003_1416	2019-02-11 16:21:16.586247+00
+29	reporting	0006_awscostentrylineitemaggregates_account_alias	2019-02-11 16:21:16.602618+00
+30	reporting	0007_awscostentrybill_provider_id	2019-02-11 16:21:16.612499+00
+31	reporting	0008_auto_20181012_1724	2019-02-11 16:21:16.624356+00
+32	reporting	0009_auto_20181016_1940	2019-02-11 16:21:16.67417+00
+33	reporting	0010_auto_20181017_1659	2019-02-11 16:21:16.826514+00
+34	reporting	0011_auto_20181018_1811	2019-02-11 16:21:16.923616+00
+35	reporting	0012_auto_20181106_1502	2019-02-11 16:21:16.942598+00
+36	reporting	0013_auto_20181107_1956	2019-02-11 16:21:17.0238+00
+37	reporting	0014_auto_20181108_0207	2019-02-11 16:21:17.034691+00
+38	reporting	0015_auto_20181109_1618	2019-02-11 16:21:17.043346+00
+39	reporting	0016_delete_rate	2019-02-11 16:21:17.049265+00
+40	reporting	0017_auto_20181121_1444	2019-02-11 16:21:17.082552+00
+41	reporting	0018_auto_20181129_0217	2019-02-11 16:21:17.196936+00
+42	reporting	0019_auto_20181206_2138	2019-02-11 16:21:17.216511+00
+43	reporting	0020_auto_20181211_1557	2019-02-11 16:21:17.243453+00
+44	reporting	0021_auto_20181212_1816	2019-02-11 16:21:17.269805+00
+45	reporting	0022_auto_20181221_1617	2019-02-11 16:21:17.282692+00
+46	reporting	0023_awscostentrylineitemdailysummary_tags	2019-02-11 16:21:17.291238+00
+47	reporting	0024_ocpusagepodlabelsummary	2019-02-11 16:21:17.304643+00
+48	reporting	0025_auto_20190128_1825	2019-02-11 16:21:17.325108+00
+49	reporting	0026_auto_20190130_1746	2019-02-11 16:21:17.352805+00
+50	reporting	0027_auto_20190205_1659	2019-02-11 16:21:17.360288+00
+51	reporting	0028_auto_20190205_2022	2019-02-11 16:21:17.422028+00
+52	reporting	0029_auto_20190207_1526	2019-02-11 16:21:17.504916+00
+53	reporting_common	0001_initial	2019-02-11 16:21:17.521717+00
+54	reporting_common	0002_auto_20180926_1905	2019-02-11 16:21:17.52924+00
+55	reporting_common	0003_auto_20180928_1732	2019-02-11 16:21:17.53369+00
+56	reporting_common	0004_auto_20181003_1859	2019-02-11 16:21:17.562575+00
+57	reporting_common	0005_auto_20181127_2046	2019-02-11 16:21:17.567523+00
+58	reporting_common	0006_auto_20190208_0316	2019-02-11 16:21:17.581111+00
+59	reporting_common	0007_auto_20190208_0316	2019-02-11 16:21:17.587529+00
+60	sessions	0001_initial	2019-02-11 16:21:17.593422+00
 \.
 
 
@@ -2411,7 +2414,7 @@ COPY acct10001.reporting_ocpusagereportperiod (id, cluster_id, report_period_sta
 --
 
 COPY public.api_customer (id, date_created, uuid, account_id, schema_name) FROM stdin;
-1	2019-02-07 18:15:41.970484+00	621b0d30-798e-4dd0-86cb-d32b3781e0ee	10001	acct10001
+1	2019-02-11 16:21:15.690864+00	04819ef6-0bee-4d17-b774-d01eecacb5ac	10001	acct10001
 \.
 
 
@@ -2458,7 +2461,7 @@ COPY public.api_tenant (id, schema_name) FROM stdin;
 --
 
 COPY public.api_user (id, uuid, username, email, date_created, is_active, customer_id) FROM stdin;
-1	0e3eb6de-ece3-453d-b53b-6b2c865b2b62	user_dev	user_dev@foo.com	2019-02-07 18:15:44.22501+00	t	1
+1	1139a313-68dc-4933-b9b4-971c991fda6e	user_dev	user_dev@foo.com	2019-02-11 16:21:17.648266+00	t	1
 \.
 
 
@@ -2467,9 +2470,9 @@ COPY public.api_user (id, uuid, username, email, date_created, is_active, custom
 --
 
 COPY public.api_userpreference (id, uuid, preference, name, description, user_id) FROM stdin;
-1	25ab51ae-271d-4b4a-9f3b-21c2d6966119	{"currency": "USD"}	currency	default preference	1
-2	35ca7f62-cb2c-42f9-a9f2-6634d68985a8	{"timezone": "UTC"}	timezone	default preference	1
-3	07b1895c-6794-48bd-994c-eba6b21d62cc	{"locale": "en_US.UTF-8"}	locale	default preference	1
+1	a4ab8882-0624-4126-9c5f-a8049fdca6a2	{"currency": "USD"}	currency	default preference	1
+2	c9e4f90d-eda3-4b1c-a51d-9a584abef06b	{"timezone": "UTC"}	timezone	default preference	1
+3	c62f9297-f121-47d9-81bb-1e8c80ce0a16	{"locale": "en_US.UTF-8"}	locale	default preference	1
 \.
 
 
@@ -2752,64 +2755,66 @@ COPY public.django_content_type (id, app_label, model) FROM stdin;
 --
 
 COPY public.django_migrations (id, app, name, applied) FROM stdin;
-1	contenttypes	0001_initial	2019-02-07 18:13:00.870434+00
-2	auth	0001_initial	2019-02-07 18:13:01.013903+00
-3	admin	0001_initial	2019-02-07 18:13:01.041331+00
-4	admin	0002_logentry_remove_auto_add	2019-02-07 18:13:01.075698+00
-5	admin	0003_logentry_add_action_flag_choices	2019-02-07 18:13:01.086644+00
-6	api	0001_initial	2019-02-07 18:13:01.24769+00
-7	api	0002_auto_20180926_1905	2019-02-07 18:13:01.25917+00
-8	api	0003_auto_20181008_1819	2019-02-07 18:13:01.301802+00
-9	api	0004_auto_20181012_1507	2019-02-07 18:13:01.315636+00
-10	api	0005_auto_20181109_2121	2019-02-07 18:13:01.335641+00
-11	api	0006_delete_rate	2019-02-07 18:13:01.343549+00
-12	api	0007_auto_20181213_1940	2019-02-07 18:13:01.385755+00
-13	contenttypes	0002_remove_content_type_name	2019-02-07 18:13:01.416457+00
-14	auth	0002_alter_permission_name_max_length	2019-02-07 18:13:01.42682+00
-15	auth	0003_alter_user_email_max_length	2019-02-07 18:13:01.440533+00
-16	auth	0004_alter_user_username_opts	2019-02-07 18:13:01.452288+00
-17	auth	0005_alter_user_last_login_null	2019-02-07 18:13:01.467239+00
-18	auth	0006_require_contenttypes_0002	2019-02-07 18:13:01.472008+00
-19	auth	0007_alter_validators_add_error_messages	2019-02-07 18:13:01.483394+00
-20	auth	0008_alter_user_username_max_length	2019-02-07 18:13:01.499602+00
-21	auth	0009_alter_user_last_name_max_length	2019-02-07 18:13:01.51529+00
-22	rates	0001_initial	2019-02-07 18:13:01.523377+00
-23	rates	0002_auto_20181205_1810	2019-02-07 18:13:01.529439+00
-24	reporting	0001_initial	2019-02-07 18:13:01.685612+00
-25	reporting	0002_auto_20180926_1818	2019-02-07 18:13:01.747053+00
-26	reporting	0003_auto_20180928_1840	2019-02-07 18:13:01.810447+00
-27	reporting	0004_auto_20181003_1633	2019-02-07 18:13:01.851756+00
-28	reporting	0005_auto_20181003_1416	2019-02-07 18:13:01.877526+00
-29	reporting	0006_awscostentrylineitemaggregates_account_alias	2019-02-07 18:13:01.887392+00
-30	reporting	0007_awscostentrybill_provider_id	2019-02-07 18:13:01.897352+00
-31	reporting	0008_auto_20181012_1724	2019-02-07 18:13:01.907444+00
-32	reporting	0009_auto_20181016_1940	2019-02-07 18:13:01.944986+00
-33	reporting	0010_auto_20181017_1659	2019-02-07 18:13:01.993307+00
-34	reporting	0011_auto_20181018_1811	2019-02-07 18:13:02.035775+00
-35	reporting	0012_auto_20181106_1502	2019-02-07 18:13:02.047093+00
-36	reporting	0013_auto_20181107_1956	2019-02-07 18:13:02.116654+00
-37	reporting	0014_auto_20181108_0207	2019-02-07 18:13:02.129626+00
-38	reporting	0015_auto_20181109_1618	2019-02-07 18:13:02.13673+00
-39	reporting	0016_delete_rate	2019-02-07 18:13:02.142228+00
-40	reporting	0017_auto_20181121_1444	2019-02-07 18:13:02.172336+00
-41	reporting	0018_auto_20181129_0217	2019-02-07 18:13:02.277871+00
-42	reporting	0019_auto_20181206_2138	2019-02-07 18:13:02.29769+00
-43	reporting	0020_auto_20181211_1557	2019-02-07 18:13:02.316879+00
-44	reporting	0021_auto_20181212_1816	2019-02-07 18:13:02.344427+00
-45	reporting	0022_auto_20181221_1617	2019-02-07 18:13:02.387824+00
-46	reporting	0023_awscostentrylineitemdailysummary_tags	2019-02-07 18:13:02.398706+00
-47	reporting	0024_ocpusagepodlabelsummary	2019-02-07 18:13:02.405422+00
-48	reporting	0025_auto_20190128_1825	2019-02-07 18:13:02.427013+00
-49	reporting	0026_auto_20190130_1746	2019-02-07 18:13:02.444689+00
-50	reporting	0027_auto_20190205_1659	2019-02-07 18:13:02.450006+00
-51	reporting	0028_auto_20190205_2022	2019-02-07 18:13:02.49821+00
-52	reporting	0029_auto_20190207_1526	2019-02-07 18:13:02.521274+00
-53	reporting_common	0001_initial	2019-02-07 18:13:02.582898+00
-54	reporting_common	0002_auto_20180926_1905	2019-02-07 18:13:02.67266+00
-55	reporting_common	0003_auto_20180928_1732	2019-02-07 18:13:02.733561+00
-56	reporting_common	0004_auto_20181003_1859	2019-02-07 18:13:02.794516+00
-57	reporting_common	0005_auto_20181127_2046	2019-02-07 18:13:02.860737+00
-58	sessions	0001_initial	2019-02-07 18:13:02.879642+00
+1	contenttypes	0001_initial	2019-02-11 16:20:54.799354+00
+2	auth	0001_initial	2019-02-11 16:20:54.881131+00
+3	admin	0001_initial	2019-02-11 16:20:54.908823+00
+4	admin	0002_logentry_remove_auto_add	2019-02-11 16:20:54.943919+00
+5	admin	0003_logentry_add_action_flag_choices	2019-02-11 16:20:54.95421+00
+6	api	0001_initial	2019-02-11 16:20:55.186933+00
+7	api	0002_auto_20180926_1905	2019-02-11 16:20:55.199121+00
+8	api	0003_auto_20181008_1819	2019-02-11 16:20:55.24188+00
+9	api	0004_auto_20181012_1507	2019-02-11 16:20:55.254645+00
+10	api	0005_auto_20181109_2121	2019-02-11 16:20:55.273385+00
+11	api	0006_delete_rate	2019-02-11 16:20:55.280137+00
+12	api	0007_auto_20181213_1940	2019-02-11 16:20:55.318142+00
+13	contenttypes	0002_remove_content_type_name	2019-02-11 16:20:55.347219+00
+14	auth	0002_alter_permission_name_max_length	2019-02-11 16:20:55.355011+00
+15	auth	0003_alter_user_email_max_length	2019-02-11 16:20:55.369187+00
+16	auth	0004_alter_user_username_opts	2019-02-11 16:20:55.381098+00
+17	auth	0005_alter_user_last_login_null	2019-02-11 16:20:55.393323+00
+18	auth	0006_require_contenttypes_0002	2019-02-11 16:20:55.396543+00
+19	auth	0007_alter_validators_add_error_messages	2019-02-11 16:20:55.406907+00
+20	auth	0008_alter_user_username_max_length	2019-02-11 16:20:55.422161+00
+21	auth	0009_alter_user_last_name_max_length	2019-02-11 16:20:55.43681+00
+22	rates	0001_initial	2019-02-11 16:20:55.444822+00
+23	rates	0002_auto_20181205_1810	2019-02-11 16:20:55.450126+00
+24	reporting	0001_initial	2019-02-11 16:20:55.596094+00
+25	reporting	0002_auto_20180926_1818	2019-02-11 16:20:55.656628+00
+26	reporting	0003_auto_20180928_1840	2019-02-11 16:20:55.71583+00
+27	reporting	0004_auto_20181003_1633	2019-02-11 16:20:55.756557+00
+28	reporting	0005_auto_20181003_1416	2019-02-11 16:20:55.781574+00
+29	reporting	0006_awscostentrylineitemaggregates_account_alias	2019-02-11 16:20:55.790401+00
+30	reporting	0007_awscostentrybill_provider_id	2019-02-11 16:20:55.800162+00
+31	reporting	0008_auto_20181012_1724	2019-02-11 16:20:55.809495+00
+32	reporting	0009_auto_20181016_1940	2019-02-11 16:20:55.844787+00
+33	reporting	0010_auto_20181017_1659	2019-02-11 16:20:55.89051+00
+34	reporting	0011_auto_20181018_1811	2019-02-11 16:20:55.931621+00
+35	reporting	0012_auto_20181106_1502	2019-02-11 16:20:55.941928+00
+36	reporting	0013_auto_20181107_1956	2019-02-11 16:20:56.014873+00
+37	reporting	0014_auto_20181108_0207	2019-02-11 16:20:56.02786+00
+38	reporting	0015_auto_20181109_1618	2019-02-11 16:20:56.034604+00
+39	reporting	0016_delete_rate	2019-02-11 16:20:56.039691+00
+40	reporting	0017_auto_20181121_1444	2019-02-11 16:20:56.07265+00
+41	reporting	0018_auto_20181129_0217	2019-02-11 16:20:56.177008+00
+42	reporting	0019_auto_20181206_2138	2019-02-11 16:20:56.197814+00
+43	reporting	0020_auto_20181211_1557	2019-02-11 16:20:56.217557+00
+44	reporting	0021_auto_20181212_1816	2019-02-11 16:20:56.247792+00
+45	reporting	0022_auto_20181221_1617	2019-02-11 16:20:56.258553+00
+46	reporting	0023_awscostentrylineitemdailysummary_tags	2019-02-11 16:20:56.267195+00
+47	reporting	0024_ocpusagepodlabelsummary	2019-02-11 16:20:56.272744+00
+48	reporting	0025_auto_20190128_1825	2019-02-11 16:20:56.29289+00
+49	reporting	0026_auto_20190130_1746	2019-02-11 16:20:56.310264+00
+50	reporting	0027_auto_20190205_1659	2019-02-11 16:20:56.316053+00
+51	reporting	0028_auto_20190205_2022	2019-02-11 16:20:56.393606+00
+52	reporting	0029_auto_20190207_1526	2019-02-11 16:20:56.41813+00
+53	reporting_common	0001_initial	2019-02-11 16:20:56.473712+00
+54	reporting_common	0002_auto_20180926_1905	2019-02-11 16:20:56.554685+00
+55	reporting_common	0003_auto_20180928_1732	2019-02-11 16:20:56.612731+00
+56	reporting_common	0004_auto_20181003_1859	2019-02-11 16:20:56.671778+00
+57	reporting_common	0005_auto_20181127_2046	2019-02-11 16:20:56.736738+00
+58	reporting_common	0006_auto_20190208_0316	2019-02-11 16:20:56.760975+00
+59	reporting_common	0007_auto_20190208_0316	2019-02-11 16:20:56.900449+00
+60	sessions	0001_initial	2019-02-11 16:20:56.917966+00
 \.
 
 
@@ -2849,74 +2854,85 @@ COPY public.reporting_common_costusagereportstatus (id, report_name, last_comple
 -- Data for Name: reporting_common_reportcolumnmap; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.reporting_common_reportcolumnmap (id, provider_type, provider_column_name, database_table, database_column) FROM stdin;
-1	AWS	bill/BillingEntity	reporting_awscostentrybill	billing_resource
-2	AWS	bill/BillType	reporting_awscostentrybill	bill_type
-3	AWS	bill/PayerAccountId	reporting_awscostentrybill	payer_account_id
-4	AWS	bill/BillingPeriodStartDate	reporting_awscostentrybill	billing_period_start
-5	AWS	bill/BillingPeriodEndDate	reporting_awscostentrybill	billing_period_end
-6	AWS	bill/InvoiceId	reporting_awscostentrylineitem	invoice_id
-7	AWS	lineItem/LineItemType	reporting_awscostentrylineitem	line_item_type
-8	AWS	lineItem/UsageAccountId	reporting_awscostentrylineitem	usage_account_id
-9	AWS	lineItem/UsageStartDate	reporting_awscostentrylineitem	usage_start
-10	AWS	lineItem/UsageEndDate	reporting_awscostentrylineitem	usage_end
-11	AWS	lineItem/ProductCode	reporting_awscostentrylineitem	product_code
-12	AWS	lineItem/UsageType	reporting_awscostentrylineitem	usage_type
-13	AWS	lineItem/Operation	reporting_awscostentrylineitem	operation
-14	AWS	lineItem/AvailabilityZone	reporting_awscostentrylineitem	availability_zone
-15	AWS	lineItem/ResourceId	reporting_awscostentrylineitem	resource_id
-16	AWS	lineItem/UsageAmount	reporting_awscostentrylineitem	usage_amount
-17	AWS	lineItem/NormalizationFactor	reporting_awscostentrylineitem	normalization_factor
-18	AWS	lineItem/NormalizedUsageAmount	reporting_awscostentrylineitem	normalized_usage_amount
-19	AWS	lineItem/CurrencyCode	reporting_awscostentrylineitem	currency_code
-20	AWS	lineItem/UnblendedRate	reporting_awscostentrylineitem	unblended_rate
-21	AWS	lineItem/UnblendedCost	reporting_awscostentrylineitem	unblended_cost
-22	AWS	lineItem/BlendedRate	reporting_awscostentrylineitem	blended_rate
-23	AWS	lineItem/BlendedCost	reporting_awscostentrylineitem	blended_cost
-24	AWS	lineItem/TaxType	reporting_awscostentrylineitem	tax_type
-25	AWS	pricing/publicOnDemandCost	reporting_awscostentrylineitem	public_on_demand_cost
-26	AWS	pricing/publicOnDemandRate	reporting_awscostentrylineitem	public_on_demand_rate
-27	AWS	pricing/term	reporting_awscostentrypricing	term
-28	AWS	pricing/unit	reporting_awscostentrypricing	unit
-29	AWS	product/sku	reporting_awscostentryproduct	sku
-30	AWS	product/ProductName	reporting_awscostentryproduct	product_name
-31	AWS	product/productFamily	reporting_awscostentryproduct	product_family
-32	AWS	product/servicecode	reporting_awscostentryproduct	service_code
-33	AWS	product/region	reporting_awscostentryproduct	region
-34	AWS	product/instanceType	reporting_awscostentryproduct	instance_type
-35	AWS	product/memory	reporting_awscostentryproduct	memory
-36	AWS	product/memory_unit	reporting_awscostentryproduct	memory_unit
-37	AWS	product/vcpu	reporting_awscostentryproduct	vcpu
-38	AWS	reservation/ReservationARN	reporting_awscostentryreservation	reservation_arn
-39	AWS	reservation/NumberOfReservations	reporting_awscostentryreservation	number_of_reservations
-40	AWS	reservation/UnitsPerReservation	reporting_awscostentryreservation	units_per_reservation
-41	AWS	reservation/StartTime	reporting_awscostentryreservation	start_time
-42	AWS	reservation/EndTime	reporting_awscostentryreservation	end_time
-43	AWS	reservation/AmortizedUpfrontFeeForBillingPeriod	reporting_awscostentrylineitem	reservation_amortized_upfront_fee
-44	AWS	reservation/AmortizedUpfrontCostForUsage	reporting_awscostentrylineitem	reservation_amortized_upfront_cost_for_usage
-45	AWS	reservation/RecurringFeeForUsage	reporting_awscostentrylineitem	reservation_recurring_fee_for_usage
-46	AWS	reservation/UnusedQuantity	reporting_awscostentrylineitem	reservation_unused_quantity
-47	AWS	reservation/UnusedRecurringFee	reporting_awscostentrylineitem	reservation_unused_recurring_fee
-68	OCP	cluster_id	reporting_ocpusagereportperiod	cluster_id
-69	OCP	report_period_start	reporting_ocpusagereportperiod	report_period_start
-70	OCP	report_period_end	reporting_ocpusagereportperiod	report_period_end
-71	OCP	interval_start	reporting_ocpusagereport	interval_start
-72	OCP	interval_end	reporting_ocpusagereport	interval_end
-73	OCP	namespace	reporting_ocpusagelineitem	namespace
-74	OCP	pod	reporting_ocpusagelineitem	pod
-75	OCP	node	reporting_ocpusagelineitem	node
-76	OCP	pod_usage_cpu_core_seconds	reporting_ocpusagelineitem	pod_usage_cpu_core_seconds
-77	OCP	pod_request_cpu_core_seconds	reporting_ocpusagelineitem	pod_request_cpu_core_seconds
-78	OCP	pod_limit_cpu_core_seconds	reporting_ocpusagelineitem	pod_limit_cpu_core_seconds
-79	OCP	pod_usage_memory_byte_seconds	reporting_ocpusagelineitem	pod_usage_memory_byte_seconds
-80	OCP	pod_request_memory_byte_seconds	reporting_ocpusagelineitem	pod_request_memory_byte_seconds
-81	OCP	pod_limit_memory_byte_seconds	reporting_ocpusagelineitem	pod_limit_memory_byte_seconds
-82	OCP	node_capacity_cpu_cores	reporting_ocpusagelineitem	node_capacity_cpu_cores
-83	OCP	node_capacity_cpu_core_seconds	reporting_ocpusagelineitem	node_capacity_cpu_core_seconds
-84	OCP	node_capacity_memory_bytes	reporting_ocpusagelineitem	node_capacity_memory_bytes
-85	OCP	node_capacity_memory_byte_seconds	reporting_ocpusagelineitem	node_capacity_memory_byte_seconds
-86	OCP	resource_id	reporting_ocpusagelineitem	resource_id
-87	OCP	pod_labels	reporting_ocpusagelineitem	pod_labels
+COPY public.reporting_common_reportcolumnmap (id, provider_type, provider_column_name, database_table, database_column, report_type) FROM stdin;
+88	OCP	cluster_id	reporting_ocpusagereportperiod	cluster_id	OCP-CPU-MEM
+89	OCP	report_period_start	reporting_ocpusagereportperiod	report_period_start	OCP-CPU-MEM
+90	OCP	report_period_end	reporting_ocpusagereportperiod	report_period_end	OCP-CPU-MEM
+91	OCP	interval_start	reporting_ocpusagereport	interval_start	OCP-CPU-MEM
+92	OCP	interval_end	reporting_ocpusagereport	interval_end	OCP-CPU-MEM
+93	OCP	namespace	reporting_ocpusagelineitem	namespace	OCP-CPU-MEM
+94	OCP	pod	reporting_ocpusagelineitem	pod	OCP-CPU-MEM
+95	OCP	node	reporting_ocpusagelineitem	node	OCP-CPU-MEM
+96	OCP	pod_usage_cpu_core_seconds	reporting_ocpusagelineitem	pod_usage_cpu_core_seconds	OCP-CPU-MEM
+97	OCP	pod_request_cpu_core_seconds	reporting_ocpusagelineitem	pod_request_cpu_core_seconds	OCP-CPU-MEM
+98	OCP	pod_limit_cpu_core_seconds	reporting_ocpusagelineitem	pod_limit_cpu_core_seconds	OCP-CPU-MEM
+99	OCP	pod_usage_memory_byte_seconds	reporting_ocpusagelineitem	pod_usage_memory_byte_seconds	OCP-CPU-MEM
+100	OCP	pod_request_memory_byte_seconds	reporting_ocpusagelineitem	pod_request_memory_byte_seconds	OCP-CPU-MEM
+101	OCP	pod_limit_memory_byte_seconds	reporting_ocpusagelineitem	pod_limit_memory_byte_seconds	OCP-CPU-MEM
+102	OCP	node_capacity_cpu_cores	reporting_ocpusagelineitem	node_capacity_cpu_cores	OCP-CPU-MEM
+103	OCP	node_capacity_cpu_core_seconds	reporting_ocpusagelineitem	node_capacity_cpu_core_seconds	OCP-CPU-MEM
+104	OCP	node_capacity_memory_bytes	reporting_ocpusagelineitem	node_capacity_memory_bytes	OCP-CPU-MEM
+105	OCP	node_capacity_memory_byte_seconds	reporting_ocpusagelineitem	node_capacity_memory_byte_seconds	OCP-CPU-MEM
+106	OCP	resource_id	reporting_ocpusagelineitem	resource_id	OCP-CPU-MEM
+107	OCP	pod_labels	reporting_ocpusagelineitem	pod_labels	OCP-CPU-MEM
+108	OCP	pod	reporting_ocpstoragelineitem	pod	OCP-STORAGE
+109	OCP	namespace	reporting_ocpstoragelineitem	namespace	OCP-STORAGE
+110	OCP	persistentvolumeclaim	reporting_ocpstoragelineitem	persistentvolumeclaim	OCP-STORAGE
+111	OCP	persistentvolume	reporting_ocpstoragelineitem	persistentvolume	OCP-STORAGE
+112	OCP	storageclass	reporting_ocpstoragelineitem	storageclass	OCP-STORAGE
+113	OCP	persistentvolumeclaim_capacity_bytes	reporting_ocpstoragelineitem	persistentvolumeclaim_capacity_bytes	OCP-STORAGE
+114	OCP	persistentvolumeclaim_capacity_byte_seconds	reporting_ocpstoragelineitem	persistentvolumeclaim_capacity_byte_seconds	OCP-STORAGE
+115	OCP	volume_request_storage_byte_seconds	reporting_ocpstoragelineitem	volume_request_storage_byte_seconds	OCP-STORAGE
+116	OCP	persistentvolumeclaim_usage_byte_seconds	reporting_ocpstoragelineitem	persistentvolumeclaim_usage_byte_seconds	OCP-STORAGE
+117	OCP	persistentvolume_labels	reporting_ocpstoragelineitem	persistentvolume_labels	OCP-STORAGE
+118	OCP	persistentvolumeclaim_labels	reporting_ocpstoragelineitem	persistentvolumeclaim_labels	OCP-STORAGE
+119	AWS	bill/BillingEntity	reporting_awscostentrybill	billing_resource	AWS-CUR
+120	AWS	bill/BillType	reporting_awscostentrybill	bill_type	AWS-CUR
+121	AWS	bill/PayerAccountId	reporting_awscostentrybill	payer_account_id	AWS-CUR
+122	AWS	bill/BillingPeriodStartDate	reporting_awscostentrybill	billing_period_start	AWS-CUR
+123	AWS	bill/BillingPeriodEndDate	reporting_awscostentrybill	billing_period_end	AWS-CUR
+124	AWS	bill/InvoiceId	reporting_awscostentrylineitem	invoice_id	AWS-CUR
+125	AWS	lineItem/LineItemType	reporting_awscostentrylineitem	line_item_type	AWS-CUR
+126	AWS	lineItem/UsageAccountId	reporting_awscostentrylineitem	usage_account_id	AWS-CUR
+127	AWS	lineItem/UsageStartDate	reporting_awscostentrylineitem	usage_start	AWS-CUR
+128	AWS	lineItem/UsageEndDate	reporting_awscostentrylineitem	usage_end	AWS-CUR
+129	AWS	lineItem/ProductCode	reporting_awscostentrylineitem	product_code	AWS-CUR
+130	AWS	lineItem/UsageType	reporting_awscostentrylineitem	usage_type	AWS-CUR
+131	AWS	lineItem/Operation	reporting_awscostentrylineitem	operation	AWS-CUR
+132	AWS	lineItem/AvailabilityZone	reporting_awscostentrylineitem	availability_zone	AWS-CUR
+133	AWS	lineItem/ResourceId	reporting_awscostentrylineitem	resource_id	AWS-CUR
+134	AWS	lineItem/UsageAmount	reporting_awscostentrylineitem	usage_amount	AWS-CUR
+135	AWS	lineItem/NormalizationFactor	reporting_awscostentrylineitem	normalization_factor	AWS-CUR
+136	AWS	lineItem/NormalizedUsageAmount	reporting_awscostentrylineitem	normalized_usage_amount	AWS-CUR
+137	AWS	lineItem/CurrencyCode	reporting_awscostentrylineitem	currency_code	AWS-CUR
+138	AWS	lineItem/UnblendedRate	reporting_awscostentrylineitem	unblended_rate	AWS-CUR
+139	AWS	lineItem/UnblendedCost	reporting_awscostentrylineitem	unblended_cost	AWS-CUR
+140	AWS	lineItem/BlendedRate	reporting_awscostentrylineitem	blended_rate	AWS-CUR
+141	AWS	lineItem/BlendedCost	reporting_awscostentrylineitem	blended_cost	AWS-CUR
+142	AWS	lineItem/TaxType	reporting_awscostentrylineitem	tax_type	AWS-CUR
+143	AWS	pricing/publicOnDemandCost	reporting_awscostentrylineitem	public_on_demand_cost	AWS-CUR
+144	AWS	pricing/publicOnDemandRate	reporting_awscostentrylineitem	public_on_demand_rate	AWS-CUR
+145	AWS	pricing/term	reporting_awscostentrypricing	term	AWS-CUR
+146	AWS	pricing/unit	reporting_awscostentrypricing	unit	AWS-CUR
+147	AWS	product/sku	reporting_awscostentryproduct	sku	AWS-CUR
+148	AWS	product/ProductName	reporting_awscostentryproduct	product_name	AWS-CUR
+149	AWS	product/productFamily	reporting_awscostentryproduct	product_family	AWS-CUR
+150	AWS	product/servicecode	reporting_awscostentryproduct	service_code	AWS-CUR
+151	AWS	product/region	reporting_awscostentryproduct	region	AWS-CUR
+152	AWS	product/instanceType	reporting_awscostentryproduct	instance_type	AWS-CUR
+153	AWS	product/memory	reporting_awscostentryproduct	memory	AWS-CUR
+154	AWS	product/memory_unit	reporting_awscostentryproduct	memory_unit	AWS-CUR
+155	AWS	product/vcpu	reporting_awscostentryproduct	vcpu	AWS-CUR
+156	AWS	reservation/ReservationARN	reporting_awscostentryreservation	reservation_arn	AWS-CUR
+157	AWS	reservation/NumberOfReservations	reporting_awscostentryreservation	number_of_reservations	AWS-CUR
+158	AWS	reservation/UnitsPerReservation	reporting_awscostentryreservation	units_per_reservation	AWS-CUR
+159	AWS	reservation/StartTime	reporting_awscostentryreservation	start_time	AWS-CUR
+160	AWS	reservation/EndTime	reporting_awscostentryreservation	end_time	AWS-CUR
+161	AWS	reservation/AmortizedUpfrontFeeForBillingPeriod	reporting_awscostentrylineitem	reservation_amortized_upfront_fee	AWS-CUR
+162	AWS	reservation/AmortizedUpfrontCostForUsage	reporting_awscostentrylineitem	reservation_amortized_upfront_cost_for_usage	AWS-CUR
+163	AWS	reservation/RecurringFeeForUsage	reporting_awscostentrylineitem	reservation_recurring_fee_for_usage	AWS-CUR
+164	AWS	reservation/UnusedQuantity	reporting_awscostentrylineitem	reservation_unused_quantity	AWS-CUR
+165	AWS	reservation/UnusedRecurringFee	reporting_awscostentrylineitem	reservation_unused_recurring_fee	AWS-CUR
 \.
 
 
@@ -2932,7 +2948,7 @@ COPY public.si_unit_scale (id, prefix, prefix_symbol, multiplying_factor) FROM s
 -- Name: django_migrations_id_seq; Type: SEQUENCE SET; Schema: acct10001; Owner: postgres
 --
 
-SELECT pg_catalog.setval('acct10001.django_migrations_id_seq', 58, true);
+SELECT pg_catalog.setval('acct10001.django_migrations_id_seq', 60, true);
 
 
 --
@@ -3191,7 +3207,7 @@ SELECT pg_catalog.setval('public.django_content_type_id_seq', 42, true);
 -- Name: django_migrations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.django_migrations_id_seq', 58, true);
+SELECT pg_catalog.setval('public.django_migrations_id_seq', 60, true);
 
 
 --
@@ -3219,7 +3235,7 @@ SELECT pg_catalog.setval('public.reporting_common_costusagereportstatus_id_seq',
 -- Name: reporting_common_reportcolumnmap_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.reporting_common_reportcolumnmap_id_seq', 87, true);
+SELECT pg_catalog.setval('public.reporting_common_reportcolumnmap_id_seq', 165, true);
 
 
 --
@@ -3870,19 +3886,19 @@ ALTER TABLE ONLY public.reporting_common_costusagereportstatus
 
 
 --
+-- Name: reporting_common_reportcolumnmap reporting_common_reportc_report_type_provider_col_986f6289_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.reporting_common_reportcolumnmap
+    ADD CONSTRAINT reporting_common_reportc_report_type_provider_col_986f6289_uniq UNIQUE (report_type, provider_column_name);
+
+
+--
 -- Name: reporting_common_reportcolumnmap reporting_common_reportcolumnmap_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.reporting_common_reportcolumnmap
     ADD CONSTRAINT reporting_common_reportcolumnmap_pkey PRIMARY KEY (id);
-
-
---
--- Name: reporting_common_reportcolumnmap reporting_common_reportcolumnmap_provider_column_name_key; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.reporting_common_reportcolumnmap
-    ADD CONSTRAINT reporting_common_reportcolumnmap_provider_column_name_key UNIQUE (provider_column_name);
 
 
 --
@@ -4417,13 +4433,6 @@ CREATE INDEX reporting_common_costusagereportmanifest_provider_id_6abb15de ON pu
 --
 
 CREATE INDEX reporting_common_costusagereportstatus_manifest_id_62ef64b9 ON public.reporting_common_costusagereportstatus USING btree (manifest_id);
-
-
---
--- Name: reporting_common_reportc_provider_column_name_e01eaba3_like; Type: INDEX; Schema: public; Owner: postgres
---
-
-CREATE INDEX reporting_common_reportc_provider_column_name_e01eaba3_like ON public.reporting_common_reportcolumnmap USING btree (provider_column_name varchar_pattern_ops);
 
 
 --

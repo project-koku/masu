@@ -25,6 +25,7 @@ import tempfile
 
 from sqlalchemy.sql.expression import delete
 
+from masu.config import Config
 from masu.database import OCP_REPORT_TABLE_MAP
 from masu.database.ocp_report_db_accessor import OCPReportDBAccessor
 from masu.database.reporting_common_db_accessor import ReportingCommonDBAccessor
@@ -32,6 +33,7 @@ from masu.exceptions import MasuProcessingError
 from masu.external import GZIP_COMPRESSED, UNCOMPRESSED
 from masu.processor.ocp.ocp_report_processor import OCPReportProcessor, OCPReportProcessorError, OCPReportTypes, ProcessedOCPReport
 from tests import MasuTestCase
+from unittest.mock import patch
 
 
 class ProcessedOCPReportTest(MasuTestCase):
@@ -165,6 +167,30 @@ class OCPReportProcessorTest(MasuTestCase):
             count = report_db._session.query(table).count()
             if table_name not in ('reporting_ocpusagelineitem_daily', 'reporting_ocpusagelineitem_daily_summary'):
                 self.assertTrue(count >= counts[table_name])
+
+    def test_process_default_small_batches(self):
+        """Test the processing of an uncompressed file in small batches."""
+        with patch.object(Config, 'REPORT_PROCESSING_BATCH_SIZE', 5):
+            counts = {}
+            processor = OCPReportProcessor(
+                schema_name='acct10001',
+                report_path=self.test_report,
+                compression=UNCOMPRESSED,
+                provider_id=1
+            )
+            report_db = self.accessor
+            report_schema = report_db.report_schema
+            for table_name in self.report_tables:
+                table = getattr(report_schema, table_name)
+                count = report_db._session.query(table).count()
+                counts[table_name] = count
+
+            processor.process()
+            for table_name in self.report_tables:
+                table = getattr(report_schema, table_name)
+                count = report_db._session.query(table).count()
+                if table_name not in ('reporting_ocpusagelineitem_daily', 'reporting_ocpusagelineitem_daily_summary'):
+                    self.assertTrue(count >= counts[table_name])
 
     def test_process_duplicates(self):
         """Test that row duplicates are not inserted into the DB."""
@@ -355,6 +381,98 @@ class OCPReportProcessorTest(MasuTestCase):
 
         self.assertIsNotNone(self.ocp_processor._processor.line_item_columns)
 
+    def test_create_usage_report_line_item_storage_no_labels(self):
+        """Test that line item data is returned properly."""
+        cluster_id = '12345'
+        report_period_id = self.ocp_processor._processor._create_report_period(self.row, cluster_id, self.accessor)
+        report_id = self.ocp_processor._processor._create_report(self.row, report_period_id, self.accessor)
+        row = copy.deepcopy(self.row)
+        row['persistentvolume_labels'] = ''
+        row['persistentvolumeclaim_labels'] = ''
+        storage_processor = OCPReportProcessor(
+            schema_name='acct10001',
+            report_path=self.storage_report,
+            compression=UNCOMPRESSED,
+            provider_id=1
+        )
+        storage_processor._processor._create_usage_report_line_item(
+            row,
+            report_period_id,
+            report_id,
+            self.accessor
+        )
+
+        line_item = None
+        if storage_processor._processor.processed_report.line_items:
+            line_item = storage_processor._processor.processed_report.line_items[-1]
+
+        self.assertIsNotNone(line_item)
+        self.assertEqual(line_item.get('report_period_id'), report_period_id)
+        self.assertEqual(line_item.get('report_id'), report_id)
+        self.assertEqual(line_item.get('persistentvolume_labels'), '{}')
+        self.assertEqual(line_item.get('persistentvolumeclaim_labels'), '{}')
+
+        self.assertIsNotNone(storage_processor._processor.line_item_columns)
+
+    def test_create_usage_report_line_item_storage_missing_labels(self):
+        """Test that line item data is returned properly."""
+        cluster_id = '12345'
+        storage_processor = OCPReportProcessor(
+            schema_name='acct10001',
+            report_path=self.storage_report,
+            compression=UNCOMPRESSED,
+            provider_id=1
+        )
+        report_period_id = storage_processor._processor._create_report_period(self.row, cluster_id, self.accessor)
+        report_id = storage_processor._processor._create_report(self.row, report_period_id, self.accessor)
+        row = copy.deepcopy(self.row)
+        del row['pod_labels']
+
+        storage_processor._processor._create_usage_report_line_item(
+            row,
+            report_period_id,
+            report_id,
+            self.accessor
+        )
+
+        line_item = None
+        if storage_processor._processor.processed_report.line_items:
+            line_item = storage_processor._processor.processed_report.line_items[-1]
+    
+        self.assertIsNotNone(line_item)
+        self.assertEqual(line_item.get('report_period_id'), report_period_id)
+        self.assertEqual(line_item.get('report_id'), report_id)
+        self.assertEqual(line_item.get('persistentvolume_labels'), '{}')
+        self.assertEqual(line_item.get('persistentvolumeclaim_labels'), '{}')
+
+        self.assertIsNotNone(storage_processor._processor.line_item_columns)
+
+    def test_create_usage_report_line_item_missing_labels(self):
+        """Test that line item data with missing pod_labels is returned properly."""
+        cluster_id = '12345'
+        report_period_id = self.ocp_processor._processor._create_report_period(self.row, cluster_id, self.accessor)
+        report_id = self.ocp_processor._processor._create_report(self.row, report_period_id, self.accessor)
+        row = copy.deepcopy(self.row)
+
+        del row['pod_labels']
+        self.ocp_processor._processor._create_usage_report_line_item(
+            row,
+            report_period_id,
+            report_id,
+            self.accessor
+        )
+
+        line_item = None
+        if self.ocp_processor._processor.processed_report.line_items:
+            line_item = self.ocp_processor._processor.processed_report.line_items[-1]
+
+        self.assertIsNotNone(line_item)
+        self.assertEqual(line_item.get('report_period_id'), report_period_id)
+        self.assertEqual(line_item.get('report_id'), report_id)
+        self.assertEqual(line_item.get('pod_labels'), '{}')
+
+        self.assertIsNotNone(self.ocp_processor._processor.line_item_columns)
+
     def test_remove_temp_cur_files(self):
         """Test to remove temporary usage report files."""
         # Update once temporary file logic is implemented.
@@ -365,6 +483,22 @@ class OCPReportProcessorTest(MasuTestCase):
         removed_files = self.ocp_processor.remove_temp_cur_files(cur_dir, manifest_id)
         self.assertEqual(sorted(removed_files), sorted(expected_delete_list))
 
+        shutil.rmtree(cur_dir)
+
+    def test_remove_temp_cur_files_storage(self):
+        """Test to remove temporary storage report files."""
+        # Update once temporary file logic is implemented.
+        cur_dir = tempfile.mkdtemp()
+        manifest_id = 1
+        expected_delete_list = []
+        storage_processor = OCPReportProcessor(
+            schema_name='acct10001',
+            report_path=self.storage_report,
+            compression=UNCOMPRESSED,
+            provider_id=1
+        )
+        removed_files = storage_processor.remove_temp_cur_files(cur_dir, manifest_id)
+        self.assertEqual(sorted(removed_files), sorted(expected_delete_list))
         shutil.rmtree(cur_dir)
 
     def test_process_pod_labels(self):
@@ -400,5 +534,85 @@ class OCPReportProcessorTest(MasuTestCase):
             provider_id=1
         )
 
+        report_db = self.accessor
+        table_name = OCP_REPORT_TABLE_MAP['storage_line_item']
+        report_schema = report_db.report_schema
+        table = getattr(report_schema, table_name)
+        before_count = report_db._session.query(table).count()
+
         processor.process()
-        self.assertIsNotNone(processor._processor._report_path)
+
+        after_count = report_db._session.query(table).count()
+        self.assertGreater(after_count, before_count)
+
+    def test_process_storage_duplicates(self):
+        """Test that row duplicate storage rows are not inserted into the DB."""
+        counts = {}
+        processor = OCPReportProcessor(
+            schema_name='acct10001',
+            report_path=self.storage_report,
+            compression=UNCOMPRESSED,
+            provider_id=1
+        )
+
+        # Process for the first time
+        processor.process()
+
+        report_db = self.accessor
+        report_schema = report_db.report_schema
+
+        for table_name in self.report_tables:
+            table = getattr(report_schema, table_name)
+            count = report_db._session.query(table).count()
+            counts[table_name] = count
+
+        processor = OCPReportProcessor(
+            schema_name='acct10001',
+            report_path=self.storage_report,
+            compression=UNCOMPRESSED,
+            provider_id=1
+        )
+        # Process for the second time
+        processor.process()
+        for table_name in self.report_tables:
+            table = getattr(report_schema, table_name)
+            count = report_db._session.query(table).count()
+            self.assertTrue(count == counts[table_name])
+
+    def test_process_usage_and_storage_default(self):
+        """Test the processing of an uncompressed storage and usage files."""
+        storage_processor = OCPReportProcessor(
+            schema_name='acct10001',
+            report_path=self.storage_report,
+            compression=UNCOMPRESSED,
+            provider_id=1
+        )
+
+        report_db = self.accessor
+        table_name = OCP_REPORT_TABLE_MAP['storage_line_item']
+        report_schema = report_db.report_schema
+        table = getattr(report_schema, table_name)
+        storage_before_count = report_db._session.query(table).count()
+
+        storage_processor.process()
+
+        storage_after_count = report_db._session.query(table).count()
+        self.assertGreater(storage_after_count, storage_before_count)
+
+        processor = OCPReportProcessor(
+            schema_name='acct10001',
+            report_path=self.test_report,
+            compression=UNCOMPRESSED,
+            provider_id=1
+        )
+
+        report_db = self.accessor
+        table_name = OCP_REPORT_TABLE_MAP['line_item']
+        report_schema = report_db.report_schema
+        table = getattr(report_schema, table_name)
+        before_count = report_db._session.query(table).count()
+
+        processor.process()
+
+        after_count = report_db._session.query(table).count()
+        self.assertGreater(after_count, before_count)

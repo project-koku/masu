@@ -63,6 +63,7 @@ class OCPReportSummaryUpdaterTest(MasuTestCase):
             'assembly_id': '1234',
             'billing_period_start_datetime': billing_start,
             'num_total_files': 2,
+            'num_processed_files': 2,
             'provider_id': 1
         }
         cls.manifest_accessor = ReportManifestDBAccessor()
@@ -248,10 +249,10 @@ class OCPReportSummaryUpdaterTest(MasuTestCase):
     @patch('masu.processor.ocp.ocp_report_summary_updater.OCPReportDBAccessor.populate_line_item_aggregate_table')
     @patch('masu.processor.ocp.ocp_report_summary_updater.OCPReportDBAccessor.populate_line_item_daily_summary_table')
     @patch('masu.processor.ocp.ocp_report_summary_updater.OCPReportDBAccessor.populate_line_item_daily_table')
-    def test_update_summary_tables_new_period_not_done_processing(self,
-                                                                  mock_daily,
-                                                                  mock_sum,
-                                                                  mock_agg):
+    def test_update_summary_tables_existing_period_done_processing(self,
+                                                                   mock_daily,
+                                                                   mock_sum,
+                                                                   mock_agg):
         """Test that summary tables are not run for a full month."""
 
         manifest_id = self.manifest.id
@@ -261,11 +262,12 @@ class OCPReportSummaryUpdaterTest(MasuTestCase):
         bill_date = start_date.replace(day=1).date()
 
         period = self.accessor.get_usage_periods_by_date(bill_date)[0]
+        period.summary_data_creation_datetime = start_date
+        self.accessor.commit()
 
         expected_start_date = start_date.strftime('%Y-%m-%d')
         expected_end_date = end_date.strftime('%Y-%m-%d')
 
-        self.assertIsNone(period.summary_data_creation_datetime)
         self.assertIsNone(period.summary_data_updated_datetime)
 
         self.updater.update_summary_tables(
@@ -282,6 +284,53 @@ class OCPReportSummaryUpdaterTest(MasuTestCase):
             period = accessor.get_usage_periods_by_date(bill_date)[0]
             self.assertIsNotNone(period.summary_data_creation_datetime)
             self.assertIsNotNone(period.summary_data_updated_datetime)
+
+    @patch('masu.processor.ocp.ocp_report_summary_updater.OCPReportDBAccessor.populate_line_item_aggregate_table')
+    @patch('masu.processor.ocp.ocp_report_summary_updater.OCPReportDBAccessor.populate_line_item_daily_summary_table')
+    @patch('masu.processor.ocp.ocp_report_summary_updater.OCPReportDBAccessor.populate_line_item_daily_table')
+    def test_update_summary_tables_new_period_not_done_processing(self,
+                                                                  mock_daily,
+                                                                  mock_sum,
+                                                                  mock_agg):
+        """Test that summary tables are not run since num_processed_files != num_total_files."""
+        billing_start = self.date_accessor.today_with_timezone('UTC').replace(day=1) + relativedelta(months=-1)
+        manifest_dict = {
+            'assembly_id': '1234',
+            'billing_period_start_datetime': billing_start,
+            'num_total_files': 2,
+            'num_processed_files': 1,
+            'provider_id': 1
+        }
+        self.manifest_accessor.delete(self.manifest)
+        self.manifest_accessor.commit()
+        self.manifest = self.manifest_accessor.add(manifest_dict)
+        self.manifest_accessor.commit()
+
+        manifest_id = self.manifest.id
+
+        start_date = self.date_accessor.today_with_timezone('UTC')
+        end_date = start_date + datetime.timedelta(days=1)
+        bill_date = start_date.replace(day=1).date()
+
+        period = self.accessor.get_usage_periods_by_date(bill_date)[0]
+
+        self.assertIsNone(period.summary_data_creation_datetime)
+        self.assertIsNone(period.summary_data_updated_datetime)
+
+        self.updater.update_summary_tables(
+            start_date,
+            end_date,
+            manifest_id
+        )
+
+        mock_daily.assert_not_called()
+        mock_sum.assert_not_called()
+        mock_agg.assert_not_called()
+
+        with OCPReportDBAccessor('acct10001', self.column_map) as accessor:
+            period = accessor.get_usage_periods_by_date(bill_date)[0]
+            self.assertIsNone(period.summary_data_creation_datetime)
+            self.assertIsNone(period.summary_data_updated_datetime)
 
     @patch('masu.processor.ocp.ocp_report_summary_updater.OCPReportDBAccessor.populate_line_item_aggregate_table')
     @patch('masu.processor.ocp.ocp_report_summary_updater.OCPReportDBAccessor.populate_line_item_daily_summary_table')

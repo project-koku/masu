@@ -738,6 +738,18 @@ class TestUpdateSummaryTablesTask(MasuTestCase):
             self.assertIsNotNone(item.pod_charge_memory_gigabyte_hours)
             self.assertIsNotNone(item.pod_charge_cpu_core_hours)
 
+        storage_daily_name = OCP_REPORT_TABLE_MAP['storage_line_item_daily']
+        items = self.ocp_accessor._get_db_obj_query(storage_daily_name).all()
+        for item in items:
+            self.assertIsNotNone(item.volume_request_storage_byte_seconds)
+            self.assertIsNotNone(item.persistentvolumeclaim_usage_byte_seconds)
+
+        storage_summary_name = OCP_REPORT_TABLE_MAP['storage_line_item_daily_summary']
+        items = self.ocp_accessor._get_db_obj_query(storage_summary_name).all()
+        for item in items:
+            self.assertIsNotNone(item.volume_request_storage_gigabyte_hours)
+            self.assertIsNotNone(item.persistentvolumeclaim_usage_gigabyte_hours)
+
     @patch('masu.processor.tasks.update_charge_info')
     @patch('masu.database.ocp_rate_db_accessor.OCPRateDBAccessor.get_memory_gb_usage_per_hour_rates')
     @patch('masu.database.ocp_rate_db_accessor.OCPRateDBAccessor.get_cpu_core_usage_per_hour_rates')

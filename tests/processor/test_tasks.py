@@ -25,7 +25,8 @@ import logging
 import os
 import uuid
 from datetime import date, datetime, timedelta
-from unittest.mock import call, patch, Mock
+from unittest.mock import call, patch, Mock, ANY
+from urllib.parse import urlencode
 
 import faker
 import psycopg2
@@ -50,6 +51,7 @@ from masu.processor.tasks import (get_report_files,
                                   process_report_file,
                                   remove_expired_data,
                                   update_charge_info,
+                                  update_all_summary_tables,
                                   update_summary_tables)
 from masu.external.date_accessor import DateAccessor
 from masu.util.aws import common as utils
@@ -788,3 +790,12 @@ class TestUpdateSummaryTablesTask(MasuTestCase):
         """Test that update_charge_info is not called for AWS."""
         provider_aws_uuid = '6e212746-484a-40cd-bba0-09a19d132d64'
         update_charge_info(schema_name='acct10001', provider_uuid=provider_aws_uuid)
+
+    @patch('masu.processor.tasks.update_summary_tables')
+    def test_get_report_data_for_all_providers(self, mock_update):
+        """Test GET report_data endpoint with provider_uuid=*."""
+        start_date = date.today()
+        update_all_summary_tables(start_date)
+
+        mock_update.delay.assert_called_with(
+            ANY, ANY, ANY, str(start_date), ANY)

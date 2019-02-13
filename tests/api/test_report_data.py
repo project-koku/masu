@@ -53,7 +53,8 @@ class ReportDataTests(MasuTestCase):
             params['schema'],
             'AWS',
             params['provider_uuid'],
-            str(params['start_date'])
+            str(params['start_date']),
+            None
         )
 
     @patch('masu.api.report_data.update_summary_tables')
@@ -226,7 +227,7 @@ class ReportDataTests(MasuTestCase):
             str(params['end_date'])
         )
 
-    @patch('masu.api.report_data.update_summary_tables')
+    @patch('masu.api.report_data.update_all_summary_tables')
     def test_get_report_data_for_all_providers(self, mock_update):
         """Test GET report_data endpoint with provider_uuid=*."""
         start_date = datetime.date.today()
@@ -246,10 +247,8 @@ class ReportDataTests(MasuTestCase):
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         self.assertIn(expected_key, body)
         mock_update.delay.assert_called_with(
-            ANY,
-            ANY,
-            ANY,
-            str(params['start_date'])
+            str(params['start_date']),
+            None
         )
 
     @patch('masu.api.report_data.remove_expired_data')

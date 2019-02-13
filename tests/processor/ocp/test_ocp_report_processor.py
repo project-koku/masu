@@ -18,6 +18,7 @@
 """Test the OCPReportProcessor."""
 import csv
 import copy
+import datetime
 import gzip
 import json
 import shutil
@@ -28,6 +29,7 @@ from sqlalchemy.sql.expression import delete
 from masu.config import Config
 from masu.database import OCP_REPORT_TABLE_MAP
 from masu.database.ocp_report_db_accessor import OCPReportDBAccessor
+from masu.database.report_stats_db_accessor import ReportStatsDBAccessor
 from masu.database.reporting_common_db_accessor import ReportingCommonDBAccessor
 from masu.exceptions import MasuProcessingError
 from masu.external import GZIP_COMPRESSED, UNCOMPRESSED
@@ -475,31 +477,41 @@ class OCPReportProcessorTest(MasuTestCase):
 
     def test_remove_temp_cur_files(self):
         """Test to remove temporary usage report files."""
-        # Update once temporary file logic is implemented.
-        cur_dir = tempfile.mkdtemp()
-        manifest_id = 1
+        insights_local_dir = tempfile.mkdtemp()
+
+        manifest_data = {"uuid": "6e019de5-a41d-4cdb-b9a0-99bfba9a9cb5"}
+        manifest = '{}/{}'.format(insights_local_dir, 'manifest.json')
+        with open(manifest, 'w') as outfile:
+            json.dump(manifest_data, outfile)
+
+        file_list = [{'file': '6e019de5-a41d-4cdb-b9a0-99bfba9a9cb5-ocp-1.csv.gz',
+                      'processed_date': datetime.datetime(year=2018, month=5, day=3)},
+                     {'file': '6e019de5-a41d-4cdb-b9a0-99bfba9a9cb5-ocp-2.csv.gz',
+                      'processed_date': datetime.datetime(year=2018, month=5, day=3)},
+                     {'file': '2aeb9169-2526-441c-9eca-d7ed015d52bd-ocp-1.csv.gz',
+                      'processed_date': datetime.datetime(year=2018, month=5, day=2)},
+                     {'file': '6c8487e8-c590-4e6a-b2c2-91a2375c0bad-ocp-1.csv.gz',
+                      'processed_date': datetime.datetime(year=2018, month=5, day=1)},
+                     {'file': '6c8487e8-c590-4e6a-b2c2-91a2375d0bed-ocp-1.csv.gz',
+                      'processed_date': None}]
         expected_delete_list = []
+        for item in file_list:
+            path = '{}/{}'.format(insights_local_dir, item['file'])
+            f = open(path, 'w')
+            stats = ReportStatsDBAccessor(item['file'], None)
+            stats.update(last_completed_datetime=item['processed_date'])
+            stats.commit()
+            stats.close_session()
+            f.close()
+            if not item['file'].startswith(manifest_data.get('uuid')) and item['processed_date']:
+                expected_delete_list.append(path)
 
-        removed_files = self.ocp_processor.remove_temp_cur_files(cur_dir, manifest_id)
-        self.assertEqual(sorted(removed_files), sorted(expected_delete_list))
-
-        shutil.rmtree(cur_dir)
-
-    def test_remove_temp_cur_files_storage(self):
-        """Test to remove temporary storage report files."""
-        # Update once temporary file logic is implemented.
-        cur_dir = tempfile.mkdtemp()
-        manifest_id = 1
-        expected_delete_list = []
-        storage_processor = OCPReportProcessor(
-            schema_name='acct10001',
-            report_path=self.storage_report,
-            compression=UNCOMPRESSED,
-            provider_id=1
+        removed_files = self.ocp_processor.remove_temp_cur_files(
+            insights_local_dir,
+            manifest_id=None
         )
-        removed_files = storage_processor.remove_temp_cur_files(cur_dir, manifest_id)
         self.assertEqual(sorted(removed_files), sorted(expected_delete_list))
-        shutil.rmtree(cur_dir)
+        shutil.rmtree(insights_local_dir)
 
     def test_process_pod_labels(self):
         """Test that our report label string format is parsed."""

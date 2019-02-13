@@ -31,6 +31,9 @@ services:
         - FLASK_APP=masu
         - FLASK_ENV=development
         - prometheus_multiproc_dir=/tmp
+        - MASU_DATE_OVERRIDE
+        - MASU_RETAIN_NUM_MONTHS
+        - MASU_DEBUG
       privileged: true
       ports:
           - "5000:5000"
@@ -59,6 +62,9 @@ services:
         - INSIGHTS_KAFKA_PORT=29092
         - KAFKA_CONNECT=True
         - prometheus_multiproc_dir=/tmp
+        - MASU_DATE_OVERRIDE
+        - MASU_RETAIN_NUM_MONTHS
+        - MASU_DEBUG
       privileged: true
       volumes:
         - '.:/masu/'

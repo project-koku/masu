@@ -63,6 +63,10 @@ class OCPReportDBCleanerTest(MasuTestCase):
             reporting_period,
             report
         )
+        self.creator.create_ocp_storage_line_item(
+            reporting_period,
+            report
+        )
 
     def tearDown(self):
         """Return the database to a pre-test state."""
@@ -86,6 +90,7 @@ class OCPReportDBCleanerTest(MasuTestCase):
         report_period_table_name = OCP_REPORT_TABLE_MAP['report_period']
         report_table_name = OCP_REPORT_TABLE_MAP['report']
         line_item_table_name = OCP_REPORT_TABLE_MAP['line_item']
+        storage_line_item_table_name = OCP_REPORT_TABLE_MAP['storage_line_item']
 
         cleaner = OCPReportDBCleaner('acct10001')
 
@@ -96,6 +101,7 @@ class OCPReportDBCleanerTest(MasuTestCase):
         self.assertIsNotNone(self.accessor._get_db_obj_query(report_period_table_name).first())
         self.assertIsNotNone(self.accessor._get_db_obj_query(report_table_name).first())
         self.assertIsNotNone(self.accessor._get_db_obj_query(line_item_table_name).first())
+        self.assertIsNotNone(self.accessor._get_db_obj_query(storage_line_item_table_name).first())
 
         removed_data = cleaner.purge_expired_report_data(cutoff_date)
 
@@ -106,12 +112,14 @@ class OCPReportDBCleanerTest(MasuTestCase):
         self.assertIsNone(self.accessor._get_db_obj_query(report_period_table_name).first())
         self.assertIsNone(self.accessor._get_db_obj_query(report_table_name).first())
         self.assertIsNone(self.accessor._get_db_obj_query(line_item_table_name).first())
+        self.assertIsNone(self.accessor._get_db_obj_query(storage_line_item_table_name).first())
 
     def test_purge_expired_report_data_before_date(self):
         """Test to remove report data before a provided date."""
         report_period_table_name = OCP_REPORT_TABLE_MAP['report_period']
         report_table_name = OCP_REPORT_TABLE_MAP['report']
         line_item_table_name = OCP_REPORT_TABLE_MAP['line_item']
+        storage_line_item_table_name = OCP_REPORT_TABLE_MAP['storage_line_item']
 
         cleaner = OCPReportDBCleaner('acct10001')
 
@@ -124,6 +132,7 @@ class OCPReportDBCleanerTest(MasuTestCase):
         self.assertIsNotNone(self.accessor._get_db_obj_query(report_period_table_name).first())
         self.assertIsNotNone(self.accessor._get_db_obj_query(report_table_name).first())
         self.assertIsNotNone(self.accessor._get_db_obj_query(line_item_table_name).first())
+        self.assertIsNotNone(self.accessor._get_db_obj_query(storage_line_item_table_name).first())
 
         removed_data = cleaner.purge_expired_report_data(earlier_cutoff)
 
@@ -132,12 +141,14 @@ class OCPReportDBCleanerTest(MasuTestCase):
         self.assertIsNotNone(self.accessor._get_db_obj_query(report_period_table_name).first())
         self.assertIsNotNone(self.accessor._get_db_obj_query(report_table_name).first())
         self.assertIsNotNone(self.accessor._get_db_obj_query(line_item_table_name).first())
+        self.assertIsNotNone(self.accessor._get_db_obj_query(storage_line_item_table_name).first())
 
     def test_purge_expired_report_data_after_date(self):
         """Test to remove report data after a provided date."""
         report_period_table_name = OCP_REPORT_TABLE_MAP['report_period']
         report_table_name = OCP_REPORT_TABLE_MAP['report']
         line_item_table_name = OCP_REPORT_TABLE_MAP['line_item']
+        storage_line_item_table_name = OCP_REPORT_TABLE_MAP['storage_line_item']
 
         cleaner = OCPReportDBCleaner('acct10001')
 
@@ -150,6 +161,7 @@ class OCPReportDBCleanerTest(MasuTestCase):
         self.assertIsNotNone(self.accessor._get_db_obj_query(report_period_table_name).first())
         self.assertIsNotNone(self.accessor._get_db_obj_query(report_table_name).first())
         self.assertIsNotNone(self.accessor._get_db_obj_query(line_item_table_name).first())
+        self.assertIsNotNone(self.accessor._get_db_obj_query(storage_line_item_table_name).first())
 
         removed_data = cleaner.purge_expired_report_data(later_cutoff)
         self.assertEqual(len(removed_data), 1)
@@ -159,12 +171,14 @@ class OCPReportDBCleanerTest(MasuTestCase):
         self.assertIsNone(self.accessor._get_db_obj_query(report_period_table_name).first())
         self.assertIsNone(self.accessor._get_db_obj_query(report_table_name).first())
         self.assertIsNone(self.accessor._get_db_obj_query(line_item_table_name).first())
+        self.assertIsNone(self.accessor._get_db_obj_query(storage_line_item_table_name).first())
 
     def test_purge_expired_report_data_on_date_simulate(self):
         """Test to simulate removing report data on a provided date."""
         report_period_table_name = OCP_REPORT_TABLE_MAP['report_period']
         report_table_name = OCP_REPORT_TABLE_MAP['report']
         line_item_table_name = OCP_REPORT_TABLE_MAP['line_item']
+        storage_line_item_table_name = OCP_REPORT_TABLE_MAP['storage_line_item']
 
         cleaner = OCPReportDBCleaner('acct10001')
 
@@ -175,6 +189,7 @@ class OCPReportDBCleanerTest(MasuTestCase):
         self.assertIsNotNone(self.accessor._get_db_obj_query(report_period_table_name).first())
         self.assertIsNotNone(self.accessor._get_db_obj_query(report_table_name).first())
         self.assertIsNotNone(self.accessor._get_db_obj_query(line_item_table_name).first())
+        self.assertIsNotNone(self.accessor._get_db_obj_query(storage_line_item_table_name).first())
 
         removed_data = cleaner.purge_expired_report_data(cutoff_date, simulate=True)
 
@@ -185,12 +200,14 @@ class OCPReportDBCleanerTest(MasuTestCase):
         self.assertIsNotNone(self.accessor._get_db_obj_query(report_period_table_name).first())
         self.assertIsNotNone(self.accessor._get_db_obj_query(report_table_name).first())
         self.assertIsNotNone(self.accessor._get_db_obj_query(line_item_table_name).first())
+        self.assertIsNotNone(self.accessor._get_db_obj_query(storage_line_item_table_name).first())
 
     def test_purge_expired_report_data_for_provider(self):
         """Test that the provider_id deletes all data for the provider."""
         report_period_table_name = OCP_REPORT_TABLE_MAP['report_period']
         report_table_name = OCP_REPORT_TABLE_MAP['report']
         line_item_table_name = OCP_REPORT_TABLE_MAP['line_item']
+        storage_line_item_table_name = OCP_REPORT_TABLE_MAP['storage_line_item']
 
         cleaner = OCPReportDBCleaner('acct10001')
 
@@ -200,6 +217,7 @@ class OCPReportDBCleanerTest(MasuTestCase):
         self.assertIsNotNone(self.accessor._get_db_obj_query(report_period_table_name).first())
         self.assertIsNotNone(self.accessor._get_db_obj_query(report_table_name).first())
         self.assertIsNotNone(self.accessor._get_db_obj_query(line_item_table_name).first())
+        self.assertIsNotNone(self.accessor._get_db_obj_query(storage_line_item_table_name).first())
 
         removed_data = cleaner.purge_expired_report_data(provider_id=1)
 
@@ -210,6 +228,7 @@ class OCPReportDBCleanerTest(MasuTestCase):
         self.assertIsNone(self.accessor._get_db_obj_query(report_period_table_name).first())
         self.assertIsNone(self.accessor._get_db_obj_query(report_table_name).first())
         self.assertIsNone(self.accessor._get_db_obj_query(line_item_table_name).first())
+        self.assertIsNone(self.accessor._get_db_obj_query(storage_line_item_table_name).first())
 
     def test_purge_expired_report_data_no_args(self):
         """Test that the provider_id deletes all data for the provider."""

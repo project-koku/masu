@@ -663,7 +663,9 @@ CREATE TABLE acct10001.reporting_ocpawscostlineitem_daily_summary (
     tags jsonb,
     unblended_cost numeric(17,9),
     pod_cost numeric(24,6),
-    account_alias_id integer
+    account_alias_id integer,
+    normalized_usage_amount double precision,
+    usage_amount double precision
 );
 
 
@@ -691,7 +693,7 @@ ALTER SEQUENCE acct10001.reporting_ocpawscostlineitem_daily_summary_id_seq OWNED
 
 
 --
--- Name: reporting_ocpstoragelineitem; Type: TABLE; Schema: acct10001; Owner: postgres
+-- Name: reporting_ocpstoragelineitem; Type: TABLE; Schema: acct10001; Owner: kokuadmin
 --
 
 CREATE TABLE acct10001.reporting_ocpstoragelineitem (
@@ -712,10 +714,10 @@ CREATE TABLE acct10001.reporting_ocpstoragelineitem (
 );
 
 
-ALTER TABLE acct10001.reporting_ocpstoragelineitem OWNER TO postgres;
+ALTER TABLE acct10001.reporting_ocpstoragelineitem OWNER TO kokuadmin;
 
 --
--- Name: reporting_ocpstoragelineitem_daily; Type: TABLE; Schema: acct10001; Owner: postgres
+-- Name: reporting_ocpstoragelineitem_daily; Type: TABLE; Schema: acct10001; Owner: kokuadmin
 --
 
 CREATE TABLE acct10001.reporting_ocpstoragelineitem_daily (
@@ -739,10 +741,10 @@ CREATE TABLE acct10001.reporting_ocpstoragelineitem_daily (
 );
 
 
-ALTER TABLE acct10001.reporting_ocpstoragelineitem_daily OWNER TO postgres;
+ALTER TABLE acct10001.reporting_ocpstoragelineitem_daily OWNER TO kokuadmin;
 
 --
--- Name: reporting_ocpstoragelineitem_daily_id_seq; Type: SEQUENCE; Schema: acct10001; Owner: postgres
+-- Name: reporting_ocpstoragelineitem_daily_id_seq; Type: SEQUENCE; Schema: acct10001; Owner: kokuadmin
 --
 
 CREATE SEQUENCE acct10001.reporting_ocpstoragelineitem_daily_id_seq
@@ -753,17 +755,17 @@ CREATE SEQUENCE acct10001.reporting_ocpstoragelineitem_daily_id_seq
     CACHE 1;
 
 
-ALTER TABLE acct10001.reporting_ocpstoragelineitem_daily_id_seq OWNER TO postgres;
+ALTER TABLE acct10001.reporting_ocpstoragelineitem_daily_id_seq OWNER TO kokuadmin;
 
 --
--- Name: reporting_ocpstoragelineitem_daily_id_seq; Type: SEQUENCE OWNED BY; Schema: acct10001; Owner: postgres
+-- Name: reporting_ocpstoragelineitem_daily_id_seq; Type: SEQUENCE OWNED BY; Schema: acct10001; Owner: kokuadmin
 --
 
 ALTER SEQUENCE acct10001.reporting_ocpstoragelineitem_daily_id_seq OWNED BY acct10001.reporting_ocpstoragelineitem_daily.id;
 
 
 --
--- Name: reporting_ocpstoragelineitem_daily_summary; Type: TABLE; Schema: acct10001; Owner: postgres
+-- Name: reporting_ocpstoragelineitem_daily_summary; Type: TABLE; Schema: acct10001; Owner: kokuadmin
 --
 
 CREATE TABLE acct10001.reporting_ocpstoragelineitem_daily_summary (
@@ -786,10 +788,10 @@ CREATE TABLE acct10001.reporting_ocpstoragelineitem_daily_summary (
 );
 
 
-ALTER TABLE acct10001.reporting_ocpstoragelineitem_daily_summary OWNER TO postgres;
+ALTER TABLE acct10001.reporting_ocpstoragelineitem_daily_summary OWNER TO kokuadmin;
 
 --
--- Name: reporting_ocpstoragelineitem_daily_summary_id_seq; Type: SEQUENCE; Schema: acct10001; Owner: postgres
+-- Name: reporting_ocpstoragelineitem_daily_summary_id_seq; Type: SEQUENCE; Schema: acct10001; Owner: kokuadmin
 --
 
 CREATE SEQUENCE acct10001.reporting_ocpstoragelineitem_daily_summary_id_seq
@@ -800,17 +802,17 @@ CREATE SEQUENCE acct10001.reporting_ocpstoragelineitem_daily_summary_id_seq
     CACHE 1;
 
 
-ALTER TABLE acct10001.reporting_ocpstoragelineitem_daily_summary_id_seq OWNER TO postgres;
+ALTER TABLE acct10001.reporting_ocpstoragelineitem_daily_summary_id_seq OWNER TO kokuadmin;
 
 --
--- Name: reporting_ocpstoragelineitem_daily_summary_id_seq; Type: SEQUENCE OWNED BY; Schema: acct10001; Owner: postgres
+-- Name: reporting_ocpstoragelineitem_daily_summary_id_seq; Type: SEQUENCE OWNED BY; Schema: acct10001; Owner: kokuadmin
 --
 
 ALTER SEQUENCE acct10001.reporting_ocpstoragelineitem_daily_summary_id_seq OWNED BY acct10001.reporting_ocpstoragelineitem_daily_summary.id;
 
 
 --
--- Name: reporting_ocpstoragelineitem_id_seq; Type: SEQUENCE; Schema: acct10001; Owner: postgres
+-- Name: reporting_ocpstoragelineitem_id_seq; Type: SEQUENCE; Schema: acct10001; Owner: kokuadmin
 --
 
 CREATE SEQUENCE acct10001.reporting_ocpstoragelineitem_id_seq
@@ -821,17 +823,17 @@ CREATE SEQUENCE acct10001.reporting_ocpstoragelineitem_id_seq
     CACHE 1;
 
 
-ALTER TABLE acct10001.reporting_ocpstoragelineitem_id_seq OWNER TO postgres;
+ALTER TABLE acct10001.reporting_ocpstoragelineitem_id_seq OWNER TO kokuadmin;
 
 --
--- Name: reporting_ocpstoragelineitem_id_seq; Type: SEQUENCE OWNED BY; Schema: acct10001; Owner: postgres
+-- Name: reporting_ocpstoragelineitem_id_seq; Type: SEQUENCE OWNED BY; Schema: acct10001; Owner: kokuadmin
 --
 
 ALTER SEQUENCE acct10001.reporting_ocpstoragelineitem_id_seq OWNED BY acct10001.reporting_ocpstoragelineitem.id;
 
 
 --
--- Name: reporting_ocpusagelineitem; Type: TABLE; Schema: acct10001; Owner: postgres
+-- Name: reporting_ocpusagelineitem; Type: TABLE; Schema: acct10001; Owner: kokuadmin
 --
 
 CREATE TABLE acct10001.reporting_ocpusagelineitem (
@@ -1948,28 +1950,28 @@ ALTER TABLE ONLY acct10001.reporting_ocpawscostlineitem_daily_summary ALTER COLU
 
 
 --
--- Name: reporting_ocpstoragelineitem id; Type: DEFAULT; Schema: acct10001; Owner: postgres
+-- Name: reporting_ocpstoragelineitem id; Type: DEFAULT; Schema: acct10001; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY acct10001.reporting_ocpstoragelineitem ALTER COLUMN id SET DEFAULT nextval('acct10001.reporting_ocpstoragelineitem_id_seq'::regclass);
 
 
 --
--- Name: reporting_ocpstoragelineitem_daily id; Type: DEFAULT; Schema: acct10001; Owner: postgres
+-- Name: reporting_ocpstoragelineitem_daily id; Type: DEFAULT; Schema: acct10001; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY acct10001.reporting_ocpstoragelineitem_daily ALTER COLUMN id SET DEFAULT nextval('acct10001.reporting_ocpstoragelineitem_daily_id_seq'::regclass);
 
 
 --
--- Name: reporting_ocpstoragelineitem_daily_summary id; Type: DEFAULT; Schema: acct10001; Owner: postgres
+-- Name: reporting_ocpstoragelineitem_daily_summary id; Type: DEFAULT; Schema: acct10001; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY acct10001.reporting_ocpstoragelineitem_daily_summary ALTER COLUMN id SET DEFAULT nextval('acct10001.reporting_ocpstoragelineitem_daily_summary_id_seq'::regclass);
 
 
 --
--- Name: reporting_ocpusagelineitem id; Type: DEFAULT; Schema: acct10001; Owner: postgres
+-- Name: reporting_ocpusagelineitem id; Type: DEFAULT; Schema: acct10001; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY acct10001.reporting_ocpusagelineitem ALTER COLUMN id SET DEFAULT nextval('acct10001.reporting_ocpusagelineitem_id_seq'::regclass);
@@ -2325,7 +2327,31 @@ COPY acct10001.reporting_awstags_summary (key, "values") FROM stdin;
 -- Data for Name: reporting_ocpawscostlineitem_daily_summary; Type: TABLE DATA; Schema: acct10001; Owner: postgres
 --
 
-COPY acct10001.reporting_ocpawscostlineitem_daily_summary (id, cluster_id, cluster_alias, namespace, pod, node, resource_id, usage_start, usage_end, pod_labels, product_code, product_family, usage_account_id, availability_zone, region, unit, tags, unblended_cost, pod_cost, account_alias_id) FROM stdin;
+COPY acct10001.reporting_ocpawscostlineitem_daily_summary (id, cluster_id, cluster_alias, namespace, pod, node, resource_id, usage_start, usage_end, pod_labels, product_code, product_family, usage_account_id, availability_zone, region, unit, tags, unblended_cost, pod_cost, account_alias_id, normalized_usage_amount, usage_amount) FROM stdin;
+\.
+
+
+--
+-- Data for Name: reporting_ocpstoragelineitem; Type: TABLE DATA; Schema: acct10001; Owner: kokuadmin
+--
+
+COPY acct10001.reporting_ocpstoragelineitem (id, namespace, pod, persistentvolumeclaim, persistentvolume, storageclass, persistentvolumeclaim_capacity_bytes, persistentvolumeclaim_capacity_byte_seconds, volume_request_storage_byte_seconds, persistentvolumeclaim_usage_byte_seconds, persistentvolume_labels, persistentvolumeclaim_labels, report_id, report_period_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: reporting_ocpstoragelineitem_daily; Type: TABLE DATA; Schema: acct10001; Owner: kokuadmin
+--
+
+COPY acct10001.reporting_ocpstoragelineitem_daily (id, cluster_id, cluster_alias, namespace, pod, persistentvolumeclaim, persistentvolume, storageclass, usage_start, usage_end, persistentvolumeclaim_capacity_bytes, persistentvolumeclaim_capacity_byte_seconds, volume_request_storage_byte_seconds, persistentvolumeclaim_usage_byte_seconds, total_seconds, persistentvolume_labels, persistentvolumeclaim_labels) FROM stdin;
+\.
+
+
+--
+-- Data for Name: reporting_ocpstoragelineitem_daily_summary; Type: TABLE DATA; Schema: acct10001; Owner: kokuadmin
+--
+
+COPY acct10001.reporting_ocpstoragelineitem_daily_summary (id, cluster_id, cluster_alias, namespace, persistentvolumeclaim, persistentvolume, storageclass, pod, usage_start, usage_end, persistentvolume_labels, persistentvolumeclaim_labels, persistentvolumeclaim_capacity_gigabyte, persistentvolumeclaim_capacity_gigabyte_hours, volume_request_storage_gigabyte_hours, persistentvolumeclaim_usage_gigabyte_hours) FROM stdin;
 \.
 
 
@@ -2414,7 +2440,7 @@ COPY acct10001.reporting_ocpusagereportperiod (id, cluster_id, report_period_sta
 --
 
 COPY public.api_customer (id, date_created, uuid, account_id, schema_name) FROM stdin;
-1	2019-02-11 16:21:15.690864+00	04819ef6-0bee-4d17-b774-d01eecacb5ac	10001	acct10001
+1	2019-02-08 01:59:59.902694+00	ac149c1c-9f13-46d7-a6dc-b66155108f99	10001	acct10001
 \.
 
 
@@ -2461,7 +2487,7 @@ COPY public.api_tenant (id, schema_name) FROM stdin;
 --
 
 COPY public.api_user (id, uuid, username, email, date_created, is_active, customer_id) FROM stdin;
-1	1139a313-68dc-4933-b9b4-971c991fda6e	user_dev	user_dev@foo.com	2019-02-11 16:21:17.648266+00	t	1
+1	27478498-4179-4892-9144-a376f8769c23	test_customer	test@example.com	2019-02-08 02:00:03.419995+00	t	1
 \.
 
 
@@ -2470,9 +2496,9 @@ COPY public.api_user (id, uuid, username, email, date_created, is_active, custom
 --
 
 COPY public.api_userpreference (id, uuid, preference, name, description, user_id) FROM stdin;
-1	a4ab8882-0624-4126-9c5f-a8049fdca6a2	{"currency": "USD"}	currency	default preference	1
-2	c9e4f90d-eda3-4b1c-a51d-9a584abef06b	{"timezone": "UTC"}	timezone	default preference	1
-3	c62f9297-f121-47d9-81bb-1e8c80ce0a16	{"locale": "en_US.UTF-8"}	locale	default preference	1
+1	0c3800e1-0ce8-44dc-834e-b1780d94c0e1	{"currency": "USD"}	currency	default preference	1
+2	ab9ce9c6-7f91-412a-b101-beba08279da5	{"timezone": "UTC"}	timezone	default preference	1
+3	5b6a677d-b4d4-4ddb-b568-9f75f3dabb99	{"locale": "en_US.UTF-8"}	locale	default preference	1
 \.
 
 
@@ -2753,8 +2779,6 @@ COPY public.django_content_type (id, app_label, model) FROM stdin;
 --
 -- Data for Name: django_migrations; Type: TABLE DATA; Schema: public; Owner: postgres
 --
-
-COPY public.django_migrations (id, app, name, applied) FROM stdin;
 1	contenttypes	0001_initial	2019-02-11 16:20:54.799354+00
 2	auth	0001_initial	2019-02-11 16:20:54.881131+00
 3	admin	0001_initial	2019-02-11 16:20:54.908823+00
@@ -3036,28 +3060,28 @@ SELECT pg_catalog.setval('acct10001.reporting_ocpawscostlineitem_daily_summary_i
 
 
 --
--- Name: reporting_ocpstoragelineitem_daily_id_seq; Type: SEQUENCE SET; Schema: acct10001; Owner: postgres
+-- Name: reporting_ocpstoragelineitem_daily_id_seq; Type: SEQUENCE SET; Schema: acct10001; Owner: kokuadmin
 --
 
 SELECT pg_catalog.setval('acct10001.reporting_ocpstoragelineitem_daily_id_seq', 1, false);
 
 
 --
--- Name: reporting_ocpstoragelineitem_daily_summary_id_seq; Type: SEQUENCE SET; Schema: acct10001; Owner: postgres
+-- Name: reporting_ocpstoragelineitem_daily_summary_id_seq; Type: SEQUENCE SET; Schema: acct10001; Owner: kokuadmin
 --
 
 SELECT pg_catalog.setval('acct10001.reporting_ocpstoragelineitem_daily_summary_id_seq', 1, false);
 
 
 --
--- Name: reporting_ocpstoragelineitem_id_seq; Type: SEQUENCE SET; Schema: acct10001; Owner: postgres
+-- Name: reporting_ocpstoragelineitem_id_seq; Type: SEQUENCE SET; Schema: acct10001; Owner: kokuadmin
 --
 
 SELECT pg_catalog.setval('acct10001.reporting_ocpstoragelineitem_id_seq', 1, false);
 
 
 --
--- Name: reporting_ocpusagelineitem_aggregates_id_seq; Type: SEQUENCE SET; Schema: acct10001; Owner: postgres
+-- Name: reporting_ocpusagelineitem_aggregates_id_seq; Type: SEQUENCE SET; Schema: acct10001; Owner: kokuadmin
 --
 
 SELECT pg_catalog.setval('acct10001.reporting_ocpusagelineitem_aggregates_id_seq', 1, false);
@@ -3422,7 +3446,7 @@ ALTER TABLE ONLY acct10001.reporting_ocpawscostlineitem_daily_summary
 
 
 --
--- Name: reporting_ocpstoragelineitem reporting_ocpstorageline_report_id_namespace_pers_9bf00103_uniq; Type: CONSTRAINT; Schema: acct10001; Owner: postgres
+-- Name: reporting_ocpstoragelineitem reporting_ocpstorageline_report_id_namespace_pers_9bf00103_uniq; Type: CONSTRAINT; Schema: acct10001; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY acct10001.reporting_ocpstoragelineitem
@@ -3430,7 +3454,7 @@ ALTER TABLE ONLY acct10001.reporting_ocpstoragelineitem
 
 
 --
--- Name: reporting_ocpstoragelineitem_daily reporting_ocpstoragelineitem_daily_pkey; Type: CONSTRAINT; Schema: acct10001; Owner: postgres
+-- Name: reporting_ocpstoragelineitem_daily reporting_ocpstoragelineitem_daily_pkey; Type: CONSTRAINT; Schema: acct10001; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY acct10001.reporting_ocpstoragelineitem_daily
@@ -3438,7 +3462,7 @@ ALTER TABLE ONLY acct10001.reporting_ocpstoragelineitem_daily
 
 
 --
--- Name: reporting_ocpstoragelineitem_daily_summary reporting_ocpstoragelineitem_daily_summary_pkey; Type: CONSTRAINT; Schema: acct10001; Owner: postgres
+-- Name: reporting_ocpstoragelineitem_daily_summary reporting_ocpstoragelineitem_daily_summary_pkey; Type: CONSTRAINT; Schema: acct10001; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY acct10001.reporting_ocpstoragelineitem_daily_summary
@@ -3446,7 +3470,7 @@ ALTER TABLE ONLY acct10001.reporting_ocpstoragelineitem_daily_summary
 
 
 --
--- Name: reporting_ocpstoragelineitem reporting_ocpstoragelineitem_pkey; Type: CONSTRAINT; Schema: acct10001; Owner: postgres
+-- Name: reporting_ocpstoragelineitem reporting_ocpstoragelineitem_pkey; Type: CONSTRAINT; Schema: acct10001; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY acct10001.reporting_ocpstoragelineitem
@@ -3454,7 +3478,7 @@ ALTER TABLE ONLY acct10001.reporting_ocpstoragelineitem
 
 
 --
--- Name: reporting_ocpusagelineitem reporting_ocpusagelineit_report_id_namespace_pod__dfc2c342_uniq; Type: CONSTRAINT; Schema: acct10001; Owner: postgres
+-- Name: reporting_ocpusagelineitem reporting_ocpusagelineit_report_id_namespace_pod__dfc2c342_uniq; Type: CONSTRAINT; Schema: acct10001; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY acct10001.reporting_ocpusagelineitem
@@ -4114,21 +4138,21 @@ CREATE INDEX reporting_ocpawscostlineit_account_alias_id_f19d2883 ON acct10001.r
 
 
 --
--- Name: reporting_ocpstoragelineitem_report_id_6ff71ea6; Type: INDEX; Schema: acct10001; Owner: postgres
+-- Name: reporting_ocpstoragelineitem_report_id_6ff71ea6; Type: INDEX; Schema: acct10001; Owner: kokuadmin
 --
 
 CREATE INDEX reporting_ocpstoragelineitem_report_id_6ff71ea6 ON acct10001.reporting_ocpstoragelineitem USING btree (report_id);
 
 
 --
--- Name: reporting_ocpstoragelineitem_report_period_id_6d730b12; Type: INDEX; Schema: acct10001; Owner: postgres
+-- Name: reporting_ocpstoragelineitem_report_period_id_6d730b12; Type: INDEX; Schema: acct10001; Owner: kokuadmin
 --
 
 CREATE INDEX reporting_ocpstoragelineitem_report_period_id_6d730b12 ON acct10001.reporting_ocpstoragelineitem USING btree (report_period_id);
 
 
 --
--- Name: reporting_ocpusagelineitem_report_id_32a973b0; Type: INDEX; Schema: acct10001; Owner: postgres
+-- Name: reporting_ocpusagelineitem_report_id_32a973b0; Type: INDEX; Schema: acct10001; Owner: kokuadmin
 --
 
 CREATE INDEX reporting_ocpusagelineitem_report_id_32a973b0 ON acct10001.reporting_ocpusagelineitem USING btree (report_id);
@@ -4539,7 +4563,7 @@ ALTER TABLE ONLY acct10001.reporting_ocpawscostlineitem_daily_summary
 
 
 --
--- Name: reporting_ocpstoragelineitem reporting_ocpstorage_report_id_6ff71ea6_fk_reporting; Type: FK CONSTRAINT; Schema: acct10001; Owner: postgres
+-- Name: reporting_ocpstoragelineitem reporting_ocpstorage_report_id_6ff71ea6_fk_reporting; Type: FK CONSTRAINT; Schema: acct10001; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY acct10001.reporting_ocpstoragelineitem
@@ -4547,7 +4571,7 @@ ALTER TABLE ONLY acct10001.reporting_ocpstoragelineitem
 
 
 --
--- Name: reporting_ocpstoragelineitem reporting_ocpstorage_report_period_id_6d730b12_fk_reporting; Type: FK CONSTRAINT; Schema: acct10001; Owner: postgres
+-- Name: reporting_ocpstoragelineitem reporting_ocpstorage_report_period_id_6d730b12_fk_reporting; Type: FK CONSTRAINT; Schema: acct10001; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY acct10001.reporting_ocpstoragelineitem
@@ -4555,7 +4579,7 @@ ALTER TABLE ONLY acct10001.reporting_ocpstoragelineitem
 
 
 --
--- Name: reporting_ocpusagelineitem reporting_ocpusageli_report_id_32a973b0_fk_reporting; Type: FK CONSTRAINT; Schema: acct10001; Owner: postgres
+-- Name: reporting_ocpusagelineitem reporting_ocpusageli_report_id_32a973b0_fk_reporting; Type: FK CONSTRAINT; Schema: acct10001; Owner: kokuadmin
 --
 
 ALTER TABLE ONLY acct10001.reporting_ocpusagelineitem

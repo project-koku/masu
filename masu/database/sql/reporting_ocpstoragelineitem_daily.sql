@@ -121,6 +121,7 @@ CREATE TEMPORARY TABLE reporting_ocpstoragelineitem_daily_{uuid} AS (
         usage_end,
         namespace,
         pod,
+        node,
         persistentvolumeclaim,
         persistentvolume,
         storageclass,
@@ -138,6 +139,7 @@ CREATE TEMPORARY TABLE reporting_ocpstoragelineitem_daily_{uuid} AS (
             date(ur.interval_start) as usage_end,
             li.namespace,
             li.pod,
+            max(uli.node) as node,
             li.persistentvolumeclaim,
             li.persistentvolume,
             li.storageclass,
@@ -171,6 +173,10 @@ CREATE TEMPORARY TABLE reporting_ocpstoragelineitem_daily_{uuid} AS (
                 AND date(ur.interval_start) = pvcl.usage_start
         LEFT JOIN public.api_provider as p
             ON rp.provider_id = p.id
+        LEFT JOIN reporting_ocpusagelineitem_daily as uli
+            ON li.pod = uli.pod
+                AND li.namespace = uli.namespace
+                AND rp.cluster_id = uli.cluster_id
         WHERE date(ur.interval_start) >= '{start_date}'
             AND date(ur.interval_start) <= '{end_date}'
         GROUP BY rp.cluster_id,
@@ -200,6 +206,7 @@ INSERT INTO reporting_ocpstoragelineitem_daily (
     usage_end,
     namespace,
     pod,
+    node,
     persistentvolume_labels,
     persistentvolumeclaim_labels,
     persistentvolumeclaim,
@@ -217,6 +224,7 @@ INSERT INTO reporting_ocpstoragelineitem_daily (
         usage_end,
         namespace,
         pod,
+        node,
         persistentvolume_labels,
         persistentvolumeclaim_labels,
         persistentvolumeclaim,

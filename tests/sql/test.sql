@@ -694,7 +694,7 @@ ALTER SEQUENCE acct10001.reporting_ocpawscostlineitem_daily_summary_id_seq OWNED
 
 
 --
--- Name: reporting_ocpstoragelineitem; Type: TABLE; Schema: acct10001; Owner: kokuadmin
+-- Name: reporting_ocpstoragelineitem; Type: TABLE; Schema: acct10001; Owner: postgres
 --
 
 CREATE TABLE acct10001.reporting_ocpstoragelineitem (
@@ -715,10 +715,10 @@ CREATE TABLE acct10001.reporting_ocpstoragelineitem (
 );
 
 
-ALTER TABLE acct10001.reporting_ocpstoragelineitem OWNER TO kokuadmin;
+ALTER TABLE acct10001.reporting_ocpstoragelineitem OWNER TO postgres;
 
 --
--- Name: reporting_ocpstoragelineitem_daily; Type: TABLE; Schema: acct10001; Owner: kokuadmin
+-- Name: reporting_ocpstoragelineitem_daily; Type: TABLE; Schema: acct10001; Owner: postgres
 --
 
 CREATE TABLE acct10001.reporting_ocpstoragelineitem_daily (
@@ -742,10 +742,10 @@ CREATE TABLE acct10001.reporting_ocpstoragelineitem_daily (
 );
 
 
-ALTER TABLE acct10001.reporting_ocpstoragelineitem_daily OWNER TO kokuadmin;
+ALTER TABLE acct10001.reporting_ocpstoragelineitem_daily OWNER TO postgres;
 
 --
--- Name: reporting_ocpstoragelineitem_daily_id_seq; Type: SEQUENCE; Schema: acct10001; Owner: kokuadmin
+-- Name: reporting_ocpstoragelineitem_daily_id_seq; Type: SEQUENCE; Schema: acct10001; Owner: postgres
 --
 
 CREATE SEQUENCE acct10001.reporting_ocpstoragelineitem_daily_id_seq
@@ -756,17 +756,17 @@ CREATE SEQUENCE acct10001.reporting_ocpstoragelineitem_daily_id_seq
     CACHE 1;
 
 
-ALTER TABLE acct10001.reporting_ocpstoragelineitem_daily_id_seq OWNER TO kokuadmin;
+ALTER TABLE acct10001.reporting_ocpstoragelineitem_daily_id_seq OWNER TO postgres;
 
 --
--- Name: reporting_ocpstoragelineitem_daily_id_seq; Type: SEQUENCE OWNED BY; Schema: acct10001; Owner: kokuadmin
+-- Name: reporting_ocpstoragelineitem_daily_id_seq; Type: SEQUENCE OWNED BY; Schema: acct10001; Owner: postgres
 --
 
 ALTER SEQUENCE acct10001.reporting_ocpstoragelineitem_daily_id_seq OWNED BY acct10001.reporting_ocpstoragelineitem_daily.id;
 
 
 --
--- Name: reporting_ocpstoragelineitem_daily_summary; Type: TABLE; Schema: acct10001; Owner: kokuadmin
+-- Name: reporting_ocpstoragelineitem_daily_summary; Type: TABLE; Schema: acct10001; Owner: postgres
 --
 
 CREATE TABLE acct10001.reporting_ocpstoragelineitem_daily_summary (
@@ -785,14 +785,15 @@ CREATE TABLE acct10001.reporting_ocpstoragelineitem_daily_summary (
     persistentvolumeclaim_capacity_gigabyte numeric(24,6),
     persistentvolumeclaim_capacity_gigabyte_hours numeric(24,6),
     volume_request_storage_gigabyte_hours numeric(24,6),
-    persistentvolumeclaim_usage_gigabyte_hours numeric(24,6)
+    persistentvolumeclaim_usage_gigabyte_hours numeric(24,6),
+    persistentvolumeclaim_charge_gb_month numeric(24,6)
 );
 
 
-ALTER TABLE acct10001.reporting_ocpstoragelineitem_daily_summary OWNER TO kokuadmin;
+ALTER TABLE acct10001.reporting_ocpstoragelineitem_daily_summary OWNER TO postgres;
 
 --
--- Name: reporting_ocpstoragelineitem_daily_summary_id_seq; Type: SEQUENCE; Schema: acct10001; Owner: kokuadmin
+-- Name: reporting_ocpstoragelineitem_daily_summary_id_seq; Type: SEQUENCE; Schema: acct10001; Owner: postgres
 --
 
 CREATE SEQUENCE acct10001.reporting_ocpstoragelineitem_daily_summary_id_seq
@@ -803,17 +804,17 @@ CREATE SEQUENCE acct10001.reporting_ocpstoragelineitem_daily_summary_id_seq
     CACHE 1;
 
 
-ALTER TABLE acct10001.reporting_ocpstoragelineitem_daily_summary_id_seq OWNER TO kokuadmin;
+ALTER TABLE acct10001.reporting_ocpstoragelineitem_daily_summary_id_seq OWNER TO postgres;
 
 --
--- Name: reporting_ocpstoragelineitem_daily_summary_id_seq; Type: SEQUENCE OWNED BY; Schema: acct10001; Owner: kokuadmin
+-- Name: reporting_ocpstoragelineitem_daily_summary_id_seq; Type: SEQUENCE OWNED BY; Schema: acct10001; Owner: postgres
 --
 
 ALTER SEQUENCE acct10001.reporting_ocpstoragelineitem_daily_summary_id_seq OWNED BY acct10001.reporting_ocpstoragelineitem_daily_summary.id;
 
 
 --
--- Name: reporting_ocpstoragelineitem_id_seq; Type: SEQUENCE; Schema: acct10001; Owner: kokuadmin
+-- Name: reporting_ocpstoragelineitem_id_seq; Type: SEQUENCE; Schema: acct10001; Owner: postgres
 --
 
 CREATE SEQUENCE acct10001.reporting_ocpstoragelineitem_id_seq
@@ -824,17 +825,41 @@ CREATE SEQUENCE acct10001.reporting_ocpstoragelineitem_id_seq
     CACHE 1;
 
 
-ALTER TABLE acct10001.reporting_ocpstoragelineitem_id_seq OWNER TO kokuadmin;
+ALTER TABLE acct10001.reporting_ocpstoragelineitem_id_seq OWNER TO postgres;
 
 --
--- Name: reporting_ocpstoragelineitem_id_seq; Type: SEQUENCE OWNED BY; Schema: acct10001; Owner: kokuadmin
+-- Name: reporting_ocpstoragelineitem_id_seq; Type: SEQUENCE OWNED BY; Schema: acct10001; Owner: postgres
 --
 
 ALTER SEQUENCE acct10001.reporting_ocpstoragelineitem_id_seq OWNED BY acct10001.reporting_ocpstoragelineitem.id;
 
 
 --
--- Name: reporting_ocpusagelineitem; Type: TABLE; Schema: acct10001; Owner: kokuadmin
+-- Name: reporting_ocpstoragevolumeclaimlabel_summary; Type: TABLE; Schema: acct10001; Owner: postgres
+--
+
+CREATE TABLE acct10001.reporting_ocpstoragevolumeclaimlabel_summary (
+    key character varying(253) NOT NULL,
+    "values" character varying(253)[] NOT NULL
+);
+
+
+ALTER TABLE acct10001.reporting_ocpstoragevolumeclaimlabel_summary OWNER TO postgres;
+
+--
+-- Name: reporting_ocpstoragevolumelabel_summary; Type: TABLE; Schema: acct10001; Owner: postgres
+--
+
+CREATE TABLE acct10001.reporting_ocpstoragevolumelabel_summary (
+    key character varying(253) NOT NULL,
+    "values" character varying(253)[] NOT NULL
+);
+
+
+ALTER TABLE acct10001.reporting_ocpstoragevolumelabel_summary OWNER TO postgres;
+
+--
+-- Name: reporting_ocpusagelineitem; Type: TABLE; Schema: acct10001; Owner: postgres
 --
 
 CREATE TABLE acct10001.reporting_ocpusagelineitem (
@@ -1951,28 +1976,28 @@ ALTER TABLE ONLY acct10001.reporting_ocpawscostlineitem_daily_summary ALTER COLU
 
 
 --
--- Name: reporting_ocpstoragelineitem id; Type: DEFAULT; Schema: acct10001; Owner: kokuadmin
+-- Name: reporting_ocpstoragelineitem id; Type: DEFAULT; Schema: acct10001; Owner: postgres
 --
 
 ALTER TABLE ONLY acct10001.reporting_ocpstoragelineitem ALTER COLUMN id SET DEFAULT nextval('acct10001.reporting_ocpstoragelineitem_id_seq'::regclass);
 
 
 --
--- Name: reporting_ocpstoragelineitem_daily id; Type: DEFAULT; Schema: acct10001; Owner: kokuadmin
+-- Name: reporting_ocpstoragelineitem_daily id; Type: DEFAULT; Schema: acct10001; Owner: postgres
 --
 
 ALTER TABLE ONLY acct10001.reporting_ocpstoragelineitem_daily ALTER COLUMN id SET DEFAULT nextval('acct10001.reporting_ocpstoragelineitem_daily_id_seq'::regclass);
 
 
 --
--- Name: reporting_ocpstoragelineitem_daily_summary id; Type: DEFAULT; Schema: acct10001; Owner: kokuadmin
+-- Name: reporting_ocpstoragelineitem_daily_summary id; Type: DEFAULT; Schema: acct10001; Owner: postgres
 --
 
 ALTER TABLE ONLY acct10001.reporting_ocpstoragelineitem_daily_summary ALTER COLUMN id SET DEFAULT nextval('acct10001.reporting_ocpstoragelineitem_daily_summary_id_seq'::regclass);
 
 
 --
--- Name: reporting_ocpusagelineitem id; Type: DEFAULT; Schema: acct10001; Owner: kokuadmin
+-- Name: reporting_ocpusagelineitem id; Type: DEFAULT; Schema: acct10001; Owner: postgres
 --
 
 ALTER TABLE ONLY acct10001.reporting_ocpusagelineitem ALTER COLUMN id SET DEFAULT nextval('acct10001.reporting_ocpusagelineitem_id_seq'::regclass);
@@ -2165,68 +2190,72 @@ ALTER TABLE ONLY public.si_unit_scale ALTER COLUMN id SET DEFAULT nextval('publi
 --
 
 COPY acct10001.django_migrations (id, app, name, applied) FROM stdin;
-1	contenttypes	0001_initial	2019-02-13 22:00:56.090464+00
-2	auth	0001_initial	2019-02-13 22:00:56.106291+00
-3	admin	0001_initial	2019-02-13 22:00:56.120823+00
-4	admin	0002_logentry_remove_auto_add	2019-02-13 22:00:56.132113+00
-5	admin	0003_logentry_add_action_flag_choices	2019-02-13 22:00:56.143015+00
-6	api	0001_initial	2019-02-13 22:00:56.181048+00
-7	api	0002_auto_20180926_1905	2019-02-13 22:00:56.190944+00
-8	api	0003_auto_20181008_1819	2019-02-13 22:00:56.211733+00
-9	api	0004_auto_20181012_1507	2019-02-13 22:00:56.221982+00
-10	api	0005_auto_20181109_2121	2019-02-13 22:00:56.230282+00
-11	api	0006_delete_rate	2019-02-13 22:00:56.236252+00
-12	api	0007_auto_20181213_1940	2019-02-13 22:00:56.251847+00
-13	contenttypes	0002_remove_content_type_name	2019-02-13 22:00:56.267113+00
-14	auth	0002_alter_permission_name_max_length	2019-02-13 22:00:56.274913+00
-15	auth	0003_alter_user_email_max_length	2019-02-13 22:00:56.286279+00
-16	auth	0004_alter_user_username_opts	2019-02-13 22:00:56.29848+00
-17	auth	0005_alter_user_last_login_null	2019-02-13 22:00:56.31253+00
-18	auth	0006_require_contenttypes_0002	2019-02-13 22:00:56.316983+00
-19	auth	0007_alter_validators_add_error_messages	2019-02-13 22:00:56.327949+00
-20	auth	0008_alter_user_username_max_length	2019-02-13 22:00:56.339247+00
-21	auth	0009_alter_user_last_name_max_length	2019-02-13 22:00:56.350379+00
-22	rates	0001_initial	2019-02-13 22:00:56.374754+00
-23	rates	0002_auto_20181205_1810	2019-02-13 22:00:56.381301+00
-24	reporting	0001_initial	2019-02-13 22:00:56.735676+00
-25	reporting	0002_auto_20180926_1818	2019-02-13 22:00:56.922855+00
-26	reporting	0003_auto_20180928_1840	2019-02-13 22:00:56.998337+00
-27	reporting	0004_auto_20181003_1633	2019-02-13 22:00:57.186998+00
-28	reporting	0005_auto_20181003_1416	2019-02-13 22:00:57.210682+00
-29	reporting	0006_awscostentrylineitemaggregates_account_alias	2019-02-13 22:00:57.227025+00
-30	reporting	0007_awscostentrybill_provider_id	2019-02-13 22:00:57.238642+00
-31	reporting	0008_auto_20181012_1724	2019-02-13 22:00:57.2532+00
-32	reporting	0009_auto_20181016_1940	2019-02-13 22:00:57.348039+00
-33	reporting	0010_auto_20181017_1659	2019-02-13 22:00:57.576093+00
-34	reporting	0011_auto_20181018_1811	2019-02-13 22:00:57.676392+00
-35	reporting	0012_auto_20181106_1502	2019-02-13 22:00:57.697852+00
-36	reporting	0013_auto_20181107_1956	2019-02-13 22:00:57.787066+00
-37	reporting	0014_auto_20181108_0207	2019-02-13 22:00:57.802155+00
-38	reporting	0015_auto_20181109_1618	2019-02-13 22:00:57.810917+00
-39	reporting	0016_delete_rate	2019-02-13 22:00:57.82036+00
-40	reporting	0017_auto_20181121_1444	2019-02-13 22:00:57.860276+00
-41	reporting	0018_auto_20181129_0217	2019-02-13 22:00:57.999126+00
-42	reporting	0019_auto_20181206_2138	2019-02-13 22:00:58.024894+00
-43	reporting	0020_auto_20181211_1557	2019-02-13 22:00:58.078569+00
-44	reporting	0021_auto_20181212_1816	2019-02-13 22:00:58.111137+00
-45	reporting	0022_auto_20181221_1617	2019-02-13 22:00:58.125565+00
-46	reporting	0023_awscostentrylineitemdailysummary_tags	2019-02-13 22:00:58.138798+00
-47	reporting	0024_ocpusagepodlabelsummary	2019-02-13 22:00:58.159281+00
-48	reporting	0025_auto_20190128_1825	2019-02-13 22:00:58.185126+00
-49	reporting	0026_auto_20190130_1746	2019-02-13 22:00:58.218929+00
-50	reporting	0027_auto_20190205_1659	2019-02-13 22:00:58.230148+00
-51	reporting	0028_auto_20190205_2022	2019-02-13 22:00:58.300707+00
-52	reporting	0029_auto_20190207_1526	2019-02-13 22:00:58.369341+00
-53	reporting	0030_auto_20190208_0159	2019-02-13 22:00:58.390456+00
-54	reporting	0031_ocpawscostlineitemdailysummary_instance_type	2019-02-13 22:00:58.404199+00
-55	reporting_common	0001_initial	2019-02-13 22:00:58.422146+00
-56	reporting_common	0002_auto_20180926_1905	2019-02-13 22:00:58.432382+00
-57	reporting_common	0003_auto_20180928_1732	2019-02-13 22:00:58.43853+00
-58	reporting_common	0004_auto_20181003_1859	2019-02-13 22:00:58.47598+00
-59	reporting_common	0005_auto_20181127_2046	2019-02-13 22:00:58.486993+00
-60	reporting_common	0006_auto_20190208_0316	2019-02-13 22:00:58.500687+00
-61	reporting_common	0007_auto_20190208_0316	2019-02-13 22:00:58.50884+00
-62	sessions	0001_initial	2019-02-13 22:00:58.515856+00
+1	contenttypes	0001_initial	2019-02-15 18:25:19.278111+00
+2	auth	0001_initial	2019-02-15 18:25:19.318141+00
+3	admin	0001_initial	2019-02-15 18:25:19.329859+00
+4	admin	0002_logentry_remove_auto_add	2019-02-15 18:25:19.34011+00
+5	admin	0003_logentry_add_action_flag_choices	2019-02-15 18:25:19.350996+00
+6	api	0001_initial	2019-02-15 18:25:19.392101+00
+7	api	0002_auto_20180926_1905	2019-02-15 18:25:19.400421+00
+8	api	0003_auto_20181008_1819	2019-02-15 18:25:19.41924+00
+9	api	0004_auto_20181012_1507	2019-02-15 18:25:19.427946+00
+10	api	0005_auto_20181109_2121	2019-02-15 18:25:19.435137+00
+11	api	0006_delete_rate	2019-02-15 18:25:19.439467+00
+12	api	0007_auto_20181213_1940	2019-02-15 18:25:19.45538+00
+13	contenttypes	0002_remove_content_type_name	2019-02-15 18:25:19.470967+00
+14	auth	0002_alter_permission_name_max_length	2019-02-15 18:25:19.477158+00
+15	auth	0003_alter_user_email_max_length	2019-02-15 18:25:19.486939+00
+16	auth	0004_alter_user_username_opts	2019-02-15 18:25:19.496622+00
+17	auth	0005_alter_user_last_login_null	2019-02-15 18:25:19.506853+00
+18	auth	0006_require_contenttypes_0002	2019-02-15 18:25:19.510687+00
+19	auth	0007_alter_validators_add_error_messages	2019-02-15 18:25:19.521185+00
+20	auth	0008_alter_user_username_max_length	2019-02-15 18:25:19.532785+00
+21	auth	0009_alter_user_last_name_max_length	2019-02-15 18:25:19.543415+00
+22	rates	0001_initial	2019-02-15 18:25:19.56522+00
+23	rates	0002_auto_20181205_1810	2019-02-15 18:25:19.5724+00
+24	rates	0003_auto_20190213_2040	2019-02-15 18:25:19.578501+00
+25	reporting	0001_initial	2019-02-15 18:25:19.891843+00
+26	reporting	0002_auto_20180926_1818	2019-02-15 18:25:20.034617+00
+27	reporting	0003_auto_20180928_1840	2019-02-15 18:25:20.105632+00
+28	reporting	0004_auto_20181003_1633	2019-02-15 18:25:20.233871+00
+29	reporting	0005_auto_20181003_1416	2019-02-15 18:25:20.260184+00
+30	reporting	0006_awscostentrylineitemaggregates_account_alias	2019-02-15 18:25:20.2748+00
+31	reporting	0007_awscostentrybill_provider_id	2019-02-15 18:25:20.284703+00
+32	reporting	0008_auto_20181012_1724	2019-02-15 18:25:20.29668+00
+33	reporting	0009_auto_20181016_1940	2019-02-15 18:25:20.352008+00
+34	reporting	0010_auto_20181017_1659	2019-02-15 18:25:20.533912+00
+35	reporting	0011_auto_20181018_1811	2019-02-15 18:25:20.618199+00
+36	reporting	0012_auto_20181106_1502	2019-02-15 18:25:20.639177+00
+37	reporting	0013_auto_20181107_1956	2019-02-15 18:25:20.72679+00
+38	reporting	0014_auto_20181108_0207	2019-02-15 18:25:20.739426+00
+39	reporting	0015_auto_20181109_1618	2019-02-15 18:25:20.746145+00
+40	reporting	0016_delete_rate	2019-02-15 18:25:20.752756+00
+41	reporting	0017_auto_20181121_1444	2019-02-15 18:25:20.788963+00
+42	reporting	0018_auto_20181129_0217	2019-02-15 18:25:20.915848+00
+43	reporting	0019_auto_20181206_2138	2019-02-15 18:25:20.937034+00
+44	reporting	0020_auto_20181211_1557	2019-02-15 18:25:20.965172+00
+45	reporting	0021_auto_20181212_1816	2019-02-15 18:25:20.996966+00
+46	reporting	0022_auto_20181221_1617	2019-02-15 18:25:21.008936+00
+47	reporting	0023_awscostentrylineitemdailysummary_tags	2019-02-15 18:25:21.01827+00
+48	reporting	0024_ocpusagepodlabelsummary	2019-02-15 18:25:21.035261+00
+49	reporting	0025_auto_20190128_1825	2019-02-15 18:25:21.057825+00
+50	reporting	0026_auto_20190130_1746	2019-02-15 18:25:21.087889+00
+51	reporting	0027_auto_20190205_1659	2019-02-15 18:25:21.096699+00
+52	reporting	0028_auto_20190205_2022	2019-02-15 18:25:21.201208+00
+53	reporting	0029_auto_20190207_1526	2019-02-15 18:25:21.258738+00
+54	reporting	0030_auto_20190208_0159	2019-02-15 18:25:21.277978+00
+55	reporting	0031_ocpawscostlineitemdailysummary_instance_type	2019-02-15 18:25:21.290181+00
+56	reporting	0032_auto_20190213_2152	2019-02-15 18:25:21.30257+00
+57	reporting	0033_auto_20190214_1637	2019-02-15 18:25:21.315847+00
+58	reporting	0034_ocpstoragevolumeclaimlabelsummary_ocpstoragevolumelabelsummary	2019-02-15 18:25:21.341477+00
+59	reporting_common	0001_initial	2019-02-15 18:25:21.361032+00
+60	reporting_common	0002_auto_20180926_1905	2019-02-15 18:25:21.369718+00
+61	reporting_common	0003_auto_20180928_1732	2019-02-15 18:25:21.374824+00
+62	reporting_common	0004_auto_20181003_1859	2019-02-15 18:25:21.408524+00
+63	reporting_common	0005_auto_20181127_2046	2019-02-15 18:25:21.414683+00
+64	reporting_common	0006_auto_20190208_0316	2019-02-15 18:25:21.429368+00
+65	reporting_common	0007_auto_20190208_0316	2019-02-15 18:25:21.440071+00
+66	sessions	0001_initial	2019-02-15 18:25:21.449289+00
 \.
 
 
@@ -2330,55 +2359,7 @@ COPY acct10001.reporting_awstags_summary (key, "values") FROM stdin;
 -- Data for Name: reporting_ocpawscostlineitem_daily_summary; Type: TABLE DATA; Schema: acct10001; Owner: postgres
 --
 
-COPY acct10001.reporting_ocpawscostlineitem_daily_summary (id, cluster_id, cluster_alias, namespace, pod, node, resource_id, usage_start, usage_end, pod_labels, product_code, product_family, usage_account_id, availability_zone, region, unit, tags, unblended_cost, pod_cost, account_alias_id, normalized_usage_amount, usage_amount) FROM stdin;
-\.
-
-
---
--- Data for Name: reporting_ocpstoragelineitem; Type: TABLE DATA; Schema: acct10001; Owner: kokuadmin
---
-
 COPY acct10001.reporting_ocpawscostlineitem_daily_summary (id, cluster_id, cluster_alias, namespace, pod, node, resource_id, usage_start, usage_end, pod_labels, product_code, product_family, usage_account_id, availability_zone, region, unit, tags, unblended_cost, pod_cost, account_alias_id, normalized_usage_amount, usage_amount, instance_type) FROM stdin;
-\.
-
-
---
--- Data for Name: reporting_ocpstoragelineitem; Type: TABLE DATA; Schema: acct10001; Owner: kokuadmin
---
-
-COPY acct10001.reporting_ocpstoragelineitem (id, namespace, pod, persistentvolumeclaim, persistentvolume, storageclass, persistentvolumeclaim_capacity_bytes, persistentvolumeclaim_capacity_byte_seconds, volume_request_storage_byte_seconds, persistentvolumeclaim_usage_byte_seconds, persistentvolume_labels, persistentvolumeclaim_labels, report_id, report_period_id) FROM stdin;
-\.
-
-
---
--- Data for Name: reporting_ocpstoragelineitem_daily; Type: TABLE DATA; Schema: acct10001; Owner: kokuadmin
---
-
-COPY acct10001.reporting_ocpstoragelineitem_daily (id, cluster_id, cluster_alias, namespace, pod, persistentvolumeclaim, persistentvolume, storageclass, usage_start, usage_end, persistentvolumeclaim_capacity_bytes, persistentvolumeclaim_capacity_byte_seconds, volume_request_storage_byte_seconds, persistentvolumeclaim_usage_byte_seconds, total_seconds, persistentvolume_labels, persistentvolumeclaim_labels) FROM stdin;
-\.
-
-
---
--- Data for Name: reporting_ocpstoragelineitem_daily_summary; Type: TABLE DATA; Schema: acct10001; Owner: kokuadmin
---
-
-COPY acct10001.reporting_ocpstoragelineitem_daily_summary (id, cluster_id, cluster_alias, namespace, persistentvolumeclaim, persistentvolume, storageclass, pod, usage_start, usage_end, persistentvolume_labels, persistentvolumeclaim_labels, persistentvolumeclaim_capacity_gigabyte, persistentvolumeclaim_capacity_gigabyte_hours, volume_request_storage_gigabyte_hours, persistentvolumeclaim_usage_gigabyte_hours) FROM stdin;
-\.
-
-
---
--- Data for Name: reporting_ocpstoragelineitem_daily; Type: TABLE DATA; Schema: acct10001; Owner: kokuadmin
---
-
-COPY acct10001.reporting_ocpstoragelineitem_daily (id, cluster_id, cluster_alias, namespace, pod, persistentvolumeclaim, persistentvolume, storageclass, usage_start, usage_end, persistentvolumeclaim_capacity_bytes, persistentvolumeclaim_capacity_byte_seconds, volume_request_storage_byte_seconds, persistentvolumeclaim_usage_byte_seconds, total_seconds, persistentvolume_labels, persistentvolumeclaim_labels) FROM stdin;
-\.
-
-
---
--- Data for Name: reporting_ocpstoragelineitem_daily_summary; Type: TABLE DATA; Schema: acct10001; Owner: kokuadmin
---
-
-COPY acct10001.reporting_ocpstoragelineitem_daily_summary (id, cluster_id, cluster_alias, namespace, persistentvolumeclaim, persistentvolume, storageclass, pod, usage_start, usage_end, persistentvolume_labels, persistentvolumeclaim_labels, persistentvolumeclaim_capacity_gigabyte, persistentvolumeclaim_capacity_gigabyte_hours, volume_request_storage_gigabyte_hours, persistentvolumeclaim_usage_gigabyte_hours) FROM stdin;
 \.
 
 
@@ -2402,7 +2383,23 @@ COPY acct10001.reporting_ocpstoragelineitem_daily (id, cluster_id, cluster_alias
 -- Data for Name: reporting_ocpstoragelineitem_daily_summary; Type: TABLE DATA; Schema: acct10001; Owner: postgres
 --
 
-COPY acct10001.reporting_ocpstoragelineitem_daily_summary (id, cluster_id, cluster_alias, namespace, persistentvolumeclaim, persistentvolume, storageclass, pod, usage_start, usage_end, persistentvolume_labels, persistentvolumeclaim_labels, persistentvolumeclaim_capacity_gigabyte, persistentvolumeclaim_capacity_gigabyte_hours, volume_request_storage_gigabyte_hours, persistentvolumeclaim_usage_gigabyte_hours) FROM stdin;
+COPY acct10001.reporting_ocpstoragelineitem_daily_summary (id, cluster_id, cluster_alias, namespace, persistentvolumeclaim, persistentvolume, storageclass, pod, usage_start, usage_end, persistentvolume_labels, persistentvolumeclaim_labels, persistentvolumeclaim_capacity_gigabyte, persistentvolumeclaim_capacity_gigabyte_hours, volume_request_storage_gigabyte_hours, persistentvolumeclaim_usage_gigabyte_hours, persistentvolumeclaim_charge_gb_month) FROM stdin;
+\.
+
+
+--
+-- Data for Name: reporting_ocpstoragevolumeclaimlabel_summary; Type: TABLE DATA; Schema: acct10001; Owner: postgres
+--
+
+COPY acct10001.reporting_ocpstoragevolumeclaimlabel_summary (key, "values") FROM stdin;
+\.
+
+
+--
+-- Data for Name: reporting_ocpstoragevolumelabel_summary; Type: TABLE DATA; Schema: acct10001; Owner: postgres
+--
+
+COPY acct10001.reporting_ocpstoragevolumelabel_summary (key, "values") FROM stdin;
 \.
 
 
@@ -2467,7 +2464,7 @@ COPY acct10001.reporting_ocpusagereportperiod (id, cluster_id, report_period_sta
 --
 
 COPY public.api_customer (id, date_created, uuid, account_id, schema_name) FROM stdin;
-1	2019-02-13 22:00:56.038324+00	3dea7789-e698-4dc8-aa0f-369fad98afca	10001	acct10001
+1	2019-02-15 18:25:19.18124+00	d0b196c9-5e24-427d-a8b4-460b3f934f45	10001	acct10001
 \.
 
 
@@ -2514,7 +2511,7 @@ COPY public.api_tenant (id, schema_name) FROM stdin;
 --
 
 COPY public.api_user (id, uuid, username, email, date_created, is_active, customer_id) FROM stdin;
-1	8274b122-3a0a-44cc-9e94-eb6c06856cd2	user_dev	user_dev@foo.com	2019-02-13 22:00:58.649027+00	t	1
+1	ab04a962-27b7-4ab7-9311-e615194a8318	user_dev	user_dev@foo.com	2019-02-15 18:25:21.536472+00	t	1
 \.
 
 
@@ -2523,9 +2520,9 @@ COPY public.api_user (id, uuid, username, email, date_created, is_active, custom
 --
 
 COPY public.api_userpreference (id, uuid, preference, name, description, user_id) FROM stdin;
-1	b412b422-e7cd-41f1-8c78-2e80d2c1dc04	{"currency": "USD"}	currency	default preference	1
-2	7a84ce79-2a51-4d3a-9f94-1816303ca150	{"timezone": "UTC"}	timezone	default preference	1
-3	1c5ea5b7-0a7f-4f88-abf6-2e445ca176c2	{"locale": "en_US.UTF-8"}	locale	default preference	1
+1	521a0ed4-7fb6-437b-add5-4acef012792a	{"currency": "USD"}	currency	default preference	1
+2	c41d79d1-9a55-4e10-a6af-88140426247f	{"timezone": "UTC"}	timezone	default preference	1
+3	b4d0580e-7424-43cc-8969-ec14f5aa96e7	{"locale": "en_US.UTF-8"}	locale	default preference	1
 \.
 
 
@@ -2640,6 +2637,7 @@ COPY public.auth_permission (id, name, content_type_id, codename) FROM stdin;
 88	Can view aws cost entry product	22	view_awscostentryproduct
 89	Can add aws cost entry reservation	23	add_awscostentryreservation
 90	Can change aws cost entry reservation	23	change_awscostentryreservation
+169	Can add cost usage report manifest	43	add_costusagereportmanifest
 91	Can delete aws cost entry reservation	23	delete_awscostentryreservation
 92	Can view aws cost entry reservation	23	view_awscostentryreservation
 93	Can add ocp usage line item	24	add_ocpusagelineitem
@@ -2694,30 +2692,37 @@ COPY public.auth_permission (id, name, content_type_id, codename) FROM stdin;
 142	Can change ocpu storage line item daily	36	change_ocpustoragelineitemdaily
 143	Can delete ocpu storage line item daily	36	delete_ocpustoragelineitemdaily
 144	Can view ocpu storage line item daily	36	view_ocpustoragelineitemdaily
-145	Can add cost usage report status	37	add_costusagereportstatus
-146	Can change cost usage report status	37	change_costusagereportstatus
-147	Can delete cost usage report status	37	delete_costusagereportstatus
-148	Can view cost usage report status	37	view_costusagereportstatus
-149	Can add region mapping	38	add_regionmapping
-150	Can change region mapping	38	change_regionmapping
-151	Can delete region mapping	38	delete_regionmapping
-152	Can view region mapping	38	view_regionmapping
-153	Can add report column map	39	add_reportcolumnmap
-154	Can change report column map	39	change_reportcolumnmap
-155	Can delete report column map	39	delete_reportcolumnmap
-156	Can view report column map	39	view_reportcolumnmap
-157	Can add si unit scale	40	add_siunitscale
-158	Can change si unit scale	40	change_siunitscale
-159	Can delete si unit scale	40	delete_siunitscale
-160	Can view si unit scale	40	view_siunitscale
-161	Can add cost usage report manifest	41	add_costusagereportmanifest
-162	Can change cost usage report manifest	41	change_costusagereportmanifest
-163	Can delete cost usage report manifest	41	delete_costusagereportmanifest
-164	Can view cost usage report manifest	41	view_costusagereportmanifest
-165	Can add rate	42	add_rate
-166	Can change rate	42	change_rate
-167	Can delete rate	42	delete_rate
-168	Can view rate	42	view_rate
+145	Can add ocp storage volume claim label summary	37	add_ocpstoragevolumeclaimlabelsummary
+146	Can change ocp storage volume claim label summary	37	change_ocpstoragevolumeclaimlabelsummary
+147	Can delete ocp storage volume claim label summary	37	delete_ocpstoragevolumeclaimlabelsummary
+148	Can view ocp storage volume claim label summary	37	view_ocpstoragevolumeclaimlabelsummary
+149	Can add ocp storage volume label summary	38	add_ocpstoragevolumelabelsummary
+150	Can change ocp storage volume label summary	38	change_ocpstoragevolumelabelsummary
+151	Can delete ocp storage volume label summary	38	delete_ocpstoragevolumelabelsummary
+152	Can view ocp storage volume label summary	38	view_ocpstoragevolumelabelsummary
+153	Can add cost usage report status	39	add_costusagereportstatus
+154	Can change cost usage report status	39	change_costusagereportstatus
+155	Can delete cost usage report status	39	delete_costusagereportstatus
+156	Can view cost usage report status	39	view_costusagereportstatus
+157	Can add region mapping	40	add_regionmapping
+158	Can change region mapping	40	change_regionmapping
+159	Can delete region mapping	40	delete_regionmapping
+160	Can view region mapping	40	view_regionmapping
+161	Can add report column map	41	add_reportcolumnmap
+162	Can change report column map	41	change_reportcolumnmap
+163	Can delete report column map	41	delete_reportcolumnmap
+164	Can view report column map	41	view_reportcolumnmap
+165	Can add si unit scale	42	add_siunitscale
+166	Can change si unit scale	42	change_siunitscale
+167	Can delete si unit scale	42	delete_siunitscale
+168	Can view si unit scale	42	view_siunitscale
+170	Can change cost usage report manifest	43	change_costusagereportmanifest
+171	Can delete cost usage report manifest	43	delete_costusagereportmanifest
+172	Can view cost usage report manifest	43	view_costusagereportmanifest
+173	Can add rate	44	add_rate
+174	Can change rate	44	change_rate
+175	Can delete rate	44	delete_rate
+176	Can view rate	44	view_rate
 \.
 
 
@@ -2794,82 +2799,88 @@ COPY public.django_content_type (id, app_label, model) FROM stdin;
 34	reporting	ocpstoragelineitem
 35	reporting	ocpstoragelineitemdailysummary
 36	reporting	ocpustoragelineitemdaily
-37	reporting_common	costusagereportstatus
-38	reporting_common	regionmapping
-39	reporting_common	reportcolumnmap
-40	reporting_common	siunitscale
-41	reporting_common	costusagereportmanifest
-42	rates	rate
+37	reporting	ocpstoragevolumeclaimlabelsummary
+38	reporting	ocpstoragevolumelabelsummary
+39	reporting_common	costusagereportstatus
+40	reporting_common	regionmapping
+41	reporting_common	reportcolumnmap
+42	reporting_common	siunitscale
+43	reporting_common	costusagereportmanifest
+44	rates	rate
 \.
 
 
 --
--- Data for Name: django_migrations; Type: TABLE DATA; Schema: public; Owner: kokuadmin
+-- Data for Name: django_migrations; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 COPY public.django_migrations (id, app, name, applied) FROM stdin;
-1	contenttypes	0001_initial	2019-02-13 22:00:47.025517+00
-2	auth	0001_initial	2019-02-13 22:00:47.131991+00
-3	admin	0001_initial	2019-02-13 22:00:47.166996+00
-4	admin	0002_logentry_remove_auto_add	2019-02-13 22:00:47.178815+00
-5	admin	0003_logentry_add_action_flag_choices	2019-02-13 22:00:47.191308+00
-6	api	0001_initial	2019-02-13 22:00:47.360567+00
-7	api	0002_auto_20180926_1905	2019-02-13 22:00:47.370121+00
-8	api	0003_auto_20181008_1819	2019-02-13 22:00:47.420026+00
-9	api	0004_auto_20181012_1507	2019-02-13 22:00:47.434282+00
-10	api	0005_auto_20181109_2121	2019-02-13 22:00:47.459159+00
-11	api	0006_delete_rate	2019-02-13 22:00:47.470825+00
-12	api	0007_auto_20181213_1940	2019-02-13 22:00:47.52083+00
-13	contenttypes	0002_remove_content_type_name	2019-02-13 22:00:47.553478+00
-14	auth	0002_alter_permission_name_max_length	2019-02-13 22:00:47.564001+00
-15	auth	0003_alter_user_email_max_length	2019-02-13 22:00:47.578426+00
-16	auth	0004_alter_user_username_opts	2019-02-13 22:00:47.590684+00
-17	auth	0005_alter_user_last_login_null	2019-02-13 22:00:47.604997+00
-18	auth	0006_require_contenttypes_0002	2019-02-13 22:00:47.609363+00
-19	auth	0007_alter_validators_add_error_messages	2019-02-13 22:00:47.621387+00
-20	auth	0008_alter_user_username_max_length	2019-02-13 22:00:47.641484+00
-21	auth	0009_alter_user_last_name_max_length	2019-02-13 22:00:47.65506+00
-22	rates	0001_initial	2019-02-13 22:00:47.663086+00
-23	rates	0002_auto_20181205_1810	2019-02-13 22:00:47.671493+00
-24	reporting	0001_initial	2019-02-13 22:00:47.807581+00
-25	reporting	0002_auto_20180926_1818	2019-02-13 22:00:47.864665+00
-26	reporting	0003_auto_20180928_1840	2019-02-13 22:00:47.923039+00
-27	reporting	0004_auto_20181003_1633	2019-02-13 22:00:47.961232+00
-28	reporting	0005_auto_20181003_1416	2019-02-13 22:00:47.981339+00
-29	reporting	0006_awscostentrylineitemaggregates_account_alias	2019-02-13 22:00:47.993161+00
-30	reporting	0007_awscostentrybill_provider_id	2019-02-13 22:00:48.005373+00
-31	reporting	0008_auto_20181012_1724	2019-02-13 22:00:48.054463+00
-32	reporting	0009_auto_20181016_1940	2019-02-13 22:00:48.087691+00
-33	reporting	0010_auto_20181017_1659	2019-02-13 22:00:48.129655+00
-34	reporting	0011_auto_20181018_1811	2019-02-13 22:00:48.169078+00
-35	reporting	0012_auto_20181106_1502	2019-02-13 22:00:48.178698+00
-36	reporting	0013_auto_20181107_1956	2019-02-13 22:00:48.244641+00
-37	reporting	0014_auto_20181108_0207	2019-02-13 22:00:48.261732+00
-38	reporting	0015_auto_20181109_1618	2019-02-13 22:00:48.271674+00
-39	reporting	0016_delete_rate	2019-02-13 22:00:48.278903+00
-40	reporting	0017_auto_20181121_1444	2019-02-13 22:00:48.314874+00
-41	reporting	0018_auto_20181129_0217	2019-02-13 22:00:48.413813+00
-42	reporting	0019_auto_20181206_2138	2019-02-13 22:00:48.431748+00
-43	reporting	0020_auto_20181211_1557	2019-02-13 22:00:48.450557+00
-44	reporting	0021_auto_20181212_1816	2019-02-13 22:00:48.48155+00
-45	reporting	0022_auto_20181221_1617	2019-02-13 22:00:48.495759+00
-46	reporting	0023_awscostentrylineitemdailysummary_tags	2019-02-13 22:00:48.506263+00
-47	reporting	0024_ocpusagepodlabelsummary	2019-02-13 22:00:48.513748+00
-48	reporting	0025_auto_20190128_1825	2019-02-13 22:00:48.535763+00
-49	reporting	0026_auto_20190130_1746	2019-02-13 22:00:48.559758+00
-50	reporting	0027_auto_20190205_1659	2019-02-13 22:00:48.566029+00
-51	reporting	0028_auto_20190205_2022	2019-02-13 22:00:48.615338+00
-52	reporting	0029_auto_20190207_1526	2019-02-13 22:00:48.637164+00
-53	reporting	0030_auto_20190208_0159	2019-02-13 22:00:48.655698+00
-54	reporting	0031_ocpawscostlineitemdailysummary_instance_type	2019-02-13 22:00:48.669086+00
-55	reporting_common	0001_initial	2019-02-13 22:00:48.744437+00
-56	reporting_common	0002_auto_20180926_1905	2019-02-13 22:00:48.844704+00
-57	reporting_common	0003_auto_20180928_1732	2019-02-13 22:00:48.908261+00
-58	reporting_common	0004_auto_20181003_1859	2019-02-13 22:00:48.975775+00
-59	reporting_common	0005_auto_20181127_2046	2019-02-13 22:00:49.04153+00
-60	reporting_common	0006_auto_20190208_0316	2019-02-13 22:00:49.070106+00
-61	reporting_common	0007_auto_20190208_0316	2019-02-13 22:00:49.229955+00
-62	sessions	0001_initial	2019-02-13 22:00:49.251656+00
+1	contenttypes	0001_initial	2019-02-15 18:24:27.02942+00
+2	auth	0001_initial	2019-02-15 18:24:27.12633+00
+3	admin	0001_initial	2019-02-15 18:24:27.181559+00
+4	admin	0002_logentry_remove_auto_add	2019-02-15 18:24:27.195495+00
+5	admin	0003_logentry_add_action_flag_choices	2019-02-15 18:24:27.207968+00
+6	api	0001_initial	2019-02-15 18:24:27.367465+00
+7	api	0002_auto_20180926_1905	2019-02-15 18:24:27.378474+00
+8	api	0003_auto_20181008_1819	2019-02-15 18:24:27.418792+00
+9	api	0004_auto_20181012_1507	2019-02-15 18:24:27.433677+00
+10	api	0005_auto_20181109_2121	2019-02-15 18:24:27.453817+00
+11	api	0006_delete_rate	2019-02-15 18:24:27.461291+00
+12	api	0007_auto_20181213_1940	2019-02-15 18:24:27.512715+00
+13	contenttypes	0002_remove_content_type_name	2019-02-15 18:24:27.542049+00
+14	auth	0002_alter_permission_name_max_length	2019-02-15 18:24:27.55121+00
+15	auth	0003_alter_user_email_max_length	2019-02-15 18:24:27.56401+00
+16	auth	0004_alter_user_username_opts	2019-02-15 18:24:27.575821+00
+17	auth	0005_alter_user_last_login_null	2019-02-15 18:24:27.588634+00
+18	auth	0006_require_contenttypes_0002	2019-02-15 18:24:27.592366+00
+19	auth	0007_alter_validators_add_error_messages	2019-02-15 18:24:27.603478+00
+20	auth	0008_alter_user_username_max_length	2019-02-15 18:24:27.620851+00
+21	auth	0009_alter_user_last_name_max_length	2019-02-15 18:24:27.634216+00
+22	rates	0001_initial	2019-02-15 18:24:27.642228+00
+23	rates	0002_auto_20181205_1810	2019-02-15 18:24:27.647773+00
+24	rates	0003_auto_20190213_2040	2019-02-15 18:24:27.653475+00
+25	reporting	0001_initial	2019-02-15 18:24:27.818349+00
+26	reporting	0002_auto_20180926_1818	2019-02-15 18:24:27.887329+00
+27	reporting	0003_auto_20180928_1840	2019-02-15 18:24:27.9858+00
+28	reporting	0004_auto_20181003_1633	2019-02-15 18:24:28.032343+00
+29	reporting	0005_auto_20181003_1416	2019-02-15 18:24:28.056325+00
+30	reporting	0006_awscostentrylineitemaggregates_account_alias	2019-02-15 18:24:28.068795+00
+31	reporting	0007_awscostentrybill_provider_id	2019-02-15 18:24:28.095258+00
+32	reporting	0008_auto_20181012_1724	2019-02-15 18:24:28.105788+00
+33	reporting	0009_auto_20181016_1940	2019-02-15 18:24:28.140861+00
+34	reporting	0010_auto_20181017_1659	2019-02-15 18:24:28.18782+00
+35	reporting	0011_auto_20181018_1811	2019-02-15 18:24:28.230536+00
+36	reporting	0012_auto_20181106_1502	2019-02-15 18:24:28.241866+00
+37	reporting	0013_auto_20181107_1956	2019-02-15 18:24:28.31509+00
+38	reporting	0014_auto_20181108_0207	2019-02-15 18:24:28.32747+00
+39	reporting	0015_auto_20181109_1618	2019-02-15 18:24:28.33496+00
+40	reporting	0016_delete_rate	2019-02-15 18:24:28.34145+00
+41	reporting	0017_auto_20181121_1444	2019-02-15 18:24:28.372734+00
+42	reporting	0018_auto_20181129_0217	2019-02-15 18:24:28.488005+00
+43	reporting	0019_auto_20181206_2138	2019-02-15 18:24:28.508638+00
+44	reporting	0020_auto_20181211_1557	2019-02-15 18:24:28.566377+00
+45	reporting	0021_auto_20181212_1816	2019-02-15 18:24:28.593517+00
+46	reporting	0022_auto_20181221_1617	2019-02-15 18:24:28.606116+00
+47	reporting	0023_awscostentrylineitemdailysummary_tags	2019-02-15 18:24:28.615303+00
+48	reporting	0024_ocpusagepodlabelsummary	2019-02-15 18:24:28.621762+00
+49	reporting	0025_auto_20190128_1825	2019-02-15 18:24:28.642309+00
+50	reporting	0026_auto_20190130_1746	2019-02-15 18:24:28.661308+00
+51	reporting	0027_auto_20190205_1659	2019-02-15 18:24:28.666896+00
+52	reporting	0028_auto_20190205_2022	2019-02-15 18:24:28.711032+00
+53	reporting	0029_auto_20190207_1526	2019-02-15 18:24:28.7381+00
+54	reporting	0030_auto_20190208_0159	2019-02-15 18:24:28.758339+00
+55	reporting	0031_ocpawscostlineitemdailysummary_instance_type	2019-02-15 18:24:28.771925+00
+56	reporting	0032_auto_20190213_2152	2019-02-15 18:24:28.783846+00
+57	reporting	0033_auto_20190214_1637	2019-02-15 18:24:28.796803+00
+58	reporting	0034_ocpstoragevolumeclaimlabelsummary_ocpstoragevolumelabelsummary	2019-02-15 18:24:28.806476+00
+59	reporting_common	0001_initial	2019-02-15 18:24:28.871035+00
+60	reporting_common	0002_auto_20180926_1905	2019-02-15 18:24:28.96025+00
+61	reporting_common	0003_auto_20180928_1732	2019-02-15 18:24:29.026211+00
+62	reporting_common	0004_auto_20181003_1859	2019-02-15 18:24:29.090911+00
+63	reporting_common	0005_auto_20181127_2046	2019-02-15 18:24:29.159268+00
+64	reporting_common	0006_auto_20190208_0316	2019-02-15 18:24:29.187142+00
+65	reporting_common	0007_auto_20190208_0316	2019-02-15 18:24:29.351945+00
+66	sessions	0001_initial	2019-02-15 18:24:29.371699+00
 \.
 
 
@@ -2906,7 +2917,7 @@ COPY public.reporting_common_costusagereportstatus (id, report_name, last_comple
 
 
 --
--- Data for Name: reporting_common_reportcolumnmap; Type: TABLE DATA; Schema: public; Owner: kokuadmin
+-- Data for Name: reporting_common_reportcolumnmap; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 COPY public.reporting_common_reportcolumnmap (id, provider_type, provider_column_name, database_table, database_column, report_type) FROM stdin;
@@ -3003,7 +3014,7 @@ COPY public.si_unit_scale (id, prefix, prefix_symbol, multiplying_factor) FROM s
 -- Name: django_migrations_id_seq; Type: SEQUENCE SET; Schema: acct10001; Owner: postgres
 --
 
-SELECT pg_catalog.setval('acct10001.django_migrations_id_seq', 62, true);
+SELECT pg_catalog.setval('acct10001.django_migrations_id_seq', 66, true);
 
 
 --
@@ -3091,28 +3102,28 @@ SELECT pg_catalog.setval('acct10001.reporting_ocpawscostlineitem_daily_summary_i
 
 
 --
--- Name: reporting_ocpstoragelineitem_daily_id_seq; Type: SEQUENCE SET; Schema: acct10001; Owner: kokuadmin
+-- Name: reporting_ocpstoragelineitem_daily_id_seq; Type: SEQUENCE SET; Schema: acct10001; Owner: postgres
 --
 
 SELECT pg_catalog.setval('acct10001.reporting_ocpstoragelineitem_daily_id_seq', 1, false);
 
 
 --
--- Name: reporting_ocpstoragelineitem_daily_summary_id_seq; Type: SEQUENCE SET; Schema: acct10001; Owner: kokuadmin
+-- Name: reporting_ocpstoragelineitem_daily_summary_id_seq; Type: SEQUENCE SET; Schema: acct10001; Owner: postgres
 --
 
 SELECT pg_catalog.setval('acct10001.reporting_ocpstoragelineitem_daily_summary_id_seq', 1, false);
 
 
 --
--- Name: reporting_ocpstoragelineitem_id_seq; Type: SEQUENCE SET; Schema: acct10001; Owner: kokuadmin
+-- Name: reporting_ocpstoragelineitem_id_seq; Type: SEQUENCE SET; Schema: acct10001; Owner: postgres
 --
 
 SELECT pg_catalog.setval('acct10001.reporting_ocpstoragelineitem_id_seq', 1, false);
 
 
 --
--- Name: reporting_ocpusagelineitem_aggregates_id_seq; Type: SEQUENCE SET; Schema: acct10001; Owner: kokuadmin
+-- Name: reporting_ocpusagelineitem_aggregates_id_seq; Type: SEQUENCE SET; Schema: acct10001; Owner: postgres
 --
 
 SELECT pg_catalog.setval('acct10001.reporting_ocpusagelineitem_aggregates_id_seq', 1, false);
@@ -3220,7 +3231,7 @@ SELECT pg_catalog.setval('public.auth_group_permissions_id_seq', 1, false);
 -- Name: auth_permission_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.auth_permission_id_seq', 168, true);
+SELECT pg_catalog.setval('public.auth_permission_id_seq', 176, true);
 
 
 --
@@ -3255,14 +3266,14 @@ SELECT pg_catalog.setval('public.django_admin_log_id_seq', 1, false);
 -- Name: django_content_type_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.django_content_type_id_seq', 42, true);
+SELECT pg_catalog.setval('public.django_content_type_id_seq', 44, true);
 
 
 --
 -- Name: django_migrations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.django_migrations_id_seq', 62, true);
+SELECT pg_catalog.setval('public.django_migrations_id_seq', 66, true);
 
 
 --
@@ -3477,7 +3488,7 @@ ALTER TABLE ONLY acct10001.reporting_ocpawscostlineitem_daily_summary
 
 
 --
--- Name: reporting_ocpstoragelineitem reporting_ocpstorageline_report_id_namespace_pers_9bf00103_uniq; Type: CONSTRAINT; Schema: acct10001; Owner: kokuadmin
+-- Name: reporting_ocpstoragelineitem reporting_ocpstorageline_report_id_namespace_pers_9bf00103_uniq; Type: CONSTRAINT; Schema: acct10001; Owner: postgres
 --
 
 ALTER TABLE ONLY acct10001.reporting_ocpstoragelineitem
@@ -3485,7 +3496,7 @@ ALTER TABLE ONLY acct10001.reporting_ocpstoragelineitem
 
 
 --
--- Name: reporting_ocpstoragelineitem_daily reporting_ocpstoragelineitem_daily_pkey; Type: CONSTRAINT; Schema: acct10001; Owner: kokuadmin
+-- Name: reporting_ocpstoragelineitem_daily reporting_ocpstoragelineitem_daily_pkey; Type: CONSTRAINT; Schema: acct10001; Owner: postgres
 --
 
 ALTER TABLE ONLY acct10001.reporting_ocpstoragelineitem_daily
@@ -3493,7 +3504,7 @@ ALTER TABLE ONLY acct10001.reporting_ocpstoragelineitem_daily
 
 
 --
--- Name: reporting_ocpstoragelineitem_daily_summary reporting_ocpstoragelineitem_daily_summary_pkey; Type: CONSTRAINT; Schema: acct10001; Owner: kokuadmin
+-- Name: reporting_ocpstoragelineitem_daily_summary reporting_ocpstoragelineitem_daily_summary_pkey; Type: CONSTRAINT; Schema: acct10001; Owner: postgres
 --
 
 ALTER TABLE ONLY acct10001.reporting_ocpstoragelineitem_daily_summary
@@ -3501,7 +3512,7 @@ ALTER TABLE ONLY acct10001.reporting_ocpstoragelineitem_daily_summary
 
 
 --
--- Name: reporting_ocpstoragelineitem reporting_ocpstoragelineitem_pkey; Type: CONSTRAINT; Schema: acct10001; Owner: kokuadmin
+-- Name: reporting_ocpstoragelineitem reporting_ocpstoragelineitem_pkey; Type: CONSTRAINT; Schema: acct10001; Owner: postgres
 --
 
 ALTER TABLE ONLY acct10001.reporting_ocpstoragelineitem
@@ -3509,7 +3520,23 @@ ALTER TABLE ONLY acct10001.reporting_ocpstoragelineitem
 
 
 --
--- Name: reporting_ocpusagelineitem reporting_ocpusagelineit_report_id_namespace_pod__dfc2c342_uniq; Type: CONSTRAINT; Schema: acct10001; Owner: kokuadmin
+-- Name: reporting_ocpstoragevolumeclaimlabel_summary reporting_ocpstoragevolumeclaimlabel_summary_pkey; Type: CONSTRAINT; Schema: acct10001; Owner: postgres
+--
+
+ALTER TABLE ONLY acct10001.reporting_ocpstoragevolumeclaimlabel_summary
+    ADD CONSTRAINT reporting_ocpstoragevolumeclaimlabel_summary_pkey PRIMARY KEY (key);
+
+
+--
+-- Name: reporting_ocpstoragevolumelabel_summary reporting_ocpstoragevolumelabel_summary_pkey; Type: CONSTRAINT; Schema: acct10001; Owner: postgres
+--
+
+ALTER TABLE ONLY acct10001.reporting_ocpstoragevolumelabel_summary
+    ADD CONSTRAINT reporting_ocpstoragevolumelabel_summary_pkey PRIMARY KEY (key);
+
+
+--
+-- Name: reporting_ocpusagelineitem reporting_ocpusagelineit_report_id_namespace_pod__dfc2c342_uniq; Type: CONSTRAINT; Schema: acct10001; Owner: postgres
 --
 
 ALTER TABLE ONLY acct10001.reporting_ocpusagelineitem
@@ -3941,7 +3968,7 @@ ALTER TABLE ONLY public.reporting_common_costusagereportstatus
 
 
 --
--- Name: reporting_common_reportcolumnmap reporting_common_reportc_report_type_provider_col_986f6289_uniq; Type: CONSTRAINT; Schema: public; Owner: kokuadmin
+-- Name: reporting_common_reportcolumnmap reporting_common_reportc_report_type_provider_col_986f6289_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.reporting_common_reportcolumnmap
@@ -3949,7 +3976,7 @@ ALTER TABLE ONLY public.reporting_common_reportcolumnmap
 
 
 --
--- Name: reporting_common_reportcolumnmap reporting_common_reportcolumnmap_pkey; Type: CONSTRAINT; Schema: public; Owner: kokuadmin
+-- Name: reporting_common_reportcolumnmap reporting_common_reportcolumnmap_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.reporting_common_reportcolumnmap
@@ -4169,21 +4196,35 @@ CREATE INDEX reporting_ocpawscostlineit_account_alias_id_f19d2883 ON acct10001.r
 
 
 --
--- Name: reporting_ocpstoragelineitem_report_id_6ff71ea6; Type: INDEX; Schema: acct10001; Owner: kokuadmin
+-- Name: reporting_ocpstoragelineitem_report_id_6ff71ea6; Type: INDEX; Schema: acct10001; Owner: postgres
 --
 
 CREATE INDEX reporting_ocpstoragelineitem_report_id_6ff71ea6 ON acct10001.reporting_ocpstoragelineitem USING btree (report_id);
 
 
 --
--- Name: reporting_ocpstoragelineitem_report_period_id_6d730b12; Type: INDEX; Schema: acct10001; Owner: kokuadmin
+-- Name: reporting_ocpstoragelineitem_report_period_id_6d730b12; Type: INDEX; Schema: acct10001; Owner: postgres
 --
 
 CREATE INDEX reporting_ocpstoragelineitem_report_period_id_6d730b12 ON acct10001.reporting_ocpstoragelineitem USING btree (report_period_id);
 
 
 --
--- Name: reporting_ocpusagelineitem_report_id_32a973b0; Type: INDEX; Schema: acct10001; Owner: kokuadmin
+-- Name: reporting_ocpstoragevolumeclaimlabel_summary_key_012a657a_like; Type: INDEX; Schema: acct10001; Owner: postgres
+--
+
+CREATE INDEX reporting_ocpstoragevolumeclaimlabel_summary_key_012a657a_like ON acct10001.reporting_ocpstoragevolumeclaimlabel_summary USING btree (key varchar_pattern_ops);
+
+
+--
+-- Name: reporting_ocpstoragevolumelabel_summary_key_05144f9e_like; Type: INDEX; Schema: acct10001; Owner: postgres
+--
+
+CREATE INDEX reporting_ocpstoragevolumelabel_summary_key_05144f9e_like ON acct10001.reporting_ocpstoragevolumelabel_summary USING btree (key varchar_pattern_ops);
+
+
+--
+-- Name: reporting_ocpusagelineitem_report_id_32a973b0; Type: INDEX; Schema: acct10001; Owner: postgres
 --
 
 CREATE INDEX reporting_ocpusagelineitem_report_id_32a973b0 ON acct10001.reporting_ocpusagelineitem USING btree (report_id);
@@ -4491,7 +4532,7 @@ CREATE INDEX reporting_common_costusagereportstatus_manifest_id_62ef64b9 ON publ
 
 
 --
--- Name: si_unit_scale_prefix_eb9daade_like; Type: INDEX; Schema: public; Owner: kokuadmin
+-- Name: si_unit_scale_prefix_eb9daade_like; Type: INDEX; Schema: public; Owner: postgres
 --
 
 CREATE INDEX si_unit_scale_prefix_eb9daade_like ON public.si_unit_scale USING btree (prefix varchar_pattern_ops);
@@ -4594,7 +4635,7 @@ ALTER TABLE ONLY acct10001.reporting_ocpawscostlineitem_daily_summary
 
 
 --
--- Name: reporting_ocpstoragelineitem reporting_ocpstorage_report_id_6ff71ea6_fk_reporting; Type: FK CONSTRAINT; Schema: acct10001; Owner: kokuadmin
+-- Name: reporting_ocpstoragelineitem reporting_ocpstorage_report_id_6ff71ea6_fk_reporting; Type: FK CONSTRAINT; Schema: acct10001; Owner: postgres
 --
 
 ALTER TABLE ONLY acct10001.reporting_ocpstoragelineitem
@@ -4602,7 +4643,7 @@ ALTER TABLE ONLY acct10001.reporting_ocpstoragelineitem
 
 
 --
--- Name: reporting_ocpstoragelineitem reporting_ocpstorage_report_period_id_6d730b12_fk_reporting; Type: FK CONSTRAINT; Schema: acct10001; Owner: kokuadmin
+-- Name: reporting_ocpstoragelineitem reporting_ocpstorage_report_period_id_6d730b12_fk_reporting; Type: FK CONSTRAINT; Schema: acct10001; Owner: postgres
 --
 
 ALTER TABLE ONLY acct10001.reporting_ocpstoragelineitem
@@ -4610,7 +4651,7 @@ ALTER TABLE ONLY acct10001.reporting_ocpstoragelineitem
 
 
 --
--- Name: reporting_ocpusagelineitem reporting_ocpusageli_report_id_32a973b0_fk_reporting; Type: FK CONSTRAINT; Schema: acct10001; Owner: kokuadmin
+-- Name: reporting_ocpusagelineitem reporting_ocpusageli_report_id_32a973b0_fk_reporting; Type: FK CONSTRAINT; Schema: acct10001; Owner: postgres
 --
 
 ALTER TABLE ONLY acct10001.reporting_ocpusagelineitem
@@ -4772,3 +4813,4 @@ ALTER TABLE ONLY public.reporting_common_costusagereportmanifest
 --
 -- PostgreSQL database dump complete
 --
+

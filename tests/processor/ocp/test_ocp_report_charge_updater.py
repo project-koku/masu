@@ -76,6 +76,10 @@ class OCPReportChargeUpdaterTest(MasuTestCase):
             reporting_period,
             report
         )
+        self.creator.create_ocp_storage_line_item(
+            reporting_period,
+            report
+        )
 
     def tearDown(self):
         """Return the database to a pre-test state."""
@@ -436,7 +440,7 @@ class OCPReportChargeUpdaterTest(MasuTestCase):
                             2: Decimal(15),
                             3: Decimal(25),
                             4: Decimal(50),
-                            5: Decimal(0)}
+                            5: Decimal(0),}
 
         expected_results = {1: Decimal(0.5),
                             2: Decimal(2.0),
@@ -475,7 +479,9 @@ class OCPReportChargeUpdaterTest(MasuTestCase):
             "unit": "USD"
         }]
         }
-        usage_dictionary = {1: Decimal(5), 2: Decimal(15), 3: Decimal(25)}
+        usage_dictionary = {1: Decimal(5),
+                            2: Decimal(15),
+                            3: Decimal(25),}
 
         expected_results = {1: {'expected_charge': Decimal(0.5)},
                             2: {'expected_charge': Decimal(2.0)},
@@ -592,6 +598,39 @@ class OCPReportChargeUpdaterTest(MasuTestCase):
                              round(float(item.pod_charge_memory_gigabyte_hours), 6))
             self.assertEqual(round(0.0, 6),
                              round(float(item.pod_charge_cpu_core_hours), 6))
+
+    @patch('masu.database.ocp_rate_db_accessor.OCPRateDBAccessor.get_storage_gb_request_per_month_rates')
+    @patch('masu.database.ocp_rate_db_accessor.OCPRateDBAccessor.get_storage_gb_usage_per_month_rates')
+    def test_update_summary_storage_charge(self, mock_db_storage_usage_rate, mock_db_storage_request_rate):
+        """Test that OCP charge information is updated for storage."""
+        usage_rate = {'tiered_rate': [{'value': '100', 'unit': 'USD'}]}
+        request_rate = {'tiered_rate': [{'value': '200', 'unit': 'USD'}]}
+
+        mock_db_storage_usage_rate.return_value = usage_rate
+        mock_db_storage_request_rate.return_value = request_rate
+
+        usage_rate_value = float(usage_rate.get('tiered_rate')[0].get('value'))
+        request_rate_value = float(request_rate.get('tiered_rate')[0].get('value'))
+
+        usage_period = self.accessor.get_current_usage_period()
+        start_date = usage_period.report_period_start.date() + relativedelta(days=-1)
+        end_date = usage_period.report_period_end.date() + relativedelta(days=+1)
+
+        self.accessor.populate_line_item_daily_table(start_date, end_date)
+        self.accessor.populate_line_item_daily_summary_table(start_date, end_date)
+        self.accessor.populate_storage_line_item_daily_table(start_date, end_date)
+        self.accessor.populate_storage_line_item_daily_summary_table(start_date, end_date)
+        self.updater.update_summary_charge_info()
+
+        table_name = OCP_REPORT_TABLE_MAP['storage_line_item_daily_summary']
+
+        items = self.accessor._get_db_obj_query(table_name).all()
+        for item in items:
+            storage_charge = float(item.persistentvolumeclaim_charge_gb_month)
+            expected_usage_charge = usage_rate_value * float(item.persistentvolumeclaim_usage_gigabyte_months)
+            expected_request_charge = request_rate_value * float(item.volume_request_storage_gigabyte_months)
+            self.assertEqual(round(storage_charge, 6),
+                             round(expected_usage_charge + expected_request_charge, 6))
 
     @patch('masu.database.ocp_rate_db_accessor.OCPRateDBAccessor.get_cpu_core_usage_per_hour_rates')
     @patch('masu.database.ocp_rate_db_accessor.OCPRateDBAccessor.get_memory_gb_usage_per_hour_rates')

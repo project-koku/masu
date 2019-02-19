@@ -209,7 +209,8 @@ class ProcessReportFileTests(MasuTestCase):
         mock_processor.side_effect = ReportProcessorError('mock error')
         mock_stats_acc = mock_stats_accessor().__enter__()
 
-        _process_report_file(schema_name, provider, provider_uuid, report_dict)
+        with self.assertRaises(ReportProcessorError):
+            _process_report_file(schema_name, provider, provider_uuid, report_dict)
 
         mock_stats_acc.log_last_started_datetime.assert_called()
         mock_stats_acc.log_last_completed_datetime.assert_not_called()

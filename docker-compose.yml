@@ -7,7 +7,7 @@ services:
           - RABBITMQ_DEFAULT_USER=guest
           - RABBITMQ_DEFAULT_PASS=guest
       ports:
-          - "5673:5672"
+          - "${RABBITMQ_PORT-5673}:5672"
 
   server:
       build:

@@ -35,7 +35,8 @@ Please use \`make <target>' where <target> is one of:
   docker-shell              run django and db containers with shell access to server (for pdb)
   docker-logs               connect to console logs for all services
   docker-test-all           run unittests
-  
+  docker-rabbit 			make the rabbit service
+
 --- Commands using an OpenShift Cluster ---
   oc-clean                  stop openshift cluster & remove local config data
   oc-create-all             run all application services in openshift cluster
@@ -249,3 +250,6 @@ docker-test-all:
 
 docker-down:
 	docker-compose down
+
+docker-rabbit:
+	docker-compose up -d rabbit

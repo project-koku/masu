@@ -1,10 +1,11 @@
 #!/bin/sh
-TOX_DB=$1
+DB_NAME=$1
+TEST_DB_NAME=$2
+DB_ADMIN=$3
 CWD=$(pwd)
-DB_ADMIN=postgres
 USER_IN_FILE=$(grep -n "OWNER TO" "$CWD/tests/sql/test.sql" | head -n 1 | cut -d ' ' -f6 | cut -d ';' -f 1)
 TEST_ENV="$CWD/.env.test"
-NORMAL_ENV="$CWD/.env"
+TEST_DATABASE='test'
 
 if [ -f $TEST_ENV ]; then
   source $TEST_ENV
@@ -15,28 +16,28 @@ if ! [ -x "$(command -v psql)" ]; then
   exit 1
 fi
 
-if [ -n "$TOX_DB" ]; then
-  echo "Overriding database name with ${TOX_DB}"
-  DATABASE_NAME=${TOX_DB}
+if [ -n "$TEST_DB_NAME" ]; then
+  echo "Overriding database name with ${TEST_DB_NAME}"
+  TEST_DATABASE=${TEST_DB_NAME}
 fi
 
-echo "Creating ${DATABASE_NAME}"
+echo "Creating ${TEST_DATABASE}"
 
-psql postgres -p ${DATABASE_PORT} -h ${DATABASE_HOST} -U $DB_ADMIN -c "DROP DATABASE IF EXISTS ${DATABASE_NAME};"
-psql postgres -p ${DATABASE_PORT} -h ${DATABASE_HOST} -U $DB_ADMIN -c "CREATE DATABASE ${DATABASE_NAME};"
-psql postgres -p ${DATABASE_PORT} -h ${DATABASE_HOST} -U $DB_ADMIN -c "CREATE ROLE ${DATABASE_USER} LOGIN;"
+psql $DB_NAME -p ${DATABASE_PORT} -h ${DATABASE_HOST} -U $DB_ADMIN -c "DROP DATABASE IF EXISTS ${TEST_DATABASE};"
+psql $DB_NAME -p ${DATABASE_PORT} -h ${DATABASE_HOST} -U $DB_ADMIN -c "CREATE DATABASE ${TEST_DATABASE};"
+psql $DB_NAME -p ${DATABASE_PORT} -h ${DATABASE_HOST} -U $DB_ADMIN -c "CREATE ROLE ${DATABASE_USER} LOGIN;"
 
-psql ${DATABASE_NAME} -p ${DATABASE_PORT} -h ${DATABASE_HOST} -U $DB_ADMIN -c 'DROP SCHEMA IF EXISTS acct10001 CASCADE; DROP SCHEMA IF EXISTS public CASCADE;'
+psql ${TEST_DATABASE} -p ${DATABASE_PORT} -h ${DATABASE_HOST} -U $DB_ADMIN -c 'DROP SCHEMA IF EXISTS acct10001 CASCADE; DROP SCHEMA IF EXISTS public CASCADE;'
 
-psql ${DATABASE_NAME} -p ${DATABASE_PORT} -h ${DATABASE_HOST} -U $DB_ADMIN -c 'CREATE SCHEMA public;'
+psql ${TEST_DATABASE} -p ${DATABASE_PORT} -h ${DATABASE_HOST} -U $DB_ADMIN -c 'CREATE SCHEMA public;'
 
-cat "$CWD/tests/sql/test.sql" | sed "s/$USER_IN_FILE/${DATABASE_USER}/g" | psql ${DATABASE_NAME}  -p ${DATABASE_PORT} -h ${DATABASE_HOST} -U $DB_ADMIN
+cat "$CWD/tests/sql/test.sql" | sed "s/$USER_IN_FILE/${DATABASE_USER}/g" | psql ${TEST_DATABASE}  -p ${DATABASE_PORT} -h ${DATABASE_HOST} -U $DB_ADMIN
 
 
-psql ${DATABASE_NAME} -p ${DATABASE_PORT} -h ${DATABASE_HOST} -U $DB_ADMIN -c "ALTER DATABASE ${DATABASE_NAME} OWNER TO ${DATABASE_USER};"
+psql ${TEST_DATABASE} -p ${DATABASE_PORT} -h ${DATABASE_HOST} -U $DB_ADMIN -c "ALTER DATABASE ${TEST_DATABASE} OWNER TO ${DATABASE_USER};"
 
-psql ${DATABASE_NAME} -p ${DATABASE_PORT} -h ${DATABASE_HOST} -U $DB_ADMIN -c "ALTER SCHEMA acct10001 OWNER TO ${DATABASE_USER};"
+psql ${TEST_DATABASE} -p ${DATABASE_PORT} -h ${DATABASE_HOST} -U $DB_ADMIN -c "ALTER SCHEMA acct10001 OWNER TO ${DATABASE_USER};"
 
-psql ${DATABASE_NAME} -p ${DATABASE_PORT} -h ${DATABASE_HOST} -U $DB_ADMIN -c "ALTER SCHEMA public OWNER TO ${DATABASE_USER};"
+psql ${TEST_DATABASE} -p ${DATABASE_PORT} -h ${DATABASE_HOST} -U $DB_ADMIN -c "ALTER SCHEMA public OWNER TO ${DATABASE_USER};"
 
-echo "Database ${DATABASE_NAME} has been refreshed."
+echo "Database ${TEST_DATABASE} has been refreshed."

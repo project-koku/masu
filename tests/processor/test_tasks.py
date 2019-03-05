@@ -621,26 +621,21 @@ class TestUpdateSummaryTablesTask(MasuTestCase):
 
         daily_table_name = AWS_CUR_TABLE_MAP['line_item_daily']
         summary_table_name = AWS_CUR_TABLE_MAP['line_item_daily_summary']
-        agg_table_name = AWS_CUR_TABLE_MAP['line_item_aggregates']
         start_date = self.start_date.replace(day=1) + relativedelta.relativedelta(months=-1)
 
         daily_query = self.aws_accessor._get_db_obj_query(daily_table_name)
         summary_query = self.aws_accessor._get_db_obj_query(summary_table_name)
-        agg_query = self.aws_accessor._get_db_obj_query(agg_table_name)
 
         initial_daily_count = daily_query.count()
         initial_summary_count = summary_query.count()
-        initial_agg_count = agg_query.count()
 
         self.assertEqual(initial_daily_count, 0)
         self.assertEqual(initial_summary_count, 0)
-        self.assertEqual(initial_agg_count, 0)
 
         update_summary_tables(self.schema_name, provider, provider_aws_uuid, start_date)
 
         self.assertNotEqual(daily_query.count(), initial_daily_count)
         self.assertNotEqual(summary_query.count(), initial_summary_count)
-        self.assertNotEqual(agg_query.count(), initial_agg_count)
 
     @patch('masu.processor.tasks.update_charge_info')
     def test_update_summary_tables_aws_end_date(self, mock_charge_info):
@@ -714,22 +709,17 @@ class TestUpdateSummaryTablesTask(MasuTestCase):
         provider_ocp_uuid = '3c6e687e-1a09-4a05-970c-2ccf44b0952e'
 
         daily_table_name = OCP_REPORT_TABLE_MAP['line_item_daily']
-        agg_table_name = OCP_REPORT_TABLE_MAP['line_item_aggregates']
         start_date = self.start_date.replace(day=1) + relativedelta.relativedelta(months=-1)
 
         daily_query = self.ocp_accessor._get_db_obj_query(daily_table_name)
-        agg_query = self.ocp_accessor._get_db_obj_query(agg_table_name)
 
         initial_daily_count = daily_query.count()
-        initial_agg_count = agg_query.count()
 
         self.assertEqual(initial_daily_count, 0)
-        self.assertEqual(initial_agg_count, 0)
 
         update_summary_tables(self.schema_name, provider, provider_ocp_uuid, start_date)
 
         self.assertNotEqual(daily_query.count(), initial_daily_count)
-        self.assertNotEqual(agg_query.count(), initial_agg_count)
 
         update_charge_info(schema_name='acct10001', provider_uuid=provider_ocp_uuid)
 

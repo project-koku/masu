@@ -268,49 +268,6 @@ CREATE TABLE acct10001.reporting_awscostentrylineitem (
 ALTER TABLE acct10001.reporting_awscostentrylineitem OWNER TO kokuadmin;
 
 --
--- Name: reporting_awscostentrylineitem_aggregates; Type: TABLE; Schema: acct10001; Owner: kokuadmin
---
-
-CREATE TABLE acct10001.reporting_awscostentrylineitem_aggregates (
-    id integer NOT NULL,
-    time_scope_value integer NOT NULL,
-    report_type character varying(50) NOT NULL,
-    usage_account_id character varying(50),
-    product_code character varying(50) NOT NULL,
-    region character varying(50),
-    availability_zone character varying(50),
-    usage_amount numeric(17,9),
-    unblended_cost numeric(17,9),
-    resource_count integer,
-    account_alias_id integer,
-    tags jsonb
-);
-
-
-ALTER TABLE acct10001.reporting_awscostentrylineitem_aggregates OWNER TO kokuadmin;
-
---
--- Name: reporting_awscostentrylineitem_aggregates_id_seq; Type: SEQUENCE; Schema: acct10001; Owner: kokuadmin
---
-
-CREATE SEQUENCE acct10001.reporting_awscostentrylineitem_aggregates_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE acct10001.reporting_awscostentrylineitem_aggregates_id_seq OWNER TO kokuadmin;
-
---
--- Name: reporting_awscostentrylineitem_aggregates_id_seq; Type: SEQUENCE OWNED BY; Schema: acct10001; Owner: kokuadmin
---
-
-ALTER SEQUENCE acct10001.reporting_awscostentrylineitem_aggregates_id_seq OWNED BY acct10001.reporting_awscostentrylineitem_aggregates.id;
-
-
---
 -- Name: reporting_awscostentrylineitem_daily; Type: TABLE; Schema: acct10001; Owner: kokuadmin
 --
 
@@ -394,7 +351,8 @@ CREATE TABLE acct10001.reporting_awscostentrylineitem_daily_summary (
     public_on_demand_rate numeric(17,9),
     tax_type text,
     account_alias_id integer,
-    tags jsonb
+    tags jsonb,
+    resource_ids character varying(256)[]
 );
 
 
@@ -1080,54 +1038,6 @@ CREATE TABLE acct10001.reporting_ocpusagelineitem (
 
 
 ALTER TABLE acct10001.reporting_ocpusagelineitem OWNER TO kokuadmin;
-
---
--- Name: reporting_ocpusagelineitem_aggregates; Type: TABLE; Schema: acct10001; Owner: kokuadmin
---
-
-CREATE TABLE acct10001.reporting_ocpusagelineitem_aggregates (
-    id integer NOT NULL,
-    time_scope_value integer NOT NULL,
-    cluster_id character varying(50),
-    namespace character varying(253) NOT NULL,
-    pod character varying(253) NOT NULL,
-    node character varying(253) NOT NULL,
-    pod_usage_cpu_core_hours numeric(24,6),
-    pod_request_cpu_core_hours numeric(24,6),
-    pod_limit_cpu_core_hours numeric(24,6),
-    pod_usage_memory_gigabytes numeric(24,6),
-    pod_request_memory_gigabytes numeric(24,6),
-    pod_limit_memory_gigabytes numeric(24,6),
-    node_capacity_cpu_core_hours numeric(20,6),
-    node_capacity_cpu_cores numeric(20,6),
-    node_capacity_memory_byte_hours numeric(20,6),
-    node_capacity_memory_bytes numeric(20,6),
-    resource_id character varying(253)
-);
-
-
-ALTER TABLE acct10001.reporting_ocpusagelineitem_aggregates OWNER TO kokuadmin;
-
---
--- Name: reporting_ocpusagelineitem_aggregates_id_seq; Type: SEQUENCE; Schema: acct10001; Owner: kokuadmin
---
-
-CREATE SEQUENCE acct10001.reporting_ocpusagelineitem_aggregates_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE acct10001.reporting_ocpusagelineitem_aggregates_id_seq OWNER TO kokuadmin;
-
---
--- Name: reporting_ocpusagelineitem_aggregates_id_seq; Type: SEQUENCE OWNED BY; Schema: acct10001; Owner: kokuadmin
---
-
-ALTER SEQUENCE acct10001.reporting_ocpusagelineitem_aggregates_id_seq OWNED BY acct10001.reporting_ocpusagelineitem_aggregates.id;
-
 
 --
 -- Name: reporting_ocpusagelineitem_daily_id_seq; Type: SEQUENCE; Schema: acct10001; Owner: kokuadmin
@@ -2124,13 +2034,6 @@ ALTER TABLE ONLY acct10001.reporting_awscostentrylineitem ALTER COLUMN id SET DE
 
 
 --
--- Name: reporting_awscostentrylineitem_aggregates id; Type: DEFAULT; Schema: acct10001; Owner: kokuadmin
---
-
-ALTER TABLE ONLY acct10001.reporting_awscostentrylineitem_aggregates ALTER COLUMN id SET DEFAULT nextval('acct10001.reporting_awscostentrylineitem_aggregates_id_seq'::regclass);
-
-
---
 -- Name: reporting_awscostentrylineitem_daily id; Type: DEFAULT; Schema: acct10001; Owner: kokuadmin
 --
 
@@ -2198,13 +2101,6 @@ ALTER TABLE ONLY acct10001.reporting_ocpstoragelineitem_daily_summary ALTER COLU
 --
 
 ALTER TABLE ONLY acct10001.reporting_ocpusagelineitem ALTER COLUMN id SET DEFAULT nextval('acct10001.reporting_ocpusagelineitem_id_seq'::regclass);
-
-
---
--- Name: reporting_ocpusagelineitem_aggregates id; Type: DEFAULT; Schema: acct10001; Owner: kokuadmin
---
-
-ALTER TABLE ONLY acct10001.reporting_ocpusagelineitem_aggregates ALTER COLUMN id SET DEFAULT nextval('acct10001.reporting_ocpusagelineitem_aggregates_id_seq'::regclass);
 
 
 --
@@ -2387,78 +2283,80 @@ ALTER TABLE ONLY public.si_unit_scale ALTER COLUMN id SET DEFAULT nextval('publi
 --
 
 COPY acct10001.django_migrations (id, app, name, applied) FROM stdin;
-1	contenttypes	0001_initial	2019-02-26 21:05:56.20653+00
-2	auth	0001_initial	2019-02-26 21:05:56.224898+00
-3	admin	0001_initial	2019-02-26 21:05:56.240396+00
-4	admin	0002_logentry_remove_auto_add	2019-02-26 21:05:56.252238+00
-5	admin	0003_logentry_add_action_flag_choices	2019-02-26 21:05:56.263793+00
-6	api	0001_initial	2019-02-26 21:05:56.303723+00
-7	api	0002_auto_20180926_1905	2019-02-26 21:05:56.316721+00
-8	api	0003_auto_20181008_1819	2019-02-26 21:05:56.337426+00
-9	api	0004_auto_20181012_1507	2019-02-26 21:05:56.348208+00
-10	api	0005_auto_20181109_2121	2019-02-26 21:05:56.35696+00
-11	api	0006_delete_rate	2019-02-26 21:05:56.363047+00
-12	api	0007_auto_20181213_1940	2019-02-26 21:05:56.379258+00
-13	contenttypes	0002_remove_content_type_name	2019-02-26 21:05:56.395046+00
-14	auth	0002_alter_permission_name_max_length	2019-02-26 21:05:56.403881+00
-15	auth	0003_alter_user_email_max_length	2019-02-26 21:05:56.416079+00
-16	auth	0004_alter_user_username_opts	2019-02-26 21:05:56.429766+00
-17	auth	0005_alter_user_last_login_null	2019-02-26 21:05:56.441654+00
-18	auth	0006_require_contenttypes_0002	2019-02-26 21:05:56.446673+00
-19	auth	0007_alter_validators_add_error_messages	2019-02-26 21:05:56.457867+00
-20	auth	0008_alter_user_username_max_length	2019-02-26 21:05:56.4694+00
-21	auth	0009_alter_user_last_name_max_length	2019-02-26 21:05:56.481554+00
-22	rates	0001_initial	2019-02-26 21:05:56.501822+00
-23	rates	0002_auto_20181205_1810	2019-02-26 21:05:56.509333+00
-24	rates	0003_auto_20190213_2040	2019-02-26 21:05:56.516061+00
-25	reporting	0001_initial	2019-02-26 21:05:56.856499+00
-26	reporting	0002_auto_20180926_1818	2019-02-26 21:05:57.008678+00
-27	reporting	0003_auto_20180928_1840	2019-02-26 21:05:57.088029+00
-28	reporting	0004_auto_20181003_1633	2019-02-26 21:05:57.224128+00
-29	reporting	0005_auto_20181003_1416	2019-02-26 21:05:57.248798+00
-30	reporting	0006_awscostentrylineitemaggregates_account_alias	2019-02-26 21:05:57.265652+00
-31	reporting	0007_awscostentrybill_provider_id	2019-02-26 21:05:57.279124+00
-32	reporting	0008_auto_20181012_1724	2019-02-26 21:05:57.39158+00
-33	reporting	0009_auto_20181016_1940	2019-02-26 21:05:57.446649+00
-34	reporting	0010_auto_20181017_1659	2019-02-26 21:05:57.640773+00
-35	reporting	0011_auto_20181018_1811	2019-02-26 21:05:57.731362+00
-36	reporting	0012_auto_20181106_1502	2019-02-26 21:05:57.753396+00
-37	reporting	0013_auto_20181107_1956	2019-02-26 21:05:57.84858+00
-38	reporting	0014_auto_20181108_0207	2019-02-26 21:05:57.864032+00
-39	reporting	0015_auto_20181109_1618	2019-02-26 21:05:57.872896+00
-40	reporting	0016_delete_rate	2019-02-26 21:05:57.880685+00
-41	reporting	0017_auto_20181121_1444	2019-02-26 21:05:57.9211+00
-42	reporting	0018_auto_20181129_0217	2019-02-26 21:05:58.057346+00
-43	reporting	0019_auto_20181206_2138	2019-02-26 21:05:58.080677+00
-44	reporting	0020_auto_20181211_1557	2019-02-26 21:05:58.109191+00
-45	reporting	0021_auto_20181212_1816	2019-02-26 21:05:58.143504+00
-46	reporting	0022_auto_20181221_1617	2019-02-26 21:05:58.157845+00
-47	reporting	0023_awscostentrylineitemdailysummary_tags	2019-02-26 21:05:58.168013+00
-48	reporting	0024_ocpusagepodlabelsummary	2019-02-26 21:05:58.184336+00
-49	reporting	0025_auto_20190128_1825	2019-02-26 21:05:58.210048+00
-50	reporting	0026_auto_20190130_1746	2019-02-26 21:05:58.243969+00
-51	reporting	0027_auto_20190205_1659	2019-02-26 21:05:58.253326+00
-52	reporting	0028_auto_20190205_2022	2019-02-26 21:05:58.32528+00
-53	reporting	0029_auto_20190207_1526	2019-02-26 21:05:58.390308+00
-54	reporting	0030_auto_20190208_0159	2019-02-26 21:05:58.410739+00
-55	reporting	0031_ocpawscostlineitemdailysummary_instance_type	2019-02-26 21:05:58.423651+00
-56	reporting	0032_auto_20190213_2152	2019-02-26 21:05:58.438392+00
-57	reporting	0033_auto_20190214_1637	2019-02-26 21:05:58.451856+00
-58	reporting	0034_ocpstoragevolumeclaimlabelsummary_ocpstoragevolumelabelsummary	2019-02-26 21:05:58.482796+00
-59	reporting	0035_ocpawscostlineitemdailysummary_currency_code	2019-02-26 21:05:58.497835+00
-60	reporting	0036_auto_20190215_2058	2019-02-26 21:05:58.535135+00
-61	reporting	0037_auto_20190218_2054	2019-02-26 21:05:58.591533+00
-62	reporting	0038_auto_20190220_1511	2019-02-26 21:05:58.613011+00
-63	reporting	0039_auto_20190220_1610	2019-02-26 21:05:58.704659+00
-64	reporting	0040_auto_20190226_1538	2019-02-26 21:05:58.734087+00
-65	reporting_common	0001_initial	2019-02-26 21:05:58.753736+00
-66	reporting_common	0002_auto_20180926_1905	2019-02-26 21:05:58.76312+00
-67	reporting_common	0003_auto_20180928_1732	2019-02-26 21:05:58.769582+00
-68	reporting_common	0004_auto_20181003_1859	2019-02-26 21:05:58.801621+00
-69	reporting_common	0005_auto_20181127_2046	2019-02-26 21:05:58.808522+00
-70	reporting_common	0006_auto_20190208_0316	2019-02-26 21:05:58.823499+00
-71	reporting_common	0007_auto_20190208_0316	2019-02-26 21:05:58.831874+00
-72	sessions	0001_initial	2019-02-26 21:05:58.839694+00
+1	contenttypes	0001_initial	2019-02-28 20:50:05.315802+00
+2	auth	0001_initial	2019-02-28 20:50:05.338368+00
+3	admin	0001_initial	2019-02-28 20:50:05.355922+00
+4	admin	0002_logentry_remove_auto_add	2019-02-28 20:50:05.369407+00
+5	admin	0003_logentry_add_action_flag_choices	2019-02-28 20:50:05.383362+00
+6	api	0001_initial	2019-02-28 20:50:05.43045+00
+7	api	0002_auto_20180926_1905	2019-02-28 20:50:05.444494+00
+8	api	0003_auto_20181008_1819	2019-02-28 20:50:05.470161+00
+9	api	0004_auto_20181012_1507	2019-02-28 20:50:05.483104+00
+10	api	0005_auto_20181109_2121	2019-02-28 20:50:05.492388+00
+11	api	0006_delete_rate	2019-02-28 20:50:05.498986+00
+12	api	0007_auto_20181213_1940	2019-02-28 20:50:05.515056+00
+13	contenttypes	0002_remove_content_type_name	2019-02-28 20:50:05.530501+00
+14	auth	0002_alter_permission_name_max_length	2019-02-28 20:50:05.5397+00
+15	auth	0003_alter_user_email_max_length	2019-02-28 20:50:05.552338+00
+16	auth	0004_alter_user_username_opts	2019-02-28 20:50:05.565319+00
+17	auth	0005_alter_user_last_login_null	2019-02-28 20:50:05.577351+00
+18	auth	0006_require_contenttypes_0002	2019-02-28 20:50:05.582002+00
+19	auth	0007_alter_validators_add_error_messages	2019-02-28 20:50:05.594055+00
+20	auth	0008_alter_user_username_max_length	2019-02-28 20:50:05.605477+00
+21	auth	0009_alter_user_last_name_max_length	2019-02-28 20:50:05.617105+00
+22	rates	0001_initial	2019-02-28 20:50:05.636474+00
+23	rates	0002_auto_20181205_1810	2019-02-28 20:50:05.643275+00
+24	rates	0003_auto_20190213_2040	2019-02-28 20:50:05.648915+00
+25	reporting	0001_initial	2019-02-28 20:50:05.978628+00
+26	reporting	0002_auto_20180926_1818	2019-02-28 20:50:06.13811+00
+27	reporting	0003_auto_20180928_1840	2019-02-28 20:50:06.213735+00
+28	reporting	0004_auto_20181003_1633	2019-02-28 20:50:06.383849+00
+29	reporting	0005_auto_20181003_1416	2019-02-28 20:50:06.413646+00
+30	reporting	0006_awscostentrylineitemaggregates_account_alias	2019-02-28 20:50:06.430266+00
+31	reporting	0007_awscostentrybill_provider_id	2019-02-28 20:50:06.445991+00
+32	reporting	0008_auto_20181012_1724	2019-02-28 20:50:06.498958+00
+33	reporting	0009_auto_20181016_1940	2019-02-28 20:50:06.575371+00
+34	reporting	0010_auto_20181017_1659	2019-02-28 20:50:06.763525+00
+35	reporting	0011_auto_20181018_1811	2019-02-28 20:50:06.850507+00
+36	reporting	0012_auto_20181106_1502	2019-02-28 20:50:06.874785+00
+37	reporting	0013_auto_20181107_1956	2019-02-28 20:50:06.965865+00
+38	reporting	0014_auto_20181108_0207	2019-02-28 20:50:06.980648+00
+39	reporting	0015_auto_20181109_1618	2019-02-28 20:50:06.98903+00
+40	reporting	0016_delete_rate	2019-02-28 20:50:06.997566+00
+41	reporting	0017_auto_20181121_1444	2019-02-28 20:50:07.040087+00
+42	reporting	0018_auto_20181129_0217	2019-02-28 20:50:07.191388+00
+43	reporting	0019_auto_20181206_2138	2019-02-28 20:50:07.212965+00
+44	reporting	0020_auto_20181211_1557	2019-02-28 20:50:07.243525+00
+45	reporting	0021_auto_20181212_1816	2019-02-28 20:50:07.278253+00
+46	reporting	0022_auto_20181221_1617	2019-02-28 20:50:07.292842+00
+47	reporting	0023_awscostentrylineitemdailysummary_tags	2019-02-28 20:50:07.303983+00
+48	reporting	0024_ocpusagepodlabelsummary	2019-02-28 20:50:07.323375+00
+49	reporting	0025_auto_20190128_1825	2019-02-28 20:50:07.350638+00
+50	reporting	0026_auto_20190130_1746	2019-02-28 20:50:07.385794+00
+51	reporting	0027_auto_20190205_1659	2019-02-28 20:50:07.396729+00
+52	reporting	0028_auto_20190205_2022	2019-02-28 20:50:07.468202+00
+53	reporting	0029_auto_20190207_1526	2019-02-28 20:50:07.529562+00
+54	reporting	0030_auto_20190208_0159	2019-02-28 20:50:07.551946+00
+55	reporting	0031_ocpawscostlineitemdailysummary_instance_type	2019-02-28 20:50:07.566867+00
+56	reporting	0032_auto_20190213_2152	2019-02-28 20:50:07.582743+00
+57	reporting	0033_auto_20190214_1637	2019-02-28 20:50:07.597744+00
+58	reporting	0034_ocpstoragevolumeclaimlabelsummary_ocpstoragevolumelabelsummary	2019-02-28 20:50:07.627598+00
+59	reporting	0035_ocpawscostlineitemdailysummary_currency_code	2019-02-28 20:50:07.643737+00
+60	reporting	0036_auto_20190215_2058	2019-02-28 20:50:07.682114+00
+61	reporting	0037_auto_20190218_2054	2019-02-28 20:50:07.736835+00
+62	reporting	0038_auto_20190220_1511	2019-02-28 20:50:07.75798+00
+63	reporting	0039_auto_20190220_1610	2019-02-28 20:50:07.83512+00
+64	reporting	0040_auto_20190226_1538	2019-02-28 20:50:07.862651+00
+65	reporting	0041_awscostentrylineitemdailysummary_resource_ids	2019-02-28 20:50:07.876517+00
+66	reporting	0042_auto_20190228_2016	2019-02-28 20:50:07.904502+00
+67	reporting_common	0001_initial	2019-02-28 20:50:07.924136+00
+68	reporting_common	0002_auto_20180926_1905	2019-02-28 20:50:07.933782+00
+69	reporting_common	0003_auto_20180928_1732	2019-02-28 20:50:07.939373+00
+70	reporting_common	0004_auto_20181003_1859	2019-02-28 20:50:07.975524+00
+71	reporting_common	0005_auto_20181127_2046	2019-02-28 20:50:07.981888+00
+72	reporting_common	0006_auto_20190208_0316	2019-02-28 20:50:07.994761+00
+73	reporting_common	0007_auto_20190208_0316	2019-02-28 20:50:08.003212+00
+74	sessions	0001_initial	2019-02-28 20:50:08.010444+00
 \.
 
 
@@ -2503,14 +2401,6 @@ COPY acct10001.reporting_awscostentrylineitem (id, hash, tags, invoice_id, line_
 
 
 --
--- Data for Name: reporting_awscostentrylineitem_aggregates; Type: TABLE DATA; Schema: acct10001; Owner: kokuadmin
---
-
-COPY acct10001.reporting_awscostentrylineitem_aggregates (id, time_scope_value, report_type, usage_account_id, product_code, region, availability_zone, usage_amount, unblended_cost, resource_count, account_alias_id, tags) FROM stdin;
-\.
-
-
---
 -- Data for Name: reporting_awscostentrylineitem_daily; Type: TABLE DATA; Schema: acct10001; Owner: kokuadmin
 --
 
@@ -2522,7 +2412,7 @@ COPY acct10001.reporting_awscostentrylineitem_daily (id, line_item_type, usage_a
 -- Data for Name: reporting_awscostentrylineitem_daily_summary; Type: TABLE DATA; Schema: acct10001; Owner: kokuadmin
 --
 
-COPY acct10001.reporting_awscostentrylineitem_daily_summary (id, usage_start, usage_end, usage_account_id, product_code, product_family, availability_zone, region, instance_type, unit, resource_count, usage_amount, normalization_factor, normalized_usage_amount, currency_code, unblended_rate, unblended_cost, blended_rate, blended_cost, public_on_demand_cost, public_on_demand_rate, tax_type, account_alias_id, tags) FROM stdin;
+COPY acct10001.reporting_awscostentrylineitem_daily_summary (id, usage_start, usage_end, usage_account_id, product_code, product_family, availability_zone, region, instance_type, unit, resource_count, usage_amount, normalization_factor, normalized_usage_amount, currency_code, unblended_rate, unblended_cost, blended_rate, blended_cost, public_on_demand_cost, public_on_demand_rate, tax_type, account_alias_id, tags, resource_ids) FROM stdin;
 \.
 
 
@@ -2615,14 +2505,6 @@ COPY acct10001.reporting_ocpusagelineitem (id, namespace, pod, node, pod_usage_c
 
 
 --
--- Data for Name: reporting_ocpusagelineitem_aggregates; Type: TABLE DATA; Schema: acct10001; Owner: kokuadmin
---
-
-COPY acct10001.reporting_ocpusagelineitem_aggregates (id, time_scope_value, cluster_id, namespace, pod, node, pod_usage_cpu_core_hours, pod_request_cpu_core_hours, pod_limit_cpu_core_hours, pod_usage_memory_gigabytes, pod_request_memory_gigabytes, pod_limit_memory_gigabytes, node_capacity_cpu_core_hours, node_capacity_cpu_cores, node_capacity_memory_byte_hours, node_capacity_memory_bytes, resource_id) FROM stdin;
-\.
-
-
---
 -- Data for Name: reporting_ocpusagelineitem_daily; Type: TABLE DATA; Schema: acct10001; Owner: kokuadmin
 --
 
@@ -2667,7 +2549,7 @@ COPY acct10001.reporting_ocpusagereportperiod (id, cluster_id, report_period_sta
 --
 
 COPY public.api_customer (id, date_created, uuid, account_id, schema_name) FROM stdin;
-1	2019-02-26 21:05:56.142208+00	1ed26c69-9b01-46b9-9894-8bcf0d7b0e4f	10001	acct10001
+1	2019-02-28 20:50:05.24924+00	5dbb35f3-3b54-45e6-8a99-12fa7028f90b	10001	acct10001
 \.
 
 
@@ -2714,7 +2596,7 @@ COPY public.api_tenant (id, schema_name) FROM stdin;
 --
 
 COPY public.api_user (id, uuid, username, email, date_created, is_active, customer_id) FROM stdin;
-1	ac91e13c-bfee-43e0-a158-0280ed88fae7	user_dev	user_dev@foo.com	2019-02-26 21:05:59.02746+00	t	1
+1	2430c8d6-ac3e-4fb2-a405-3ecc097312f2	user_dev	user_dev@foo.com	2019-02-28 20:50:08.080115+00	t	1
 \.
 
 
@@ -2723,9 +2605,9 @@ COPY public.api_user (id, uuid, username, email, date_created, is_active, custom
 --
 
 COPY public.api_userpreference (id, uuid, preference, name, description, user_id) FROM stdin;
-1	efbd2c0d-efca-4de2-bf13-562fb3cfec18	{"currency": "USD"}	currency	default preference	1
-2	f8cdb0bd-2e95-4757-b046-201a7bdad043	{"timezone": "UTC"}	timezone	default preference	1
-3	5f1c4043-b7dc-41e5-ae0d-2a96399a3d8f	{"locale": "en_US.UTF-8"}	locale	default preference	1
+1	4a8bfd97-0e31-4f46-a3a1-e2bb9f2dd308	{"currency": "USD"}	currency	default preference	1
+2	4c11b0bc-bf7e-4df3-a57b-ebf9f662820b	{"timezone": "UTC"}	timezone	default preference	1
+3	4a9c2b7a-385f-4631-a508-d8ee2768cbf0	{"locale": "en_US.UTF-8"}	locale	default preference	1
 \.
 
 
@@ -2818,122 +2700,114 @@ COPY public.auth_permission (id, name, content_type_id, codename) FROM stdin;
 66	Can change aws cost entry line item	17	change_awscostentrylineitem
 67	Can delete aws cost entry line item	17	delete_awscostentrylineitem
 68	Can view aws cost entry line item	17	view_awscostentrylineitem
-69	Can add aws cost entry line item aggregates	18	add_awscostentrylineitemaggregates
-70	Can change aws cost entry line item aggregates	18	change_awscostentrylineitemaggregates
-71	Can delete aws cost entry line item aggregates	18	delete_awscostentrylineitemaggregates
-72	Can view aws cost entry line item aggregates	18	view_awscostentrylineitemaggregates
-73	Can add aws cost entry line item daily	19	add_awscostentrylineitemdaily
-74	Can change aws cost entry line item daily	19	change_awscostentrylineitemdaily
-75	Can delete aws cost entry line item daily	19	delete_awscostentrylineitemdaily
-76	Can view aws cost entry line item daily	19	view_awscostentrylineitemdaily
-77	Can add aws cost entry line item daily summary	20	add_awscostentrylineitemdailysummary
-78	Can change aws cost entry line item daily summary	20	change_awscostentrylineitemdailysummary
-79	Can delete aws cost entry line item daily summary	20	delete_awscostentrylineitemdailysummary
-80	Can view aws cost entry line item daily summary	20	view_awscostentrylineitemdailysummary
-81	Can add aws cost entry pricing	21	add_awscostentrypricing
-82	Can change aws cost entry pricing	21	change_awscostentrypricing
-83	Can delete aws cost entry pricing	21	delete_awscostentrypricing
-84	Can view aws cost entry pricing	21	view_awscostentrypricing
-85	Can add aws cost entry product	22	add_awscostentryproduct
-86	Can change aws cost entry product	22	change_awscostentryproduct
-87	Can delete aws cost entry product	22	delete_awscostentryproduct
-88	Can view aws cost entry product	22	view_awscostentryproduct
-89	Can add aws cost entry reservation	23	add_awscostentryreservation
-90	Can change aws cost entry reservation	23	change_awscostentryreservation
-167	Can delete region mapping	42	delete_regionmapping
-91	Can delete aws cost entry reservation	23	delete_awscostentryreservation
-92	Can view aws cost entry reservation	23	view_awscostentryreservation
-93	Can add ocp usage line item	24	add_ocpusagelineitem
-94	Can change ocp usage line item	24	change_ocpusagelineitem
-95	Can delete ocp usage line item	24	delete_ocpusagelineitem
-96	Can view ocp usage line item	24	view_ocpusagelineitem
-97	Can add ocp usage line item daily	25	add_ocpusagelineitemdaily
-98	Can change ocp usage line item daily	25	change_ocpusagelineitemdaily
-99	Can delete ocp usage line item daily	25	delete_ocpusagelineitemdaily
-100	Can view ocp usage line item daily	25	view_ocpusagelineitemdaily
-101	Can add ocp usage report	26	add_ocpusagereport
-102	Can change ocp usage report	26	change_ocpusagereport
-103	Can delete ocp usage report	26	delete_ocpusagereport
-104	Can view ocp usage report	26	view_ocpusagereport
-105	Can add ocp usage report period	27	add_ocpusagereportperiod
-106	Can change ocp usage report period	27	change_ocpusagereportperiod
-107	Can delete ocp usage report period	27	delete_ocpusagereportperiod
-108	Can view ocp usage report period	27	view_ocpusagereportperiod
-109	Can add ocp usage line item aggregates	28	add_ocpusagelineitemaggregates
-110	Can change ocp usage line item aggregates	28	change_ocpusagelineitemaggregates
-111	Can delete ocp usage line item aggregates	28	delete_ocpusagelineitemaggregates
-112	Can view ocp usage line item aggregates	28	view_ocpusagelineitemaggregates
-113	Can add ocp usage line item daily summary	29	add_ocpusagelineitemdailysummary
-114	Can change ocp usage line item daily summary	29	change_ocpusagelineitemdailysummary
-115	Can delete ocp usage line item daily summary	29	delete_ocpusagelineitemdailysummary
-116	Can view ocp usage line item daily summary	29	view_ocpusagelineitemdailysummary
-117	Can add ocp usage pod label summary	30	add_ocpusagepodlabelsummary
-118	Can change ocp usage pod label summary	30	change_ocpusagepodlabelsummary
-119	Can delete ocp usage pod label summary	30	delete_ocpusagepodlabelsummary
-120	Can view ocp usage pod label summary	30	view_ocpusagepodlabelsummary
-121	Can add aws tags summary	31	add_awstagssummary
-122	Can change aws tags summary	31	change_awstagssummary
-123	Can delete aws tags summary	31	delete_awstagssummary
-124	Can view aws tags summary	31	view_awstagssummary
-125	Can add ocpaws cost line item daily	32	add_ocpawscostlineitemdaily
-126	Can change ocpaws cost line item daily	32	change_ocpawscostlineitemdaily
-127	Can delete ocpaws cost line item daily	32	delete_ocpawscostlineitemdaily
-128	Can view ocpaws cost line item daily	32	view_ocpawscostlineitemdaily
-129	Can add ocpaws cost line item daily summary	33	add_ocpawscostlineitemdailysummary
-130	Can change ocpaws cost line item daily summary	33	change_ocpawscostlineitemdailysummary
-131	Can delete ocpaws cost line item daily summary	33	delete_ocpawscostlineitemdailysummary
-132	Can view ocpaws cost line item daily summary	33	view_ocpawscostlineitemdailysummary
-133	Can add ocp storage line item	34	add_ocpstoragelineitem
-134	Can change ocp storage line item	34	change_ocpstoragelineitem
-135	Can delete ocp storage line item	34	delete_ocpstoragelineitem
-136	Can view ocp storage line item	34	view_ocpstoragelineitem
-137	Can add ocp storage line item daily summary	35	add_ocpstoragelineitemdailysummary
-138	Can change ocp storage line item daily summary	35	change_ocpstoragelineitemdailysummary
-139	Can delete ocp storage line item daily summary	35	delete_ocpstoragelineitemdailysummary
-140	Can view ocp storage line item daily summary	35	view_ocpstoragelineitemdailysummary
-141	Can add ocp storage volume claim label summary	36	add_ocpstoragevolumeclaimlabelsummary
-142	Can change ocp storage volume claim label summary	36	change_ocpstoragevolumeclaimlabelsummary
-143	Can delete ocp storage volume claim label summary	36	delete_ocpstoragevolumeclaimlabelsummary
-144	Can view ocp storage volume claim label summary	36	view_ocpstoragevolumeclaimlabelsummary
-145	Can add ocp storage volume label summary	37	add_ocpstoragevolumelabelsummary
-146	Can change ocp storage volume label summary	37	change_ocpstoragevolumelabelsummary
-147	Can delete ocp storage volume label summary	37	delete_ocpstoragevolumelabelsummary
-148	Can view ocp storage volume label summary	37	view_ocpstoragevolumelabelsummary
-149	Can add ocp storage line item daily	38	add_ocpstoragelineitemdaily
-150	Can change ocp storage line item daily	38	change_ocpstoragelineitemdaily
-151	Can delete ocp storage line item daily	38	delete_ocpstoragelineitemdaily
-152	Can view ocp storage line item daily	38	view_ocpstoragelineitemdaily
-153	Can add ocpaws storage line item daily	39	add_ocpawsstoragelineitemdaily
-154	Can change ocpaws storage line item daily	39	change_ocpawsstoragelineitemdaily
-155	Can delete ocpaws storage line item daily	39	delete_ocpawsstoragelineitemdaily
-156	Can view ocpaws storage line item daily	39	view_ocpawsstoragelineitemdaily
-157	Can add ocpaws usage line item daily	40	add_ocpawsusagelineitemdaily
-158	Can change ocpaws usage line item daily	40	change_ocpawsusagelineitemdaily
-159	Can delete ocpaws usage line item daily	40	delete_ocpawsusagelineitemdaily
-160	Can view ocpaws usage line item daily	40	view_ocpawsusagelineitemdaily
-161	Can add cost usage report status	41	add_costusagereportstatus
-162	Can change cost usage report status	41	change_costusagereportstatus
-163	Can delete cost usage report status	41	delete_costusagereportstatus
-164	Can view cost usage report status	41	view_costusagereportstatus
-165	Can add region mapping	42	add_regionmapping
-166	Can change region mapping	42	change_regionmapping
-168	Can view region mapping	42	view_regionmapping
-169	Can add report column map	43	add_reportcolumnmap
-170	Can change report column map	43	change_reportcolumnmap
-171	Can delete report column map	43	delete_reportcolumnmap
-172	Can view report column map	43	view_reportcolumnmap
-173	Can add si unit scale	44	add_siunitscale
-174	Can change si unit scale	44	change_siunitscale
-175	Can delete si unit scale	44	delete_siunitscale
-176	Can view si unit scale	44	view_siunitscale
-177	Can add cost usage report manifest	45	add_costusagereportmanifest
-178	Can change cost usage report manifest	45	change_costusagereportmanifest
-179	Can delete cost usage report manifest	45	delete_costusagereportmanifest
-180	Can view cost usage report manifest	45	view_costusagereportmanifest
-181	Can add rate	46	add_rate
-182	Can change rate	46	change_rate
-183	Can delete rate	46	delete_rate
-184	Can view rate	46	view_rate
+69	Can add aws cost entry line item daily	18	add_awscostentrylineitemdaily
+70	Can change aws cost entry line item daily	18	change_awscostentrylineitemdaily
+71	Can delete aws cost entry line item daily	18	delete_awscostentrylineitemdaily
+72	Can view aws cost entry line item daily	18	view_awscostentrylineitemdaily
+73	Can add aws cost entry line item daily summary	19	add_awscostentrylineitemdailysummary
+74	Can change aws cost entry line item daily summary	19	change_awscostentrylineitemdailysummary
+75	Can delete aws cost entry line item daily summary	19	delete_awscostentrylineitemdailysummary
+76	Can view aws cost entry line item daily summary	19	view_awscostentrylineitemdailysummary
+77	Can add aws cost entry pricing	20	add_awscostentrypricing
+78	Can change aws cost entry pricing	20	change_awscostentrypricing
+79	Can delete aws cost entry pricing	20	delete_awscostentrypricing
+80	Can view aws cost entry pricing	20	view_awscostentrypricing
+81	Can add aws cost entry product	21	add_awscostentryproduct
+82	Can change aws cost entry product	21	change_awscostentryproduct
+83	Can delete aws cost entry product	21	delete_awscostentryproduct
+84	Can view aws cost entry product	21	view_awscostentryproduct
+85	Can add aws cost entry reservation	22	add_awscostentryreservation
+86	Can change aws cost entry reservation	22	change_awscostentryreservation
+87	Can delete aws cost entry reservation	22	delete_awscostentryreservation
+88	Can view aws cost entry reservation	22	view_awscostentryreservation
+89	Can add ocp usage line item	23	add_ocpusagelineitem
+90	Can change ocp usage line item	23	change_ocpusagelineitem
+91	Can delete ocp usage line item	23	delete_ocpusagelineitem
+92	Can view ocp usage line item	23	view_ocpusagelineitem
+93	Can add ocp usage line item daily	24	add_ocpusagelineitemdaily
+94	Can change ocp usage line item daily	24	change_ocpusagelineitemdaily
+95	Can delete ocp usage line item daily	24	delete_ocpusagelineitemdaily
+96	Can view ocp usage line item daily	24	view_ocpusagelineitemdaily
+97	Can add ocp usage report	25	add_ocpusagereport
+98	Can change ocp usage report	25	change_ocpusagereport
+99	Can delete ocp usage report	25	delete_ocpusagereport
+100	Can view ocp usage report	25	view_ocpusagereport
+101	Can add ocp usage report period	26	add_ocpusagereportperiod
+102	Can change ocp usage report period	26	change_ocpusagereportperiod
+103	Can delete ocp usage report period	26	delete_ocpusagereportperiod
+104	Can view ocp usage report period	26	view_ocpusagereportperiod
+105	Can add ocp usage line item daily summary	27	add_ocpusagelineitemdailysummary
+106	Can change ocp usage line item daily summary	27	change_ocpusagelineitemdailysummary
+107	Can delete ocp usage line item daily summary	27	delete_ocpusagelineitemdailysummary
+108	Can view ocp usage line item daily summary	27	view_ocpusagelineitemdailysummary
+109	Can add ocp usage pod label summary	28	add_ocpusagepodlabelsummary
+110	Can change ocp usage pod label summary	28	change_ocpusagepodlabelsummary
+111	Can delete ocp usage pod label summary	28	delete_ocpusagepodlabelsummary
+112	Can view ocp usage pod label summary	28	view_ocpusagepodlabelsummary
+113	Can add aws tags summary	29	add_awstagssummary
+114	Can change aws tags summary	29	change_awstagssummary
+115	Can delete aws tags summary	29	delete_awstagssummary
+116	Can view aws tags summary	29	view_awstagssummary
+117	Can add ocpaws cost line item daily	30	add_ocpawscostlineitemdaily
+118	Can change ocpaws cost line item daily	30	change_ocpawscostlineitemdaily
+119	Can delete ocpaws cost line item daily	30	delete_ocpawscostlineitemdaily
+120	Can view ocpaws cost line item daily	30	view_ocpawscostlineitemdaily
+121	Can add ocpaws cost line item daily summary	31	add_ocpawscostlineitemdailysummary
+122	Can change ocpaws cost line item daily summary	31	change_ocpawscostlineitemdailysummary
+123	Can delete ocpaws cost line item daily summary	31	delete_ocpawscostlineitemdailysummary
+124	Can view ocpaws cost line item daily summary	31	view_ocpawscostlineitemdailysummary
+125	Can add ocp storage line item	32	add_ocpstoragelineitem
+126	Can change ocp storage line item	32	change_ocpstoragelineitem
+127	Can delete ocp storage line item	32	delete_ocpstoragelineitem
+128	Can view ocp storage line item	32	view_ocpstoragelineitem
+129	Can add ocp storage line item daily summary	33	add_ocpstoragelineitemdailysummary
+130	Can change ocp storage line item daily summary	33	change_ocpstoragelineitemdailysummary
+131	Can delete ocp storage line item daily summary	33	delete_ocpstoragelineitemdailysummary
+132	Can view ocp storage line item daily summary	33	view_ocpstoragelineitemdailysummary
+133	Can add ocp storage volume claim label summary	34	add_ocpstoragevolumeclaimlabelsummary
+134	Can change ocp storage volume claim label summary	34	change_ocpstoragevolumeclaimlabelsummary
+135	Can delete ocp storage volume claim label summary	34	delete_ocpstoragevolumeclaimlabelsummary
+136	Can view ocp storage volume claim label summary	34	view_ocpstoragevolumeclaimlabelsummary
+137	Can add ocp storage volume label summary	35	add_ocpstoragevolumelabelsummary
+138	Can change ocp storage volume label summary	35	change_ocpstoragevolumelabelsummary
+139	Can delete ocp storage volume label summary	35	delete_ocpstoragevolumelabelsummary
+140	Can view ocp storage volume label summary	35	view_ocpstoragevolumelabelsummary
+141	Can add ocp storage line item daily	36	add_ocpstoragelineitemdaily
+142	Can change ocp storage line item daily	36	change_ocpstoragelineitemdaily
+143	Can delete ocp storage line item daily	36	delete_ocpstoragelineitemdaily
+144	Can view ocp storage line item daily	36	view_ocpstoragelineitemdaily
+145	Can add ocpaws storage line item daily	37	add_ocpawsstoragelineitemdaily
+146	Can change ocpaws storage line item daily	37	change_ocpawsstoragelineitemdaily
+147	Can delete ocpaws storage line item daily	37	delete_ocpawsstoragelineitemdaily
+148	Can view ocpaws storage line item daily	37	view_ocpawsstoragelineitemdaily
+149	Can add ocpaws usage line item daily	38	add_ocpawsusagelineitemdaily
+150	Can change ocpaws usage line item daily	38	change_ocpawsusagelineitemdaily
+151	Can delete ocpaws usage line item daily	38	delete_ocpawsusagelineitemdaily
+152	Can view ocpaws usage line item daily	38	view_ocpawsusagelineitemdaily
+153	Can add cost usage report status	39	add_costusagereportstatus
+154	Can change cost usage report status	39	change_costusagereportstatus
+155	Can delete cost usage report status	39	delete_costusagereportstatus
+156	Can view cost usage report status	39	view_costusagereportstatus
+157	Can add region mapping	40	add_regionmapping
+158	Can change region mapping	40	change_regionmapping
+159	Can delete region mapping	40	delete_regionmapping
+160	Can view region mapping	40	view_regionmapping
+161	Can add report column map	41	add_reportcolumnmap
+162	Can change report column map	41	change_reportcolumnmap
+163	Can delete report column map	41	delete_reportcolumnmap
+164	Can view report column map	41	view_reportcolumnmap
+165	Can add si unit scale	42	add_siunitscale
+166	Can change si unit scale	42	change_siunitscale
+167	Can delete si unit scale	42	delete_siunitscale
+168	Can view si unit scale	42	view_siunitscale
+169	Can add cost usage report manifest	43	add_costusagereportmanifest
+170	Can change cost usage report manifest	43	change_costusagereportmanifest
+171	Can delete cost usage report manifest	43	delete_costusagereportmanifest
+172	Can view cost usage report manifest	43	view_costusagereportmanifest
+173	Can add rate	44	add_rate
+174	Can change rate	44	change_rate
+175	Can delete rate	44	delete_rate
+176	Can view rate	44	view_rate
 \.
 
 
@@ -2991,35 +2865,33 @@ COPY public.django_content_type (id, app_label, model) FROM stdin;
 15	reporting	awscostentry
 16	reporting	awscostentrybill
 17	reporting	awscostentrylineitem
-18	reporting	awscostentrylineitemaggregates
-19	reporting	awscostentrylineitemdaily
-20	reporting	awscostentrylineitemdailysummary
-21	reporting	awscostentrypricing
-22	reporting	awscostentryproduct
-23	reporting	awscostentryreservation
-24	reporting	ocpusagelineitem
-25	reporting	ocpusagelineitemdaily
-26	reporting	ocpusagereport
-27	reporting	ocpusagereportperiod
-28	reporting	ocpusagelineitemaggregates
-29	reporting	ocpusagelineitemdailysummary
-30	reporting	ocpusagepodlabelsummary
-31	reporting	awstagssummary
-32	reporting	ocpawscostlineitemdaily
-33	reporting	ocpawscostlineitemdailysummary
-34	reporting	ocpstoragelineitem
-35	reporting	ocpstoragelineitemdailysummary
-36	reporting	ocpstoragevolumeclaimlabelsummary
-37	reporting	ocpstoragevolumelabelsummary
-38	reporting	ocpstoragelineitemdaily
-39	reporting	ocpawsstoragelineitemdaily
-40	reporting	ocpawsusagelineitemdaily
-41	reporting_common	costusagereportstatus
-42	reporting_common	regionmapping
-43	reporting_common	reportcolumnmap
-44	reporting_common	siunitscale
-45	reporting_common	costusagereportmanifest
-46	rates	rate
+18	reporting	awscostentrylineitemdaily
+19	reporting	awscostentrylineitemdailysummary
+20	reporting	awscostentrypricing
+21	reporting	awscostentryproduct
+22	reporting	awscostentryreservation
+23	reporting	ocpusagelineitem
+24	reporting	ocpusagelineitemdaily
+25	reporting	ocpusagereport
+26	reporting	ocpusagereportperiod
+27	reporting	ocpusagelineitemdailysummary
+28	reporting	ocpusagepodlabelsummary
+29	reporting	awstagssummary
+30	reporting	ocpawscostlineitemdaily
+31	reporting	ocpawscostlineitemdailysummary
+32	reporting	ocpstoragelineitem
+33	reporting	ocpstoragelineitemdailysummary
+34	reporting	ocpstoragevolumeclaimlabelsummary
+35	reporting	ocpstoragevolumelabelsummary
+36	reporting	ocpstoragelineitemdaily
+37	reporting	ocpawsstoragelineitemdaily
+38	reporting	ocpawsusagelineitemdaily
+39	reporting_common	costusagereportstatus
+40	reporting_common	regionmapping
+41	reporting_common	reportcolumnmap
+42	reporting_common	siunitscale
+43	reporting_common	costusagereportmanifest
+44	rates	rate
 \.
 
 
@@ -3028,78 +2900,80 @@ COPY public.django_content_type (id, app_label, model) FROM stdin;
 --
 
 COPY public.django_migrations (id, app, name, applied) FROM stdin;
-1	contenttypes	0001_initial	2019-02-26 21:05:44.745119+00
-2	auth	0001_initial	2019-02-26 21:05:44.859973+00
-3	admin	0001_initial	2019-02-26 21:05:44.892797+00
-4	admin	0002_logentry_remove_auto_add	2019-02-26 21:05:44.904466+00
-5	admin	0003_logentry_add_action_flag_choices	2019-02-26 21:05:44.916976+00
-6	api	0001_initial	2019-02-26 21:05:45.089039+00
-7	api	0002_auto_20180926_1905	2019-02-26 21:05:45.099487+00
-8	api	0003_auto_20181008_1819	2019-02-26 21:05:45.151125+00
-9	api	0004_auto_20181012_1507	2019-02-26 21:05:45.166664+00
-10	api	0005_auto_20181109_2121	2019-02-26 21:05:45.202439+00
-11	api	0006_delete_rate	2019-02-26 21:05:45.214662+00
-12	api	0007_auto_20181213_1940	2019-02-26 21:05:45.255532+00
-13	contenttypes	0002_remove_content_type_name	2019-02-26 21:05:45.286485+00
-14	auth	0002_alter_permission_name_max_length	2019-02-26 21:05:45.297395+00
-15	auth	0003_alter_user_email_max_length	2019-02-26 21:05:45.311026+00
-16	auth	0004_alter_user_username_opts	2019-02-26 21:05:45.322006+00
-17	auth	0005_alter_user_last_login_null	2019-02-26 21:05:45.335617+00
-18	auth	0006_require_contenttypes_0002	2019-02-26 21:05:45.339601+00
-19	auth	0007_alter_validators_add_error_messages	2019-02-26 21:05:45.35024+00
-20	auth	0008_alter_user_username_max_length	2019-02-26 21:05:45.36741+00
-21	auth	0009_alter_user_last_name_max_length	2019-02-26 21:05:45.380155+00
-22	rates	0001_initial	2019-02-26 21:05:45.38773+00
-23	rates	0002_auto_20181205_1810	2019-02-26 21:05:45.395409+00
-24	rates	0003_auto_20190213_2040	2019-02-26 21:05:45.401569+00
-25	reporting	0001_initial	2019-02-26 21:05:45.536108+00
-26	reporting	0002_auto_20180926_1818	2019-02-26 21:05:45.590989+00
-27	reporting	0003_auto_20180928_1840	2019-02-26 21:05:45.644537+00
-28	reporting	0004_auto_20181003_1633	2019-02-26 21:05:45.68141+00
-29	reporting	0005_auto_20181003_1416	2019-02-26 21:05:45.702144+00
-30	reporting	0006_awscostentrylineitemaggregates_account_alias	2019-02-26 21:05:45.712003+00
-31	reporting	0007_awscostentrybill_provider_id	2019-02-26 21:05:45.723773+00
-32	reporting	0008_auto_20181012_1724	2019-02-26 21:05:45.765358+00
-33	reporting	0009_auto_20181016_1940	2019-02-26 21:05:45.797791+00
-34	reporting	0010_auto_20181017_1659	2019-02-26 21:05:45.839148+00
-35	reporting	0011_auto_20181018_1811	2019-02-26 21:05:45.881209+00
-36	reporting	0012_auto_20181106_1502	2019-02-26 21:05:45.892628+00
-37	reporting	0013_auto_20181107_1956	2019-02-26 21:05:45.957322+00
-38	reporting	0014_auto_20181108_0207	2019-02-26 21:05:45.971766+00
-39	reporting	0015_auto_20181109_1618	2019-02-26 21:05:45.981711+00
-40	reporting	0016_delete_rate	2019-02-26 21:05:45.988705+00
-41	reporting	0017_auto_20181121_1444	2019-02-26 21:05:46.020444+00
-42	reporting	0018_auto_20181129_0217	2019-02-26 21:05:46.123274+00
-43	reporting	0019_auto_20181206_2138	2019-02-26 21:05:46.143531+00
-44	reporting	0020_auto_20181211_1557	2019-02-26 21:05:46.161711+00
-45	reporting	0021_auto_20181212_1816	2019-02-26 21:05:46.188518+00
-46	reporting	0022_auto_20181221_1617	2019-02-26 21:05:46.199981+00
-47	reporting	0023_awscostentrylineitemdailysummary_tags	2019-02-26 21:05:46.211323+00
-48	reporting	0024_ocpusagepodlabelsummary	2019-02-26 21:05:46.219645+00
-49	reporting	0025_auto_20190128_1825	2019-02-26 21:05:46.238784+00
-50	reporting	0026_auto_20190130_1746	2019-02-26 21:05:46.255929+00
-51	reporting	0027_auto_20190205_1659	2019-02-26 21:05:46.262468+00
-52	reporting	0028_auto_20190205_2022	2019-02-26 21:05:46.301994+00
-53	reporting	0029_auto_20190207_1526	2019-02-26 21:05:46.326458+00
-54	reporting	0030_auto_20190208_0159	2019-02-26 21:05:46.347626+00
-55	reporting	0031_ocpawscostlineitemdailysummary_instance_type	2019-02-26 21:05:46.35889+00
-56	reporting	0032_auto_20190213_2152	2019-02-26 21:05:46.371899+00
-57	reporting	0033_auto_20190214_1637	2019-02-26 21:05:46.386008+00
-58	reporting	0034_ocpstoragevolumeclaimlabelsummary_ocpstoragevolumelabelsummary	2019-02-26 21:05:46.396177+00
-59	reporting	0035_ocpawscostlineitemdailysummary_currency_code	2019-02-26 21:05:46.407714+00
-60	reporting	0036_auto_20190215_2058	2019-02-26 21:05:46.439708+00
-61	reporting	0037_auto_20190218_2054	2019-02-26 21:05:46.457801+00
-62	reporting	0038_auto_20190220_1511	2019-02-26 21:05:46.46828+00
-63	reporting	0039_auto_20190220_1610	2019-02-26 21:05:46.514727+00
-64	reporting	0040_auto_20190226_1538	2019-02-26 21:05:46.537681+00
-65	reporting_common	0001_initial	2019-02-26 21:05:46.611784+00
-66	reporting_common	0002_auto_20180926_1905	2019-02-26 21:05:46.727315+00
-67	reporting_common	0003_auto_20180928_1732	2019-02-26 21:05:46.806854+00
-68	reporting_common	0004_auto_20181003_1859	2019-02-26 21:05:46.88217+00
-69	reporting_common	0005_auto_20181127_2046	2019-02-26 21:05:46.958624+00
-70	reporting_common	0006_auto_20190208_0316	2019-02-26 21:05:46.991395+00
-71	reporting_common	0007_auto_20190208_0316	2019-02-26 21:05:47.221809+00
-72	sessions	0001_initial	2019-02-26 21:05:47.245804+00
+1	contenttypes	0001_initial	2019-02-28 20:49:53.868806+00
+2	auth	0001_initial	2019-02-28 20:49:53.969752+00
+3	admin	0001_initial	2019-02-28 20:49:54.007723+00
+4	admin	0002_logentry_remove_auto_add	2019-02-28 20:49:54.029795+00
+5	admin	0003_logentry_add_action_flag_choices	2019-02-28 20:49:54.054129+00
+6	api	0001_initial	2019-02-28 20:49:54.275009+00
+7	api	0002_auto_20180926_1905	2019-02-28 20:49:54.285049+00
+8	api	0003_auto_20181008_1819	2019-02-28 20:49:54.333641+00
+9	api	0004_auto_20181012_1507	2019-02-28 20:49:54.347799+00
+10	api	0005_auto_20181109_2121	2019-02-28 20:49:54.371191+00
+11	api	0006_delete_rate	2019-02-28 20:49:54.381266+00
+12	api	0007_auto_20181213_1940	2019-02-28 20:49:54.433939+00
+13	contenttypes	0002_remove_content_type_name	2019-02-28 20:49:54.46517+00
+14	auth	0002_alter_permission_name_max_length	2019-02-28 20:49:54.475821+00
+15	auth	0003_alter_user_email_max_length	2019-02-28 20:49:54.49108+00
+16	auth	0004_alter_user_username_opts	2019-02-28 20:49:54.505576+00
+17	auth	0005_alter_user_last_login_null	2019-02-28 20:49:54.521607+00
+18	auth	0006_require_contenttypes_0002	2019-02-28 20:49:54.527759+00
+19	auth	0007_alter_validators_add_error_messages	2019-02-28 20:49:54.55074+00
+20	auth	0008_alter_user_username_max_length	2019-02-28 20:49:54.58616+00
+21	auth	0009_alter_user_last_name_max_length	2019-02-28 20:49:54.607467+00
+22	rates	0001_initial	2019-02-28 20:49:54.620189+00
+23	rates	0002_auto_20181205_1810	2019-02-28 20:49:54.631034+00
+24	rates	0003_auto_20190213_2040	2019-02-28 20:49:54.641764+00
+25	reporting	0001_initial	2019-02-28 20:49:54.788005+00
+26	reporting	0002_auto_20180926_1818	2019-02-28 20:49:54.846623+00
+27	reporting	0003_auto_20180928_1840	2019-02-28 20:49:54.904503+00
+28	reporting	0004_auto_20181003_1633	2019-02-28 20:49:54.943184+00
+29	reporting	0005_auto_20181003_1416	2019-02-28 20:49:54.96618+00
+30	reporting	0006_awscostentrylineitemaggregates_account_alias	2019-02-28 20:49:54.974782+00
+31	reporting	0007_awscostentrybill_provider_id	2019-02-28 20:49:55.019849+00
+32	reporting	0008_auto_20181012_1724	2019-02-28 20:49:55.030343+00
+33	reporting	0009_auto_20181016_1940	2019-02-28 20:49:55.064396+00
+34	reporting	0010_auto_20181017_1659	2019-02-28 20:49:55.102755+00
+35	reporting	0011_auto_20181018_1811	2019-02-28 20:49:55.142044+00
+36	reporting	0012_auto_20181106_1502	2019-02-28 20:49:55.152301+00
+37	reporting	0013_auto_20181107_1956	2019-02-28 20:49:55.218444+00
+38	reporting	0014_auto_20181108_0207	2019-02-28 20:49:55.231868+00
+39	reporting	0015_auto_20181109_1618	2019-02-28 20:49:55.239817+00
+40	reporting	0016_delete_rate	2019-02-28 20:49:55.246792+00
+41	reporting	0017_auto_20181121_1444	2019-02-28 20:49:55.280391+00
+42	reporting	0018_auto_20181129_0217	2019-02-28 20:49:55.375761+00
+43	reporting	0019_auto_20181206_2138	2019-02-28 20:49:55.396141+00
+44	reporting	0020_auto_20181211_1557	2019-02-28 20:49:55.418283+00
+45	reporting	0021_auto_20181212_1816	2019-02-28 20:49:55.445481+00
+46	reporting	0022_auto_20181221_1617	2019-02-28 20:49:55.456951+00
+47	reporting	0023_awscostentrylineitemdailysummary_tags	2019-02-28 20:49:55.466846+00
+48	reporting	0024_ocpusagepodlabelsummary	2019-02-28 20:49:55.474268+00
+49	reporting	0025_auto_20190128_1825	2019-02-28 20:49:55.494765+00
+50	reporting	0026_auto_20190130_1746	2019-02-28 20:49:55.5147+00
+51	reporting	0027_auto_20190205_1659	2019-02-28 20:49:55.521103+00
+52	reporting	0028_auto_20190205_2022	2019-02-28 20:49:55.566057+00
+53	reporting	0029_auto_20190207_1526	2019-02-28 20:49:55.590888+00
+54	reporting	0030_auto_20190208_0159	2019-02-28 20:49:55.609263+00
+55	reporting	0031_ocpawscostlineitemdailysummary_instance_type	2019-02-28 20:49:55.62061+00
+56	reporting	0032_auto_20190213_2152	2019-02-28 20:49:55.632458+00
+57	reporting	0033_auto_20190214_1637	2019-02-28 20:49:55.6465+00
+58	reporting	0034_ocpstoragevolumeclaimlabelsummary_ocpstoragevolumelabelsummary	2019-02-28 20:49:55.656741+00
+59	reporting	0035_ocpawscostlineitemdailysummary_currency_code	2019-02-28 20:49:55.675922+00
+60	reporting	0036_auto_20190215_2058	2019-02-28 20:49:55.707516+00
+61	reporting	0037_auto_20190218_2054	2019-02-28 20:49:55.726735+00
+62	reporting	0038_auto_20190220_1511	2019-02-28 20:49:55.737511+00
+63	reporting	0039_auto_20190220_1610	2019-02-28 20:49:55.788631+00
+64	reporting	0040_auto_20190226_1538	2019-02-28 20:49:55.810178+00
+65	reporting	0041_awscostentrylineitemdailysummary_resource_ids	2019-02-28 20:49:55.823369+00
+66	reporting	0042_auto_20190228_2016	2019-02-28 20:49:55.840417+00
+67	reporting_common	0001_initial	2019-02-28 20:49:55.918837+00
+68	reporting_common	0002_auto_20180926_1905	2019-02-28 20:49:56.033039+00
+69	reporting_common	0003_auto_20180928_1732	2019-02-28 20:49:56.112996+00
+70	reporting_common	0004_auto_20181003_1859	2019-02-28 20:49:56.192404+00
+71	reporting_common	0005_auto_20181127_2046	2019-02-28 20:49:56.281674+00
+72	reporting_common	0006_auto_20190208_0316	2019-02-28 20:49:56.354841+00
+73	reporting_common	0007_auto_20190208_0316	2019-02-28 20:49:56.525277+00
+74	sessions	0001_initial	2019-02-28 20:49:56.546149+00
 \.
 
 
@@ -3233,7 +3107,7 @@ COPY public.si_unit_scale (id, prefix, prefix_symbol, multiplying_factor) FROM s
 -- Name: django_migrations_id_seq; Type: SEQUENCE SET; Schema: acct10001; Owner: kokuadmin
 --
 
-SELECT pg_catalog.setval('acct10001.django_migrations_id_seq', 72, true);
+SELECT pg_catalog.setval('acct10001.django_migrations_id_seq', 74, true);
 
 
 --
@@ -3262,13 +3136,6 @@ SELECT pg_catalog.setval('acct10001.reporting_awscostentry_id_seq', 1, false);
 --
 
 SELECT pg_catalog.setval('acct10001.reporting_awscostentrybill_id_seq', 1, false);
-
-
---
--- Name: reporting_awscostentrylineitem_aggregates_id_seq; Type: SEQUENCE SET; Schema: acct10001; Owner: kokuadmin
---
-
-SELECT pg_catalog.setval('acct10001.reporting_awscostentrylineitem_aggregates_id_seq', 1, false);
 
 
 --
@@ -3339,13 +3206,6 @@ SELECT pg_catalog.setval('acct10001.reporting_ocpstoragelineitem_daily_summary_i
 --
 
 SELECT pg_catalog.setval('acct10001.reporting_ocpstoragelineitem_id_seq', 1, false);
-
-
---
--- Name: reporting_ocpusagelineitem_aggregates_id_seq; Type: SEQUENCE SET; Schema: acct10001; Owner: kokuadmin
---
-
-SELECT pg_catalog.setval('acct10001.reporting_ocpusagelineitem_aggregates_id_seq', 1, false);
 
 
 --
@@ -3450,7 +3310,7 @@ SELECT pg_catalog.setval('public.auth_group_permissions_id_seq', 1, false);
 -- Name: auth_permission_id_seq; Type: SEQUENCE SET; Schema: public; Owner: kokuadmin
 --
 
-SELECT pg_catalog.setval('public.auth_permission_id_seq', 184, true);
+SELECT pg_catalog.setval('public.auth_permission_id_seq', 176, true);
 
 
 --
@@ -3485,14 +3345,14 @@ SELECT pg_catalog.setval('public.django_admin_log_id_seq', 1, false);
 -- Name: django_content_type_id_seq; Type: SEQUENCE SET; Schema: public; Owner: kokuadmin
 --
 
-SELECT pg_catalog.setval('public.django_content_type_id_seq', 46, true);
+SELECT pg_catalog.setval('public.django_content_type_id_seq', 44, true);
 
 
 --
 -- Name: django_migrations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: kokuadmin
 --
 
-SELECT pg_catalog.setval('public.django_migrations_id_seq', 72, true);
+SELECT pg_catalog.setval('public.django_migrations_id_seq', 74, true);
 
 
 --
@@ -3600,14 +3460,6 @@ ALTER TABLE ONLY acct10001.reporting_awscostentrybill
 
 ALTER TABLE ONLY acct10001.reporting_awscostentrybill
     ADD CONSTRAINT reporting_awscostentrybill_pkey PRIMARY KEY (id);
-
-
---
--- Name: reporting_awscostentrylineitem_aggregates reporting_awscostentrylineitem_aggregates_pkey; Type: CONSTRAINT; Schema: acct10001; Owner: kokuadmin
---
-
-ALTER TABLE ONLY acct10001.reporting_awscostentrylineitem_aggregates
-    ADD CONSTRAINT reporting_awscostentrylineitem_aggregates_pkey PRIMARY KEY (id);
 
 
 --
@@ -3760,14 +3612,6 @@ ALTER TABLE ONLY acct10001.reporting_ocpstoragevolumelabel_summary
 
 ALTER TABLE ONLY acct10001.reporting_ocpusagelineitem
     ADD CONSTRAINT reporting_ocpusagelineit_report_id_namespace_pod__dfc2c342_uniq UNIQUE (report_id, namespace, pod, node);
-
-
---
--- Name: reporting_ocpusagelineitem_aggregates reporting_ocpusagelineitem_aggregates_pkey; Type: CONSTRAINT; Schema: acct10001; Owner: kokuadmin
---
-
-ALTER TABLE ONLY acct10001.reporting_ocpusagelineitem_aggregates
-    ADD CONSTRAINT reporting_ocpusagelineitem_aggregates_pkey PRIMARY KEY (id);
 
 
 --
@@ -4338,13 +4182,6 @@ CREATE INDEX reporting_awscostentryline_account_alias_id_684d6c01 ON acct10001.r
 
 
 --
--- Name: reporting_awscostentryline_account_alias_id_f97d76e5; Type: INDEX; Schema: acct10001; Owner: kokuadmin
---
-
-CREATE INDEX reporting_awscostentryline_account_alias_id_f97d76e5 ON acct10001.reporting_awscostentrylineitem_aggregates USING btree (account_alias_id);
-
-
---
 -- Name: reporting_awscostentryline_cost_entry_pricing_id_5a6a9b38; Type: INDEX; Schema: acct10001; Owner: kokuadmin
 --
 
@@ -4770,14 +4607,6 @@ CREATE INDEX si_unit_scale_prefix_eb9daade_like ON public.si_unit_scale USING bt
 
 ALTER TABLE ONLY acct10001.reporting_awscostentrylineitem_daily_summary
     ADD CONSTRAINT reporting_awscostent_account_alias_id_684d6c01_fk_reporting FOREIGN KEY (account_alias_id) REFERENCES acct10001.reporting_awsaccountalias(id) DEFERRABLE INITIALLY DEFERRED;
-
-
---
--- Name: reporting_awscostentrylineitem_aggregates reporting_awscostent_account_alias_id_f97d76e5_fk_reporting; Type: FK CONSTRAINT; Schema: acct10001; Owner: kokuadmin
---
-
-ALTER TABLE ONLY acct10001.reporting_awscostentrylineitem_aggregates
-    ADD CONSTRAINT reporting_awscostent_account_alias_id_f97d76e5_fk_reporting FOREIGN KEY (account_alias_id) REFERENCES acct10001.reporting_awsaccountalias(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --

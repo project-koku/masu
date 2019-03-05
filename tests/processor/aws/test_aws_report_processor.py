@@ -94,7 +94,6 @@ class AWSReportProcessorTest(MasuTestCase):
         _report_tables = copy.deepcopy(AWS_CUR_TABLE_MAP)
         _report_tables.pop('line_item_daily', None)
         _report_tables.pop('line_item_daily_summary', None)
-        _report_tables.pop('line_item_aggregates', None)
         _report_tables.pop('tags_summary', None)
         cls.report_tables = list(_report_tables.values())
         # Grab a single row of test data to work with

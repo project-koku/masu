@@ -25,7 +25,8 @@ soupsieve = "==1.8"
 
 [dev-packages]
 
-pylint = "===2.0.1"
+pylint = "==2.2.2"
+astroid = "==2.1.0"
 coverage = "==4.5.2"
 codecov = "==2.0.15"
 requests-mock = "==1.5.2"

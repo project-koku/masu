@@ -17,6 +17,7 @@
 
 """Test the AWS S3 utility functions."""
 
+import io
 import json
 import os.path
 import random
@@ -194,7 +195,7 @@ class AWSReportDownloaderTest(MasuTestCase):
         mock_resource.Bucket.return_value = mock_bucket
         mock_boto_resource = mock_resource
         out = self.aws_report_downloader.download_bucket()
-        expected_files = [] 
+        expected_files = []
         self.assertEqual(out, expected_files)
 
     @patch('masu.external.downloader.aws.aws_report_downloader.AWSReportDownloader.download_file',
@@ -267,3 +268,120 @@ class AWSReportDownloaderTest(MasuTestCase):
             AWSReportDownloader(self.fake_customer_name,
                                 auth_credential,
                                 self.fake_bucket_name)
+
+    @patch('masu.external.downloader.aws.aws_report_downloader.shutil')
+    @patch('masu.util.aws.common.get_assume_role_session',
+           return_value=FakeSession)
+    def test_check_size_success(self, fake_session, fake_shutil):
+        fake_client = Mock()
+        fake_client.get_object.return_value = {'ContentLength': 123456,
+                                               'Body': Mock()}
+        fake_shutil.disk_usage.return_value = (10, 10, 4096*1024*1024)
+
+        auth_credential = fake_arn(service='iam', generate_account_id=True)
+        downloader = AWSReportDownloader(self.fake_customer_name,
+                                         auth_credential,
+                                         self.fake_bucket_name)
+        downloader.s3_client = fake_client
+
+        fakekey = self.fake.file_path(depth=random.randint(1, 5),
+                                      extension=random.choice(['json', 'csv.gz']))
+        result = downloader._check_size(fakekey, check_inflate=False)
+        self.assertTrue(result)
+
+    @patch('masu.external.downloader.aws.aws_report_downloader.shutil')
+    @patch('masu.util.aws.common.get_assume_role_session',
+           return_value=FakeSession)
+    def test_check_size_fail_nospace(self, fake_session, fake_shutil):
+        fake_client = Mock()
+        fake_client.get_object.return_value = {'ContentLength': 123456,
+                                               'Body': Mock()}
+        fake_shutil.disk_usage.return_value = (10, 10, 10)
+
+        auth_credential = fake_arn(service='iam', generate_account_id=True)
+        downloader = AWSReportDownloader(self.fake_customer_name,
+                                         auth_credential,
+                                         self.fake_bucket_name)
+        downloader.s3_client = fake_client
+
+        fakekey = self.fake.file_path(depth=random.randint(1, 5),
+                                      extension=random.choice(['json', 'csv.gz']))
+        result = downloader._check_size(fakekey, check_inflate=False)
+        self.assertFalse(result)
+
+    @patch('masu.util.aws.common.get_assume_role_session',
+           return_value=FakeSession)
+    def test_check_size_fail_nosize(self, fake_session):
+        fake_client = Mock()
+        fake_client.get_object.return_value = {}
+
+        auth_credential = fake_arn(service='iam', generate_account_id=True)
+        downloader = AWSReportDownloader(self.fake_customer_name,
+                                         auth_credential,
+                                         self.fake_bucket_name)
+        downloader.s3_client = fake_client
+
+        fakekey = self.fake.file_path(depth=random.randint(1, 5),
+                                      extension=random.choice(['json', 'csv.gz']))
+        with self.assertRaises(AWSReportDownloaderError):
+            downloader._check_size(fakekey, check_inflate=False)
+
+    @patch('masu.external.downloader.aws.aws_report_downloader.shutil')
+    @patch('masu.util.aws.common.get_assume_role_session',
+           return_value=FakeSession)
+    def test_check_size_inflate_success(self, fake_session, fake_shutil):
+        fake_client = Mock()
+        fake_client.get_object.return_value = {'ContentLength': 123456,
+                                               'Body': io.BytesIO(b'\xd2\x02\x96I')}
+        fake_shutil.disk_usage.return_value = (10, 10, 4096*1024*1024)
+
+        auth_credential = fake_arn(service='iam', generate_account_id=True)
+        downloader = AWSReportDownloader(self.fake_customer_name,
+                                         auth_credential,
+                                         self.fake_bucket_name)
+        downloader.s3_client = fake_client
+
+        fakekey = self.fake.file_path(depth=random.randint(1, 5),
+                                      extension='csv.gz')
+        result = downloader._check_size(fakekey, check_inflate=True)
+        self.assertTrue(result)
+
+    @patch('masu.external.downloader.aws.aws_report_downloader.shutil')
+    @patch('masu.util.aws.common.get_assume_role_session',
+           return_value=FakeSession)
+    def test_check_size_inflate_fail(self, fake_session, fake_shutil):
+        fake_client = Mock()
+        fake_client.get_object.return_value = {'ContentLength': 123456,
+                                               'Body': io.BytesIO(b'\xd2\x02\x96I')}
+        fake_shutil.disk_usage.return_value = (10, 10, 1234567)
+
+        auth_credential = fake_arn(service='iam', generate_account_id=True)
+        downloader = AWSReportDownloader(self.fake_customer_name,
+                                         auth_credential,
+                                         self.fake_bucket_name)
+        downloader.s3_client = fake_client
+
+        fakekey = self.fake.file_path(depth=random.randint(1, 5),
+                                      extension='csv.gz')
+        result = downloader._check_size(fakekey, check_inflate=True)
+        self.assertFalse(result)
+
+    @patch('masu.external.downloader.aws.aws_report_downloader.shutil')
+    @patch('masu.util.aws.common.get_assume_role_session',
+           return_value=FakeSession)
+    def test_download_file_check_size_fail(self, fake_session, fake_shutil):
+        fake_client = Mock()
+        fake_client.get_object.return_value = {'ContentLength': 123456,
+                                               'Body': io.BytesIO(b'\xd2\x02\x96I')}
+        fake_shutil.disk_usage.return_value = (10, 10, 1234567)
+
+        auth_credential = fake_arn(service='iam', generate_account_id=True)
+        downloader = AWSReportDownloader(self.fake_customer_name,
+                                         auth_credential,
+                                         self.fake_bucket_name)
+        downloader.s3_client = fake_client
+
+        fakekey = self.fake.file_path(depth=random.randint(1, 5),
+                                      extension='csv.gz')
+        with self.assertRaises(AWSReportDownloaderError):
+            downloader.download_file(fakekey)

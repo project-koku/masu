@@ -87,10 +87,6 @@ class AWSReportProcessorTest(MasuTestCase):
         with ReportingCommonDBAccessor() as report_common_db:
             cls.column_map = report_common_db.column_map
 
-        cls.accessor = AWSReportDBAccessor('acct10001', cls.column_map)
-        cls.report_schema = cls.accessor.report_schema
-        cls.session = cls.accessor._session
-
         _report_tables = copy.deepcopy(AWS_CUR_TABLE_MAP)
         _report_tables.pop('line_item_daily', None)
         _report_tables.pop('line_item_daily_summary', None)
@@ -103,8 +99,13 @@ class AWSReportProcessorTest(MasuTestCase):
 
     @classmethod
     def tearDownClass(cls):
-        cls.accessor.close_connections()
-        cls.accessor.close_session()
+        super().tearDownClass()
+
+    def setUp(self):
+        super().setUp()
+        self.accessor = AWSReportDBAccessor('acct10001', self.column_map)
+        self.report_schema = self.accessor.report_schema
+        self.session = self.accessor._session
 
     def tearDown(self):
         """Return the database to a pre-test state."""
@@ -117,6 +118,9 @@ class AWSReportProcessorTest(MasuTestCase):
         self.processor.processed_report.remove_processed_rows()
 
         self.processor.line_item_columns = None
+        self.accessor._session.rollback()
+        self.accessor.close_connections()
+        self.accessor.close_session()
 
     def test_initializer(self):
         """Test initializer."""

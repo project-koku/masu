@@ -37,6 +37,7 @@ from masu.config import Config
 from masu.database import AWS_CUR_TABLE_MAP, OCP_REPORT_TABLE_MAP
 from masu.database.aws_report_db_accessor import AWSReportDBAccessor
 from masu.database.ocp_report_db_accessor import OCPReportDBAccessor
+from masu.database.provider_db_accessor import ProviderDBAccessor
 from masu.database.reporting_common_db_accessor import ReportingCommonDBAccessor
 from masu.database.report_stats_db_accessor import ReportStatsDBAccessor
 from masu.external import AMAZON_WEB_SERVICES, OPENSHIFT_CONTAINER_PLATFORM
@@ -535,45 +536,28 @@ class TestUpdateSummaryTablesTask(MasuTestCase):
         cls.all_tables = list(AWS_CUR_TABLE_MAP.values()) +\
                               list(OCP_REPORT_TABLE_MAP.values())
         report_common_db = ReportingCommonDBAccessor()
-        column_map = report_common_db.column_map
+        cls.column_map = report_common_db.column_map
         report_common_db.close_session()
-        cls.schema_name = 'acct10001'
-        cls.aws_accessor = AWSReportDBAccessor(schema=cls.schema_name,
-                                               column_map=column_map)
-        cls.ocp_accessor = OCPReportDBAccessor(schema=cls.schema_name,
-                                               column_map=column_map)
-
-        cls.creator = ReportObjectCreator(
-            cls.aws_accessor,
-            column_map,
-            cls.aws_accessor.report_schema.column_types
-        )
 
     @classmethod
     def tearDownClass(cls):
         """Tear down the test class."""
-        cls.aws_accessor.close_connections()
-        cls.aws_accessor.close_session()
-        cls.ocp_accessor.close_connections()
-        cls.ocp_accessor.close_session()
         super().tearDownClass()
 
     def setUp(self):
         """Set up each test."""
         super().setUp()
-        if self.aws_accessor._conn.closed:
-            self.aws_accessor._conn = self.aws_accessor._db.connect()
-        if self.aws_accessor._pg2_conn.closed:
-            self.aws_accessor._pg2_conn = self.aws_accessor._get_psycopg2_connection()
-        if self.aws_accessor._cursor.closed:
-            self.aws_accessor._cursor = self.aws_accessor._get_psycopg2_cursor()
+        self.schema_name = 'acct10001'
+        self.aws_accessor = AWSReportDBAccessor(schema=self.schema_name,
+                                               column_map=self.column_map)
+        self.ocp_accessor = OCPReportDBAccessor(schema=self.schema_name,
+                                               column_map=self.column_map)
 
-        if self.ocp_accessor._conn.closed:
-            self.ocp_accessor._conn = self.ocp_accessor._db.connect()
-        if self.ocp_accessor._pg2_conn.closed:
-            self.ocp_accessor._pg2_conn = self.ocp_accessor._get_psycopg2_connection()
-        if self.ocp_accessor._cursor.closed:
-            self.ocp_accessor._cursor = self.ocp_accessor._get_psycopg2_cursor()
+        self.creator = ReportObjectCreator(
+            self.aws_accessor,
+            self.column_map,
+            self.aws_accessor.report_schema.column_types
+        )
 
         # Populate some line item data so that the summary tables
         # have something to pull from
@@ -595,9 +579,13 @@ class TestUpdateSummaryTablesTask(MasuTestCase):
                     pricing,
                     reservation
                 )
+        provider_ocp_uuid = '3c6e687e-1a09-4a05-970c-2ccf44b0952e'
+
+        with ProviderDBAccessor(provider_uuid=provider_ocp_uuid) as provider_accessor:
+            provider_id = provider_accessor.get_provider().id
 
         for period_date in (self.start_date, last_month):
-            period = self.creator.create_ocp_report_period(period_date)
+            period = self.creator.create_ocp_report_period(period_date, provider_id=provider_id)
             report = self.creator.create_ocp_report(period, period_date)
             for _ in range(25):
                 self.creator.create_ocp_usage_line_item(period, report)
@@ -605,6 +593,10 @@ class TestUpdateSummaryTablesTask(MasuTestCase):
     def tearDown(self):
         """Return the database to a pre-test state."""
         self.aws_accessor._session.rollback()
+        self.aws_accessor.close_connections()
+        self.aws_accessor.close_session()
+        self.ocp_accessor.close_connections()
+        self.ocp_accessor.close_session()
 
         for table_name in self.all_tables:
             tables = self.aws_accessor._get_db_obj_query(table_name).all()
@@ -724,19 +716,25 @@ class TestUpdateSummaryTablesTask(MasuTestCase):
         update_charge_info(schema_name='acct10001', provider_uuid=provider_ocp_uuid)
 
         table_name = OCP_REPORT_TABLE_MAP['line_item_daily_summary']
-        items = self.ocp_accessor._get_db_obj_query(table_name).all()
+        with ProviderDBAccessor(provider_ocp_uuid) as provider_accessor:
+            provider_obj = provider_accessor.get_provider()
+
+        usage_period_qry = self.ocp_accessor.get_usage_period_query_by_provider(provider_obj.id)
+        cluster_id = usage_period_qry.first().cluster_id
+
+        items = self.ocp_accessor._get_db_obj_query(table_name).filter_by(cluster_id=cluster_id)
         for item in items:
             self.assertIsNotNone(item.pod_charge_memory_gigabyte_hours)
             self.assertIsNotNone(item.pod_charge_cpu_core_hours)
 
         storage_daily_name = OCP_REPORT_TABLE_MAP['storage_line_item_daily']
-        items = self.ocp_accessor._get_db_obj_query(storage_daily_name).all()
+        items = self.ocp_accessor._get_db_obj_query(storage_daily_name).filter_by(cluster_id=cluster_id)
         for item in items:
             self.assertIsNotNone(item.volume_request_storage_byte_seconds)
             self.assertIsNotNone(item.persistentvolumeclaim_usage_byte_seconds)
 
         storage_summary_name = OCP_REPORT_TABLE_MAP['storage_line_item_daily_summary']
-        items = self.ocp_accessor._get_db_obj_query(storage_summary_name).all()
+        items = self.ocp_accessor._get_db_obj_query(storage_summary_name).filter_by(cluster_id=cluster_id)
         for item in items:
             self.assertIsNotNone(item.volume_request_storage_gigabyte_months)
             self.assertIsNotNone(item.persistentvolumeclaim_usage_gigabyte_months)

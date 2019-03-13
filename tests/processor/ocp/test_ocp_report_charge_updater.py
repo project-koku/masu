@@ -19,12 +19,15 @@
 from dateutil.relativedelta import relativedelta
 from unittest.mock import patch
 from decimal import Decimal
+import uuid
 
 import psycopg2
 
 from masu.database import OCP_REPORT_TABLE_MAP
 from masu.database.ocp_report_db_accessor import OCPReportDBAccessor
 from masu.database.reporting_common_db_accessor import ReportingCommonDBAccessor
+from masu.database.provider_db_accessor import ProviderDBAccessor
+from masu.external.date_accessor import DateAccessor
 from masu.processor.ocp.ocp_report_charge_updater import OCPReportChargeUpdater, OCPReportChargeUpdaterError
 from tests import MasuTestCase
 from tests.database.helpers import ReportObjectCreator
@@ -38,13 +41,13 @@ class OCPReportChargeUpdaterTest(MasuTestCase):
         """Set up the test class with required objects."""
         cls.common_accessor = ReportingCommonDBAccessor()
         cls.column_map = cls.common_accessor.column_map
+        cls.ocp_provider_uuid = '3c6e687e-1a09-4a05-970c-2ccf44b0952e'
         cls.accessor = OCPReportDBAccessor(
             schema='acct10001',
             column_map=cls.column_map
         )
-        cls.updater = OCPReportChargeUpdater(
-            schema='acct10001',
-            provider_uuid='6e212746-484a-40cd-bba0-09a19d132d64'
+        cls.provider_accessor = ProviderDBAccessor(
+            provider_uuid=cls.ocp_provider_uuid
         )
         cls.report_schema = cls.accessor.report_schema
         cls.creator = ReportObjectCreator(
@@ -68,10 +71,14 @@ class OCPReportChargeUpdaterTest(MasuTestCase):
             self.accessor._pg2_conn = self.accessor._get_psycopg2_connection()
         if self.accessor._cursor.closed:
             self.accessor._cursor = self.accessor._get_psycopg2_cursor()
-
-        reporting_period = self.creator.create_ocp_report_period()
+        provider_id = self.provider_accessor.get_provider().id
+        reporting_period = self.creator.create_ocp_report_period(provider_id=provider_id)
 
         report = self.creator.create_ocp_report(reporting_period, reporting_period.report_period_start)
+        self.updater = OCPReportChargeUpdater(
+            schema='acct10001',
+            provider_uuid=self.ocp_provider_uuid
+        )
         self.creator.create_ocp_usage_line_item(
             reporting_period,
             report
@@ -740,3 +747,35 @@ class OCPReportChargeUpdaterTest(MasuTestCase):
             #                  round(float(item.pod_charge_memory_gigabyte_hours), 6))
             self.assertIsNone(item.pod_charge_cpu_core_hours)
             self.assertIsNone(item.pod_charge_memory_gigabyte_hours)
+
+    def test_update_summary_charge_info_cpu_real_rates(self):
+        """Test that OCP charge information is updated for cpu from the right provider uuid."""
+        cpu_usage_rate = {'metric': 'cpu_core_usage_per_hour',
+                          'provider_uuid': self.ocp_provider_uuid,
+                          'rates': {'tiered_rate': [{'value': 1.5, 'unit': 'USD'}]}}
+        self.creator.create_rate(**cpu_usage_rate)
+
+        other_cpu_usage_rate = {'metric': 'cpu_core_usage_per_hour',
+                          'provider_uuid': '6e212746-484a-40cd-bba0-09a19d132d64',
+                          'rates': {'tiered_rate': [{'value': 2.5, 'unit': 'USD'}]}}
+        self.creator.create_rate(**other_cpu_usage_rate)
+
+        cpu_rate_value = float(cpu_usage_rate.get('rates').get('tiered_rate')[0].get('value'))
+
+        usage_period = self.accessor.get_current_usage_period()
+        start_date = usage_period.report_period_start.date() + relativedelta(days=-1)
+        end_date = usage_period.report_period_end.date() + relativedelta(days=+1)
+
+        self.accessor.populate_line_item_daily_table(start_date, end_date)
+        self.accessor.populate_line_item_daily_summary_table(start_date, end_date)
+        self.updater.update_summary_charge_info()
+
+        table_name = OCP_REPORT_TABLE_MAP['line_item_daily_summary']
+
+        items = self.accessor._get_db_obj_query(table_name).all()
+        for item in items:
+            cpu_usage_value = float(item.pod_usage_cpu_core_hours)
+            self.assertEqual(round(0.0, 5),
+                             round(float(item.pod_charge_memory_gigabyte_hours), 5))
+            self.assertEqual(round(cpu_usage_value*cpu_rate_value, 5),
+                             round(float(item.pod_charge_cpu_core_hours), 5))

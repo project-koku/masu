@@ -140,12 +140,13 @@ class OCPReportSummaryUpdaterTest(MasuTestCase):
         self.updater.update_summary_tables(
             start_date,
             end_date,
+            self.ocp_test_provider_uuid,
             manifest_id
         )
 
-        mock_daily.assert_called_with(expected_start_date, expected_end_date)
-        mock_storage_daily.assert_called_with(expected_start_date, expected_end_date)
-        mock_sum.assert_called_with(expected_start_date, expected_end_date)
+        mock_daily.assert_called_with(expected_start_date, expected_end_date, None)
+        mock_storage_daily.assert_called_with(expected_start_date, expected_end_date, None)
+        mock_sum.assert_called_with(expected_start_date, expected_end_date, None)
 
         with OCPReportDBAccessor('acct10001', self.column_map) as accessor:
             period = accessor.get_usage_periods_by_date(bill_date)[0]
@@ -186,12 +187,13 @@ class OCPReportSummaryUpdaterTest(MasuTestCase):
         self.updater.update_summary_tables(
             start_date,
             end_date,
+            self.ocp_test_provider_uuid,
             manifest_id
         )
 
-        mock_daily.assert_called_with(expected_start_date, expected_end_date)
-        mock_storage_daily.assert_called_with(expected_start_date, expected_end_date)
-        mock_sum.assert_called_with(expected_start_date, expected_end_date)
+        mock_daily.assert_called_with(expected_start_date, expected_end_date, None)
+        mock_storage_daily.assert_called_with(expected_start_date, expected_end_date, None)
+        mock_sum.assert_called_with(expected_start_date, expected_end_date, None)
 
         with OCPReportDBAccessor('acct10001', self.column_map) as accessor:
             period = accessor.get_usage_periods_by_date(bill_date)[0]
@@ -245,13 +247,14 @@ class OCPReportSummaryUpdaterTest(MasuTestCase):
         self.updater.update_summary_tables(
             start_date,
             end_date,
+            self.ocp_test_provider_uuid,
             manifest_id
         )
 
-        mock_daily.assert_called_with(expected_start_date, expected_end_date)
-        mock_storage_daily.assert_called_with(expected_start_date, expected_end_date)
-        mock_storage_summary.assert_called_with(expected_start_date, expected_end_date)
-        mock_sum.assert_called_with(expected_start_date, expected_end_date)
+        mock_daily.assert_called_with(expected_start_date, expected_end_date, None)
+        mock_storage_daily.assert_called_with(expected_start_date, expected_end_date, None)
+        mock_storage_summary.assert_called_with(expected_start_date, expected_end_date, None)
+        mock_sum.assert_called_with(expected_start_date, expected_end_date, None)
 
         with OCPReportDBAccessor('acct10001', self.column_map) as accessor:
             period = accessor.get_usage_periods_by_date(bill_date)[0]
@@ -287,13 +290,14 @@ class OCPReportSummaryUpdaterTest(MasuTestCase):
         self.updater.update_summary_tables(
             start_date,
             end_date,
+            self.ocp_test_provider_uuid,
             manifest_id
         )
 
-        mock_daily.assert_called_with(expected_start_date, expected_end_date)
-        mock_storage_daily.assert_called_with(expected_start_date, expected_end_date)
-        mock_storage_summary.assert_called_with(expected_start_date, expected_end_date)
-        mock_sum.assert_called_with(expected_start_date, expected_end_date)
+        mock_daily.assert_called_with(expected_start_date, expected_end_date, None)
+        mock_storage_daily.assert_called_with(expected_start_date, expected_end_date, None)
+        mock_storage_summary.assert_called_with(expected_start_date, expected_end_date, None)
+        mock_sum.assert_called_with(expected_start_date, expected_end_date, None)
 
         with OCPReportDBAccessor('acct10001', self.column_map) as accessor:
             period = accessor.get_usage_periods_by_date(bill_date)[0]
@@ -337,6 +341,7 @@ class OCPReportSummaryUpdaterTest(MasuTestCase):
         self.updater.update_summary_tables(
             start_date,
             end_date,
+            self.ocp_test_provider_uuid,
             manifest_id
         )
 
@@ -372,13 +377,14 @@ class OCPReportSummaryUpdaterTest(MasuTestCase):
 
         self.updater.update_summary_tables(
             start_date,
-            end_date
+            end_date,
+            self.ocp_test_provider_uuid
         )
 
-        mock_daily.assert_called_with(expected_start_date, expected_end_date)
-        mock_storage_daily.assert_called_with(expected_start_date, expected_end_date)
-        mock_storage_summary.assert_called_with(expected_start_date, expected_end_date)
-        mock_sum.assert_called_with(expected_start_date, expected_end_date)
+        mock_daily.assert_called_with(expected_start_date, expected_end_date, None)
+        mock_storage_daily.assert_called_with(expected_start_date, expected_end_date, None)
+        mock_storage_summary.assert_called_with(expected_start_date, expected_end_date, None)
+        mock_sum.assert_called_with(expected_start_date, expected_end_date, None)
 
         with OCPReportDBAccessor('acct10001', self.column_map) as accessor:
             period = accessor.get_usage_periods_by_date(bill_date)[0]
@@ -410,6 +416,7 @@ class OCPReportSummaryUpdaterTest(MasuTestCase):
         self.updater.update_summary_tables(
             start_date,
             end_date,
+            self.ocp_test_provider_uuid,
             manifest_id
         )
 

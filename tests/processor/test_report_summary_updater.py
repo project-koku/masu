@@ -18,6 +18,7 @@
 """Test the ReportSummaryUpdater object."""
 
 import datetime
+import uuid
 from unittest.mock import patch
 
 import pytz
@@ -48,40 +49,37 @@ class ReportSummaryUpdaterTest(MasuTestCase):
     @patch('masu.processor.report_summary_updater.AWSReportSummaryUpdater.update_summary_tables')
     def test_aws_route(self, mock_update):
         """Test that AWS report updating works as expected."""
-        provider = AMAZON_WEB_SERVICES
-        updater = ReportSummaryUpdater(self.schema, provider)
+        updater = ReportSummaryUpdater(self.schema, self.aws_test_provider_uuid)
         self.assertIsInstance(updater._updater, AWSReportSummaryUpdater)
         updater.update_summary_tables(self.today, self.tomorrow)
-        mock_update.assert_called_with(self.today, self.tomorrow, None)
+        mock_update.assert_called_with(self.today, self.tomorrow, self.aws_test_provider_uuid, None)
 
     @patch('masu.processor.report_summary_updater.AWSReportSummaryUpdater.update_summary_tables')
     def test_aws_local_route(self, mock_update):
         """Test that AWS Local report updating works as expected."""
-        provider = AWS_LOCAL_SERVICE_PROVIDER
-        updater = ReportSummaryUpdater(self.schema, provider)
+        updater = ReportSummaryUpdater(self.schema, self.aws_test_provider_uuid)
         self.assertIsInstance(updater._updater, AWSReportSummaryUpdater)
         updater.update_summary_tables(self.today, self.tomorrow)
-        mock_update.assert_called_with(self.today, self.tomorrow, None)
+        mock_update.assert_called_with(self.today, self.tomorrow, self.aws_test_provider_uuid, None)
 
     @patch('masu.processor.report_summary_updater.OCPReportSummaryUpdater.update_summary_tables')
     def test_ocp_route(self, mock_update):
         """Test that OCP report updating works as expected."""
-        provider = OPENSHIFT_CONTAINER_PLATFORM
-        updater = ReportSummaryUpdater(self.schema, provider)
+        updater = ReportSummaryUpdater(self.schema, self.ocp_test_provider_uuid)
         self.assertIsInstance(updater._updater, OCPReportSummaryUpdater)
         updater.update_summary_tables(self.today, self.tomorrow)
-        mock_update.assert_called_with(self.today, self.tomorrow, None)
+        mock_update.assert_called_with(self.today, self.tomorrow, self.ocp_test_provider_uuid, None)
 
     @patch('masu.processor.report_summary_updater.OCPReportSummaryUpdater.update_summary_tables')
     def test_ocp_local_route(self, mock_update):
         """Test that OCP Local report updating works as expected."""
-        provider = OCP_LOCAL_SERVICE_PROVIDER
-        updater = ReportSummaryUpdater(self.schema, provider)
+        updater = ReportSummaryUpdater(self.schema, self.ocp_test_provider_uuid)
         self.assertIsInstance(updater._updater, OCPReportSummaryUpdater)
         updater.update_summary_tables(self.today, self.tomorrow)
-        mock_update.assert_called_with(self.today, self.tomorrow, None)
+        mock_update.assert_called_with(self.today, self.tomorrow, self.ocp_test_provider_uuid, None)
 
     def test_bad_provider(self):
         """Test that an unimplemented provider throws an error."""
         with self.assertRaises(ReportSummaryUpdaterError):
-            updater = ReportSummaryUpdater(self.schema, 'UnimplementedProvider')
+            random_uuid = str(uuid.uuid4())
+            updater = ReportSummaryUpdater(self.schema, random_uuid)

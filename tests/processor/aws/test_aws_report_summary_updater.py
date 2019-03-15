@@ -142,6 +142,7 @@ class AWSReportSummaryUpdaterTest(MasuTestCase):
         self.updater.update_summary_tables(
             start_date,
             end_date,
+            self.aws_test_provider_uuid,
             manifest_id
         )
 
@@ -186,6 +187,7 @@ class AWSReportSummaryUpdaterTest(MasuTestCase):
         self.updater.update_summary_tables(
             start_date,
             end_date,
+            self.aws_test_provider_uuid,
             manifest_id
         )
 
@@ -242,6 +244,7 @@ class AWSReportSummaryUpdaterTest(MasuTestCase):
         self.updater.update_summary_tables(
             start_date,
             end_date,
+            self.aws_test_provider_uuid,
             manifest_id
         )
 
@@ -285,6 +288,7 @@ class AWSReportSummaryUpdaterTest(MasuTestCase):
         self.updater.update_summary_tables(
             start_date,
             end_date,
+            self.aws_test_provider_uuid,
             manifest_id
         )
 
@@ -330,6 +334,7 @@ class AWSReportSummaryUpdaterTest(MasuTestCase):
         self.updater.update_summary_tables(
             start_date,
             end_date,
+            self.aws_test_provider_uuid,
             manifest_id
         )
 
@@ -374,6 +379,7 @@ class AWSReportSummaryUpdaterTest(MasuTestCase):
         self.updater.update_summary_tables(
             start_date,
             end_date,
+            self.aws_test_provider_uuid,
             manifest_id
         )
 
@@ -406,7 +412,8 @@ class AWSReportSummaryUpdaterTest(MasuTestCase):
 
         self.updater.update_summary_tables(
             start_date,
-            end_date
+            end_date,
+            self.aws_test_provider_uuid,
         )
 
         mock_daily.assert_called_with(expected_start_date, expected_end_date)

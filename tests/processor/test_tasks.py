@@ -533,6 +533,8 @@ class TestUpdateSummaryTablesTask(MasuTestCase):
     def setUpClass(cls):
         """Setup for the class."""
         super().setUpClass()
+        cls.aws_tables = list(AWS_CUR_TABLE_MAP.values())
+        cls.ocp_tables = list(OCP_REPORT_TABLE_MAP.values())
         cls.all_tables = list(AWS_CUR_TABLE_MAP.values()) +\
                               list(OCP_REPORT_TABLE_MAP.values())
         report_common_db = ReportingCommonDBAccessor()
@@ -584,32 +586,39 @@ class TestUpdateSummaryTablesTask(MasuTestCase):
         with ProviderDBAccessor(provider_uuid=provider_ocp_uuid) as provider_accessor:
             provider_id = provider_accessor.get_provider().id
 
+        cluster_id = 'testcluster'
         for period_date in (self.start_date, last_month):
-            period = self.creator.create_ocp_report_period(period_date, provider_id=provider_id)
+            period = self.creator.create_ocp_report_period(period_date, provider_id=provider_id,
+                                                           cluster_id=cluster_id)
             report = self.creator.create_ocp_report(period, period_date)
             for _ in range(25):
                 self.creator.create_ocp_usage_line_item(period, report)
 
     def tearDown(self):
         """Return the database to a pre-test state."""
+        for table_name in self.aws_tables:
+            tables = self.aws_accessor._get_db_obj_query(table_name).all()
+            for table in tables:
+                self.aws_accessor._session.delete(table)
+        self.aws_accessor.commit()
+        for table_name in self.ocp_tables:
+            tables = self.ocp_accessor._get_db_obj_query(table_name).all()
+            for table in tables:
+                self.ocp_accessor._session.delete(table)
+        self.ocp_accessor.commit()
+
         self.aws_accessor._session.rollback()
         self.aws_accessor.close_connections()
         self.aws_accessor.close_session()
         self.ocp_accessor.close_connections()
         self.ocp_accessor.close_session()
-
-        for table_name in self.all_tables:
-            tables = self.aws_accessor._get_db_obj_query(table_name).all()
-            for table in tables:
-                self.aws_accessor._session.delete(table)
-        self.aws_accessor.commit()
         super().tearDown()
 
     @patch('masu.processor.tasks.update_charge_info')
     def test_update_summary_tables_aws(self, mock_charge_info):
         """Test that the summary table task runs."""
         provider = 'AWS'
-        provider_aws_uuid = None
+        provider_aws_uuid = self.aws_test_provider_uuid
 
         daily_table_name = AWS_CUR_TABLE_MAP['line_item_daily']
         summary_table_name = AWS_CUR_TABLE_MAP['line_item_daily_summary']
@@ -708,7 +717,6 @@ class TestUpdateSummaryTablesTask(MasuTestCase):
         initial_daily_count = daily_query.count()
 
         self.assertEqual(initial_daily_count, 0)
-
         update_summary_tables(self.schema_name, provider, provider_ocp_uuid, start_date)
 
         self.assertNotEqual(daily_query.count(), initial_daily_count)

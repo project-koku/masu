@@ -149,10 +149,10 @@
         },
         "kafka-python": {
             "hashes": [
-                "sha256:078acdcd1fc6eddacc46d437c664998b4cf7613b7e79ced66a460965f2648f88",
-                "sha256:0b56f286b674dcb331d80c1d39a01a753cc3acc962bee707da5f207db74f0a26"
+                "sha256:3100c10601c7a5ddd744186a26148432a4dd0d99f003e90bf6f3bdfd1c9d5406",
+                "sha256:8023700c350e2dcfc4ea820b42d3c3c2074859c9d98770a91fee5d7da67fc335"
             ],
-            "version": "==1.4.3"
+            "version": "==1.4.5"
         },
         "kombu": {
             "hashes": [

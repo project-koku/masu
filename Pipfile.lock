@@ -537,11 +537,10 @@
         },
         "pyfakefs": {
             "hashes": [
-                "sha256:1f3d589a20150fdf106cdad6de14817a362e4c6a5ca31a0fcdaec127c6b9aa88",
-                "sha256:8969435f8e7ca10f60c22096b02b15ad3af143de7d3bb4d73507b812bcdd8e37"
+                "sha256:39f1a39ed3b61def03aa4f3c38c4322273b18834e0b3cc0a200b33f36f7a4321",
+                "sha256:8cd2270d65d3316dd4dc6bb83242df2e0990d27605209bc16e8041bcc0956961"
             ],
-            "index": "pypi",
-            "version": "==3.5.7"
+            "version": "==3.5.8"
         },
         "pylint": {
             "hashes": [

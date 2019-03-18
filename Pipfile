@@ -34,7 +34,7 @@ tox = "==3.7.0"
 faker = "==1.0.4"
 pyfakefs = "==3.5.8"
 flower = "==0.9.3"
-responses = "==0.10.5"
+responses = "==0.10.6"
 
 
 [requires]

@@ -8,7 +8,7 @@ name = "pypi"
 [packages]
 
 aiokafka = "==0.5.1"
-boto3 = "==1.9.111"
+boto3 = "==1.9.115"
 flask = "==1.0.2"
 psycopg2-binary = ">=2.7.0"
 gunicorn = "==19.9.0"
@@ -24,6 +24,7 @@ soupsieve = "==1.8"
 
 
 [dev-packages]
+
 pylint = "==2.2.2"
 astroid = "==2.1.0"
 coverage = "==4.5.2"

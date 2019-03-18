@@ -24,6 +24,7 @@ from decimal import Decimal
 import gzip
 from itertools import islice
 import json
+import logging
 import random
 import shutil
 import tempfile
@@ -35,11 +36,13 @@ from sqlalchemy.sql import func
 from masu.config import Config
 from masu.database import AWS_CUR_TABLE_MAP
 from masu.database.aws_report_db_accessor import AWSReportDBAccessor
+from masu.database.report_manifest_db_accessor import ReportManifestDBAccessor
 from masu.database.report_stats_db_accessor import ReportStatsDBAccessor
 from tests.database.helpers import ReportObjectCreator
 from masu.database.reporting_common_db_accessor import ReportingCommonDBAccessor
 from masu.exceptions import MasuProcessingError
 from masu.external import GZIP_COMPRESSED, UNCOMPRESSED
+from masu.external.date_accessor import DateAccessor
 from masu.processor.aws.aws_report_processor import AWSReportProcessor, ProcessedReport
 import masu.util.common as common_util
 from tests import MasuTestCase
@@ -84,6 +87,23 @@ class AWSReportProcessorTest(MasuTestCase):
             provider_id=1
         )
 
+        cls.date_accessor = DateAccessor()
+        billing_start = cls.date_accessor.today_with_timezone('UTC').replace(
+            year=2018,
+            month=6,
+            day=1,
+            hour=0,
+            minute=0,
+            second=0
+        )
+        cls.manifest_dict = {
+            'assembly_id': '1234',
+            'billing_period_start_datetime': billing_start,
+            'num_total_files': 2,
+            'provider_id': 1
+        }
+        cls.manifest_accessor = ReportManifestDBAccessor()
+
         with ReportingCommonDBAccessor() as report_common_db:
             cls.column_map = report_common_db.column_map
 
@@ -99,6 +119,7 @@ class AWSReportProcessorTest(MasuTestCase):
 
     @classmethod
     def tearDownClass(cls):
+        cls.manifest_accessor.close_session()
         super().tearDownClass()
 
     def setUp(self):
@@ -106,6 +127,10 @@ class AWSReportProcessorTest(MasuTestCase):
         self.accessor = AWSReportDBAccessor('acct10001', self.column_map)
         self.report_schema = self.accessor.report_schema
         self.session = self.accessor._session
+
+
+        self.manifest = self.manifest_accessor.add(self.manifest_dict)
+        self.manifest_accessor.commit()
 
     def tearDown(self):
         """Return the database to a pre-test state."""
@@ -116,6 +141,11 @@ class AWSReportProcessorTest(MasuTestCase):
         self.accessor._pg2_conn.commit()
 
         self.processor.processed_report.remove_processed_rows()
+
+        manifests = self.manifest_accessor._get_db_obj_query().all()
+        for manifest in manifests:
+            self.manifest_accessor.delete(manifest)
+        self.manifest_accessor.commit()
 
         self.processor.line_item_columns = None
         self.accessor._session.rollback()
@@ -152,7 +182,8 @@ class AWSReportProcessorTest(MasuTestCase):
             schema_name='acct10001',
             report_path=self.test_report,
             compression=UNCOMPRESSED,
-            provider_id=1
+            provider_id=1,
+            manifest_id=self.manifest.id
         )
         report_db = self.accessor
         report_schema = report_db.report_schema
@@ -161,7 +192,12 @@ class AWSReportProcessorTest(MasuTestCase):
             count = report_db._session.query(table).count()
             counts[table_name] = count
 
-        processor.process()
+        bill_date = self.manifest.billing_period_start_datetime.date()
+        expected = f'INFO:masu.processor.aws.aws_report_processor:Deleting data for schema: acct10001 and bill date: {bill_date}'
+        logging.disable(logging.NOTSET) # We are currently disabling all logging below CRITICAL in masu/__init__.py
+        with self.assertLogs('masu.processor.aws.aws_report_processor', level='INFO') as logger:
+            processor.process()
+            self.assertIn(expected, logger.output)
 
         for table_name in self.report_tables:
             table = getattr(report_schema, table_name)
@@ -221,6 +257,9 @@ class AWSReportProcessorTest(MasuTestCase):
             count = report_db._session.query(table).count()
             counts[table_name] = count
 
+        # Wipe stale data
+        self.accessor._get_db_obj_query(AWS_CUR_TABLE_MAP['line_item']).delete()
+
         processor = AWSReportProcessor(
             schema_name='acct10001',
             report_path=self.test_report,
@@ -275,6 +314,9 @@ class AWSReportProcessorTest(MasuTestCase):
 
         table = getattr(report_schema, table_name)
         orig_count = report_db._session.query(table).count()
+
+        # Wipe stale data
+        self.accessor._get_db_obj_query(table_name).delete()
 
         processor = AWSReportProcessor(
             schema_name='acct10001',
@@ -333,6 +375,9 @@ class AWSReportProcessorTest(MasuTestCase):
 
         table = getattr(report_schema, table_name)
         orig_count = report_db._session.query(table).count()
+
+        # Wipe stale data
+        self.accessor._get_db_obj_query(table_name).delete()
 
         processor = AWSReportProcessor(
             schema_name='acct10001',
@@ -617,11 +662,6 @@ class AWSReportProcessorTest(MasuTestCase):
         if self.processor.processed_report.line_items:
             line_item = self.processor.processed_report.line_items[-1]
 
-        data = copy.deepcopy(line_item)
-        data.pop('hash')
-        data_str = self.processor._create_line_item_hash_string(data)
-        hash_str = self.processor.hasher.hash_string_to_hex(data_str)
-
         self.assertIsNotNone(line_item)
         self.assertIn('tags', line_item)
         self.assertEqual(line_item.get('cost_entry_id'), cost_entry_id)
@@ -632,7 +672,6 @@ class AWSReportProcessorTest(MasuTestCase):
             line_item.get('cost_entry_reservation_id'),
             reservation_id
         )
-        self.assertEqual(line_item.get('hash'), hash_str)
 
         self.assertIsNotNone(self.processor.line_item_columns)
 
@@ -801,43 +840,6 @@ class AWSReportProcessorTest(MasuTestCase):
 
         self.assertEqual(product_id, expected_id)
 
-    def test_create_line_item_hash_string(self):
-        """Test that a hash string is properly formatted."""
-        bill_id = self.processor._create_cost_entry_bill(self.row, self.accessor)
-        cost_entry_id = self.processor._create_cost_entry(self.row, bill_id, self.accessor)
-        product_id = self.processor._create_cost_entry_product(self.row, self.accessor)
-        pricing_id = self.processor._create_cost_entry_pricing(self.row, self.accessor)
-        reservation_id = self.processor._create_cost_entry_reservation(self.row, self.accessor)
-
-        self.accessor.commit()
-
-        self.processor._create_cost_entry_line_item(
-            self.row,
-            cost_entry_id,
-            bill_id,
-            product_id,
-            pricing_id,
-            reservation_id,
-            self.accessor
-        )
-
-        line_item = None
-        if self.processor.processed_report.line_items:
-            line_item = self.processor.processed_report.line_items[-1]
-
-        line_item = common_util.stringify_json_data(copy.deepcopy(line_item))
-        line_item.pop('hash')
-        data = [line_item.get(column, 'None')
-                for column in self.processor.hash_columns]
-        expected = ':'.join(data)
-
-        result = self.processor._create_line_item_hash_string(line_item)
-
-        self.assertEqual(result, expected)
-        result = self.processor._create_line_item_hash_string(line_item)
-
-        self.assertEqual(result, expected)
-
     def test_remove_temp_cur_files(self):
         """Test to remove temporary cost usage files."""
         cur_dir = tempfile.mkdtemp()
@@ -875,3 +877,102 @@ class AWSReportProcessorTest(MasuTestCase):
         )
         self.assertEqual(sorted(removed_files), sorted(expected_delete_list))
         shutil.rmtree(cur_dir)
+
+    def test_check_for_finalized_bill_bill_is_finalized(self):
+        """Verify that a file with invoice_id is marked as finalzed."""
+        data = []
+        table_name = AWS_CUR_TABLE_MAP['line_item']
+
+        with open(self.test_report, 'r') as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                data.append(row)
+
+        for row in data:
+            row['bill/InvoiceId'] = '12345'
+
+        tmp_file = '/tmp/test_process_finalized_rows.csv'
+        field_names = data[0].keys()
+
+        with open(tmp_file, 'w') as f:
+            writer = csv.DictWriter(f, fieldnames=field_names)
+            writer.writeheader()
+            writer.writerows(data)
+
+        processor = AWSReportProcessor(
+            schema_name='acct10001',
+            report_path=tmp_file,
+            compression=UNCOMPRESSED,
+            provider_id=1
+        )
+
+        result = processor._check_for_finalized_bill()
+
+        self.assertTrue(result)
+
+    def test_check_for_finalized_bill_bill_not_finalized(self):
+        """Verify that a file without invoice_id is not marked as finalzed."""
+
+        processor = AWSReportProcessor(
+            schema_name='acct10001',
+            report_path=self.test_report,
+            compression=UNCOMPRESSED,
+            provider_id=1
+        )
+
+        result = processor._check_for_finalized_bill()
+
+        self.assertFalse(result)
+
+    def test_delete_line_items_success(self):
+        """Test that data is deleted before processing a manifest."""
+        processor = AWSReportProcessor(
+            schema_name='acct10001',
+            report_path=self.test_report,
+            compression=UNCOMPRESSED,
+            provider_id=1,
+            manifest_id=self.manifest.id
+        )
+        processor.process()
+        result = processor._delete_line_items()
+
+        bills = self.accessor.get_cost_entry_bills()
+        for bill_id in bills.values():
+            line_item_query = self.accessor.get_lineitem_query_for_billid(bill_id)
+            self.assertTrue(result)
+            self.assertEqual(line_item_query.count(), 0)
+
+    def test_delete_line_items_not_first_file_in_manifest(self):
+        """Test that data is not deleted once a file has been processed."""
+        self.manifest.num_processed_files = 1
+        self.manifest_accessor.commit()
+        processor = AWSReportProcessor(
+            schema_name='acct10001',
+            report_path=self.test_report,
+            compression=UNCOMPRESSED,
+            provider_id=1,
+            manifest_id=self.manifest.id
+        )
+        processor.process()
+        result = processor._delete_line_items()
+        bills = self.accessor.get_cost_entry_bills()
+        for bill_id in bills.values():
+            line_item_query = self.accessor.get_lineitem_query_for_billid(bill_id)
+            self.assertFalse(result)
+            self.assertNotEqual(line_item_query.count(), 0)
+
+    def test_delete_line_items_no_manifest(self):
+        """Test that no data is deleted without a manifest id."""
+        processor = AWSReportProcessor(
+            schema_name='acct10001',
+            report_path=self.test_report,
+            compression=UNCOMPRESSED,
+            provider_id=1
+        )
+        processor.process()
+        result = processor._delete_line_items()
+        bills = self.accessor.get_cost_entry_bills()
+        for bill_id in bills.values():
+            line_item_query = self.accessor.get_lineitem_query_for_billid(bill_id)
+            self.assertFalse(result)
+            self.assertNotEqual(line_item_query.count(), 0)

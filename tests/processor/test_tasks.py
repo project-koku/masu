@@ -392,7 +392,6 @@ class TestProcessorTasks(MasuTestCase):
         """
 
 
-        mock_process_files.delay = Mock()
         mock_get_files.return_value = self.fake_reports
 
         mock_started.return_value = self.today
@@ -402,7 +401,8 @@ class TestProcessorTasks(MasuTestCase):
 
         mock_completed.return_value = None
         get_report_files(**self.fake_get_report_args)
-        mock_process_files.delay.assert_not_called()
+
+        mock_process_files.assert_not_called()
 
     @patch('masu.processor.tasks.ReportStatsDBAccessor.get_last_completed_datetime')
     @patch('masu.processor.tasks.ReportStatsDBAccessor.get_last_started_datetime')
@@ -444,7 +444,6 @@ class TestProcessorTasks(MasuTestCase):
         Test that the chained task is not called when no end time is set since
         processing is in progress but completion timeout has not been reached.
         """
-        mock_process_files.delay = Mock()
         mock_get_files.return_value = self.fake_reports
 
         mock_started.return_value = self.today
@@ -453,7 +452,7 @@ class TestProcessorTasks(MasuTestCase):
         mock_date.return_value = self.today + timedelta(hours=1)
 
         get_report_files(**self.fake_get_report_args)
-        mock_process_files.delay.assert_not_called()
+        mock_process_files.assert_not_called()
 
     @patch('masu.processor.tasks.ReportStatsDBAccessor.get_last_completed_datetime')
     @patch('masu.processor.tasks.ReportStatsDBAccessor.get_last_started_datetime')

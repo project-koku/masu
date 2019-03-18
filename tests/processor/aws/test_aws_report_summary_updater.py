@@ -71,6 +71,9 @@ class AWSReportSummaryUpdaterTest(MasuTestCase):
     @classmethod
     def tearDownClass(cls):
         """Tear down the test class."""
+        cls.manifest_accessor.close_session()
+        cls.accessor.close_connections()
+        cls.accessor.close_session()
         super().tearDownClass()
 
     def setUp(self):
@@ -292,14 +295,14 @@ class AWSReportSummaryUpdaterTest(MasuTestCase):
             manifest_id
         )
 
-        mock_daily.assert_called_with(expected_start_date, expected_end_date)
-        mock_summary.assert_called_with(expected_start_date, expected_end_date)
-        mock_ocp.assert_called_with(expected_start_date, expected_end_date)
+        mock_daily.assert_not_called()
+        mock_summary.assert_not_called()
+        mock_ocp.assert_not_called()
 
         with AWSReportDBAccessor('acct10001', self.column_map) as accessor:
             bill = accessor.get_cost_entry_bills_by_date(bill_date)[0]
-            self.assertIsNotNone(bill.summary_data_creation_datetime)
-            self.assertIsNotNone(bill.summary_data_updated_datetime)
+            self.assertIsNone(bill.summary_data_creation_datetime)
+            self.assertIsNone(bill.summary_data_updated_datetime)
 
     @patch('masu.processor.aws.aws_report_summary_updater.AWSReportDBAccessor.populate_ocp_on_aws_cost_daily_summary')
     @patch('masu.processor.aws.aws_report_summary_updater.AWSReportDBAccessor.populate_line_item_daily_summary_table')
@@ -383,14 +386,14 @@ class AWSReportSummaryUpdaterTest(MasuTestCase):
             manifest_id
         )
 
-        mock_daily.assert_called_with(expected_start_date, expected_end_date)
-        mock_summary.assert_called_with(expected_start_date, expected_end_date)
-        mock_ocp.assert_called_with(expected_start_date, expected_end_date)
+        mock_daily.assert_not_called()
+        mock_summary.assert_not_called()
+        mock_ocp.assert_not_called()
 
         with AWSReportDBAccessor('acct10001', self.column_map) as accessor:
             bill = accessor.get_cost_entry_bills_by_date(bill_date)[0]
-            self.assertIsNotNone(bill.summary_data_creation_datetime)
-            self.assertIsNotNone(bill.summary_data_updated_datetime)
+            self.assertIsNone(bill.summary_data_creation_datetime)
+            self.assertIsNone(bill.summary_data_updated_datetime)
 
     @patch('masu.processor.aws.aws_report_summary_updater.AWSReportDBAccessor.populate_ocp_on_aws_cost_daily_summary')
     @patch('masu.processor.aws.aws_report_summary_updater.AWSReportDBAccessor.populate_line_item_daily_summary_table')

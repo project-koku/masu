@@ -71,6 +71,9 @@ class OCPReportSummaryUpdaterTest(MasuTestCase):
     @classmethod
     def tearDownClass(cls):
         """Tear down the test class."""
+        cls.manifest_accessor.close_session()
+        cls.accessor.close_connections()
+        cls.accessor.close_session()
         super().tearDownClass()
 
     def setUp(self):

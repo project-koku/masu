@@ -385,3 +385,37 @@ class AWSReportDownloaderTest(MasuTestCase):
                                       extension='csv.gz')
         with self.assertRaises(AWSReportDownloaderError):
             downloader.download_file(fakekey)
+
+    @patch('masu.util.aws.common.get_assume_role_session',
+           return_value=FakeSession)
+    def test_download_file_raise_downloader_err(self, fake_session):
+        fake_response = {'Error': {'Code': self.fake.word()}}
+        fake_client = Mock()
+        fake_client.get_object.side_effect = ClientError(fake_response,
+                                                         'masu-test')
+
+        auth_credential = fake_arn(service='iam', generate_account_id=True)
+        downloader = AWSReportDownloader(self.fake_customer_name,
+                                         auth_credential,
+                                         self.fake_bucket_name)
+        downloader.s3_client = fake_client
+
+        with self.assertRaises(AWSReportDownloaderError):
+            downloader.download_file(self.fake.file_path())
+
+    @patch('masu.util.aws.common.get_assume_role_session',
+           return_value=FakeSession)
+    def test_download_file_raise_nofile_err(self, fake_session):
+        fake_response = {'Error': {'Code': 'NoSuchKey'}}
+        fake_client = Mock()
+        fake_client.get_object.side_effect = ClientError(fake_response,
+                                                         'masu-test')
+
+        auth_credential = fake_arn(service='iam', generate_account_id=True)
+        downloader = AWSReportDownloader(self.fake_customer_name,
+                                         auth_credential,
+                                         self.fake_bucket_name)
+        downloader.s3_client = fake_client
+
+        with self.assertRaises(AWSReportDownloaderNoFileError):
+            downloader.download_file(self.fake.file_path())

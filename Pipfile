@@ -8,7 +8,7 @@ name = "pypi"
 [packages]
 
 aiokafka = "==0.5.1"
-boto3 = "==1.9.111"
+boto3 = "==1.9.115"
 flask = "==1.0.2"
 psycopg2-binary = ">=2.7.0"
 gunicorn = "==19.9.0"
@@ -24,16 +24,17 @@ soupsieve = "==1.8"
 
 
 [dev-packages]
-pylint = "==2.2.2"
-astroid = "==2.1.0"
-coverage = "==4.5.2"
+
+pylint = "==2.3.1"
+astroid = "==2.2.5"
+coverage = "==4.5.3"
 codecov = "==2.0.15"
 requests-mock = "==1.5.2"
 tox = "==3.7.0"
-faker = "==1.0.2"
-pyfakefs = "==3.5.7"
-flower = "==0.9.2"
-responses = "==0.10.5"
+faker = "==1.0.4"
+pyfakefs = "==3.5.8"
+flower = "==0.9.3"
+responses = "==0.10.6"
 
 
 [requires]

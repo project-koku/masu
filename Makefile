@@ -159,6 +159,13 @@ oc-create-scheduler: oc-create-configmap oc-create-secrets
 		-p SOURCE_REPOSITORY_REF=$(shell git rev-parse --abbrev-ref HEAD) \
 	| oc create -f -
 
+oc-create-monitor: oc-create-configmap oc-create-secrets
+	oc get bc/masu-monitor dc/masu-monitor || \
+	oc process -f $(TOPDIR)/openshift/monitor.yaml \
+		--param-file=$(TOPDIR)/openshift/monitor.env \
+		-p SOURCE_REPOSITORY_REF=$(shell git rev-parse --abbrev-ref HEAD) \
+	| oc create -f -
+
 oc-delete-scheduler:
 	oc delete deploymentconfigs/masu-scheduler  \
 		buildconfigs/masu-scheduler \

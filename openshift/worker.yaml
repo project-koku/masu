@@ -77,6 +77,23 @@ objects:
     - github:
         secret: ${GITHUB_WEBHOOK_SECRET}
       type: GitHub
+- kind: Service
+  apiVersion: v1
+  metadata:
+    annotations:
+      description: Masu worker statistics
+      prometheus.io/scrape: 'true'
+      prometheus.io/path: /metrics
+      prometheus.io/port: '9999'
+    name: masu-stats
+    labels:
+      app: ${NAME}-worker
+  spec:
+    ports:
+    - port: 9999
+      name: stats
+    selector:
+      app: masu
 - kind: StatefulSet
   apiVersion: apps/v1beta1
   metadata:
@@ -111,6 +128,9 @@ objects:
         containers:
         - name: ${NAME}-worker
           image: ${NAME}-worker
+          ports:
+          - containerPort: 9999
+            name: stats
           command:
             - /bin/bash
             - -c

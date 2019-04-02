@@ -9,7 +9,7 @@ services:
       ports:
           - "${RABBITMQ_PORT-5673}:5672"
 
-  server:
+  masu-server:
       build:
           context: .
           dockerfile: Dockerfile
@@ -42,7 +42,7 @@ services:
       links:
         - rabbit
 
-  worker:
+  masu-worker:
       build:
           context: .
           dockerfile: Dockerfile
@@ -66,10 +66,45 @@ services:
         - MASU_RETAIN_NUM_MONTHS
         - MASU_DEBUG
       privileged: true
+      ports:
+          - "9999:9999"
       volumes:
         - '.:/masu/'
         # - '~/aws_local:/tmp/local_bucket'
         # - '~/insights_local:/var/tmp/insights_local'
+      links:
+          - rabbit
+      depends_on:
+          - rabbit
+
+  prometheus:
+      hostname: prometheus
+      image: prom/prometheus:latest
+      ports:
+          - "9090:9090"
+      volumes:
+        - './docker_resources/prometheus/:/etc/prometheus/'
+
+  grafana:
+      image: grafana/grafana
+      ports:
+          - "3000:3000"
+      volumes:
+        - './docker_resources/grafana/provisioning/:/etc/grafana/provisioning/'
+      depends_on:
+        - prometheus
+
+  monitor:
+      build:
+          context: .
+          dockerfile: Dockerfile
+      working_dir: /masu
+      entrypoint: ['celery-prometheus-exporter', '--enable-events', '--broker=amqp://rabbit:5672//', '--verbose']
+      privileged: true
+      ports:
+          - "8888:8888"
+      volumes:
+        - '.:/masu/'
       links:
           - rabbit
       depends_on:

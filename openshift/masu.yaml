@@ -316,6 +316,19 @@ objects:
       description: "Keeps track of changes in the application image"
     labels:
       app: ${NAME}
+- apiVersion: autoscaling/v1
+  kind: HorizontalPodAutoscaler
+  metadata:
+    name: ${NAME}
+    namespace: ${NAMESPACE}
+  spec:
+    maxReplicas: 3
+    minReplicas: 1
+    scaleTargetRef:
+      apiVersion: apps.openshift.io/v1
+      kind: DeploymentConfig
+      name: ${NAME}
+    targetCPUUtilizationPercentage: 90
 parameters:
 - description: The name assigned to all frontend objects defined in this template.
   displayName: Name

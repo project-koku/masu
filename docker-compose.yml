@@ -1,6 +1,7 @@
 version: '3'
 services:
   rabbit:
+      container_name: masu_rabbit
       hostname: rabbit
       image: rabbitmq:latest
       environment:
@@ -10,6 +11,7 @@ services:
           - "${RABBITMQ_PORT-5673}:5672"
 
   masu-server:
+      container_name: masu_server
       build:
           context: .
           dockerfile: Dockerfile
@@ -43,6 +45,7 @@ services:
         - rabbit
 
   masu-worker:
+      container_name: masu_worker
       build:
           context: .
           dockerfile: Dockerfile
@@ -78,6 +81,7 @@ services:
           - rabbit
 
   prometheus:
+      container_name: masu_prometheus
       hostname: prometheus
       image: prom/prometheus:latest
       ports:
@@ -86,6 +90,7 @@ services:
         - './docker_resources/prometheus/:/etc/prometheus/'
 
   grafana:
+      container_name: masu_grafana
       image: grafana/grafana
       ports:
           - "3000:3000"
@@ -95,6 +100,7 @@ services:
         - prometheus
 
   monitor:
+      container_name: masu_monitor
       build:
           context: .
           dockerfile: Dockerfile

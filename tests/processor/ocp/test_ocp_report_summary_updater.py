@@ -97,7 +97,7 @@ class OCPReportSummaryUpdaterTest(MasuTestCase):
             report_period,
             report
         )
-        self.manifest = self.manifest_accessor.add(self.manifest_dict)
+        self.manifest = self.manifest_accessor.add(**self.manifest_dict)
         self.manifest_accessor.commit()
 
     def tearDown(self):
@@ -227,7 +227,7 @@ class OCPReportSummaryUpdaterTest(MasuTestCase):
         }
         self.manifest_accessor.delete(self.manifest)
         self.manifest_accessor.commit()
-        self.manifest = self.manifest_accessor.add(manifest_dict)
+        self.manifest = self.manifest_accessor.add(**manifest_dict)
         self.manifest_accessor.commit()
 
         self.manifest.num_processed_files = self.manifest.num_total_files
@@ -339,7 +339,7 @@ class OCPReportSummaryUpdaterTest(MasuTestCase):
         }
         self.manifest_accessor.delete(self.manifest)
         self.manifest_accessor.commit()
-        self.manifest = self.manifest_accessor.add(manifest_dict)
+        self.manifest = self.manifest_accessor.add(**manifest_dict)
         self.manifest_accessor.commit()
 
         manifest_id = self.manifest.id

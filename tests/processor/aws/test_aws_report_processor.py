@@ -127,9 +127,7 @@ class AWSReportProcessorTest(MasuTestCase):
         self.accessor = AWSReportDBAccessor('acct10001', self.column_map)
         self.report_schema = self.accessor.report_schema
         self.session = self.accessor._session
-
-
-        self.manifest = self.manifest_accessor.add(self.manifest_dict)
+        self.manifest = self.manifest_accessor.add(**self.manifest_dict)
         self.manifest_accessor.commit()
 
     def tearDown(self):

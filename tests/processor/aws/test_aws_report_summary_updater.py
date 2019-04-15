@@ -100,7 +100,7 @@ class AWSReportSummaryUpdaterTest(MasuTestCase):
             reservation
         )
 
-        self.manifest = self.manifest_accessor.add(self.manifest_dict)
+        self.manifest = self.manifest_accessor.add(**self.manifest_dict)
         self.manifest_accessor.commit()
 
     def tearDown(self):
@@ -217,7 +217,8 @@ class AWSReportSummaryUpdaterTest(MasuTestCase):
         }
         self.manifest_accessor.delete(self.manifest)
         self.manifest_accessor.commit()
-        self.manifest = self.manifest_accessor.add(manifest_dict)
+
+        self.manifest = self.manifest_accessor.add(**manifest_dict)
         self.manifest_accessor.commit()
 
         self.manifest.num_processed_files = self.manifest.num_total_files

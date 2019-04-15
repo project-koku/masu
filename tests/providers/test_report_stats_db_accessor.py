@@ -56,7 +56,7 @@ class ReportStatsDBAccessorTest(MasuTestCase):
         saver = ReportStatsDBAccessor('myreport', self.manifest_id)
         self.assertIsNotNone(saver._session)
 
-        saver.remove()
+        saver.delete()
         saver.commit()
         saver.close_session()
 
@@ -84,7 +84,7 @@ class ReportStatsDBAccessorTest(MasuTestCase):
 
         self.assertEqual(saver.get_etag(), 'myetag')
 
-        saver.remove()
+        saver.delete()
         saver.commit()
         saver.close_session()
         saver2.close_session()
@@ -98,7 +98,7 @@ class ReportStatsDBAccessorTest(MasuTestCase):
         returned_obj = saver._get_db_obj_query()
         self.assertEqual(returned_obj.first().report_name, 'myreport')
 
-        saver.remove()
+        saver.delete()
         saver.commit()
         returned_obj = saver._get_db_obj_query()
         self.assertIsNone(returned_obj.first())
@@ -145,7 +145,7 @@ class ReportStatsDBAccessorTest(MasuTestCase):
         saver.commit()
         self.assertEqual(saver.get_cursor_position(), 100)
 
-        saver.remove()
+        saver.delete()
         saver.commit()
         returned_obj = saver._get_db_obj_query()
         self.assertIsNone(returned_obj.first())
@@ -154,21 +154,21 @@ class ReportStatsDBAccessorTest(MasuTestCase):
     def test_log_last_started_datetime(self):
         """Test convience function for last started processing time."""
         saver = ReportStatsDBAccessor('myreport', self.manifest_id)
-        saver.commit()
         saver.log_last_started_datetime()
         saver.commit()
 
-        saver.remove()
+        # FIXME: missing asserts
+        saver.delete()
         saver.commit()
         saver.close_session()
 
     def test_log_last_completed_datetime(self):
         """Test convience function for last completed processing time."""
         saver = ReportStatsDBAccessor('myreport', self.manifest_id)
-        saver.commit()
         saver.log_last_completed_datetime()
         saver.commit()
 
-        saver.remove()
+        # FIXME: missing asserts
+        saver.delete()
         saver.commit()
         saver.close_session()

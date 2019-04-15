@@ -135,14 +135,17 @@ class OCPReportSummaryUpdaterTest(MasuTestCase):
         period.summary_data_creation_datetime = start_date
         self.accessor.commit()
 
+        start_date_str = start_date.strftime('%Y-%m-%d')
+        end_date_str = end_date.strftime('%Y-%m-%d')
+
         expected_start_date = start_date.strftime('%Y-%m-%d')
         expected_end_date = end_date.strftime('%Y-%m-%d')
 
         self.assertIsNone(period.summary_data_updated_datetime)
 
         self.updater.update_summary_tables(
-            start_date,
-            end_date,
+            start_date_str,
+            end_date_str,
             self.ocp_test_provider_uuid,
             manifest_id
         )
@@ -180,6 +183,9 @@ class OCPReportSummaryUpdaterTest(MasuTestCase):
                     bill_date.month
                 )[1]
 
+        start_date_str = start_date.strftime('%Y-%m-%d')
+        end_date_str = end_date.strftime('%Y-%m-%d')
+
         expected_start_date = start_date.replace(day=1).strftime('%Y-%m-%d')
         expected_end_date = end_date.replace(day=last_day_of_month)\
             .strftime('%Y-%m-%d')
@@ -188,8 +194,8 @@ class OCPReportSummaryUpdaterTest(MasuTestCase):
         self.assertIsNone(period.summary_data_updated_datetime)
 
         self.updater.update_summary_tables(
-            start_date,
-            end_date,
+            start_date_str,
+            end_date_str,
             self.ocp_test_provider_uuid,
             manifest_id
         )
@@ -240,6 +246,9 @@ class OCPReportSummaryUpdaterTest(MasuTestCase):
                     bill_date.month
                 )[1]
 
+        start_date_str = start_date.strftime('%Y-%m-%d')
+        end_date_str = end_date.strftime('%Y-%m-%d')
+
         expected_start_date = bill_date.strftime('%Y-%m-%d')
         expected_end_date = bill_date.replace(day=last_day_of_month)\
             .strftime('%Y-%m-%d')
@@ -248,8 +257,8 @@ class OCPReportSummaryUpdaterTest(MasuTestCase):
         self.assertIsNone(period.summary_data_updated_datetime)
 
         self.updater.update_summary_tables(
-            start_date,
-            end_date,
+            start_date_str,
+            end_date_str,
             self.ocp_test_provider_uuid,
             manifest_id
         )
@@ -285,14 +294,17 @@ class OCPReportSummaryUpdaterTest(MasuTestCase):
         period.summary_data_creation_datetime = start_date
         self.accessor.commit()
 
+        start_date_str = start_date.strftime('%Y-%m-%d')
+        end_date_str = end_date.strftime('%Y-%m-%d')
+
         expected_start_date = start_date.strftime('%Y-%m-%d')
         expected_end_date = end_date.strftime('%Y-%m-%d')
 
         self.assertIsNone(period.summary_data_updated_datetime)
 
         self.updater.update_summary_tables(
-            start_date,
-            end_date,
+            start_date_str,
+            end_date_str,
             self.ocp_test_provider_uuid,
             manifest_id
         )
@@ -341,9 +353,12 @@ class OCPReportSummaryUpdaterTest(MasuTestCase):
         self.assertIsNone(period.summary_data_creation_datetime)
         self.assertIsNone(period.summary_data_updated_datetime)
 
+        start_date_str = start_date.strftime('%Y-%m-%d')
+        end_date_str = end_date.strftime('%Y-%m-%d')
+
         self.updater.update_summary_tables(
-            start_date,
-            end_date,
+            start_date_str,
+            end_date_str,
             self.ocp_test_provider_uuid,
             manifest_id
         )
@@ -375,12 +390,15 @@ class OCPReportSummaryUpdaterTest(MasuTestCase):
         period.summary_data_updated_datetime = start_date
         self.accessor.commit()
 
+        start_date_str = start_date.strftime('%Y-%m-%d')
+        end_date_str = end_date.strftime('%Y-%m-%d')
+
         expected_start_date = start_date.strftime('%Y-%m-%d')
         expected_end_date = end_date.strftime('%Y-%m-%d')
 
         self.updater.update_summary_tables(
-            start_date,
-            end_date,
+            start_date_str,
+            end_date_str,
             self.ocp_test_provider_uuid
         )
 
@@ -416,9 +434,12 @@ class OCPReportSummaryUpdaterTest(MasuTestCase):
         mock_period = Mock()
         mock_period.filter_by.return_value = mock_period_filter_by
 
+        start_date_str = start_date.strftime('%Y-%m-%d')
+        end_date_str = end_date.strftime('%Y-%m-%d')
+
         self.updater.update_summary_tables(
-            start_date,
-            end_date,
+            start_date_str,
+            end_date_str,
             self.ocp_test_provider_uuid,
             manifest_id
         )

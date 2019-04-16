@@ -80,9 +80,9 @@ class OCPUtilTests(MasuTestCase):
         self.assertIsNotNone(cluster_id)
 
     def test_get_cluster_id_from_non_ocp_provider(self):
-        """Test that Exception is raised for getting cluster ID on non-OCP provider."""
-        with self.assertRaises(MasuProviderError):
-            utils.get_cluster_id_from_provider(self.aws_test_provider_uuid, self.test_schema)
+        """Test that None is returned when getting cluster ID on non-OCP provider."""
+        cluster_id = utils.get_cluster_id_from_provider(self.aws_test_provider_uuid, self.test_schema)
+        self.assertIsNone(cluster_id)
 
     def test_get_multiple_clusters_one_ocp_provider(self):
         """Test that Exception is raised for multiple cluster IDs on a single OCP provider."""

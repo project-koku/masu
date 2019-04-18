@@ -150,6 +150,12 @@ objects:
                   key: database-password
                   name: ${DATABASE_SERVICE_NAME}
                   optional: false
+            - name: DATABASE_CA_CERT
+              valueFrom:
+                secretKeyRef:
+                  key: database-client-cert
+                  name: ${DATABASE_SERVICE_NAME}
+                  optional: true
             - name: MASU_SECRET_KEY
               valueFrom:
                 secretKeyRef:

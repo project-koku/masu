@@ -202,7 +202,8 @@ class AWSReportProcessorTest(MasuTestCase):
             count = report_db._session.query(table).count()
 
             if table_name in ('reporting_awscostentryreservation',
-                              'reporting_ocpawscostlineitem_daily_summary'):
+                              'reporting_ocpawscostlineitem_daily_summary',
+                              'reporting_ocpawscostlineitem_project_daily_summary'):
                 self.assertTrue(count >= counts[table_name])
             else:
                 self.assertTrue(count > counts[table_name])
@@ -230,7 +231,8 @@ class AWSReportProcessorTest(MasuTestCase):
             count = report_db._session.query(table).count()
 
             if table_name in ('reporting_awscostentryreservation',
-                              'reporting_ocpawscostlineitem_daily_summary'):
+                              'reporting_ocpawscostlineitem_daily_summary',
+                              'reporting_ocpawscostlineitem_project_daily_summary'):
                 self.assertTrue(count >= counts[table_name])
             else:
                 self.assertTrue(count > counts[table_name])

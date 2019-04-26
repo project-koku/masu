@@ -4,6 +4,7 @@ CREATE TEMPORARY TABLE reporting_ocpcosts_summary_{uuid} AS (
         FROM (
             SELECT id as aws_id,
                 usage_start,
+                pds.resource_id,
                 LOWER(key) as key,
                 LOWER(value) as value
             FROM reporting_ocpawscostlineitem_project_daily_summary AS pds,
@@ -21,8 +22,8 @@ CREATE TEMPORARY TABLE reporting_ocpcosts_summary_{uuid} AS (
                 lids.namespace,
                 LOWER(key) as key,
                 LOWER(value) as value
-            FROM reporting_ocpusagelineitem_daily_summary AS lids,
-                jsonb_each_text(lids.pod_labels) labels
+            FROM reporting_ocpstoragelineitem_daily_summary AS lids,
+                jsonb_each_text(lids.volume_labels) labels
             WHERE date(lids.usage_start) >= '{start_date}'
                 AND date(lids.usage_start) <= '{end_date}'
                 AND lids.cluster_id = '{cluster_id}'
@@ -33,7 +34,6 @@ CREATE TEMPORARY TABLE reporting_ocpcosts_summary_{uuid} AS (
                 OR (aws.key = 'openshift_cluster' AND aws.value = ocp.cluster_alias)
                 OR (aws.key = 'openshift_node' AND aws.value = ocp.node)
                 OR (aws.key = 'openshift_project' AND aws.value = ocp.namespace)
-                OR (aws.resource_id = ocp.resource_id)
             )
         GROUP BY aws_id
     ),

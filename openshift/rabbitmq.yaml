@@ -138,6 +138,8 @@ objects:
       application: ${APPLICATION_NAME}
     name: ${APPLICATION_NAME}
   spec:
+    failedBuildsHistoryLimit: 1
+    successfulBuildsHistoryLimit: 2
     output:
       to:
         kind: ImageStreamTag

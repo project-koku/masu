@@ -61,6 +61,8 @@ objects:
     labels:
       app: ${NAME}
   spec:
+    failedBuildsHistoryLimit: 1
+    successfulBuildsHistoryLimit: 2
     output:
       to:
         kind: ImageStreamTag
@@ -403,4 +405,3 @@ parameters:
     blank a value will be defaulted.
   displayName: Application Hostname
   name: APPLICATION_DOMAIN
-

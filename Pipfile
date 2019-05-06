@@ -8,7 +8,7 @@ name = "pypi"
 [packages]
 
 aiokafka = "==0.5.1"
-boto3 = "==1.9.134"
+boto3 = "==1.9.142"
 flask = "==1.0.2"
 psycopg2-binary = ">=2.7.0"
 gunicorn = "==19.9.0"

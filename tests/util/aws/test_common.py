@@ -15,22 +15,31 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-from dateutil.relativedelta import relativedelta
-
 import random
 import string
 from unittest import TestCase
-from datetime import datetime
+from datetime import datetime, timedelta
 from unittest.mock import patch, Mock
 
 import boto3
 from botocore.exceptions import ClientError
+from dateutil.relativedelta import relativedelta
 from faker import Faker
 
+from masu.database import AWS_CUR_TABLE_MAP
+from masu.database.report_db_accessor_base import ReportSchema
+from masu.database.aws_report_db_accessor import AWSReportDBAccessor
+from masu.database.provider_db_accessor import ProviderDBAccessor
+from masu.database.reporting_common_db_accessor import ReportingCommonDBAccessor
+from masu.external import AWS_REGIONS
+from masu.external.date_accessor import DateAccessor
+from masu.util.aws.common import get_bill_ids_from_provider
 from masu.util.aws import common as utils
+
+from tests import MasuTestCase
+from tests.database.helpers import ReportObjectCreator
 from tests.external.downloader.aws import (fake_arn,
                                            fake_aws_account_id)
-from masu.external import AWS_REGIONS
 from tests.external.downloader.aws.test_aws_report_downloader import FakeSession
 
 # the cn endpoints aren't supported by moto, so filter them out
@@ -60,14 +69,29 @@ response = {
 MOCK_BOTO_CLIENT.assume_role.return_value = response
 
 
-class TestAWSUtils(TestCase):
+class TestAWSUtils(MasuTestCase):
     fake = Faker()
 
     def setUp(self):
+        """Setup the test."""
+        super().setUp()
         self.account_id = fake_aws_account_id()
         self.arn = fake_arn(account_id=self.account_id,
                             region=REGION,
                             service='iam')
+        with ReportingCommonDBAccessor() as common_accessor:
+            self.column_map = common_accessor.column_map
+
+    def tearDown(self):
+        """Tear down the test."""
+        with AWSReportDBAccessor(schema=self.test_schema, column_map=self.column_map) as accessor:
+            for table_name in list(AWS_CUR_TABLE_MAP.values()):
+                table_obj = getattr(accessor.report_schema, table_name)
+                accessor._session.query(table_obj).delete()
+                # for table in tables:
+                #     accessor._session.delete(table)
+            accessor.commit()
+
 
     @patch('masu.util.aws.common.boto3.client', return_value=MOCK_BOTO_CLIENT)
     def test_get_assume_role_session(self, mock_boto_client):
@@ -179,6 +203,140 @@ class TestAWSUtils(TestCase):
         local_file = utils.get_local_file_name(input_key)
         self.assertEqual(expected_local_file, local_file)
 
+    def test_get_bill_ids_from_provider(self):
+        """Test that bill IDs are returned for an AWS provider."""
+        date_accessor = DateAccessor()
+
+        with AWSReportDBAccessor(schema=self.test_schema, column_map=self.column_map) as accessor:
+            report_schema = accessor.report_schema
+            creator = ReportObjectCreator(
+                accessor,
+                self.column_map,
+                report_schema.column_types
+            )
+            expected_bill_ids = []
+
+            end_date = date_accessor.today_with_timezone('utc').replace(day=1)
+            start_date = end_date
+            for i in range(2):
+                start_date = start_date - relativedelta(months=i)
+                bill = creator.create_cost_entry_bill(bill_date=start_date)
+                expected_bill_ids.append(str(bill.id))
+
+        bill_ids = utils.get_bill_ids_from_provider(
+            self.aws_test_provider_uuid,
+            self.test_schema
+        )
+
+        self.assertEqual(bill_ids, expected_bill_ids)
+
+    def test_get_bill_ids_from_provider_with_start_date(self):
+        """Test that bill IDs are returned for an AWS provider with start date."""
+        date_accessor = DateAccessor()
+
+        with ProviderDBAccessor(provider_uuid=self.aws_test_provider_uuid) as provider_accessor:
+            provider = provider_accessor.get_provider()
+        with AWSReportDBAccessor(schema=self.test_schema, column_map=self.column_map) as accessor:
+            report_schema = accessor.report_schema
+            creator = ReportObjectCreator(
+                accessor,
+                self.column_map,
+                report_schema.column_types
+            )
+
+            end_date = date_accessor.today_with_timezone('utc').replace(day=1)
+            start_date = end_date
+            for i in range(2):
+                start_date = start_date - relativedelta(months=i)
+                bill = creator.create_cost_entry_bill(bill_date=start_date)
+
+            bill_table_name = AWS_CUR_TABLE_MAP['bill']
+            bill_obj = getattr(accessor.report_schema, bill_table_name)
+            bills = accessor.get_cost_entry_bills_query_by_provider(provider.id)
+            bills = bills.filter(bill_obj.billing_period_start>=end_date.date()).all()
+            expected_bill_ids = [str(bill.id) for bill in bills]
+
+
+        bill_ids = utils.get_bill_ids_from_provider(
+            self.aws_test_provider_uuid,
+            self.test_schema,
+            start_date=end_date
+        )
+
+        self.assertEqual(bill_ids, expected_bill_ids)
+
+    def test_get_bill_ids_from_provider_with_end_date(self):
+        """Test that bill IDs are returned for an AWS provider with end date."""
+        date_accessor = DateAccessor()
+
+        with ProviderDBAccessor(provider_uuid=self.aws_test_provider_uuid) as provider_accessor:
+            provider = provider_accessor.get_provider()
+        with AWSReportDBAccessor(schema=self.test_schema, column_map=self.column_map) as accessor:
+            report_schema = accessor.report_schema
+            creator = ReportObjectCreator(
+                accessor,
+                self.column_map,
+                report_schema.column_types
+            )
+
+            end_date = date_accessor.today_with_timezone('utc').replace(day=1)
+            start_date = end_date
+            for i in range(2):
+                start_date = start_date - relativedelta(months=i)
+                bill = creator.create_cost_entry_bill(bill_date=start_date)
+
+            bill_table_name = AWS_CUR_TABLE_MAP['bill']
+            bill_obj = getattr(accessor.report_schema, bill_table_name)
+            bills = accessor.get_cost_entry_bills_query_by_provider(provider.id)
+            bills = bills.filter(bill_obj.billing_period_start<=start_date.date()).all()
+            expected_bill_ids = [str(bill.id) for bill in bills]
+
+
+        bill_ids = utils.get_bill_ids_from_provider(
+            self.aws_test_provider_uuid,
+            self.test_schema,
+            end_date=start_date
+        )
+
+        self.assertEqual(bill_ids, expected_bill_ids)
+
+    def test_get_bill_ids_from_provider_with_start_and_end_date(self):
+        """Test that bill IDs are returned for an AWS provider with both dates."""
+        date_accessor = DateAccessor()
+
+        with ProviderDBAccessor(provider_uuid=self.aws_test_provider_uuid) as provider_accessor:
+            provider = provider_accessor.get_provider()
+        with AWSReportDBAccessor(schema=self.test_schema, column_map=self.column_map) as accessor:
+            report_schema = accessor.report_schema
+            creator = ReportObjectCreator(
+                accessor,
+                self.column_map,
+                report_schema.column_types
+            )
+
+            end_date = date_accessor.today_with_timezone('utc').replace(day=1)
+            start_date = end_date
+            for i in range(2):
+                start_date = start_date - relativedelta(months=i)
+                print(start_date)
+                bill = creator.create_cost_entry_bill(bill_date=start_date)
+
+            bill_table_name = AWS_CUR_TABLE_MAP['bill']
+            bill_obj = getattr(accessor.report_schema, bill_table_name)
+            bills = accessor.get_cost_entry_bills_query_by_provider(provider.id)
+            bills = bills.filter(bill_obj.billing_period_start>=start_date.date())\
+                .filter(bill_obj.billing_period_start<=end_date.date()).all()
+            expected_bill_ids = [str(bill.id) for bill in bills]
+
+
+        bill_ids = utils.get_bill_ids_from_provider(
+            self.aws_test_provider_uuid,
+            self.test_schema,
+            start_date=start_date,
+            end_date=end_date
+        )
+
+        self.assertEqual(bill_ids, expected_bill_ids)
 
 class AwsArnTest(TestCase):
     """AwnArn class test case."""

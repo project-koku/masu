@@ -51,13 +51,14 @@ class OCPCloudReportSummaryUpdaterTest(MasuTestCase):
             None
         )
 
-        mock_ocp_on_aws.assert_called_with(start_date_str, end_date_str)
+        mock_ocp_on_aws.assert_called_with(start_date_str, end_date_str, None, [])
         mock_ocp.assert_not_called()
 
     @patch('masu.processor.ocp.ocp_cloud_summary_updater.AWSReportDBAccessor.populate_ocp_on_aws_cost_daily_summary')
     @patch('masu.database.ocp_report_db_accessor.OCPReportDBAccessor.populate_cost_summary_table')
     @patch('masu.processor.ocp.ocp_cloud_summary_updater.get_cluster_id_from_provider')
-    def test_update_summary_tables_with_ocp_provider(self, mock_utility, mock_ocp, mock_ocp_on_aws):
+    def test_update_summary_tables_with_ocp_provider(self, mock_utility,
+                                                     mock_ocp, mock_ocp_on_aws):
         """Test that summary tables are properly run for an OCP provider."""
         fake_cluster = 'my-ocp-cluster'
         mock_utility.return_value = fake_cluster
@@ -72,5 +73,29 @@ class OCPCloudReportSummaryUpdaterTest(MasuTestCase):
             None
         )
 
-        mock_ocp_on_aws.assert_called_with(start_date_str, end_date_str)
+        mock_ocp_on_aws.assert_called_with(start_date_str, end_date_str,
+                                           fake_cluster, [])
         mock_ocp.assert_called_with(fake_cluster, start_date_str, end_date_str)
+
+    @patch('masu.processor.ocp.ocp_cloud_summary_updater.AWSReportDBAccessor.populate_ocp_on_aws_cost_daily_summary')
+    @patch('masu.database.ocp_report_db_accessor.OCPReportDBAccessor.populate_cost_summary_table')
+    @patch('masu.processor.ocp.ocp_cloud_summary_updater.get_bill_ids_from_provider')
+    def test_update_summary_tables_with_aws_provider(self, mock_utility,
+                                                     mock_ocp, mock_ocp_on_aws):
+        """Test that summary tables are properly run for an OCP provider."""
+        fake_bill_ids = [1,2]
+        mock_utility.return_value = fake_bill_ids
+        start_date = self.date_accessor.today_with_timezone('UTC')
+        end_date = start_date + datetime.timedelta(days=1)
+        start_date_str = start_date.strftime('%Y-%m-%d')
+        end_date_str = end_date.strftime('%Y-%m-%d')
+        self.updater.update_summary_tables(
+            start_date_str,
+            end_date_str,
+            self.ocp_test_provider_uuid,
+            None
+        )
+
+        mock_ocp_on_aws.assert_called_with(start_date_str, end_date_str,
+                                           None, fake_bill_ids)
+        mock_ocp.assert_not_called()

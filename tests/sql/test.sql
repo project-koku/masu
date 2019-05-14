@@ -4983,4 +4983,3 @@ ALTER TABLE ONLY public.reporting_common_costusagereportmanifest
 --
 -- PostgreSQL database dump complete
 --
-

@@ -21,24 +21,23 @@ import random
 import logging
 
 import faker
-from celery.result import AsyncResult
 from unittest.mock import patch
-
 
 from masu.external import (AMAZON_WEB_SERVICES, OPENSHIFT_CONTAINER_PLATFORM)
 from masu.external.accounts_accessor import (AccountsAccessor, AccountsAccessorError)
-from masu.external.report_downloader import ReportDownloaderError
 from masu.processor.expired_data_remover import ExpiredDataRemover
 from masu.processor.orchestrator import Orchestrator
 from tests import MasuTestCase
 from tests.external.downloader.aws import fake_arn
 
+
 class FakeDownloader():
     fake = faker.Faker()
+
     def download_reports(self, number_of_months=1):
         path = '/var/tmp/masu'
         fake_files = []
-        for _ in range(1,random.randint(5,50)):
+        for _ in range(1, random.randint(5, 50)):
             fake_files.append({'file': '{}/{}/aws/{}-{}.csv'.format(path,
                                                                     self.fake.word(),
                                                                     self.fake.word(),
@@ -54,7 +53,7 @@ class OrchestratorTest(MasuTestCase):
     def setUp(self):
         super().setUp()
         self.mock_accounts = []
-        for _ in range(1, random.randint(5,20)):
+        for _ in range(1, random.randint(5, 20)):
             self.mock_accounts.append({
                 'authentication': fake_arn(service='iam', generate_account_id=True),
                 'billing_source': self.fake.word(),
@@ -141,7 +140,8 @@ class OrchestratorTest(MasuTestCase):
         mock_remover.return_value = expected_results
 
         expected = 'INFO:masu.processor.orchestrator:Expired data removal queued - customer: acct10001, Task ID: {}'
-        logging.disable(logging.NOTSET) # We are currently disabling all logging below CRITICAL in masu/__init__.py
+        # unset disabling all logging below CRITICAL from masu/__init__.py
+        logging.disable(logging.NOTSET)
         with self.assertLogs('masu.processor.orchestrator', level='INFO') as logger:
             orchestrator = Orchestrator()
             results = orchestrator.remove_expired_report_data()
@@ -164,3 +164,40 @@ class OrchestratorTest(MasuTestCase):
         results = orchestrator.remove_expired_report_data()
 
         self.assertEqual(results, [])
+
+    @patch('masu.processor.orchestrator.AccountLabel', spec=True)
+    @patch('masu.processor.orchestrator.ProviderStatus', spec=True)
+    @patch('masu.processor.orchestrator.get_report_files.delay', return_value=True)
+    def test_prepare_w_status_valid(self, mock_task, mock_accessor,
+                                    mock_labeler):
+        """Test that Orchestrator.prepare() works when status is valid."""
+        mock_labeler().get_label_details.return_value = (True, True)
+
+        mock_accessor().is_valid.return_value = True
+        mock_accessor().is_backing_off.return_value = False
+
+        orchestrator = Orchestrator()
+        orchestrator.prepare()
+        mock_task.assert_called()
+
+    @patch('masu.processor.orchestrator.ProviderStatus', spec=True)
+    @patch('masu.processor.orchestrator.get_report_files.delay', return_value=True)
+    def test_prepare_w_status_invalid(self, mock_task, mock_accessor):
+        """Test that Orchestrator.prepare() is skipped when status is invalid."""
+        mock_accessor.is_valid.return_value = False
+        mock_accessor.is_backing_off.return_value = False
+
+        orchestrator = Orchestrator()
+        orchestrator.prepare()
+        mock_task.assert_not_called()
+
+    @patch('masu.processor.orchestrator.ProviderStatus', spec=True)
+    @patch('masu.processor.orchestrator.get_report_files.delay', return_value=True)
+    def test_prepare_w_status_backoff(self, mock_task, mock_accessor):
+        """Test that Orchestrator.prepare() is skipped when backing off."""
+        mock_accessor.is_valid.return_value = False
+        mock_accessor.is_backing_off.return_value = True
+
+        orchestrator = Orchestrator()
+        orchestrator.prepare()
+        mock_task.assert_not_called()

@@ -17,19 +17,14 @@
 
 """Test the download task."""
 
-import random
-import string
 import shutil
 import tempfile
 import logging
 import os
-import uuid
 from datetime import date, datetime, timedelta
 from unittest.mock import call, patch, Mock, ANY
-from urllib.parse import urlencode
 
 import faker
-import psycopg2
 from dateutil import relativedelta
 from sqlalchemy.sql import func
 
@@ -38,14 +33,12 @@ from masu.database import AWS_CUR_TABLE_MAP, OCP_REPORT_TABLE_MAP
 from masu.database.aws_report_db_accessor import AWSReportDBAccessor
 from masu.database.ocp_report_db_accessor import OCPReportDBAccessor
 from masu.database.provider_db_accessor import ProviderDBAccessor
+from masu.database.provider_status_accessor import ProviderStatusCode
 from masu.database.reporting_common_db_accessor import ReportingCommonDBAccessor
-from masu.database.report_stats_db_accessor import ReportStatsDBAccessor
-from masu.external import AMAZON_WEB_SERVICES, OPENSHIFT_CONTAINER_PLATFORM
+from masu.external.date_accessor import DateAccessor
 from masu.external.report_downloader import ReportDownloader, ReportDownloaderError
-
 from masu.processor.expired_data_remover import ExpiredDataRemover
 from masu.processor.report_processor import ReportProcessorError
-from masu.processor.report_charge_updater import ReportChargeUpdater
 from masu.processor._tasks.download import _get_report_files
 from masu.processor._tasks.process import _process_report_file
 from masu.processor.tasks import (get_report_files,
@@ -54,17 +47,17 @@ from masu.processor.tasks import (get_report_files,
                                   update_charge_info,
                                   update_all_summary_tables,
                                   update_summary_tables)
-from masu.external.date_accessor import DateAccessor
-from masu.util.aws import common as utils
 from tests import MasuTestCase
 from tests.database.helpers import ReportObjectCreator
 from tests.external.downloader.aws import fake_arn
+
 
 class FakeDownloader(Mock):
     def get_reports(self):
         fake_file_list = ['/var/tmp/masu/my-report-name/aws/my-report-file.csv',
                           '/var/tmp/masu/other-report-name/aws/other-report-file.csv']
         return fake_file_list
+
 
 class GetReportFileTests(MasuTestCase):
     """Test Cases for the celery task."""
@@ -79,7 +72,7 @@ class GetReportFileTests(MasuTestCase):
                                    authentication=account,
                                    provider_type='AWS',
                                    report_name=self.fake.word(),
-                                   provider_uuid='6e212746-484a-40cd-bba0-09a19d132d64',
+                                   provider_uuid=self.aws_test_provider_uuid,
                                    billing_source=self.fake.word())
 
         self.assertIsInstance(report, list)
@@ -92,13 +85,13 @@ class GetReportFileTests(MasuTestCase):
         os.makedirs(Config.TMP_DIR, exist_ok=True)
 
         account = fake_arn(service='iam', generate_account_id=True)
-        expected = 'INFO:masu.processor._tasks.download:Avaiable disk space'
+        expected = 'INFO:masu.processor._tasks.download:Available disk space'
         with self.assertLogs('masu.processor._tasks.download', level='INFO') as logger:
             _get_report_files(customer_name=self.fake.word(),
                               authentication=account,
                               provider_type='AWS',
                               report_name=self.fake.word(),
-                              provider_uuid='6e212746-484a-40cd-bba0-09a19d132d64',
+                              provider_uuid=self.aws_test_provider_uuid,
                               billing_source=self.fake.word())
             statement_found = False
             for log in logger.output:
@@ -113,16 +106,17 @@ class GetReportFileTests(MasuTestCase):
         """Test task for logging when temp directory does not exist."""
         logging.disable(logging.NOTSET)
 
-        shutil.rmtree(Config.TMP_DIR, ignore_errors=True)
+        Config.TMP_DIR = '/this/path/does/not/exist'
 
         account = fake_arn(service='iam', generate_account_id=True)
-        expected = 'INFO:masu.processor._tasks.download:Unable to find avaiable disk space. {} does not exist'.format(Config.TMP_DIR)
+        expected = 'INFO:masu.processor._tasks.download:Unable to find' + \
+            f' available disk space. {Config.TMP_DIR} does not exist'
         with self.assertLogs('masu.processor._tasks.download', level='INFO') as logger:
             _get_report_files(customer_name=self.fake.word(),
                               authentication=account,
                               provider_type='AWS',
                               report_name=self.fake.word(),
-                              provider_uuid='6e212746-484a-40cd-bba0-09a19d132d64',
+                              provider_uuid=self.aws_test_provider_uuid,
                               billing_source=self.fake.word())
             self.assertIn(expected, logger.output)
 
@@ -137,7 +131,7 @@ class GetReportFileTests(MasuTestCase):
                               authentication=account,
                               provider_type='AWS',
                               report_name=self.fake.word(),
-                              provider_uuid='6e212746-484a-40cd-bba0-09a19d132d64',
+                              provider_uuid=self.aws_test_provider_uuid,
                               billing_source=self.fake.word())
 
     @patch('masu.processor._tasks.download.ReportDownloader._set_downloader', return_value=FakeDownloader)
@@ -152,16 +146,51 @@ class GetReportFileTests(MasuTestCase):
         account = fake_arn(service='iam', generate_account_id=True)
         with patch.object(ReportDownloader, 'get_reports') as download_call:
             _get_report_files(customer_name=self.fake.word(),
-                            authentication=account,
-                            provider_type='AWS',
-                            report_name=self.fake.word(),
-                            provider_uuid='6e212746-484a-40cd-bba0-09a19d132d64',
-                            billing_source=self.fake.word())
+                              authentication=account,
+                              provider_type='AWS',
+                              report_name=self.fake.word(),
+                              provider_uuid=self.aws_test_provider_uuid,
+                              billing_source=self.fake.word())
 
             download_call.assert_called_with(initial_month_qty)
 
         Config.INGEST_OVERRIDE = False
         Config.INITIAL_INGEST_NUM_MONTHS = 2
+
+    @patch('masu.processor._tasks.download.ProviderStatus.set_error')
+    @patch('masu.processor._tasks.download.ReportDownloader._set_downloader',
+           side_effect=ReportDownloaderError('only a test'))
+    def test_get_report_exception_update_status(self,
+                                                fake_downloader,
+                                                fake_status):
+        """Test that status is updated when an exception is raised."""
+        account = fake_arn(service='iam', generate_account_id=True)
+
+        try:
+            _get_report_files(customer_name=self.fake.word(),
+                              authentication=account,
+                              provider_type='AWS',
+                              report_name=self.fake.word(),
+                              provider_uuid=self.aws_test_provider_uuid,
+                              billing_source=self.fake.word())
+        except ReportDownloaderError:
+            pass
+        fake_status.assert_called()
+
+    @patch('masu.processor._tasks.download.ProviderStatus.set_status')
+    @patch('masu.processor._tasks.download.ReportDownloader', spec=True)
+    def test_get_report_update_status(self, fake_downloader, fake_status):
+        """Test that status is updated when downloading is complete."""
+        account = fake_arn(service='iam', generate_account_id=True)
+
+        _get_report_files(customer_name=self.fake.word(),
+                          authentication=account,
+                          provider_type='AWS',
+                          report_name=self.fake.word(),
+                          provider_uuid=self.aws_test_provider_uuid,
+                          billing_source=self.fake.word())
+        fake_status.assert_called_with(ProviderStatusCode.READY)
+
 
 class ProcessReportFileTests(MasuTestCase):
     """Test Cases for the Orchestrator object."""
@@ -178,8 +207,8 @@ class ProcessReportFileTests(MasuTestCase):
         provider = 'AWS'
         provider_uuid = '6e212746-484a-40cd-bba0-09a19d132d64'
         report_dict = {'file': path,
-                   'compression': 'gzip',
-                   'start_date': str(DateAccessor().today())}
+                       'compression': 'gzip',
+                       'start_date': str(DateAccessor().today())}
 
         mock_proc = mock_processor()
         mock_stats_acc = mock_stats_accessor().__enter__()
@@ -204,8 +233,8 @@ class ProcessReportFileTests(MasuTestCase):
         provider = 'AWS'
         provider_uuid = '6e212746-484a-40cd-bba0-09a19d132d64'
         report_dict = {'file': path,
-                   'compression': 'gzip',
-                   'start_date': str(DateAccessor().today())}
+                       'compression': 'gzip',
+                       'start_date': str(DateAccessor().today())}
 
         mock_processor.side_effect = ReportProcessorError('mock error')
         mock_stats_acc = mock_stats_accessor().__enter__()
@@ -231,8 +260,8 @@ class ProcessReportFileTests(MasuTestCase):
         provider = 'AWS'
         provider_uuid = '6e212746-484a-40cd-bba0-09a19d132d64'
         report_dict = {'file': path,
-                   'compression': 'gzip',
-                   'start_date': str(DateAccessor().today())}
+                       'compression': 'gzip',
+                       'start_date': str(DateAccessor().today())}
 
         mock_proc = mock_processor()
         mock_stats_acc = mock_stats_accessor().__enter__()
@@ -246,6 +275,7 @@ class ProcessReportFileTests(MasuTestCase):
         mock_stats_acc.commit.assert_called()
         mock_manifest_acc.mark_manifest_as_updated.assert_not_called()
         shutil.rmtree(report_dir)
+
 
 class TestProcessorTasks(MasuTestCase):
     """Test cases for Processor Celery tasks."""
@@ -360,10 +390,10 @@ class TestProcessorTasks(MasuTestCase):
     @patch('masu.processor.tasks._get_report_files')
     @patch('masu.processor.tasks.process_report_file')
     def test_get_report_files_timestamps_empty_start(self,
-                                               mock_process_files,
-                                               mock_get_files,
-                                               mock_started,
-                                               mock_completed):
+                                                     mock_process_files,
+                                                     mock_get_files,
+                                                     mock_started,
+                                                     mock_completed):
         """
         Test that the chained task is called when no start time is set.
         """
@@ -381,16 +411,15 @@ class TestProcessorTasks(MasuTestCase):
     @patch('masu.processor.tasks.process_report_file')
     @patch('masu.external.date_accessor.DateAccessor.today')
     def test_get_report_files_timestamps_empty_end(self,
-                                               mock_date,
-                                               mock_process_files,
-                                               mock_get_files,
-                                               mock_started,
-                                               mock_completed):
+                                                   mock_date,
+                                                   mock_process_files,
+                                                   mock_get_files,
+                                                   mock_started,
+                                                   mock_completed):
         """
         Test that the chained task is not called when no end time is set since
         processing is in progress.
         """
-
 
         mock_get_files.return_value = self.fake_reports
 
@@ -410,11 +439,11 @@ class TestProcessorTasks(MasuTestCase):
     @patch('masu.processor.tasks.process_report_file')
     @patch('masu.external.date_accessor.DateAccessor.today_with_timezone')
     def test_get_report_files_timestamps_empty_end_timeout(self,
-                                               mock_date,
-                                               mock_process_files,
-                                               mock_get_files,
-                                               mock_started,
-                                               mock_completed):
+                                                           mock_date,
+                                                           mock_process_files,
+                                                           mock_get_files,
+                                                           mock_started,
+                                                           mock_completed):
         """
         Test that the chained task is called when no end time is set since
         processing has exceeded the timeout.
@@ -435,11 +464,11 @@ class TestProcessorTasks(MasuTestCase):
     @patch('masu.processor.tasks.process_report_file')
     @patch('masu.external.date_accessor.DateAccessor.today_with_timezone')
     def test_get_report_files_timestamps_empty_end_no_timeout(self,
-                                               mock_date,
-                                               mock_process_files,
-                                               mock_get_files,
-                                               mock_started,
-                                               mock_completed):
+                                                              mock_date,
+                                                              mock_process_files,
+                                                              mock_get_files,
+                                                              mock_started,
+                                                              mock_completed):
         """
         Test that the chained task is not called when no end time is set since
         processing is in progress but completion timeout has not been reached.
@@ -459,10 +488,10 @@ class TestProcessorTasks(MasuTestCase):
     @patch('masu.processor.tasks._get_report_files')
     @patch('masu.processor.tasks.process_report_file')
     def test_get_report_files_timestamps_empty_both(self,
-                                               mock_process_files,
-                                               mock_get_files,
-                                               mock_started,
-                                               mock_completed):
+                                                    mock_process_files,
+                                                    mock_get_files,
+                                                    mock_started,
+                                                    mock_completed):
         """
         Test that the chained task is called when no timestamps are set.
         """
@@ -506,6 +535,7 @@ class TestProcessorTasks(MasuTestCase):
             manifest_id=None
         )
 
+
 class TestRemoveExpiredDataTasks(MasuTestCase):
     """Test cases for Processor Celery tasks."""
 
@@ -518,11 +548,11 @@ class TestRemoveExpiredDataTasks(MasuTestCase):
 
         expected = 'INFO:masu.processor._tasks.remove_expired:Expired Data: {}'
 
-        logging.disable(logging.NOTSET) # We are currently disabling all logging below CRITICAL in masu/__init__.py
+        # disable logging override set in masu/__init__.py
+        logging.disable(logging.NOTSET)
         with self.assertLogs('masu.processor._tasks.remove_expired') as logger:
             remove_expired_data(schema_name='acct10001', provider='AWS', simulate=True)
             self.assertIn(expected.format(str(expected_results)), logger.output)
-
 
 
 class TestUpdateSummaryTablesTask(MasuTestCase):
@@ -534,8 +564,8 @@ class TestUpdateSummaryTablesTask(MasuTestCase):
         super().setUpClass()
         cls.aws_tables = list(AWS_CUR_TABLE_MAP.values())
         cls.ocp_tables = list(OCP_REPORT_TABLE_MAP.values())
-        cls.all_tables = list(AWS_CUR_TABLE_MAP.values()) +\
-                              list(OCP_REPORT_TABLE_MAP.values())
+        cls.all_tables = list(AWS_CUR_TABLE_MAP.values()) + \
+            list(OCP_REPORT_TABLE_MAP.values())
         report_common_db = ReportingCommonDBAccessor()
         cls.column_map = report_common_db.column_map
         report_common_db.close_session()
@@ -550,9 +580,9 @@ class TestUpdateSummaryTablesTask(MasuTestCase):
         super().setUp()
         self.schema_name = 'acct10001'
         self.aws_accessor = AWSReportDBAccessor(schema=self.schema_name,
-                                               column_map=self.column_map)
+                                                column_map=self.column_map)
         self.ocp_accessor = OCPReportDBAccessor(schema=self.schema_name,
-                                               column_map=self.column_map)
+                                                column_map=self.column_map)
 
         self.creator = ReportObjectCreator(
             self.aws_accessor,
@@ -796,8 +826,9 @@ class TestUpdateSummaryTablesTask(MasuTestCase):
 
     def test_update_charge_info_aws(self):
         """Test that update_charge_info is not called for AWS."""
-        provider_aws_uuid = '6e212746-484a-40cd-bba0-09a19d132d64'
-        update_charge_info(schema_name='acct10001', provider_uuid=provider_aws_uuid)
+        update_charge_info(schema_name='acct10001',
+                           provider_uuid=self.aws_test_provider_uuid)
+        # FIXME: no asserts on test
 
     @patch('masu.processor.tasks.update_summary_tables')
     def test_get_report_data_for_all_providers(self, mock_update):

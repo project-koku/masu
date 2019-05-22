@@ -82,7 +82,7 @@ class OrchestratorTest(MasuTestCase):
 
     @patch('masu.external.account_label.AccountLabel._set_labler', return_value=None)
     @patch('masu.external.report_downloader.ReportDownloader._set_downloader', return_value=FakeDownloader)
-    @patch('masu.processor.orchestrator.get_report_files.delay', return_value=True)
+    @patch('masu.processor.orchestrator.get_report_files.apply_async', return_value=True)
     def test_prepare(self, mock_task, mock_downloader, mock_labeler):
         """Test downloading cost usage reports."""
         orchestrator = Orchestrator()
@@ -100,16 +100,14 @@ class OrchestratorTest(MasuTestCase):
         self.assertIsNone(reports)
 
     @patch.object(AccountsAccessor, 'get_accounts')
-    @patch('masu.processor.tasks.process_report_file', return_value=None)
-    def test_init_all_accounts(self, mock_task, mock_accessor):
+    def test_init_all_accounts(self, mock_accessor):
         """Test initializing orchestrator with forced billing source."""
         mock_accessor.return_value = self.mock_accounts
         orchestrator_all = Orchestrator()
         self.assertEqual(orchestrator_all._accounts, self.mock_accounts)
 
     @patch.object(AccountsAccessor, 'get_accounts')
-    @patch('masu.processor.tasks.process_report_file', return_value=None)
-    def test_init_with_billing_source(self, mock_task, mock_accessor):
+    def test_init_with_billing_source(self, mock_accessor):
         """Test initializing orchestrator with forced billing source."""
         mock_accessor.return_value = self.mock_accounts
 
@@ -122,8 +120,7 @@ class OrchestratorTest(MasuTestCase):
                          fake_source.get('billing_source'))
 
     @patch.object(AccountsAccessor, 'get_accounts')
-    @patch('masu.processor.tasks.process_report_file', return_value=None)
-    def test_init_all_accounts_error(self, mock_task, mock_accessor):
+    def test_init_all_accounts_error(self, mock_accessor):
         """Test initializing orchestrator accounts error."""
         mock_accessor.side_effect = AccountsAccessorError('Sample timeout error')
         try:
@@ -132,7 +129,7 @@ class OrchestratorTest(MasuTestCase):
             self.fail('unexpected error')
 
     @patch.object(ExpiredDataRemover, 'remove')
-    @patch('masu.processor.orchestrator.remove_expired_data.delay', return_value=True)
+    @patch('masu.processor.orchestrator.remove_expired_data.apply_async', return_value=True)
     def test_remove_expired_report_data(self, mock_task, mock_remover):
         """Test removing expired report data."""
         expected_results = [{'account_payer_id': '999999999',
@@ -152,7 +149,7 @@ class OrchestratorTest(MasuTestCase):
 
     @patch.object(AccountsAccessor, 'get_accounts')
     @patch.object(ExpiredDataRemover, 'remove')
-    @patch('masu.processor.orchestrator.remove_expired_data.delay', return_value=True)
+    @patch('masu.processor.orchestrator.remove_expired_data.apply_async', return_value=True)
     def test_remove_expired_report_data_no_accounts(self, mock_task, mock_remover, mock_accessor):
         """Test removing expired report data with no accounts."""
         expected_results = [{'account_payer_id': '999999999',
@@ -167,7 +164,7 @@ class OrchestratorTest(MasuTestCase):
 
     @patch('masu.processor.orchestrator.AccountLabel', spec=True)
     @patch('masu.processor.orchestrator.ProviderStatus', spec=True)
-    @patch('masu.processor.orchestrator.get_report_files.delay', return_value=True)
+    @patch('masu.processor.orchestrator.get_report_files.apply_async', return_value=True)
     def test_prepare_w_status_valid(self, mock_task, mock_accessor,
                                     mock_labeler):
         """Test that Orchestrator.prepare() works when status is valid."""
@@ -181,7 +178,7 @@ class OrchestratorTest(MasuTestCase):
         mock_task.assert_called()
 
     @patch('masu.processor.orchestrator.ProviderStatus', spec=True)
-    @patch('masu.processor.orchestrator.get_report_files.delay', return_value=True)
+    @patch('masu.processor.orchestrator.get_report_files.apply_async', return_value=True)
     def test_prepare_w_status_invalid(self, mock_task, mock_accessor):
         """Test that Orchestrator.prepare() is skipped when status is invalid."""
         mock_accessor.is_valid.return_value = False
@@ -192,7 +189,7 @@ class OrchestratorTest(MasuTestCase):
         mock_task.assert_not_called()
 
     @patch('masu.processor.orchestrator.ProviderStatus', spec=True)
-    @patch('masu.processor.orchestrator.get_report_files.delay', return_value=True)
+    @patch('masu.processor.orchestrator.get_report_files.apply_async', return_value=True)
     def test_prepare_w_status_backoff(self, mock_task, mock_accessor):
         """Test that Orchestrator.prepare() is skipped when backing off."""
         mock_accessor.is_valid.return_value = False

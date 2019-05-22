@@ -36,6 +36,7 @@ services:
         - MASU_DATE_OVERRIDE
         - MASU_RETAIN_NUM_MONTHS
         - MASU_DEBUG
+        - LOG_LEVEL=ERROR
       privileged: true
       ports:
           - "5000:5000"
@@ -68,6 +69,7 @@ services:
         - MASU_DATE_OVERRIDE
         - MASU_RETAIN_NUM_MONTHS
         - MASU_DEBUG
+        - LOG_LEVEL=ERROR
       privileged: true
       ports:
           - "9999:9999"

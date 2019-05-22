@@ -42,7 +42,7 @@ from masu.processor.report_processor import ReportProcessorError
 from masu.processor._tasks.download import _get_report_files
 from masu.processor._tasks.process import _process_report_file
 from masu.processor.tasks import (get_report_files,
-                                  process_report_file,
+                                  summarize_reports,
                                   remove_expired_data,
                                   update_charge_info,
                                   update_all_summary_tables,
@@ -203,9 +203,9 @@ class ProcessReportFileTests(MasuTestCase):
         """Test the process_report_file functionality."""
         report_dir = tempfile.mkdtemp()
         path = '{}/{}'.format(report_dir, 'file1.csv')
-        schema_name = 'acct10001'
+        schema_name = self.test_schema
         provider = 'AWS'
-        provider_uuid = '6e212746-484a-40cd-bba0-09a19d132d64'
+        provider_uuid = self.aws_test_provider_uuid
         report_dict = {'file': path,
                        'compression': 'gzip',
                        'start_date': str(DateAccessor().today())}
@@ -229,9 +229,9 @@ class ProcessReportFileTests(MasuTestCase):
         """Test the process_report_file functionality when exception is thrown."""
         report_dir = tempfile.mkdtemp()
         path = '{}/{}'.format(report_dir, 'file1.csv')
-        schema_name = 'acct10001'
+        schema_name = self.test_schema
         provider = 'AWS'
-        provider_uuid = '6e212746-484a-40cd-bba0-09a19d132d64'
+        provider_uuid = self.aws_test_provider_uuid
         report_dict = {'file': path,
                        'compression': 'gzip',
                        'start_date': str(DateAccessor().today())}
@@ -256,9 +256,9 @@ class ProcessReportFileTests(MasuTestCase):
         mock_manifest_accessor.get_manifest_by_id.return_value = None
         report_dir = tempfile.mkdtemp()
         path = '{}/{}'.format(report_dir, 'file1.csv')
-        schema_name = 'acct10001'
+        schema_name = self.test_schema
         provider = 'AWS'
-        provider_uuid = '6e212746-484a-40cd-bba0-09a19d132d64'
+        provider_uuid = self.aws_test_provider_uuid
         report_dict = {'file': path,
                        'compression': 'gzip',
                        'start_date': str(DateAccessor().today())}
@@ -275,6 +275,34 @@ class ProcessReportFileTests(MasuTestCase):
         mock_stats_acc.commit.assert_called()
         mock_manifest_acc.mark_manifest_as_updated.assert_not_called()
         shutil.rmtree(report_dir)
+
+    @patch('masu.processor.tasks.update_summary_tables')
+    def test_summarize_reports_empty_list(self, mock_update_summary):
+        """
+        Test that the summarize_reports task is called when empty processing list is provided.
+        """
+        mock_update_summary.delay = Mock()
+
+        summarize_reports([])
+        mock_update_summary.delay.assert_not_called()
+
+    @patch('masu.processor.tasks.update_summary_tables')
+    def test_summarize_reports_processing_list(self, mock_update_summary):
+        """
+        Test that the summarize_reports task is called when a processing list is provided.
+        """
+        mock_update_summary.delay = Mock()
+
+        report_meta = {}
+        report_meta['start_date'] = str(DateAccessor().today())
+        report_meta['schema_name'] = self.test_schema
+        report_meta['provider_type'] = 'OCP'
+        report_meta['provider_uuid'] = self.ocp_test_provider_uuid
+        report_meta['manifest_id'] = 1
+        reports_to_summarize = [report_meta]
+
+        summarize_reports(reports_to_summarize)
+        mock_update_summary.delay.assert_called()
 
 
 class TestProcessorTasks(MasuTestCase):
@@ -308,87 +336,48 @@ class TestProcessorTasks(MasuTestCase):
                                      'provider_type': 'AWS',
                                      'schema_name': self.fake.word(),
                                      'billing_source': self.fake.word(),
-                                     'provider_uuid': '6e212746-484a-40cd-bba0-09a19d132d64'}
-
-    @patch('masu.processor.tasks._get_report_files')
-    @patch('masu.processor.tasks.process_report_file')
-    def test_get_report_files_second_task_called(self,
-                                                 mock_process_files,
-                                                 mock_get_files):
-        """Test that the chained task is called."""
-        mock_process_files.delay = Mock()
-        mock_get_files.return_value = self.fake_reports
-
-        get_report_files(**self.fake_get_report_args)
-
-        expected_calls = [
-            call(self.fake_get_report_args.get('schema_name'),
-                 report['file'],
-                 report['compression'])
-            for report in self.fake_reports
-        ]
-
-        mock_process_files.delay.has_calls(expected_calls, any_order=True)
-
-    @patch('masu.processor.tasks._get_report_files',
-           return_value=[])
-    @patch('masu.processor.tasks.process_report_file')
-    def test_get_report_files_second_task_not_called(self,
-                                                     mock_process_files,
-                                                     mock_get_files):
-        """Test that the chained task is not called."""
-        mock_process_files.delay = Mock()
-        get_report_files(**self.fake_get_report_args)
-        mock_process_files.delay.assert_not_called()
+                                     'provider_uuid': self.aws_test_provider_uuid}
 
     @patch('masu.processor.tasks.ReportStatsDBAccessor.get_last_completed_datetime')
     @patch('masu.processor.tasks.ReportStatsDBAccessor.get_last_started_datetime')
     @patch('masu.processor.tasks._get_report_files')
-    @patch('masu.processor.tasks.process_report_file')
     def test_get_report_files_timestamps_aligned(self,
-                                                 mock_process_files,
                                                  mock_get_files,
                                                  mock_started,
                                                  mock_completed):
         """
-        Test that the chained task is not called when start timestamp is before
-        end timestamp since both started and completed times are present.
+        Test to return reports only when they have not been processed.
         """
-        mock_process_files.delay = Mock()
         mock_get_files.return_value = self.fake_reports
 
         mock_started.return_value = self.yesterday
         mock_completed.return_value = self.today
 
-        get_report_files(**self.fake_get_report_args)
-        mock_process_files.delay.assert_not_called()
+        reports = get_report_files(**self.fake_get_report_args)
+        self.assertEqual(reports, [])
 
     @patch('masu.processor.tasks.ReportStatsDBAccessor.get_last_completed_datetime')
     @patch('masu.processor.tasks.ReportStatsDBAccessor.get_last_started_datetime')
     @patch('masu.processor.tasks._get_report_files')
-    @patch('masu.processor.tasks.process_report_file')
     def test_get_report_files_timestamps_misaligned(self,
-                                                    mock_process_files,
                                                     mock_get_files,
                                                     mock_started,
                                                     mock_completed):
         """
-        Test that the chained task is called when start timestamp is before
-        end timestamp.
+        Test to return reports with misaligned timestamps.
         """
-        mock_process_files.delay = Mock()
         mock_get_files.return_value = self.fake_reports
 
         mock_started.return_value = self.today
         mock_completed.return_value = self.yesterday
 
-        get_report_files(**self.fake_get_report_args)
-        mock_process_files.delay.assert_not_called()
+        reports = get_report_files(**self.fake_get_report_args)
+        self.assertEqual(reports, [])
 
     @patch('masu.processor.tasks.ReportStatsDBAccessor.get_last_completed_datetime')
     @patch('masu.processor.tasks.ReportStatsDBAccessor.get_last_started_datetime')
     @patch('masu.processor.tasks._get_report_files')
-    @patch('masu.processor.tasks.process_report_file')
+    @patch('masu.processor.tasks._process_report_file')
     def test_get_report_files_timestamps_empty_start(self,
                                                      mock_process_files,
                                                      mock_get_files,
@@ -397,22 +386,20 @@ class TestProcessorTasks(MasuTestCase):
         """
         Test that the chained task is called when no start time is set.
         """
-        mock_process_files.delay = Mock()
+        mock_process_files.apply_async = Mock()
         mock_get_files.return_value = self.fake_reports
 
         mock_started.return_value = None
         mock_completed.return_value = self.today
-        get_report_files(**self.fake_get_report_args)
-        mock_process_files.assert_called()
+        reports = get_report_files(**self.fake_get_report_args)
+        self.assertIsNotNone(reports)
 
     @patch('masu.processor.tasks.ReportStatsDBAccessor.get_last_completed_datetime')
     @patch('masu.processor.tasks.ReportStatsDBAccessor.get_last_started_datetime')
     @patch('masu.processor.tasks._get_report_files')
-    @patch('masu.processor.tasks.process_report_file')
     @patch('masu.external.date_accessor.DateAccessor.today')
     def test_get_report_files_timestamps_empty_end(self,
                                                    mock_date,
-                                                   mock_process_files,
                                                    mock_get_files,
                                                    mock_started,
                                                    mock_completed):
@@ -420,7 +407,6 @@ class TestProcessorTasks(MasuTestCase):
         Test that the chained task is not called when no end time is set since
         processing is in progress.
         """
-
         mock_get_files.return_value = self.fake_reports
 
         mock_started.return_value = self.today
@@ -429,14 +415,13 @@ class TestProcessorTasks(MasuTestCase):
         mock_date.return_value = self.today + timedelta(hours=1)
 
         mock_completed.return_value = None
-        get_report_files(**self.fake_get_report_args)
-
-        mock_process_files.assert_not_called()
+        reports = get_report_files(**self.fake_get_report_args)
+        self.assertEqual(reports, [])
 
     @patch('masu.processor.tasks.ReportStatsDBAccessor.get_last_completed_datetime')
     @patch('masu.processor.tasks.ReportStatsDBAccessor.get_last_started_datetime')
     @patch('masu.processor.tasks._get_report_files')
-    @patch('masu.processor.tasks.process_report_file')
+    @patch('masu.processor.tasks._process_report_file')
     @patch('masu.external.date_accessor.DateAccessor.today_with_timezone')
     def test_get_report_files_timestamps_empty_end_timeout(self,
                                                            mock_date,
@@ -448,20 +433,20 @@ class TestProcessorTasks(MasuTestCase):
         Test that the chained task is called when no end time is set since
         processing has exceeded the timeout.
         """
-        mock_process_files.delay = Mock()
+        mock_process_files.apply_async = Mock()
         mock_get_files.return_value = self.fake_reports
 
         mock_started.return_value = self.today
         mock_completed.return_value = None
 
         mock_date.return_value = self.today + timedelta(hours=3)
-        get_report_files(**self.fake_get_report_args)
-        mock_process_files.assert_called()
+        reports = get_report_files(**self.fake_get_report_args)
+        self.assertIsNotNone(reports)
 
     @patch('masu.processor.tasks.ReportStatsDBAccessor.get_last_completed_datetime')
     @patch('masu.processor.tasks.ReportStatsDBAccessor.get_last_started_datetime')
     @patch('masu.processor.tasks._get_report_files')
-    @patch('masu.processor.tasks.process_report_file')
+    @patch('masu.processor.tasks._process_report_file')
     @patch('masu.external.date_accessor.DateAccessor.today_with_timezone')
     def test_get_report_files_timestamps_empty_end_no_timeout(self,
                                                               mock_date,
@@ -480,60 +465,28 @@ class TestProcessorTasks(MasuTestCase):
 
         mock_date.return_value = self.today + timedelta(hours=1)
 
-        get_report_files(**self.fake_get_report_args)
-        mock_process_files.assert_not_called()
+        reports = get_report_files(**self.fake_get_report_args)
+        self.assertIsNotNone(reports)
 
     @patch('masu.processor.tasks.ReportStatsDBAccessor.get_last_completed_datetime')
     @patch('masu.processor.tasks.ReportStatsDBAccessor.get_last_started_datetime')
     @patch('masu.processor.tasks._get_report_files')
-    @patch('masu.processor.tasks.process_report_file')
+    @patch('masu.processor.tasks._process_report_file')
     def test_get_report_files_timestamps_empty_both(self,
-                                                    mock_process_files,
+                                                    mock_process_file,
                                                     mock_get_files,
                                                     mock_started,
                                                     mock_completed):
         """
         Test that the chained task is called when no timestamps are set.
         """
-        mock_process_files.delay = Mock()
         mock_get_files.return_value = self.fake_reports
+        mock_process_file.return_value = None
 
         mock_started.return_value = None
         mock_completed.return_value = None
-        get_report_files(**self.fake_get_report_args)
-        mock_process_files.assert_called()
-
-    @patch('masu.processor.tasks.update_summary_tables')
-    @patch('masu.processor.tasks._process_report_file')
-    def test_process_report_file(self, mock_process_files, mock_update_task):
-        """Test process report file functionality."""
-        expected_start_date = DateAccessor().today() - timedelta(days=2)
-        expected_end_date = DateAccessor().today().strftime('%Y-%m-%d')
-        expected_start_date = expected_start_date.strftime('%Y-%m-%d')
-        schema_name = self.fake.word()
-        report_dict = {
-            'file': 'path/to/file',
-            'compression': 'GZIP',
-            'start_date': datetime.utcnow()
-        }
-        provider = 'AWS'
-        provider_uuid = '6e212746-484a-40cd-bba0-09a19d132d64'
-        process_report_file(schema_name, provider, provider_uuid, report_dict)
-
-        mock_process_files.assert_called_with(
-            schema_name,
-            provider,
-            provider_uuid,
-            report_dict
-        )
-        mock_update_task.delay.assert_called_with(
-            schema_name,
-            provider,
-            provider_uuid,
-            expected_start_date,
-            end_date=expected_end_date,
-            manifest_id=None
-        )
+        reports = get_report_files(**self.fake_get_report_args)
+        self.assertIsNotNone(reports)
 
 
 class TestRemoveExpiredDataTasks(MasuTestCase):
@@ -551,7 +504,7 @@ class TestRemoveExpiredDataTasks(MasuTestCase):
         # disable logging override set in masu/__init__.py
         logging.disable(logging.NOTSET)
         with self.assertLogs('masu.processor._tasks.remove_expired') as logger:
-            remove_expired_data(schema_name='acct10001', provider='AWS', simulate=True)
+            remove_expired_data(schema_name=self.test_schema, provider='AWS', simulate=True)
             self.assertIn(expected.format(str(expected_results)), logger.output)
 
 
@@ -578,7 +531,7 @@ class TestUpdateSummaryTablesTask(MasuTestCase):
     def setUp(self):
         """Set up each test."""
         super().setUp()
-        self.schema_name = 'acct10001'
+        self.schema_name = self.test_schema
         self.aws_accessor = AWSReportDBAccessor(schema=self.schema_name,
                                                 column_map=self.column_map)
         self.ocp_accessor = OCPReportDBAccessor(schema=self.schema_name,
@@ -610,7 +563,7 @@ class TestUpdateSummaryTablesTask(MasuTestCase):
                     pricing,
                     reservation
                 )
-        provider_ocp_uuid = '3c6e687e-1a09-4a05-970c-2ccf44b0952e'
+        provider_ocp_uuid = self.ocp_test_provider_uuid
 
         with ProviderDBAccessor(provider_uuid=provider_ocp_uuid) as provider_accessor:
             provider_id = provider_accessor.get_provider().id
@@ -671,7 +624,7 @@ class TestUpdateSummaryTablesTask(MasuTestCase):
     def test_update_summary_tables_aws_end_date(self, mock_charge_info):
         """Test that the summary table task respects a date range."""
         provider = 'AWS'
-        provider_aws_uuid = '6e212746-484a-40cd-bba0-09a19d132d64'
+        provider_aws_uuid = self.aws_test_provider_uuid
         ce_table_name = AWS_CUR_TABLE_MAP['cost_entry']
         daily_table_name = AWS_CUR_TABLE_MAP['line_item_daily']
         summary_table_name = AWS_CUR_TABLE_MAP['line_item_daily_summary']
@@ -736,7 +689,7 @@ class TestUpdateSummaryTablesTask(MasuTestCase):
         mock_mem_rate.return_value = mem_rate
 
         provider = 'OCP'
-        provider_ocp_uuid = '3c6e687e-1a09-4a05-970c-2ccf44b0952e'
+        provider_ocp_uuid = self.ocp_test_provider_uuid
 
         daily_table_name = OCP_REPORT_TABLE_MAP['line_item_daily']
         start_date = self.start_date.replace(day=1) + relativedelta.relativedelta(months=-1)
@@ -750,7 +703,7 @@ class TestUpdateSummaryTablesTask(MasuTestCase):
 
         self.assertNotEqual(daily_query.count(), initial_daily_count)
 
-        update_charge_info(schema_name='acct10001', provider_uuid=provider_ocp_uuid)
+        update_charge_info(schema_name=self.test_schema, provider_uuid=provider_ocp_uuid)
 
         table_name = OCP_REPORT_TABLE_MAP['line_item_daily_summary']
         with ProviderDBAccessor(provider_ocp_uuid) as provider_accessor:
@@ -784,7 +737,7 @@ class TestUpdateSummaryTablesTask(MasuTestCase):
         mock_cpu_rate.return_value = 1.5
         mock_mem_rate.return_value = 2.5
         provider = 'OCP'
-        provider_ocp_uuid = '3c6e687e-1a09-4a05-970c-2ccf44b0952e'
+        provider_ocp_uuid = self.ocp_test_provider_uuid
         ce_table_name = OCP_REPORT_TABLE_MAP['report']
         daily_table_name = OCP_REPORT_TABLE_MAP['line_item_daily']
 
@@ -826,7 +779,7 @@ class TestUpdateSummaryTablesTask(MasuTestCase):
 
     def test_update_charge_info_aws(self):
         """Test that update_charge_info is not called for AWS."""
-        update_charge_info(schema_name='acct10001',
+        update_charge_info(schema_name=self.test_schema,
                            provider_uuid=self.aws_test_provider_uuid)
         # FIXME: no asserts on test
 

@@ -29,6 +29,7 @@ objects:
     app-config: /opt/app-root/src/masu/gunicorn.py
     app-home: /opt/app-root/src/masu
     app-module: masu.__init__:create_app()
+    app-namespace: ${NAMESPACE}
     rabbitmq-host: rabbitmq.${NAMESPACE}.svc
     insights-kafka-server-host: ${KAFKA_HOST}.${KAFKA_NAMESPACE}.svc
     insights-kafka-server-port: ${KAFKA_PORT}

@@ -296,6 +296,36 @@ objects:
                   name: ${NAME}
                   key: kafka-connect
                   optional: true
+            - name: NAMESPACE
+              valueFrom:
+                configMapKeyRef:
+                  name: ${NAME}
+                  key: app-namespace
+                  optional: true
+            - name: CW_AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  key: cw-aws-access-key-id
+                  name: cloudwatch
+                  optional: true
+            - name: CW_AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  key: cw-aws-secret-access-key
+                  name: cloudwatch
+                  optional: true
+            - name: CW_AWS_REGION
+              valueFrom:
+                secretKeyRef:
+                  key: cw-aws-region
+                  name: cloudwatch
+                  optional: true
+            - name: CW_LOG_GROUP
+              valueFrom:
+                secretKeyRef:
+                  key: cw-log-group
+                  name: cloudwatch
+                  optional: true
           resources:
             requests:
               cpu: ${CELERY_WORKER_CPU_REQUEST}

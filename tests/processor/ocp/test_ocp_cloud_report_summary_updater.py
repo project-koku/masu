@@ -17,8 +17,9 @@
 
 """Test the OCPCloudReportSummaryUpdaterTest."""
 import datetime
-from unittest.mock import patch
+from unittest.mock import patch, Mock
 
+from masu.database.provider_db_accessor import ProviderDBAccessor
 from masu.external.date_accessor import DateAccessor
 from masu.processor.ocp.ocp_cloud_summary_updater import OCPCloudReportSummaryUpdater
 
@@ -32,27 +33,7 @@ class OCPCloudReportSummaryUpdaterTest(MasuTestCase):
     def setUpClass(cls):
         """Set up the test class with required objects."""
         super().setUpClass()
-        cls.updater = OCPCloudReportSummaryUpdater(schema='acct10001')
         cls.date_accessor = DateAccessor()
-
-    @patch('masu.processor.ocp.ocp_cloud_summary_updater.AWSReportDBAccessor.populate_ocp_on_aws_cost_daily_summary')
-    @patch('masu.database.ocp_report_db_accessor.OCPReportDBAccessor.populate_cost_summary_table')
-    def test_update_summary_tables(self, mock_ocp, mock_ocp_on_aws):
-        """Test that summary tables are properly run."""
-        start_date = self.date_accessor.today_with_timezone('UTC')
-        end_date = start_date + datetime.timedelta(days=1)
-        start_date_str = start_date.strftime('%Y-%m-%d')
-        end_date_str = end_date.strftime('%Y-%m-%d')
-
-        self.updater.update_summary_tables(
-            start_date_str,
-            end_date_str,
-            self.aws_test_provider_uuid,
-            None
-        )
-
-        mock_ocp_on_aws.assert_called_with(start_date_str, end_date_str, None, [])
-        mock_ocp.assert_not_called()
 
     @patch('masu.processor.ocp.ocp_cloud_summary_updater.AWSReportDBAccessor.populate_ocp_on_aws_cost_daily_summary')
     @patch('masu.database.ocp_report_db_accessor.OCPReportDBAccessor.populate_cost_summary_table')
@@ -66,12 +47,14 @@ class OCPCloudReportSummaryUpdaterTest(MasuTestCase):
         end_date = start_date + datetime.timedelta(days=1)
         start_date_str = start_date.strftime('%Y-%m-%d')
         end_date_str = end_date.strftime('%Y-%m-%d')
-        self.updater.update_summary_tables(
-            start_date_str,
-            end_date_str,
-            self.ocp_test_provider_uuid,
-            None
+        with ProviderDBAccessor(self.ocp_test_provider_uuid) as provider_accessor:
+            provider = provider_accessor.get_provider()
+        updater = OCPCloudReportSummaryUpdater(
+            schema='acct10001',
+            provider=provider,
+            manifest=None
         )
+        updater.update_summary_tables(start_date_str, end_date_str)
 
         mock_ocp_on_aws.assert_called_with(start_date_str, end_date_str,
                                            fake_cluster, [])
@@ -79,23 +62,28 @@ class OCPCloudReportSummaryUpdaterTest(MasuTestCase):
 
     @patch('masu.processor.ocp.ocp_cloud_summary_updater.AWSReportDBAccessor.populate_ocp_on_aws_cost_daily_summary')
     @patch('masu.database.ocp_report_db_accessor.OCPReportDBAccessor.populate_cost_summary_table')
-    @patch('masu.processor.ocp.ocp_cloud_summary_updater.get_bill_ids_from_provider')
+    @patch('masu.processor.ocp.ocp_cloud_summary_updater.get_bills_from_provider')
     def test_update_summary_tables_with_aws_provider(self, mock_utility,
                                                      mock_ocp, mock_ocp_on_aws):
         """Test that summary tables are properly run for an OCP provider."""
-        fake_bill_ids = [1,2]
-        mock_utility.return_value = fake_bill_ids
+        fake_bills = [Mock(), Mock()]
+        fake_bills[0].id = 1
+        fake_bills[1].id = 2
+        bill_ids = [str(bill.id) for bill in fake_bills]
+        mock_utility.return_value = fake_bills
         start_date = self.date_accessor.today_with_timezone('UTC')
         end_date = start_date + datetime.timedelta(days=1)
         start_date_str = start_date.strftime('%Y-%m-%d')
         end_date_str = end_date.strftime('%Y-%m-%d')
-        self.updater.update_summary_tables(
-            start_date_str,
-            end_date_str,
-            self.ocp_test_provider_uuid,
-            None
+        with ProviderDBAccessor(self.aws_test_provider_uuid) as provider_accessor:
+            provider = provider_accessor.get_provider()
+        updater = OCPCloudReportSummaryUpdater(
+            schema='acct10001',
+            provider=provider,
+            manifest=None
         )
+        updater.update_summary_tables(start_date_str, end_date_str)
 
         mock_ocp_on_aws.assert_called_with(start_date_str, end_date_str,
-                                           None, fake_bill_ids)
+                                           None, bill_ids)
         mock_ocp.assert_not_called()

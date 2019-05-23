@@ -33,7 +33,7 @@ from masu.database.provider_db_accessor import ProviderDBAccessor
 from masu.database.reporting_common_db_accessor import ReportingCommonDBAccessor
 from masu.external import AWS_REGIONS
 from masu.external.date_accessor import DateAccessor
-from masu.util.aws.common import get_bill_ids_from_provider
+from masu.util.aws.common import get_bills_from_provider
 from masu.util.aws import common as utils
 
 from tests import MasuTestCase
@@ -223,10 +223,12 @@ class TestAWSUtils(MasuTestCase):
                 bill = creator.create_cost_entry_bill(bill_date=start_date)
                 expected_bill_ids.append(str(bill.id))
 
-        bill_ids = utils.get_bill_ids_from_provider(
+        bills = utils.get_bills_from_provider(
             self.aws_test_provider_uuid,
             self.test_schema
         )
+
+        bill_ids = [str(bill.id) for bill in bills]
 
         self.assertEqual(bill_ids, expected_bill_ids)
 
@@ -256,12 +258,12 @@ class TestAWSUtils(MasuTestCase):
             bills = bills.filter(bill_obj.billing_period_start>=end_date.date()).all()
             expected_bill_ids = [str(bill.id) for bill in bills]
 
-
-        bill_ids = utils.get_bill_ids_from_provider(
+        bills = utils.get_bills_from_provider(
             self.aws_test_provider_uuid,
             self.test_schema,
             start_date=end_date
         )
+        bill_ids = [str(bill.id) for bill in bills]
 
         self.assertEqual(bill_ids, expected_bill_ids)
 
@@ -292,11 +294,12 @@ class TestAWSUtils(MasuTestCase):
             expected_bill_ids = [str(bill.id) for bill in bills]
 
 
-        bill_ids = utils.get_bill_ids_from_provider(
+        bills = utils.get_bills_from_provider(
             self.aws_test_provider_uuid,
             self.test_schema,
             end_date=start_date
         )
+        bill_ids = [str(bill.id) for bill in bills]
 
         self.assertEqual(bill_ids, expected_bill_ids)
 
@@ -328,13 +331,13 @@ class TestAWSUtils(MasuTestCase):
                 .filter(bill_obj.billing_period_start<=end_date.date()).all()
             expected_bill_ids = [str(bill.id) for bill in bills]
 
-
-        bill_ids = utils.get_bill_ids_from_provider(
+        bills = utils.get_bills_from_provider(
             self.aws_test_provider_uuid,
             self.test_schema,
             start_date=start_date,
             end_date=end_date
         )
+        bill_ids = [str(bill.id) for bill in bills]
 
         self.assertEqual(bill_ids, expected_bill_ids)
 

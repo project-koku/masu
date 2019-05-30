@@ -16,9 +16,17 @@
 #
 
 """Test the OCP util."""
+import os
+from uuid import UUID
+
+from unittest.mock import patch
+
+import tempfile
+import shutil
 
 from masu.util.ocp import common as utils
 from masu.exceptions import MasuProviderError
+from masu.config import Config
 from masu.database import OCP_REPORT_TABLE_MAP
 from masu.database.ocp_report_db_accessor import OCPReportDBAccessor
 from masu.database.provider_db_accessor import ProviderDBAccessor
@@ -76,16 +84,36 @@ class OCPUtilTests(MasuTestCase):
 
     def test_get_cluster_id_from_provider(self):
         """Test that the cluster ID is returned from OCP provider."""
-        cluster_id = utils.get_cluster_id_from_provider(self.ocp_test_provider_uuid, self.test_schema)
+        cluster_id = utils.get_cluster_id_from_provider(self.ocp_test_provider_uuid)
         self.assertIsNotNone(cluster_id)
 
     def test_get_cluster_id_from_non_ocp_provider(self):
         """Test that None is returned when getting cluster ID on non-OCP provider."""
-        cluster_id = utils.get_cluster_id_from_provider(self.aws_test_provider_uuid, self.test_schema)
+        cluster_id = utils.get_cluster_id_from_provider(self.aws_test_provider_uuid)
         self.assertIsNone(cluster_id)
 
-    def test_get_multiple_clusters_one_ocp_provider(self):
-        """Test that Exception is raised for multiple cluster IDs on a single OCP provider."""
-        self.creator.create_ocp_report_period(provider_id=self.provider_id)
-        with self.assertRaises(MasuConfigurationError):
-            utils.get_cluster_id_from_provider(self.ocp_test_provider_uuid, self.test_schema)
+    def test_get_provider_uuid_from_cluster_id(self):
+        """Test that the provider uuid is returned for a cluster ID."""
+        cluster_id = self.ocp_provider_resource_name
+        provider_uuid = utils.get_provider_uuid_from_cluster_id(cluster_id)
+        try:
+            UUID(provider_uuid)
+        except ValueError:
+            self.fail('{} is not a valid uuid.'.format(str(provider_uuid)))
+
+    def test_get_provider_uuid_from_invalid_cluster_id(self):
+        """Test that the provider uuid is not returned for an invalid cluster ID."""
+        cluster_id = 'bad_cluster_id'
+        provider_uuid = utils.get_provider_uuid_from_cluster_id(cluster_id)
+        self.assertIsNone(provider_uuid)
+
+    def test_poll_ingest_override_for_provider(self):
+        """Test that OCP polling override returns True if insights local path exists."""
+        fake_dir = tempfile.mkdtemp()
+        with patch.object(Config, 'INSIGHTS_LOCAL_REPORT_DIR', fake_dir):
+            cluster_id = utils.get_cluster_id_from_provider(self.ocp_test_provider_uuid)
+            expected_path = '{}/{}/'.format(Config.INSIGHTS_LOCAL_REPORT_DIR,
+                                            cluster_id)
+            os.makedirs(expected_path, exist_ok=True)
+            self.assertTrue(utils.poll_ingest_override_for_provider(self.ocp_test_provider_uuid))
+        shutil.rmtree(fake_dir)

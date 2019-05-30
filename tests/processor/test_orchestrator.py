@@ -70,25 +70,26 @@ class OrchestratorTest(MasuTestCase):
 
         for account in orchestrator._accounts:
             if account.get('provider_type') == AMAZON_WEB_SERVICES:
-                self.assertEqual(account.get('authentication'), 'arn:aws:iam::111111111111:role/CostManagement')
-                self.assertEqual(account.get('billing_source'), 'test-bucket')
-                self.assertEqual(account.get('customer_name'), 'acct10001')
+                self.assertEqual(account.get('authentication'), self.aws_provider_resource_name)
+                self.assertEqual(account.get('billing_source'), self.aws_test_billing_source)
+                self.assertEqual(account.get('customer_name'), self.test_schema)
             elif account.get('provider_type') == OPENSHIFT_CONTAINER_PLATFORM:
-                self.assertEqual(account.get('authentication'), 'my-ocp-cluster-1')
-                self.assertEqual(account.get('billing_source'), None)
-                self.assertEqual(account.get('customer_name'), 'acct10001')
+                self.assertEqual(account.get('authentication'), self.ocp_provider_resource_name)
+                self.assertEqual(account.get('billing_source'), self.ocp_test_billing_source)
+                self.assertEqual(account.get('customer_name'), self.test_schema)
             else:
                 self.fail('Unexpected provider')
 
-    @patch('masu.external.account_label.AccountLabel._set_labler', return_value=None)
-    @patch('masu.external.report_downloader.ReportDownloader._set_downloader', return_value=FakeDownloader)
-    @patch('masu.processor.orchestrator.get_report_files.apply_async', return_value=True)
-    def test_prepare(self, mock_task, mock_downloader, mock_labeler):
-        """Test downloading cost usage reports."""
-        orchestrator = Orchestrator()
+        if len(orchestrator._polling_accounts) != 1:
+            self.fail("Unexpected number of listener test accounts")
 
-        reports = orchestrator.prepare()
-        self.assertTrue(reports)
+        for account in orchestrator._polling_accounts:
+            if account.get('provider_type') == AMAZON_WEB_SERVICES:
+                self.assertEqual(account.get('authentication'), self.aws_provider_resource_name)
+                self.assertEqual(account.get('billing_source'), self.aws_test_billing_source)
+                self.assertEqual(account.get('customer_name'), self.test_schema)
+            else:
+                self.fail('Unexpected provider')
 
     @patch('masu.external.report_downloader.ReportDownloader._set_downloader', return_value=FakeDownloader)
     @patch('masu.external.accounts_accessor.AccountsAccessor.get_accounts', return_value=[])

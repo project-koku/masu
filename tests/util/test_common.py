@@ -21,6 +21,12 @@ import json
 from datetime import datetime
 from decimal import Decimal
 
+from masu.external import (AMAZON_WEB_SERVICES,
+                           AWS_LOCAL_SERVICE_PROVIDER,
+                           LISTEN_INGEST,
+                           OCP_LOCAL_SERVICE_PROVIDER,
+                           OPENSHIFT_CONTAINER_PLATFORM,
+                           POLL_INGEST)
 import masu.util.common as common_utils
 
 from tests import MasuTestCase
@@ -90,3 +96,15 @@ class CommonUtilTests(MasuTestCase):
         self.assertIsInstance(result['int'], str)
         self.assertIsInstance(result['str'], str)
         self.assertIsInstance(result['Decimal'], str)
+
+    def test_ingest_method_type(self):
+        """Test taht the correct ingest method is returned for provider type."""
+        test_matrix = [{'provider_type': AMAZON_WEB_SERVICES, 'expected_ingest': POLL_INGEST},
+                       {'provider_type': AWS_LOCAL_SERVICE_PROVIDER, 'expected_ingest': POLL_INGEST},
+                       {'provider_type': OPENSHIFT_CONTAINER_PLATFORM, 'expected_ingest': LISTEN_INGEST},
+                       {'provider_type': OCP_LOCAL_SERVICE_PROVIDER, 'expected_ingest': POLL_INGEST},
+                       {'provider_type': 'NEW_TYPE', 'expected_ingest': None}]
+        
+        for test in test_matrix:
+            ingest_method = common_utils.ingest_method_for_provider(test.get('provider_type'))
+            self.assertEqual(ingest_method, test.get('expected_ingest'))

@@ -9,6 +9,7 @@ omit =
   */test_*.py
   masu/gunicorn.py
   masu/celery/worker.py
+  masu/listener/run.py
   masu/*/*_interface.py
 
 [report]

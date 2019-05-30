@@ -27,6 +27,9 @@ import requests
 from requests.exceptions import HTTPError
 import requests_mock
 from masu.config import Config
+from masu.external import OPENSHIFT_CONTAINER_PLATFORM
+from masu.external.accounts_accessor import (AccountsAccessor, AccountsAccessorError)
+from masu.external.date_accessor import DateAccessor
 import masu.external.kafka_msg_handler as msg_handler
 from tests import MasuTestCase
 
@@ -41,8 +44,8 @@ class KafkaMsg:
 class KafkaMsgHandlerTest(MasuTestCase):
     """Test Cases for the Kafka msg handler."""
 
-
     def setUp(self):
+        super().setUp()
         payload_file = open('./tests/data/ocp/payload.tar.gz', 'rb')
         self.tarball_file = payload_file.read()
         payload_file.close()
@@ -107,11 +110,55 @@ class KafkaMsgHandlerTest(MasuTestCase):
 
         # Verify that when extract_payload is successful with 'hccm' message that SUCCESS_CONFIRM_STATUS is returned
         with patch('masu.external.kafka_msg_handler.extract_payload', return_value=None):
-            self.assertEqual(msg_handler.handle_message(hccm_msg), msg_handler.SUCCESS_CONFIRM_STATUS)
+            self.assertEqual(msg_handler.handle_message(hccm_msg), (msg_handler.SUCCESS_CONFIRM_STATUS, None))
 
         # Verify that when extract_payload is not successful with 'hccm' message that FAILURE_CONFIRM_STATUS is returned
         with patch('masu.external.kafka_msg_handler.extract_payload', side_effect=msg_handler.KafkaMsgHandlerError):
-            self.assertEqual(msg_handler.handle_message(hccm_msg), msg_handler.FAILURE_CONFIRM_STATUS)
+            self.assertEqual(msg_handler.handle_message(hccm_msg), (msg_handler.FAILURE_CONFIRM_STATUS, None))
 
         # Verify that when None status is returned for non-hccm messages (we don't confirm these)
-        self.assertEqual(msg_handler.handle_message(advisor_msg), None)
+        self.assertEqual(msg_handler.handle_message(advisor_msg), (None, None))
+
+    def test_get_account(self):
+        """Test that the account details are returned given a provider uuid."""
+        ocp_account = msg_handler.get_account(self.ocp_test_provider_uuid)
+        self.assertIsNotNone(ocp_account)
+        self.assertEqual(ocp_account.get('provider_type'), OPENSHIFT_CONTAINER_PLATFORM)
+
+    @patch.object(AccountsAccessor, 'get_accounts')
+    def test_get_account_exception(self, mock_accessor):
+        """Test that no account is returned upon exception."""
+        mock_accessor.side_effect = AccountsAccessorError('Sample timeout error')
+        ocp_account = msg_handler.get_account(self.ocp_test_provider_uuid)
+        self.assertIsNone(ocp_account)
+
+    @patch('masu.external.kafka_msg_handler.summarize_reports')
+    @patch('masu.external.kafka_msg_handler.get_report_files')
+    def test_process_report_unknown_cluster_id(self, mock_get_reports, mock_summarize):
+        """Test processing a report for an unknown cluster_id."""
+        mock_download_process_value = [{'schema_name': self.test_schema,
+                                        'provider_type': OPENSHIFT_CONTAINER_PLATFORM,
+                                        'provider_uuid': self.ocp_test_provider_uuid,
+                                        'start_date': DateAccessor().today()}]
+        mock_get_reports.return_value = mock_download_process_value
+        sample_report = {'cluster_id': 'missing_cluster_id'}
+
+        msg_handler.process_report(sample_report)
+
+        mock_summarize.delay.assert_not_called()
+
+    @patch('masu.external.kafka_msg_handler.summarize_reports')
+    @patch('masu.external.kafka_msg_handler.get_report_files')
+    def test_process_report(self, mock_get_reports, mock_summarize):
+        """Test processing a report for an unknown cluster_id."""
+        mock_download_process_value = [{'schema_name': self.test_schema,
+                                        'provider_type': OPENSHIFT_CONTAINER_PLATFORM,
+                                        'provider_uuid': self.ocp_test_provider_uuid,
+                                        'start_date': DateAccessor().today()}]
+        mock_get_reports.return_value = mock_download_process_value
+        cluster_id = self.ocp_provider_resource_name
+        sample_report = {'cluster_id': cluster_id}
+
+        msg_handler.process_report(sample_report)
+
+        mock_summarize.delay.assert_called_with(mock_download_process_value)

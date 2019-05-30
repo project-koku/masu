@@ -72,13 +72,13 @@ class OCPReportChargeUpdaterTest(MasuTestCase):
         if self.accessor._cursor.closed:
             self.accessor._cursor = self.accessor._get_psycopg2_cursor()
         provider_id = self.provider_accessor.get_provider().id
-        self.cluster_id = 'testcluster'
+        self.cluster_id = self.ocp_provider_resource_name
 
         reporting_period = self.creator.create_ocp_report_period(provider_id=provider_id, cluster_id=self.cluster_id)
 
         report = self.creator.create_ocp_report(reporting_period, reporting_period.report_period_start)
         self.updater = OCPReportChargeUpdater(
-            schema='acct10001',
+            schema=self.test_schema,
             provider_uuid=self.ocp_provider_uuid
         )
         self.creator.create_ocp_usage_line_item(

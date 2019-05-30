@@ -40,5 +40,11 @@ class MasuTestCase(TestCase):
         )
         self.client = self.app.test_client()
         self.test_schema = 'acct10001'
+        self.aws_db_auth_id = '1'
+        self.ocp_db_auth_id = '2'
         self.ocp_test_provider_uuid = '3c6e687e-1a09-4a05-970c-2ccf44b0952e'
         self.aws_test_provider_uuid = '6e212746-484a-40cd-bba0-09a19d132d64'
+        self.aws_provider_resource_name = 'arn:aws:iam::111111111111:role/CostManagement'
+        self.ocp_provider_resource_name = 'my-ocp-cluster-1'
+        self.aws_test_billing_source = 'test-bucket'
+        self.ocp_test_billing_source = None

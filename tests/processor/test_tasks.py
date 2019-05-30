@@ -568,7 +568,7 @@ class TestUpdateSummaryTablesTask(MasuTestCase):
         with ProviderDBAccessor(provider_uuid=provider_ocp_uuid) as provider_accessor:
             provider_id = provider_accessor.get_provider().id
 
-        cluster_id = 'testcluster'
+        cluster_id = self.ocp_provider_resource_name
         for period_date in (self.start_date, last_month):
             period = self.creator.create_ocp_report_period(period_date, provider_id=provider_id,
                                                            cluster_id=cluster_id)

@@ -90,7 +90,10 @@ class OCPReportSummaryUpdaterTest(MasuTestCase):
             self.provider = provider_accessor.get_provider()
 
         today = DateAccessor().today_with_timezone('UTC')
-        self.report_period = self.creator.create_ocp_report_period(today, provider_id=self.provider.id)
+        cluster_id = self.ocp_provider_resource_name
+        self.report_period = self.creator.create_ocp_report_period(today,
+                                                                   provider_id=self.provider.id,
+                                                                   cluster_id=cluster_id)
         report = self.creator.create_ocp_report(self.report_period, today)
         self.creator.create_ocp_usage_line_item(
             self.report_period,

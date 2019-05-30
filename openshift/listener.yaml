@@ -1,10 +1,10 @@
 kind: Template
 apiVersion: v1
 metadata:
-  name: masu-worker-template
+  name: masu-listener-template
   annotations:
     openshift.io/display-name: "Masu"
-    description: "Worker for data ingestion engine for Koku"
+    description: "Listener for data ingestion engine for Koku"
     tags: "python,flask"
     iconClass: "icon-python"
     openshift.io/long-description: "This template defines resources needed to run the Masu application, including a build configuration and an application deployment configuration."
@@ -20,7 +20,7 @@ objects:
     annotations:
       description: Defines how to build the application
       template.alpha.openshift.io/wait-for-ready: "true"
-    name: ${NAME}-worker
+    name: ${NAME}-listener
     labels:
       app: ${NAME}
   spec:
@@ -29,7 +29,7 @@ objects:
     output:
       to:
         kind: ImageStreamTag
-        name: ${NAME}-worker:latest
+        name: ${NAME}-listener:latest
     resources:
       requests:
         memory: ${BUILD_MEMORY_REQUEST}
@@ -83,54 +83,54 @@ objects:
   apiVersion: v1
   metadata:
     annotations:
-      description: Masu worker statistics
+      description: Masu listener statistics
       prometheus.io/scrape: 'true'
       prometheus.io/path: /metrics
       prometheus.io/port: '9999'
-    name: masu-stats
+    name: masu-listener-stats
     labels:
-      app: ${NAME}-worker
+      app: ${NAME}-listener
   spec:
     ports:
     - port: 9999
       name: stats
     selector:
-      template: ${NAME}-worker-template
+      template: ${NAME}-listener-template
 - kind: StatefulSet
   apiVersion: apps/v1beta1
   metadata:
     annotations:
-      description: Defines how to deploy the celery workers
+      description: Defines how to deploy the listener
       template.alpha.openshift.io/wait-for-ready: "true"
-    name: ${NAME}-worker
+    name: ${NAME}-listener
     labels:
       app: ${NAME}
   spec:
-    replicas: ${CELERY_WORKER_REPLICAS}
+    replicas: ${LISTENER_REPLICAS}
     selector:
       matchLabels:
         app: ${NAME}
     resources:
       requests:
-        cpu: ${CELERY_WORKER_CPU_REQUEST}
-        memory: ${CELERY_WORKER_MEMORY_REQUEST}
+        cpu: ${LISTENER_CPU_REQUEST}
+        memory: ${LISTENER_MEMORY_REQUEST}
       limits:
-        cpu: ${CELERY_WORKER_CPU_LIMIT}
-        memory: ${CELERY_WORKER_MEMORY_LIMIT}
+        cpu: ${LISTENER_CPU_LIMIT}
+        memory: ${LISTENER_MEMORY_LIMIT}
     strategy:
       type: Recreate
     template:
       metadata:
         labels:
           app: ${NAME}
-          template: ${NAME}-worker-template
-        name: ${NAME}-worker
+          template: ${NAME}-listener-template
+        name: ${NAME}-listener
         annotations:
           alpha.image.policy.openshift.io/resolve-names: '*'
       spec:
         containers:
-        - name: ${NAME}-worker
-          image: ${NAME}-worker
+        - name: ${NAME}-listener
+          image: ${NAME}-listener
           ports:
           - containerPort: 9999
             name: stats
@@ -139,7 +139,7 @@ objects:
             - -c
             - >
               PYTHONPATH=. scl enable rh-python36 --
-              celery -A masu.celery.worker worker -E -l $LOG_LEVEL -Q $WORKER_QUEUES
+              python masu/listener/run.py
           env:
             - name: DATABASE_USER
               valueFrom:
@@ -195,47 +195,29 @@ objects:
                   name: ${NAME}
                   key: rabbitmq-host
                   optional: false
+            - name: INSIGHTS_KAFKA_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: ${NAME}
+                  key: insights-kafka-server-host
+                  optional: false
+            - name: INSIGHTS_KAFKA_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: ${NAME}
+                  key: insights-kafka-server-port
+                  optional: false
+            - name: INSIGHTS_KAFKA_CONN_RETRY_INTERVAL
+              valueFrom:
+                configMapKeyRef:
+                  name: ${NAME}
+                  key: insights-kafka-conn-retry-interval
+                  optional: false
             - name: LOG_LEVEL
               valueFrom:
                 configMapKeyRef:
                   name: ${NAME}
                   key: log-level
-                  optional: false
-            - name: WORKER_QUEUES
-              valueFrom:
-                configMapKeyRef:
-                  name: ${NAME}
-                  key: worker-queues
-                  optional: false
-            - name: SCHEDULE_CHECK_INTERVAL
-              valueFrom:
-                configMapKeyRef:
-                  name: ${NAME}
-                  key: schedule-check-interval
-                  optional: false
-            - name: AWS_ACCESS_KEY_ID
-              valueFrom:
-                secretKeyRef:
-                  key: aws-access-key-id
-                  name: ${NAME}
-                  optional: false
-            - name: AWS_SECRET_ACCESS_KEY
-              valueFrom:
-                secretKeyRef:
-                  key: aws-secret-access-key
-                  name: ${NAME}
-                  optional: false
-            - name: REMOVE_EXPIRED_REPORT_DATA_ON_DAY
-              valueFrom:
-                configMapKeyRef:
-                  name: ${NAME}
-                  key: remove-expired-data-on-day
-                  optional: false
-            - name: REMOVE_EXPIRED_REPORT_UTC_TIME
-              valueFrom:
-                configMapKeyRef:
-                  name: ${NAME}
-                  key: remove-expired-data-utc-time
                   optional: false
             - name: prometheus_multiproc_dir
               valueFrom:
@@ -249,76 +231,34 @@ objects:
                   name: ${NAME}
                   key: date-override
                   optional: true
-            - name: MASU_RETAIN_NUM_MONTHS
-              valueFrom:
-                configMapKeyRef:
-                  name: ${NAME}
-                  key: retain-num-months
-                  optional: true
-            - name: INITIAL_INGEST_NUM_MONTHS
-              valueFrom:
-                configMapKeyRef:
-                  name: ${NAME}
-                  key: initial-ingest-num-months
-                  optional: true
-            - name: INITIAL_INGEST_OVERRIDE
-              valueFrom:
-                configMapKeyRef:
-                  name: ${NAME}
-                  key: initial-ingest-override
-                  optional: true
             - name: DEBUG
               valueFrom:
                 configMapKeyRef:
                   name: ${NAME}
                   key: debug
                   optional: true
-            - name: NAMESPACE
+            - name: KAFKA_CONNECT
               valueFrom:
                 configMapKeyRef:
                   name: ${NAME}
-                  key: app-namespace
-                  optional: true
-            - name: CW_AWS_ACCESS_KEY_ID
-              valueFrom:
-                secretKeyRef:
-                  key: cw-aws-access-key-id
-                  name: cloudwatch
-                  optional: true
-            - name: CW_AWS_SECRET_ACCESS_KEY
-              valueFrom:
-                secretKeyRef:
-                  key: cw-aws-secret-access-key
-                  name: cloudwatch
-                  optional: true
-            - name: CW_AWS_REGION
-              valueFrom:
-                secretKeyRef:
-                  key: cw-aws-region
-                  name: cloudwatch
-                  optional: true
-            - name: CW_LOG_GROUP
-              valueFrom:
-                secretKeyRef:
-                  key: cw-log-group
-                  name: cloudwatch
+                  key: kafka-connect
                   optional: true
           resources:
             requests:
-              cpu: ${CELERY_WORKER_CPU_REQUEST}
-              memory: ${CELERY_WORKER_MEMORY_REQUEST}
+              cpu: ${LISTENER_CPU_REQUEST}
+              memory: ${LISTENER_MEMORY_REQUEST}
             limits:
-              cpu: ${CELERY_WORKER_CPU_LIMIT}
-              memory: ${CELERY_WORKER_MEMORY_LIMIT}
+              cpu: ${LISTENER_CPU_LIMIT}
+              memory: ${LISTENER_MEMORY_LIMIT}
           volumeMounts:
           - mountPath: /var/tmp/masu/
-            name: ${NAME}-worker-data
+            name: ${NAME}-listener-data
     volumeClaimTemplates:
     - metadata:
         labels:
           app: ${NAME}
           template: ${NAME}-template
-        name: ${NAME}-worker-data
+        name: ${NAME}-listener-data
       spec:
         accessModes:
         - ReadWriteOnce
@@ -330,15 +270,15 @@ objects:
     - imageChangeParams:
         automatic: true
         containerNames:
-          - ${NAME}-worker
+          - ${NAME}-listener
         from:
           kind: ImageStreamTag
-          name: ${NAME}-worker:latest
+          name: ${NAME}-listener:latest
       type: ImageChange
 - kind: ImageStream
   apiVersion: v1
   metadata:
-    name: ${NAME}-worker
+    name: ${NAME}-listener
     annotations:
       description: "Keeps track of changes in the application image"
     labels:
@@ -357,29 +297,29 @@ parameters:
   name: NAMESPACE
   required: true
   value: myproject
-- description: Number of Celery Workers to create
-  displayName: Celery Worker Replicas
-  name: CELERY_WORKER_REPLICAS
+- description: Number of listeners to create
+  displayName: Masu listener Replicas
+  name: LISTENER_REPLICAS
   required: true
   value: '1'
-- description: Initial amount of memory the Flower container will request.
-  displayName: Celery Worker Memory Request
-  name: CELERY_WORKER_MEMORY_REQUEST
+- description: Initial amount of memory the listener container will request.
+  displayName: Masu Listener Memory Request
+  name: LISTENER_MEMORY_REQUEST
   required: true
   value: 1Gi
-- description: Maximum amount of memory the Flower container can use.
-  displayName: Celery Worker Memory Limit
-  name: CELERY_WORKER_MEMORY_LIMIT
+- description: Maximum amount of memory the listener container can use.
+  displayName: Masu Listener Memory Limit
+  name: LISTENER_MEMORY_LIMIT
   required: true
   value: 1Gi
-- description: Initial amount of CPU the Flower container will request.
-  displayName: Celery Worker CPU Request
-  name: CELERY_WORKER_CPU_REQUEST
+- description: Initial amount of CPU the listener container will request.
+  displayName: Masu Listener CPU Request
+  name: LISTENER_CPU_REQUEST
   required: true
   value: '500m'
-- description: Maximum amount of CPU the Flower container can use.
-  displayName: Celery Worker CPU Limit
-  name: CELERY_WORKER_CPU_LIMIT
+- description: Maximum amount of CPU the listener container can use.
+  displayName: Masu Listener CPU Limit
+  name: LISTENER_CPU_LIMIT
   required: true
   value: '1'
 - description: Initial amount of memory the build container will request.

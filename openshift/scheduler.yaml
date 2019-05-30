@@ -201,8 +201,6 @@ objects:
                   name: ${NAME}
                   key: debug
                   optional: true
-            - name: KAFKA_CONNECT
-              value: "False"
             - name: NAMESPACE
               valueFrom:
                 configMapKeyRef:

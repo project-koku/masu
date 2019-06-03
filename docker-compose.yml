@@ -51,7 +51,7 @@ services:
           context: .
           dockerfile: Dockerfile
       working_dir: /masu
-      entrypoint: ['celery', 'worker', '-A', 'masu.celery.worker', '-l', 'debug', '-B', '--broker=amqp://guest:guest@rabbit:5672//', '-Q', 'celery,download,process,remove_expired', '--loglevel=INFO']
+      entrypoint: ['celery', '-A', 'masu.celery.worker', 'worker', '-E', '-l', 'info', '-Q', 'celery,download,remove_expired,reporting,process']
       environment:
         - DATABASE_ENGINE=postgresql
         - DATABASE_NAME=${DATABASE_NAME-postgres}
@@ -59,6 +59,8 @@ services:
         - DATABASE_PORT=5432
         - DATABASE_USER=${DATABASE_USER-postgres}
         - DATABASE_PASSWORD=${DATABASE_PASSWORD-postgres}
+        - RABBITMQ_HOST=rabbit
+        - RABBITMQ_PORT=5672
         - MASU_SECRET_KEY=abc
         - AWS_ACCESS_KEY_ID
         - AWS_SECRET_ACCESS_KEY

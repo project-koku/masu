@@ -79,7 +79,8 @@ class OCPReportChargeUpdaterTest(MasuTestCase):
         report = self.creator.create_ocp_report(reporting_period, reporting_period.report_period_start)
         self.updater = OCPReportChargeUpdater(
             schema=self.test_schema,
-            provider_uuid=self.ocp_provider_uuid
+            provider_uuid=self.ocp_provider_uuid,
+            provider_id=provider_id
         )
         self.creator.create_ocp_usage_line_item(
             reporting_period,
@@ -779,6 +780,8 @@ class OCPReportChargeUpdaterTest(MasuTestCase):
         self.accessor.populate_cost_summary_table(self.cluster_id, start_date, end_date)
         self.updater.update_summary_charge_info()
 
+        with OCPReportDBAccessor(schema='acct10001', column_map=self.column_map) as accessor:
+            self.assertIsNotNone(accessor.get_current_usage_period().derived_cost_datetime)
         table_name = OCP_REPORT_TABLE_MAP['line_item_daily_summary']
 
         items = self.accessor._get_db_obj_query(table_name).all()

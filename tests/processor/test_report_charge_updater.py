@@ -22,6 +22,7 @@ from unittest.mock import patch
 from masu.external import (AMAZON_WEB_SERVICES,
                            OPENSHIFT_CONTAINER_PLATFORM,
                            OCP_LOCAL_SERVICE_PROVIDER)
+from masu.processor.aws.aws_report_charge_updater import AWSReportChargeUpdater
 from masu.processor.ocp.ocp_report_charge_updater import OCPReportChargeUpdater
 from masu.processor.report_charge_updater import (ReportChargeUpdater,
                                                   ReportChargeUpdaterError)
@@ -55,11 +56,14 @@ class ReportChargeUpdaterTest(MasuTestCase):
         updater.update_charge_info()
         mock_update.assert_called()
 
-    def test_aws_route(self):
+    @patch('masu.processor.report_charge_updater.AWSReportChargeUpdater.update_summary_charge_info')
+    def test_aws_route(self, mock_update):
         """Test that AWS charge updating works as expected."""
         provider_aws_uuid = '6e212746-484a-40cd-bba0-09a19d132d64'
         updater = ReportChargeUpdater(self.schema, provider_aws_uuid)
-        self.assertIsNone(updater._updater)
+        self.assertIsInstance(updater._updater, AWSReportChargeUpdater)
+        updater.update_charge_info()
+        mock_update.assert_called()
 
     @patch('masu.processor.report_charge_updater.OCPReportChargeUpdater.__init__')
     def test_init_fail(self, mock_updater):

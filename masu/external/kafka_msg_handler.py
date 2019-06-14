@@ -178,6 +178,7 @@ async def send_confirmation(request_id, status):  # pragma: no cover
         msg = bytes(json.dumps(validation), 'utf-8')
         LOG.info('Validating message: %s', str(msg))
         await producer.send_and_wait(VALIDATION_TOPIC, msg)
+        LOG.info('Validating message complete.')
     finally:
         await producer.stop()
 
@@ -277,6 +278,7 @@ def process_report(report):
     cluster_id = report.get('cluster_id')
     provider_uuid = utils.get_provider_uuid_from_cluster_id(cluster_id)
     if provider_uuid:
+        LOG.info('Found provider_uuid: %s for cluster_id: %s', str(provider_uuid), str(cluster_id))
         account = get_account(provider_uuid)
         LOG.info('Processing report for account %s', account)
 
@@ -285,8 +287,11 @@ def process_report(report):
 
         async_id = summarize_reports.delay(reports_to_summarize)
         LOG.info('Summarization celery uuid: %s', str(async_id))
+    else:
+        LOG.error('Could not find provider_uuid for cluster_id: %s', str(cluster_id))
 
 
+# pylint: disable=broad-except
 async def process_messages():  # pragma: no cover
     """
     Process asyncio MSG_PENDING_QUEUE and send validation status.
@@ -306,7 +311,15 @@ async def process_messages():  # pragma: no cover
             await send_confirmation(value['request_id'], status)
         if report_meta:
             with concurrent.futures.ThreadPoolExecutor() as pool:
-                await EVENT_LOOP.run_in_executor(pool, process_report, report_meta)
+                try:
+                    await EVENT_LOOP.run_in_executor(pool, process_report, report_meta)
+                    LOG.info('Processing: %s complete.', str(report_meta))
+                except Exception as error:
+                    # The reason for catching all exceptions is to ensure that the event
+                    # loop does not block if process_report fails.
+                    # Since this is a critical path for the listener it's not worth the
+                    # risk of missing an exception in the download->process sequence.
+                    LOG.error('Line item processing exception: %s', str(error))
 
 
 async def listen_for_messages(consumer):  # pragma: no cover

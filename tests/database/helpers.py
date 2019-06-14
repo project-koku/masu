@@ -262,7 +262,7 @@ class ReportObjectCreator:
                     self.fake.past_datetime()
                 )
             elif col_type == Decimal:
-                data[column] = self.fake.pydecimal(0,7)
+                data[column] = self.fake.pydecimal(0,7, positive=True)
             else:
                 data[column] = self.fake.pystr()[:8]
 

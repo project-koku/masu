@@ -281,8 +281,7 @@ class OCPReportDBAccessorTest(MasuTestCase):
         report_table = getattr(self.accessor.report_schema, report_table_name)
         daily_table = getattr(self.accessor.report_schema, daily_table_name)
 
-        start_date = DateAccessor().today_with_timezone('UTC')
-
+        start_date = self.reporting_period.report_period_start + relativedelta.relativedelta(months=1)
         period = self.creator.create_ocp_report_period(start_date, provider_id=self.ocp_provider_id, cluster_id=self.cluster_id)
         report = self.creator.create_ocp_report(period, start_date)
         for _ in range(25):

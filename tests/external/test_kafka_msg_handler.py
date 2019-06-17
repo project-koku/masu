@@ -47,8 +47,12 @@ class KafkaMsgHandlerTest(MasuTestCase):
     def setUp(self):
         super().setUp()
         payload_file = open('./tests/data/ocp/payload.tar.gz', 'rb')
+        bad_payload_file = open('./tests/data/ocp/bad_payload.tar.gz', 'rb')
         self.tarball_file = payload_file.read()
         payload_file.close()
+
+        self.bad_tarball_file = bad_payload_file.read()
+        bad_payload_file.close()
 
         self.cluster_id = 'my-ocp-cluster-1'
         self.date_range = '20190201-20190301'
@@ -60,13 +64,31 @@ class KafkaMsgHandlerTest(MasuTestCase):
             m.get(payload_url, content=self.tarball_file)
 
             fake_dir = tempfile.mkdtemp()
+            fake_pvc_dir = tempfile.mkdtemp()
             with patch.object(Config, 'INSIGHTS_LOCAL_REPORT_DIR', fake_dir):
-                msg_handler.extract_payload(payload_url)
-                expected_path = '{}/{}/{}/'.format(Config.INSIGHTS_LOCAL_REPORT_DIR,
-                                                self.cluster_id,
-                                                self.date_range)
-                self.assertTrue(os.path.isdir(expected_path))
-                shutil.rmtree(fake_dir)
+                with patch.object(Config, 'TMP_DIR', fake_dir):
+                    msg_handler.extract_payload(payload_url)
+                    expected_path = '{}/{}/{}/'.format(Config.INSIGHTS_LOCAL_REPORT_DIR,
+                                                    self.cluster_id,
+                                                    self.date_range)
+                    self.assertTrue(os.path.isdir(expected_path))
+                    shutil.rmtree(fake_dir)
+                    shutil.rmtree(fake_pvc_dir)
+
+    def test_extract_bad_payload(self):
+        """Test to verify extracting payload missing report files is not successful."""
+        payload_url = 'http://insights-upload.com/quarnantine/file_to_validate'
+        with requests_mock.mock() as m:
+            m.get(payload_url, content=self.bad_tarball_file)
+
+            fake_dir = tempfile.mkdtemp()
+            fake_pvc_dir = tempfile.mkdtemp()
+            with patch.object(Config, 'INSIGHTS_LOCAL_REPORT_DIR', fake_dir):
+                with patch.object(Config, 'TMP_DIR', fake_dir):
+                    with self.assertRaises(msg_handler.KafkaMsgHandlerError):
+                        msg_handler.extract_payload(payload_url)
+                    shutil.rmtree(fake_dir)
+                    shutil.rmtree(fake_pvc_dir)
 
     def test_extract_payload_bad_url(self):
         """Test to verify extracting payload exceptions are handled."""

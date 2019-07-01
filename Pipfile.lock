@@ -549,11 +549,10 @@
         },
         "pyfakefs": {
             "hashes": [
-                "sha256:39f1a39ed3b61def03aa4f3c38c4322273b18834e0b3cc0a200b33f36f7a4321",
-                "sha256:8cd2270d65d3316dd4dc6bb83242df2e0990d27605209bc16e8041bcc0956961"
+                "sha256:2d973133c81c005ec8d713b76e2d9cc9e4946f6d95775bd283863ccf0f3e6604",
+                "sha256:87a9819dafa2b210a26d9453aea1903eb88bd76a2425053a8f4ba6245777c498"
             ],
-            "index": "pypi",
-            "version": "==3.5.8"
+            "version": "==3.6"
         },
         "pyflakes": {
             "hashes": [

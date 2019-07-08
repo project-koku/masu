@@ -185,7 +185,9 @@ class ReportSummaryUpdaterTest(MasuTestCase):
             self.ocp_test_provider_uuid,
             manifest_id
         )
-        self.assertFalse(updater.manifest_is_ready())
+
+        # manifest_is_ready is now unconditionally returning True, so summary is expected.
+        self.assertTrue(updater.manifest_is_ready())
 
         with ReportManifestDBAccessor() as accessor:
             manifests = accessor._get_db_obj_query().all()

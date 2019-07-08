@@ -230,7 +230,7 @@ class TestAWSUtils(MasuTestCase):
 
         bill_ids = [str(bill.id) for bill in bills]
 
-        self.assertEqual(bill_ids, expected_bill_ids)
+        self.assertEqual(sorted(bill_ids), sorted(expected_bill_ids))
 
     def test_get_bill_ids_from_provider_with_start_date(self):
         """Test that bill IDs are returned for an AWS provider with start date."""

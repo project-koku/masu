@@ -293,18 +293,19 @@ class AWSReportSummaryUpdaterTest(MasuTestCase):
         self.assertIsNone(bill.summary_data_creation_datetime)
         self.assertIsNone(bill.summary_data_updated_datetime)
 
+        # manifest_is_ready is now unconditionally returning True, so summary is expected.
         if report_updater_base.manifest_is_ready():
             self.updater.update_daily_tables(start_date_str, end_date_str)
-        mock_daily.assert_not_called()
+        mock_daily.assert_called()
 
         if report_updater_base.manifest_is_ready():
             self.updater.update_summary_tables(start_date_str, end_date_str)
-        mock_summary.assert_not_called()
+        mock_summary.assert_called()
 
         with AWSReportDBAccessor('acct10001', self.column_map) as accessor:
             bill = accessor.get_cost_entry_bills_by_date(bill_date)[0]
-            self.assertIsNone(bill.summary_data_creation_datetime)
-            self.assertIsNone(bill.summary_data_updated_datetime)
+            self.assertIsNotNone(bill.summary_data_creation_datetime)
+            self.assertIsNotNone(bill.summary_data_updated_datetime)
 
     @patch('masu.processor.aws.aws_report_summary_updater.AWSReportDBAccessor.populate_line_item_daily_summary_table')
     @patch('masu.processor.aws.aws_report_summary_updater.AWSReportDBAccessor.populate_line_item_daily_table')
@@ -377,16 +378,16 @@ class AWSReportSummaryUpdaterTest(MasuTestCase):
 
         if report_updater_base.manifest_is_ready():
             self.updater.update_daily_tables(start_date_str, end_date_str)
-        mock_daily.assert_not_called()
+        mock_daily.assert_called()
 
         if report_updater_base.manifest_is_ready():
             self.updater.update_summary_tables(start_date_str, end_date_str)
-        mock_summary.assert_not_called()
+        mock_summary.assert_called()
 
         with AWSReportDBAccessor('acct10001', self.column_map) as accessor:
             bill = accessor.get_cost_entry_bills_by_date(bill_date)[0]
-            self.assertIsNone(bill.summary_data_creation_datetime)
-            self.assertIsNone(bill.summary_data_updated_datetime)
+            self.assertIsNotNone(bill.summary_data_creation_datetime)
+            self.assertIsNotNone(bill.summary_data_updated_datetime)
 
     @patch('masu.processor.aws.aws_report_summary_updater.AWSReportDBAccessor.populate_line_item_daily_summary_table')
     @patch('masu.processor.aws.aws_report_summary_updater.AWSReportDBAccessor.populate_line_item_daily_table')

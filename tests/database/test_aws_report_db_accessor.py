@@ -1002,7 +1002,8 @@ class ReportDBAccessorTest(MasuTestCase):
         initial_count = query.count()
 
         self.accessor.populate_ocp_on_aws_cost_daily_summary(last_month,
-                                                             today)
+                                                             today,
+                                                             cluster_id, bill_ids)
 
         self.assertNotEqual(query.count(), initial_count)
 

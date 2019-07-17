@@ -197,7 +197,8 @@ class ReportObjectCreator:
     def create_ocp_usage_line_item(self,
                                    report_period,
                                    report,
-                                   resource_id=None):
+                                   resource_id=None,
+                                   null_cpu_usage=False):
         """Create an OCP usage line item database object for test."""
         table_name = OCP_REPORT_TABLE_MAP['line_item']
         data = self.create_columns_for_table(table_name)
@@ -213,6 +214,8 @@ class ReportObjectCreator:
 
         row.report_period_id = report_period.id
         row.report_id = report.id
+        if null_cpu_usage:
+            row.pod_usage_cpu_core_seconds = None
 
         self.db_accessor._session.add(row)
         self.db_accessor._session.commit()

@@ -199,11 +199,13 @@ def update_summary_tables(schema_name, provider, provider_uuid, start_date, end_
     stmt = ('update_summary_tables called with args:\n'
             ' schema_name: {},\n'
             ' provider: {},\n'
+            ' provider_uuid {},\n'
             ' start_date: {},\n'
             ' end_date: {},\n'
             ' manifest_id: {}')
     stmt = stmt.format(schema_name,
                        provider,
+                       provider_uuid,
                        start_date,
                        end_date,
                        manifest_id)

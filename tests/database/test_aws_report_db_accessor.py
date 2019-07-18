@@ -806,6 +806,56 @@ class ReportDBAccessorTest(MasuTestCase):
 
         self.assertNotEqual(getattr(entry, 'tags'), {})
 
+    def test_populate_line_item_daily_table_no_bill_ids(self):
+        """Test that the daily SQL does not error when no data is present."""
+        ce_table_name = AWS_CUR_TABLE_MAP['cost_entry']
+        daily_table_name = AWS_CUR_TABLE_MAP['line_item_daily']
+
+        ce_table = getattr(self.accessor.report_schema, ce_table_name)
+        daily_table = getattr(self.accessor.report_schema, daily_table_name)
+        bill_ids = None
+
+        start_date, end_date = self.accessor._session.query(
+            func.min(ce_table.interval_start),
+            func.max(ce_table.interval_start)
+        ).first()
+        start_date = start_date.replace(hour=0, minute=0, second=0,
+                                        microsecond=0)
+        end_date = end_date.replace(hour=0, minute=0, second=0,
+                                        microsecond=0)
+
+        query = self.accessor._get_db_obj_query(daily_table_name)
+        initial_count = query.count()
+
+        self.accessor.populate_line_item_daily_table(start_date, end_date, bill_ids)
+
+        self.assertNotEqual(query.count(), initial_count)
+
+        result_start_date, result_end_date = self.accessor._session.query(
+            func.min(daily_table.usage_start),
+            func.max(daily_table.usage_start)
+        ).first()
+
+        self.assertEqual(result_start_date, start_date)
+        self.assertEqual(result_end_date, end_date)
+
+        entry = query.first()
+
+        summary_columns = [
+            'cost_entry_product_id', 'cost_entry_pricing_id',
+            'cost_entry_reservation_id', 'line_item_type', 'usage_account_id',
+            'usage_start', 'usage_end', 'product_code', 'usage_type',
+            'operation', 'availability_zone', 'resource_id', 'usage_amount',
+            'normalization_factor', 'normalized_usage_amount', 'currency_code',
+            'unblended_rate', 'unblended_cost', 'blended_rate', 'blended_cost',
+            'public_on_demand_cost', 'public_on_demand_rate', 'tags'
+        ]
+
+        for column in summary_columns:
+            self.assertIsNotNone(getattr(entry, column))
+
+        self.assertNotEqual(getattr(entry, 'tags'), {})
+
     def test_populate_line_item_daily_summary_table(self):
         """Test that the daily summary table is populated."""
         ce_table_name = AWS_CUR_TABLE_MAP['cost_entry']

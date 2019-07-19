@@ -939,6 +939,74 @@ class ReportDBAccessorTest(MasuTestCase):
         self.assertEqual(set(sorted(possible_keys)), set(sorted(found_keys)))
         self.assertEqual(set(sorted(possible_values)), set(sorted(found_values)))
 
+    def test_populate_line_item_daily_summary_table_no_bill_ids(self):
+        """Test that the daily summary table is populated."""
+        ce_table_name = AWS_CUR_TABLE_MAP['cost_entry']
+        summary_table_name = AWS_CUR_TABLE_MAP['line_item_daily_summary']
+
+        ce_table = getattr(self.accessor.report_schema, ce_table_name)
+        summary_table = getattr(self.accessor.report_schema, summary_table_name)
+
+        bill_ids = None
+
+        table_name = AWS_CUR_TABLE_MAP['line_item']
+        tag_query = self.accessor._get_db_obj_query(table_name)
+        possible_keys = []
+        possible_values = []
+        for item in tag_query:
+            possible_keys += list(item.tags.keys())
+            possible_values += list(item.tags.values())
+
+        start_date, end_date = self.accessor._session.query(
+            func.min(ce_table.interval_start),
+            func.max(ce_table.interval_start)
+        ).first()
+
+        start_date = start_date.replace(hour=0, minute=0, second=0,
+                                        microsecond=0)
+        end_date = end_date.replace(hour=0, minute=0, second=0,
+                                        microsecond=0)
+
+        query = self.accessor._get_db_obj_query(summary_table_name)
+        initial_count = query.count()
+        self.accessor.populate_line_item_daily_table(start_date, end_date, bill_ids)
+        self.accessor.populate_line_item_daily_summary_table(start_date,
+                                                              end_date,
+                                                              bill_ids)
+
+        self.assertNotEqual(query.count(), initial_count)
+
+        result_start_date, result_end_date = self.accessor._session.query(
+            func.min(summary_table.usage_start),
+            func.max(summary_table.usage_start)
+        ).first()
+
+        self.assertEqual(result_start_date, start_date)
+        self.assertEqual(result_end_date, end_date)
+
+        entry = query.first()
+
+        summary_columns = [
+            'usage_start', 'usage_end', 'usage_account_id',
+            'product_code', 'product_family', 'availability_zone', 'region',
+            'instance_type', 'unit', 'resource_count', 'usage_amount',
+            'normalization_factor', 'normalized_usage_amount', 'currency_code',
+            'unblended_rate', 'unblended_cost', 'blended_rate', 'blended_cost',
+            'public_on_demand_cost', 'public_on_demand_rate', 'tags'
+        ]
+
+        for column in summary_columns:
+            self.assertIsNotNone(getattr(entry, column))
+
+        found_keys = []
+        found_values = []
+        for item in query.all():
+            found_keys += list(item.tags.keys())
+            found_values += list(item.tags.values())
+
+        self.assertEqual(set(sorted(possible_keys)), set(sorted(found_keys)))
+        self.assertEqual(set(sorted(possible_values)), set(sorted(found_values)))
+
     def test_populate_awstags_summary_table(self):
         """Test that the AWS tags summary table is populated."""
         bill_ids = []

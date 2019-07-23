@@ -1,19 +1,25 @@
+CREATE TEMPORARY TABLE aws_daily_tags_temp AS (
+    SELECT aws.usage_start,
+        aws.cost_entry_bill_id,
+        aws.resource_id,
+        LOWER(key) as key,
+        value
+    FROM reporting_awscostentrylineitem_daily as aws,
+        jsonb_each_text(aws.tags) labels
+)
+;
+
 CREATE TEMPORARY TABLE ocp_infrastructure_temp AS (
     SELECT aws.cost_entry_bill_id,
         ocp.cluster_id
-    FROM (
-        SELECT aws.*,
-            LOWER(key) as key,
-            value
-        FROM reporting_awscostentrylineitem_daily as aws,
-            jsonb_each_text(aws.tags) labels
-    ) aws
+    FROM aws_daily_tags_temp as aws
     JOIN reporting_ocpusagelineitem_daily as ocp
-        ON aws.resource_id = ocp.resource_id
-            OR (aws.key = 'openshift_project' AND aws.value = ocp.namespace)
-            OR (aws.key = 'openshift_node' AND aws.value = ocp.node)
-            OR (aws.key = 'openshift_cluster' AND aws.value = ocp.cluster_id)
-            OR (aws.key = 'openshift_cluster' AND aws.value = ocp.cluster_alias)
+        ON aws.usage_start::date = ocp.usage_start::date
+            AND (aws.resource_id = ocp.resource_id
+                OR (aws.key = 'openshift_project' AND aws.value = ocp.namespace)
+                OR (aws.key = 'openshift_node' AND aws.value = ocp.node)
+                OR (aws.key = 'openshift_cluster' AND aws.value = ocp.cluster_id)
+                OR (aws.key = 'openshift_cluster' AND aws.value = ocp.cluster_alias))
     WHERE date(aws.usage_start) >= '{start_date}'
         AND date(aws.usage_start) <= '{end_date}'
     GROUP BY aws.cost_entry_bill_id, ocp.cluster_id

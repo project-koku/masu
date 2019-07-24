@@ -220,7 +220,7 @@ class OCPCloudReportSummaryUpdaterTest(MasuTestCase):
             )
 
             updater.update_summary_tables(start_date_str, end_date_str)
-            mock_ocp.assert_not_called()
+            mock_ocp.assert_called()
             mock_ocp_on_aws.assert_not_called()
 
     def test_update_summary_tables(self):

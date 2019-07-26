@@ -19,7 +19,7 @@ import logging
 
 from celery import Celery
 from celery.schedules import crontab
-from celery.signals import after_setup_logger
+from celery.signals import after_setup_logger, after_setup_task_logger
 
 from masu.config import Config
 from masu.util import setup_cloudwatch_logging
@@ -32,6 +32,7 @@ celery = Celery(__name__, broker=Config.CELERY_BROKER_URL)
 # following method signature, but args and kwargs are not currently utilized.
 # Learn more about celery signals here:
 # http://docs.celeryproject.org/en/v4.2.0/userguide/signals.html#logging-signals
+@after_setup_task_logger.connect
 @after_setup_logger.connect
 def setup_loggers(logger, *args, **kwargs):  # pylint: disable=unused-argument
     """Add logging for celery with optional cloud watch."""

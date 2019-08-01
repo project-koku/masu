@@ -16,6 +16,8 @@
 #
 """Report manifest database accessor for cost usage reports."""
 
+from sqlalchemy.sql import func
+
 from masu.database.koku_database_access import KokuDBAccess
 from masu.external.date_accessor import DateAccessor
 
@@ -71,3 +73,30 @@ class ReportManifestDBAccessor(KokuDBAccess):
             kwargs['num_processed_files'] = 0
 
         return super().add(use_savepoint, **kwargs)
+
+    def get_last_report_completed_datetime(self, manifest_id):
+        """Get the most recent report processing completion time for a manifest."""
+        table = self.get_base().classes.reporting_common_costusagereportstatus
+        result = self._session.query(func.max(table.last_completed_datetime))\
+            .filter(table.manifest_id == manifest_id)\
+            .first()
+
+        return result[0]
+
+    def reset_manifest(self, manifest_id):
+        """Return the manifest to a state as if it had not been processed.
+
+        This sets the number of processed files to zero and
+        nullifies the started and completed times on the reports.
+        """
+        manifest = self.get_manifest_by_id(manifest_id)
+        manifest.num_processed_files = 0
+
+        table = self.get_base().classes.reporting_common_costusagereportstatus
+        files = self._session.query(table).filter(table.manifest_id == manifest_id)\
+            .all()
+        for file in files:
+            file.last_completed_datetime = None
+            file.last_started_datetime = None
+
+        self.commit()

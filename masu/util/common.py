@@ -16,8 +16,8 @@
 #
 
 """Common util functions."""
-import re
 import logging
+import re
 from os import listdir, remove
 
 from masu.database.report_stats_db_accessor import ReportStatsDBAccessor

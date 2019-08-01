@@ -27,9 +27,10 @@ import io
 import json
 import logging
 from datetime import datetime
-from dateutil import parser
 from enum import Enum
 from os import path
+
+from dateutil import parser
 
 from masu.config import Config
 from masu.database import OCP_REPORT_TABLE_MAP

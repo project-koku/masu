@@ -18,7 +18,6 @@
 """Test the ReportManifestDBAccessor."""
 
 from masu.database.report_manifest_db_accessor import ReportManifestDBAccessor
-from masu.database.report_stats_db_accessor import ReportStatsDBAccessor
 from masu.external.date_accessor import DateAccessor
 from tests import MasuTestCase
 
@@ -47,6 +46,7 @@ class ReportManifestDBAccessorTest(MasuTestCase):
         cls.manifest_accessor.close_session()
 
     def tearDown(self):
+        """Tear down the test case."""
         manifests = self.manifest_accessor._get_db_obj_query().all()
         for manifest in manifests:
             self.manifest_accessor.delete(manifest)

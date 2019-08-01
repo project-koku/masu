@@ -168,7 +168,7 @@ class AWSReportProcessor(ReportProcessorBase):
             invoice_id = row.get('bill/InvoiceId')
             return invoice_id is not None and invoice_id != ''
 
-    #pylint: disable=no-self-use
+    # pylint: disable=no-self-use
     def remove_temp_cur_files(self, report_path):
         """Remove temporary report files."""
         LOG.info('Cleaning up temporary report files for %s', report_path)

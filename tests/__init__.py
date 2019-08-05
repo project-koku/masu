@@ -38,6 +38,8 @@ class MasuTestCase(TestCase):
                 #'CELERY_RESULT_BACKEND': 'db+sqlite:///test.db'
             }
         )
+        self.aws_provider_id = 1
+        self.ocp_provider_id = 2
         self.client = self.app.test_client()
         self.test_schema = 'acct10001'
         self.aws_db_auth_id = '1'

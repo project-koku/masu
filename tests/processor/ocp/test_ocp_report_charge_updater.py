@@ -108,90 +108,114 @@ class OCPReportChargeUpdaterTest(MasuTestCase):
     def test_normalize_tier(self):
         """Test the tier helper function to normalize rate tier."""
         rate_json = [{
-            "usage_start": '20',
-            "usage_end": '30',
+            "usage": {
+                "usage_start": '20',
+                "usage_end": '30'
+            },
             "value": '0.30',
             "unit": "USD"
         },
         {
-            "usage_start": None,
-            "usage_end": "10",
+            "usage": {
+                "usage_start": None,
+                "usage_end": "10"
+            },
             "value": "0.10",
             "unit": "USD"
         },
         {
-            "usage_start": "10",
-            "usage_end": "20",
+            "usage": {
+                "usage_start": "10",
+                "usage_end": "20"
+            },
             "value": "0.20",
             "unit": "USD"
         },
         {
-            "usage_start": '30',
-            "usage_end": None,
+            "usage": {
+                "usage_start": '30',
+                "usage_end": None
+            },
             "value": '0.40',
             "unit": "USD"
         }]
         normalized_tier = self.updater._normalize_tier(rate_json)
         self.assertEqual(len(normalized_tier), len(rate_json))
-        self.assertIsNone(normalized_tier[0].get('usage_start'))
-        self.assertGreater(normalized_tier[1].get('usage_end'), normalized_tier[0].get('usage_end'))
-        self.assertGreater(normalized_tier[2].get('usage_end'), normalized_tier[1].get('usage_end'))
-        self.assertIsNone(normalized_tier[3].get('usage_end'))
+        self.assertIsNone(normalized_tier[0].get('usage').get('usage_start'))
+        self.assertGreater(normalized_tier[1].get('usage').get('usage_end'), normalized_tier[0].get('usage').get('usage_end'))
+        self.assertGreater(normalized_tier[2].get('usage').get('usage_end'), normalized_tier[1].get('usage').get('usage_end'))
+        self.assertIsNone(normalized_tier[3].get('usage').get('usage_end'))
 
     def test_normalize_tier_no_start_end_provided(self):
         """Test the tier helper function to normalize rate tier when end points are not provided."""
         rate_json = [{
-            "usage_start": '20',
-            "usage_end": '30',
+            "usage": {
+                "usage_start": '20',
+                "usage_end": '30'
+            },
             "value": '0.30',
             "unit": "USD"
         },
         {
-            "usage_end": "10",
-            "value": "0.10",
+            "usage": {
+                "usage_end": "10",
+                "value": "0.10"
+            },
             "unit": "USD"
         },
         {
-            "usage_start": "10",
-            "usage_end": "20",
+            "usage": {
+                "usage_start": "10",
+                "usage_end": "20"
+            },
             "value": "0.20",
             "unit": "USD"
         },
         {
-            "usage_start": '30',
+            "usage": {
+                "usage_start": '30'
+            },
             "value": '0.40',
             "unit": "USD"
         }]
         normalized_tier = self.updater._normalize_tier(rate_json)
         self.assertEqual(len(normalized_tier), len(rate_json))
-        self.assertIsNone(normalized_tier[0].get('usage_start'))
-        self.assertGreater(normalized_tier[1].get('usage_end'), normalized_tier[0].get('usage_end'))
-        self.assertGreater(normalized_tier[2].get('usage_end'), normalized_tier[1].get('usage_end'))
-        self.assertIsNone(normalized_tier[3].get('usage_end'))
+        self.assertIsNone(normalized_tier[0].get('usage').get('usage_start'))
+        self.assertGreater(normalized_tier[1].get('usage').get('usage_end'), normalized_tier[0].get('usage').get('usage_end'))
+        self.assertGreater(normalized_tier[2].get('usage').get('usage_end'), normalized_tier[1].get('usage').get('usage_end'))
+        self.assertIsNone(normalized_tier[3].get('usage').get('usage_end'))
 
     def test_normalize_tier_missing_first(self):
         """Test the tier helper function when first tier is missing."""
         rate_json = [{
-            "usage_start": None,
-            "usage_end": "10",
+            "usage": {
+                "usage_start": None,
+                "usage_end": "10"
+            },
             "value": "0.10",
             "unit": "USD"
         },
         {
-            "usage_start": '20',
-            "usage_end": '30',
+            "usage": {
+                "usage_start": '20',
+                "usage_end": '30'
+            },
             "value": '0.30',
             "unit": "USD"
         },
         {
-            "usage_start": "10",
-            "usage_end": "20",
+            "usage": {
+                "usage_start": "10",
+                "usage_end": "20"
+            },
             "value": "0.20",
             "unit": "USD"
         },
         {
-            "usage_start": '30',
-            "usage_end": '40',
+            "usage": {
+                "usage_start": '30',
+                "usage_end": '40'
+            },
             "value": '0.40',
             "unit": "USD"
         }]
@@ -202,25 +226,33 @@ class OCPReportChargeUpdaterTest(MasuTestCase):
     def test_normalize_tier_two_starts(self):
         """Test the tier helper function when two starting tiers are provided."""
         rate_json = [{
-            "usage_start": None,
-            "usage_end": "10",
+            "usage": {
+                "usage_start": None,
+                "usage_end": "10"
+            },
             "value": "0.10",
             "unit": "USD"
         },
         {
-            "usage_start": None,
-            "usage_end": '30',
+            "usage": {
+                "usage_start": None,
+                "usage_end": '30'
+            },
             "value": '0.30',
             "unit": "USD"
         },
         {
-            "usage_start": "10",
-            "usage_end": "20",
+            "usage": {
+                "usage_start": "10",
+                "usage_end": "20"
+            },
             "value": "0.20",
             "unit": "USD"
         },
         {
-            "usage_start": '30',
+            "usage": {
+                "usage_start": '30'
+            },
             "value": '0.40',
             "unit": "USD"
         }]
@@ -231,25 +263,33 @@ class OCPReportChargeUpdaterTest(MasuTestCase):
     def test_normalize_tier_two_final(self):
         """Test the tier helper function when two final tiers are provided."""
         rate_json = [{
-            "usage_start": None,
-            "usage_end": "10",
+            "usage": {
+                "usage_start": None,
+                "usage_end": "10"
+            },
             "value": "0.10",
             "unit": "USD"
         },
         {
-            "usage_start": '20',
-            "usage_end": '30',
+            "usage": {
+                "usage_start": '20',
+                "usage_end": '30'
+            },
             "value": '0.30',
             "unit": "USD"
         },
         {
-            "usage_start": "10",
-            "usage_end": None,
+            "usage": {
+                "usage_start": "10",
+                "usage_end": None
+            },
             "value": "0.20",
             "unit": "USD"
         },
         {
-            "usage_start": '30',
+            "usage": {
+                "usage_start": '30'
+            },
             "value": '0.40',
             "unit": "USD"
         }]
@@ -260,20 +300,26 @@ class OCPReportChargeUpdaterTest(MasuTestCase):
     def test_normalize_tier_missing_last(self):
         """Test the tier helper function when last tier is missing."""
         rate_json = [{
-            "usage_start": '20',
-            "usage_end": '30',
+            "usage": {
+                "usage_start": '20',
+                "usage_end": '30'
+            },
             "value": '0.30',
             "unit": "USD"
         },
         {
-            "usage_start": "10",
-            "usage_end": "20",
+            "usage": {
+                "usage_start": "10",
+                "usage_end": "20"
+            },
             "value": "0.20",
             "unit": "USD"
         },
         {
-            "usage_start": '30',
-            "usage_end": None,
+            "usage": {
+                "usage_start": '30',
+                "usage_end": None
+            },
             "value": '0.40',
             "unit": "USD"
         }]
@@ -342,26 +388,34 @@ class OCPReportChargeUpdaterTest(MasuTestCase):
     def test_calculate_variable_charge(self):
         """Test the helper function to calculate charge."""
         rate_json = {"tiered_rates": [{
-            "usage_start": None,
-            "usage_end": "10",
+            "usage": {
+                "usage_start": None,
+                "usage_end": "10"
+            },
             "value": "0.10",
             "unit": "USD"
         },
         {
-            "usage_start": "10",
-            "usage_end": "20",
+            "usage": {
+                "usage_start": "10",
+                "usage_end": "20"
+            },
             "value": "0.20",
             "unit": "USD"
         },
         {
-            "usage_start": '20',
-            "usage_end": '30',
+            "usage": {
+                "usage_start": '20',
+                "usage_end": '30'
+            },
             "value": '0.30',
             "unit": "USD"
         },
         {
-            "usage_start": '30',
-            "usage_end": None,
+            "usage": {
+                "usage_start": '30',
+                "usage_end": None
+            },
             "value": '0.40',
             "unit": "USD"
         }]
@@ -385,26 +439,34 @@ class OCPReportChargeUpdaterTest(MasuTestCase):
     def test_calculate_variable_charge_floating_ends(self):
         """Test the helper function to calculate charge with floating endpoints."""
         rate_json = {"tiered_rates": [{
-            "usage_start": None,
-            "usage_end": "10.3",
+            "usage": {
+                "usage_start": None,
+                "usage_end": "10.3"
+            },
             "value": "0.10",
             "unit": "USD"
         },
         {
-            "usage_start": "10.3",
-            "usage_end": "19.8",
+            "usage": {
+                "usage_start": "10.3",
+                "usage_end": "19.8"
+            },
             "value": "0.20",
             "unit": "USD"
         },
         {
-            "usage_start": '19.8',
-            "usage_end": '22.6',
+            "usage": {
+                "usage_start": '19.8',
+                "usage_end": '22.6'
+            },
             "value": '0.30',
             "unit": "USD"
         },
         {
-            "usage_start": '22.6',
-            "usage_end": None,
+            "usage": {
+                "usage_start": '22.6',
+                "usage_end": None
+            },
             "value": '0.40',
             "unit": "USD"
         }]
@@ -429,24 +491,32 @@ class OCPReportChargeUpdaterTest(MasuTestCase):
     def test_calculate_variable_charge_ends_missing(self):
         """Test the helper function to calculate charge when end limits are missing."""
         rate_json = {"tiered_rates": [{
-            "usage_end": "10",
+            "usage": {
+                "usage_end": "10"
+            },
             "value": "0.10",
             "unit": "USD"
         },
         {
-            "usage_start": "10",
-            "usage_end": "20",
+            "usage": {
+                "usage_start": "10",
+                "usage_end": "20"
+            },
             "value": "0.20",
             "unit": "USD"
         },
         {
-            "usage_start": '20',
-            "usage_end": '30',
+            "usage": {
+                "usage_start": '20',
+                "usage_end": '30'
+            },
             "value": '0.30',
             "unit": "USD"
         },
         {
-            "usage_start": '30',
+            "usage": {
+                "usage_start": '30'
+            },
             "value": '0.40',
             "unit": "USD"
         }]
@@ -470,26 +540,34 @@ class OCPReportChargeUpdaterTest(MasuTestCase):
     def test_calculate_charge(self):
         """Test the helper function to calculate charge."""
         rate_json = {"tiered_rates": [{
-            "usage_start": None,
-            "usage_end": "10",
+            "usage": {
+                "usage_start": None,
+                "usage_end": "10"
+            },
             "value": "0.10",
             "unit": "USD"
         },
         {
-            "usage_start": "10",
-            "usage_end": "20",
+            "usage": {
+                "usage_start": "10",
+                "usage_end": "20"
+            },
             "value": "0.20",
             "unit": "USD"
         },
         {
-            "usage_start": '20',
-            "usage_end": '30',
+            "usage": {
+                "usage_start": '20',
+                "usage_end": '30'
+            },
             "value": '0.30',
             "unit": "USD"
         },
         {
-            "usage_start": '30',
-            "usage_end": None,
+            "usage": {
+                "usage_start": '30',
+                "usage_end": None
+            },
             "value": '0.40',
             "unit": "USD"
         }]
@@ -656,26 +734,34 @@ class OCPReportChargeUpdaterTest(MasuTestCase):
     def test_update_summary_charge_info_mem_cpu_malformed_mem(self, mock_db_mem_usage_rate, mock_db_cpu_usage_rate):
         """Test that OCP charge information is updated for cpu and memory with malformed memory rates."""
         mem_rate = {"tiered_rates": [{
-            "usage_start": None,
-            "usage_end": "10",
+            "usage": {
+                "usage_start": None,
+                "usage_end": "10"
+            },
             "value": "0.10",
             "unit": "USD"
         },
         {
-            "usage_start": "10",
-            "usage_end": "20",
+            "usage": {
+                "usage_start": "10",
+                "usage_end": "20"
+            },
             "value": "0.20",
             "unit": "USD"
         },
         {
-            "usage_start": '20',
-            "usage_end": '30',
+            "usage": {
+                "usage_start": '20',
+                "usage_end": '30'
+            },
             "value": '0.30',
             "unit": "USD"
         },
         {
-            "usage_start": '30',
-            "usage_end": '40',
+            "usage": {
+                "usage_start": '30',
+                "usage_end": '40'
+            },
             "value": '0.40',
             "unit": "USD"
         }]
@@ -710,26 +796,34 @@ class OCPReportChargeUpdaterTest(MasuTestCase):
         """Test that OCP charge information is updated for cpu and memory with malformed cpu rates."""
         mem_rate = {'tiered_rates': [{'value': '100', 'unit': 'USD'}]}
         cpu_rate = {"tiered_rates": [{
-            "usage_start": "5",
-            "usage_end": "10",
+            "usage": {
+                "usage_start": "5",
+                "usage_end": "10"
+            },
             "value": "0.10",
             "unit": "USD"
         },
         {
-            "usage_start": "10",
-            "usage_end": "20",
+            "usage": {
+                "usage_start": "10",
+                "usage_end": "20"
+            },
             "value": "0.20",
             "unit": "USD"
         },
         {
-            "usage_start": '20',
-            "usage_end": '30',
+            "usage": {
+                "usage_start": '20',
+                "usage_end": '30'
+            },
             "value": '0.30',
             "unit": "USD"
         },
         {
-            "usage_start": '30',
-            "usage_end": None,
+            "usage": {
+                "usage_start": '30',
+                "usage_end": None
+            },
             "value": '0.40',
             "unit": "USD"
         }]

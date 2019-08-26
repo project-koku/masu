@@ -21,7 +21,7 @@ prometheus-client = "==0.7.1"
 prometheus-flask-exporter = "==0.9.1"
 celery-prometheus-exporter = "==1.7.0"
 soupsieve = "==1.9.3"
-watchtower = "==0.6.0"
+watchtower = "==0.7.2"
 
 
 [dev-packages]

@@ -36,7 +36,7 @@ faker = "==2.0.1"
 pyfakefs = "==3.6"
 flower = "==0.9.3"
 responses = "==0.10.6"
-flake8 = "==3.7.7"
+flake8 = "==3.7.8"
 
 
 [requires]

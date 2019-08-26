@@ -9,7 +9,7 @@ name = "pypi"
 
 aiokafka = "==0.5.2"
 boto3 = "==1.9.215"
-flask = "==1.0.3"
+flask = "==1.1.1"
 psycopg2-binary = ">=2.7.0"
 gunicorn = "==19.9.0"
 celery = "==4.3.0"

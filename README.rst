@@ -2,6 +2,8 @@
 Masu
 ====
 
+This is a READ ONLY repo. See https://github.com/project-koku/koku for current masu implementation
+
 |license| |Build Status| |codecov| |Updates| |Python 3|
 
 ~~~~~
